@@ -38,7 +38,7 @@ Gestion Candidature
 •	Mise à jour du statut de la candidature : reçue, présélectionnée, test, entretien, retenue ou non retenue
 •	Accès aux actions liées à la candidature : planification d’un test, planification d’un entretien et communication avec le candidat
 
-Spontanée :
+        Spontanée :
 •	Accès au formulaire de candidature spontanée sur le site
 •	Enregistrement automatique des candidatures reçues et accusé de réception
 •	Classement des candidatures par domaine d’activité
