@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RecruitFlow - Offres</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body data-page="offers">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">RF</div>
+          <div>
+            <p class="brand-kicker">Prototype RH</p>
+            <h1>RecruitFlow</h1>
+          </div>
+        </div>
+        <nav class="nav">
+          <a class="nav-item" data-page="dashboard" href="index.html">Dashboard</a>
+          <a class="nav-item active" data-page="offers" href="offers.html">Gestion d'offre d'emploi</a>
+          <a class="nav-item" data-page="applications" href="applications.html">Dépôt candidature</a>
+          <a class="nav-item" data-page="candidate-management" href="gestion-candidature.html">Gestion candidature</a>
+          <a class="nav-item" data-page="planning" href="planning.html">Planification test & entretien</a>
+          <a class="nav-item" data-page="communication" href="communication.html">Gestion communication</a>
+          <a class="nav-item" data-page="settings" href="settings.html">Settings</a>
+        </nav>
+        <div class="sidebar-card">
+          <p class="sidebar-card-label">Statut prototype</p>
+          <strong>Offres et liens publics</strong>
+          <span>Créer, publier, fermer et simuler le lien candidat à partir d'une offre.</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Gestion d'offre d'emploi</p>
+            <h2>Offres en cours</h2>
+          </div>
+          <div class="topbar-actions">
+            <a class="ghost-btn nav-item" href="postuler.html">Voir le formulaire candidat</a>
+            <button class="primary-btn" id="offer-create">Créer une offre</button>
+          </div>
+        </header>
+
+        <section class="hero panel">
+          <div class="hero-copy">
+            <p class="section-tag">Flux d'offre</p>
+            <h3>Publier, clôturer et suivre les candidatures par offre</h3>
+            <p>Cette page sert à valider la logique visuelle d'administration des offres avant de brancher le CRUD réel et la génération des liens candidats.</p>
+          </div>
+          <div class="hero-metrics">
+            <article class="metric-card accent">
+              <span>Offres publiées</span>
+              <strong>7</strong>
+              <small>visibles pour les candidats</small>
+            </article>
+            <article class="metric-card">
+              <span>Brouillons</span>
+              <strong>2</strong>
+              <small>prêts à être publiés</small>
+            </article>
+            <article class="metric-card">
+              <span>Clôturées</span>
+              <strong>4</strong>
+              <small>historique des campagnes</small>
+            </article>
+            <article class="metric-card">
+              <span>Accès candidat</span>
+              <strong>URL</strong>
+              <small>lien public à copier</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel-grid">
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Inventaire</p>
+                <h3>Liste des offres</h3>
+              </div>
+              <button class="ghost-btn" id="offer-add-sample">Ajouter une offre test</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Titre</th>
+                    <th>Statut</th>
+                    <th>Candidatures</th>
+                    <th>Lien public</th>
+                  </tr>
+                </thead>
+                <tbody id="offers-table">
+                  <tr>
+                    <td>Développeur Frontend</td>
+                    <td><span class="status open">Publiée</span></td>
+                    <td>18</td>
+                    <td><button class="link-btn" data-copy-link="developpeur-frontend">Copier le lien</button></td>
+                  </tr>
+                  <tr>
+                    <td>Assistant RH</td>
+                    <td><span class="status draft">Brouillon</span></td>
+                    <td>3</td>
+                    <td><button class="link-btn" data-copy-link="assistant-rh">Copier le lien</button></td>
+                  </tr>
+                  <tr>
+                    <td>Chef de projet IT</td>
+                    <td><span class="status closed">Clôturée</span></td>
+                    <td>27</td>
+                    <td><button class="link-btn" data-copy-link="chef-de-projet-it">Copier le lien</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="form-inline">
+              <input id="offer-name" type="text" placeholder="Nom de l'offre" />
+              <select id="offer-status">
+                <option value="Publiée">Publiée</option>
+                <option value="Brouillon">Brouillon</option>
+                <option value="Clôturée">Clôturée</option>
+              </select>
+              <button class="primary-btn" id="offer-save">Enregistrer</button>
+            </div>
+          </article>
+
+          <aside class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Publication</p>
+                <h3>Cycle de vie de l'offre</h3>
+              </div>
+            </div>
+            <div class="status-flow" style="margin-bottom: 18px;">
+              <span>Brouillon</span>
+              <span>Validation</span>
+              <span>Publié</span>
+              <span>Réception</span>
+              <span>Clôture</span>
+            </div>
+            <div class="note-box">
+              <p>Le lien public pointe vers la page candidat de démonstration. Quand l'API sera prête, on remplacera ce lien par une URL dynamique générée côté backend.</p>
+            </div>
+            <div class="form-stack" style="margin-top: 18px;">
+              <input type="text" value="https://recruitflow.local/postuler.html" readonly />
+              <button class="ghost-btn" id="offer-copy-url">Copier l'URL publique</button>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" aria-live="polite"></div>
+
+    <template id="offer-row-template">
+      <tr>
+        <td class="offer-title"></td>
+        <td><span class="status open offer-status"></span></td>
+        <td class="offer-count"></td>
+        <td><button class="link-btn copy-link-btn">Copier le lien</button></td>
+      </tr>
+    </template>
+  </body>
+</html>

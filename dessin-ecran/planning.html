@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RecruitFlow - Planning</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body data-page="planning">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">RF</div>
+          <div>
+            <p class="brand-kicker">Prototype RH</p>
+            <h1>RecruitFlow</h1>
+          </div>
+        </div>
+        <nav class="nav">
+          <a class="nav-item" data-page="dashboard" href="index.html">Dashboard</a>
+          <a class="nav-item" data-page="offers" href="offers.html">Gestion d'offre d'emploi</a>
+          <a class="nav-item" data-page="applications" href="applications.html">Dépôt candidature</a>
+          <a class="nav-item" data-page="candidate-management" href="gestion-candidature.html">Gestion candidature</a>
+          <a class="nav-item active" data-page="planning" href="planning.html">Planification test & entretien</a>
+          <a class="nav-item" data-page="communication" href="communication.html">Gestion communication</a>
+          <a class="nav-item" data-page="settings" href="settings.html">Settings</a>
+        </nav>
+        <div class="sidebar-card">
+          <p class="sidebar-card-label">Statut prototype</p>
+          <strong>Agenda recrutement</strong>
+          <span>Planifier, reprogrammer et visualiser tests et entretiens.</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Planification</p>
+            <h2>Tests et entretiens</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-btn">Reprogrammer</button>
+            <button class="primary-btn">Nouvel événement</button>
+          </div>
+        </header>
+
+        <section class="hero panel">
+          <div class="hero-copy">
+            <p class="section-tag">Calendrier</p>
+            <h3>Organiser chaque rendez-vous et suivre son statut</h3>
+            <p>Le prototype montre le parcours de planification depuis une fiche candidat jusqu'au calendrier global des tests et entretiens.</p>
+          </div>
+          <div class="hero-metrics">
+            <article class="metric-card accent">
+              <span>À venir</span>
+              <strong>18</strong>
+              <small>entretiens planifiés</small>
+            </article>
+            <article class="metric-card">
+              <span>Réalisés</span>
+              <strong>26</strong>
+              <small>événements clôturés</small>
+            </article>
+            <article class="metric-card">
+              <span>Annulés</span>
+              <strong>4</strong>
+              <small>reprogrammation possible</small>
+            </article>
+            <article class="metric-card">
+              <span>Lieux</span>
+              <strong>Mixte</strong>
+              <small>présentiel et visio</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="split-layout">
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Créneau</p>
+                <h3>Planifier un test ou un entretien</h3>
+              </div>
+            </div>
+            <div class="form-stack">
+              <input type="text" placeholder="Nom du candidat" />
+              <input type="date" />
+              <input type="time" />
+              <select>
+                <option>Type de rendez-vous</option>
+                <option>Test</option>
+                <option>Entretien RH</option>
+                <option>Entretien manager</option>
+              </select>
+              <select>
+                <option>Lieu ou mode</option>
+                <option>Présentiel</option>
+                <option>Visio</option>
+                <option>Téléphone</option>
+              </select>
+              <textarea rows="5" placeholder="Consignes, lien visio, salle de rendez-vous..."></textarea>
+              <button class="primary-btn">Enregistrer le rendez-vous</button>
+            </div>
+          </article>
+
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Agenda</p>
+                <h3>Vue calendrier</h3>
+              </div>
+            </div>
+            <div class="calendar-placeholder">
+              <div class="calendar-day"><strong>08:30</strong><span>Test technique - Sophie Martin</span></div>
+              <div class="calendar-day"><strong>10:00</strong><span>Entretien RH - Karim Diallo</span></div>
+              <div class="calendar-day"><strong>14:00</strong><span>Entretien manager - Nadia Benali</span></div>
+              <div class="calendar-day"><strong>16:30</strong><span>Annulation / reprogrammation</span></div>
+            </div>
+            <div class="note-box" style="margin-top: 18px;">
+              <p>Le calendrier est encore une maquette, mais l'interface permet déjà de voir le volume et la densité des rendez-vous.</p>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" aria-live="polite"></div>
+  </body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RecruitFlow - Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body data-page="settings">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">RF</div>
+          <div>
+            <p class="brand-kicker">Prototype RH</p>
+            <h1>RecruitFlow</h1>
+          </div>
+        </div>
+        <nav class="nav">
+          <a class="nav-item" data-page="dashboard" href="index.html">Dashboard</a>
+          <a class="nav-item" data-page="offers" href="offers.html">Gestion d'offre d'emploi</a>
+          <a class="nav-item" data-page="applications" href="applications.html">Dépôt candidature</a>
+          <a class="nav-item" data-page="candidate-management" href="gestion-candidature.html">Gestion candidature</a>
+          <a class="nav-item" data-page="planning" href="planning.html">Planification test & entretien</a>
+          <a class="nav-item" data-page="communication" href="communication.html">Gestion communication</a>
+          <a class="nav-item active" data-page="settings" href="settings.html">Settings</a>
+        </nav>
+        <div class="sidebar-card">
+          <p class="sidebar-card-label">Statut prototype</p>
+          <strong>Paramètres messages</strong>
+          <span>Définir les textes par défaut et le mode d'envoi automatique ou manuel.</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Settings</p>
+            <h2>Configuration des messages</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-btn">Réinitialiser</button>
+            <button class="primary-btn" id="settings-save">Enregistrer</button>
+          </div>
+        </header>
+
+        <section class="hero panel">
+          <div class="hero-copy">
+            <p class="section-tag">Paramétrage</p>
+            <h3>Centraliser les messages par type de recrutement</h3>
+            <p>Cette page prépare le futur réglage des accusés de réception, des convocations et des notifications de fin de recrutement, avec mode automatique ou manuel.</p>
+          </div>
+          <div class="hero-metrics">
+            <article class="metric-card accent">
+              <span>Accusé de réception</span>
+              <strong>Actif</strong>
+              <small>message automatique configuré</small>
+            </article>
+            <article class="metric-card">
+              <span>Convocation test</span>
+              <strong>Actif</strong>
+              <small>message enregistré</small>
+            </article>
+            <article class="metric-card">
+              <span>Entretien</span>
+              <strong>Manuel</strong>
+              <small>personnalisation avant envoi</small>
+            </article>
+            <article class="metric-card">
+              <span>Journal</span>
+              <strong>On</strong>
+              <small>historique conservé</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel card">
+          <div class="panel-head">
+            <div>
+              <p class="section-tag">Templates</p>
+              <h3>Contenus par type</h3>
+            </div>
+          </div>
+          <div class="settings-grid">
+            <label><span>Accusé de réception</span><input type="text" value="Bonjour, nous avons bien reçu votre candidature." /></label>
+            <label><span>Convocation test</span><input type="text" value="Vous êtes convoqué(e) à un test le ..." /></label>
+            <label><span>Message après test</span><input type="text" value="Merci pour votre participation..." /></label>
+            <label><span>Convocation entretien</span><input type="text" value="Nous vous invitons à un entretien le ..." /></label>
+            <label><span>Mode d'envoi</span><select><option>Automatique</option><option>Manuel</option></select></label>
+            <label><span>Canal</span><select><option>Email</option><option>SMS</option><option>Email + SMS</option></select></label>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" aria-live="polite"></div>
+  </body>
+</html>

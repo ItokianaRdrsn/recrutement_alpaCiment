@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RecruitFlow - Dépôt candidature</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body data-page="applications">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">RF</div>
+          <div>
+            <p class="brand-kicker">Prototype RH</p>
+            <h1>RecruitFlow</h1>
+          </div>
+        </div>
+        <nav class="nav">
+          <a class="nav-item" data-page="dashboard" href="index.html">Dashboard</a>
+          <a class="nav-item" data-page="offers" href="offers.html">Gestion d'offre d'emploi</a>
+          <a class="nav-item active" data-page="applications" href="applications.html">Dépôt candidature</a>
+          <a class="nav-item" data-page="candidate-management" href="gestion-candidature.html">Gestion candidature</a>
+          <a class="nav-item" data-page="planning" href="planning.html">Planification test & entretien</a>
+          <a class="nav-item" data-page="communication" href="communication.html">Gestion communication</a>
+          <a class="nav-item" data-page="settings" href="settings.html">Settings</a>
+        </nav>
+        <div class="sidebar-card">
+          <p class="sidebar-card-label">Statut prototype</p>
+          <strong>Entrée des candidatures</strong>
+          <span>Formulaire sur offre, candidature spontanée et centralisation des sources.</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Dépôt candidature</p>
+            <h2>Formulaire candidat</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-btn" id="application-preview">Aperçu accusé de réception</button>
+            <button class="primary-btn" id="application-submit">Simuler l'envoi</button>
+          </div>
+        </header>
+
+        <section class="hero panel">
+          <div class="hero-copy">
+            <p class="section-tag">Accès public</p>
+            <h3>Un point d'entrée unique pour candidater sur une offre ou spontanément</h3>
+            <p>La maquette montre l'expérience attendue côté candidat et le chemin de traitement côté RH: dépôt, réception, centralisation et accusé automatique.</p>
+          </div>
+          <div class="hero-metrics">
+            <article class="metric-card accent">
+              <span>Demandes sur offre</span>
+              <strong>128</strong>
+              <small>reçues via lien public</small>
+            </article>
+            <article class="metric-card">
+              <span>Spontanées</span>
+              <strong>31</strong>
+              <small>intégrées au vivier</small>
+            </article>
+            <article class="metric-card">
+              <span>Documents</span>
+              <strong>CV + annexes</strong>
+              <small>upload et archivage</small>
+            </article>
+            <article class="metric-card">
+              <span>Accusé de réception</span>
+              <strong>Auto</strong>
+              <small>message de confirmation</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="split-layout">
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Candidature en ligne</p>
+                <h3>Données du candidat</h3>
+              </div>
+            </div>
+            <div class="form-stack">
+              <input id="application-name" type="text" placeholder="Nom et prénom" />
+              <input id="application-email" type="email" placeholder="Adresse email" />
+              <input type="tel" placeholder="Téléphone" />
+              <select id="application-source">
+                <option value="offer">Candidature sur offre</option>
+                <option value="spontaneous">Candidature spontanée</option>
+              </select>
+              <select>
+                <option>Offre liée</option>
+                <option>Développeur Frontend</option>
+                <option>Assistant RH</option>
+                <option>Chef de projet IT</option>
+              </select>
+              <textarea rows="6" placeholder="Présentez votre profil, votre domaine d'activité et vos disponibilités."></textarea>
+              <label class="upload-box">
+                <input type="file" multiple />
+                <span>Déposer le CV et les autres documents nécessaires</span>
+              </label>
+              <button class="primary-btn" id="application-send">Déposer la candidature</button>
+            </div>
+          </article>
+
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Centralisation</p>
+                <h3>Sources de réception</h3>
+              </div>
+            </div>
+            <div class="choice-grid">
+              <div class="choice-card active">
+                <strong>Via API</strong>
+                <p>Récupération automatique des données à partir du système source.</p>
+              </div>
+              <div class="choice-card">
+                <strong>Via email</strong>
+                <p>Import des candidatures reçues dans une boîte mail dédiée.</p>
+              </div>
+              <div class="choice-card">
+                <strong>Scan papier</strong>
+                <p>Intégration future avec OCR pour centraliser les dossiers papier.</p>
+              </div>
+            </div>
+            <div class="note-box" style="margin-top: 18px;">
+              <p>Le rendu est pensé pour valider l'UX des parcours candidats avant l'automatisation des traitements.</p>
+            </div>
+            <div class="status-flow" style="margin-top: 18px;">
+              <span>Reçu</span>
+              <span>Accusé envoyé</span>
+              <span>Tri RH</span>
+              <span>Archivage</span>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" aria-live="polite"></div>
+  </body>
+</html>
