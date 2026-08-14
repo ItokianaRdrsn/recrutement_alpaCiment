@@ -44,7 +44,7 @@
           </div>
           <div class="topbar-actions">
             <button class="ghost-btn" id="vivier-switch">Voir tous les viviers</button>
-            <button class="primary-btn">Ouvrir une fiche candidat</button>
+            <a class="primary-btn" href="fiche-candidat.html?candidat=sophie">Ouvrir une fiche candidat</a>
           </div>
         </header>
 
@@ -139,7 +139,7 @@
                     <td>13/08/2026</td>
                     <td><span class="status open">Présélectionnée</span></td>
                     <td><button class="link-btn">Consulter</button></td>
-                    <td><button class="ghost-btn table-action" data-candidate="sophie">Voir fiche</button></td>
+                    <td><a class="ghost-btn table-action" href="fiche-candidat.html?candidat=sophie">Voir fiche</a></td>
                   </tr>
                   <tr>
                     <td>Karim Diallo</td>
@@ -148,7 +148,7 @@
                     <td>14/08/2026</td>
                     <td><span class="status pending">Planifier test</span></td>
                     <td><button class="link-btn">Consulter</button></td>
-                    <td><button class="ghost-btn table-action" data-candidate="karim">Voir fiche</button></td>
+                    <td><a class="ghost-btn table-action" href="fiche-candidat.html?candidat=karim">Voir fiche</a></td>
                   </tr>
                   <tr>
                     <td>Nadia Benali</td>
@@ -157,7 +157,7 @@
                     <td>11/08/2026</td>
                     <td><span class="status closed">Non retenue</span></td>
                     <td><button class="link-btn">Consulter</button></td>
-                    <td><button class="ghost-btn table-action" data-candidate="nadia">Voir fiche</button></td>
+                    <td><a class="ghost-btn table-action" href="fiche-candidat.html?candidat=nadia">Voir fiche</a></td>
                   </tr>
                 </tbody>
               </table>
@@ -185,58 +185,25 @@
           <article class="panel card">
             <div class="panel-head">
               <div>
-                <p class="section-tag">Dossier</p>
-                <h3>Fiche candidat</h3>
+                <p class="section-tag">Accès rapide</p>
+                <h3>Consultation du dossier candidat</h3>
               </div>
             </div>
-            <div class="candidate-profile">
-              <div class="candidate-avatar">SM</div>
-              <div>
-                <strong>Sophie Martin</strong>
-                <p>s.martin@email.com</p>
-                <span class="status open">Statut actuel: Présélectionnée</span>
-              </div>
+            <div class="note-box">
+              <p>La fiche candidat est maintenant séparée sur une page dédiée pour éviter de concentrer toutes les informations sur un seul écran.</p>
             </div>
-
-            <div class="choice-grid" style="margin-top: 16px;">
-              <div class="choice-card active" style="grid-column: span 3;">
-                <strong>Documents du candidat</strong>
-                <p>CV.pdf, LettreMotivation.pdf, Portfolio.zip</p>
-                <div class="inline-actions" style="margin-top: 10px;">
-                  <button class="ghost-btn">Voir</button>
-                  <button class="ghost-btn">Telecharger</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="inline-actions" style="margin-top: 14px;">
-              <select id="candidate-status-select">
-                <option value="recu">Reçue</option>
-                <option value="preselection" selected>Présélectionnée</option>
-                <option value="test">Planifier test</option>
-                <option value="entretien">Planifier entretien</option>
-                <option value="retenue">Retenue</option>
-                <option value="non-retenue">Non retenue</option>
-                <option value="vivier">Vivier</option>
-              </select>
-              <button class="primary-btn" id="candidate-status-update">Changer statut</button>
-            </div>
-
             <div class="timeline" style="margin-top: 16px;">
-              <p class="section-tag">Historique des changements</p>
+              <p class="section-tag">Contenu de la fiche dédiée</p>
               <ul>
-                <li><strong>13/08</strong> - Reçue</li>
-                <li><strong>14/08</strong> - Présélectionnée</li>
-                <li><strong>17/08</strong> - Test</li>
-                <li><strong>21/08</strong> - Entretien</li>
-                <li><strong>25/08</strong> - Retenue</li>
+                <li>Informations candidat avec photo, email, statut actuel</li>
+                <li>Consultation et téléchargement de documents</li>
+                <li>Changement de statut et conservation de l'historique</li>
+                <li>Actions de communication et planification</li>
               </ul>
             </div>
-
-            <div class="template-list" style="margin-top: 16px;">
-              <button class="template-item active">Communiquer</button>
-              <button class="template-item">Planifier test</button>
-              <button class="template-item">Planifier entretien</button>
+            <div class="inline-actions" style="margin-top: 16px;">
+              <a class="primary-btn" href="fiche-candidat.html?candidat=sophie">Ouvrir la fiche de Sophie</a>
+              <a class="ghost-btn" href="fiche-candidat.html?candidat=karim">Ouvrir la fiche de Karim</a>
             </div>
           </article>
         </section>

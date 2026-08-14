@@ -224,12 +224,9 @@ function wireCandidateManagement() {
   const offerFilter = document.getElementById('filter-offer');
   const dateFilter = document.getElementById('filter-date');
   const vivierSwitch = document.getElementById('vivier-switch');
-  const statusSelect = document.getElementById('candidate-status-select');
-  const updateStatus = document.getElementById('candidate-status-update');
   const directionSelect = document.getElementById('direction-select');
   const directionOption = document.getElementById('direction-option-select');
   const competenceSearch = document.getElementById('competence-search');
-  const tableButtons = document.querySelectorAll('.table-action');
 
   const notifyFilter = () => showToast('Filtres appliqués (mode démo).');
 
@@ -263,25 +260,6 @@ function wireCandidateManagement() {
     vivierSwitch.addEventListener('click', () => showToast('Affichage vivier activé (simulation).'));
   }
 
-  if (updateStatus && statusSelect) {
-    updateStatus.addEventListener('click', () => {
-      const labels = {
-        recu: 'Reçue',
-        preselection: 'Présélectionnée',
-        test: 'Planifier test',
-        entretien: 'Planifier entretien',
-        retenue: 'Retenue',
-        'non-retenue': 'Non retenue',
-        vivier: 'Vivier',
-      };
-      showToast(`Statut changé vers: ${labels[statusSelect.value] || statusSelect.value}`);
-    });
-  }
-
-  tableButtons.forEach((button) => {
-    button.addEventListener('click', () => showToast(`Fiche ${button.dataset.candidate} chargée (démo).`));
-  });
-
   if (directionSelect) {
     directionSelect.addEventListener('change', () => showToast(`Direction: ${directionSelect.value}`));
   }
@@ -295,6 +273,125 @@ function wireCandidateManagement() {
       if (competenceSearch.value.length > 2) {
         showToast(`Matching sur competence: ${competenceSearch.value}`);
       }
+    });
+  }
+}
+
+function wireCandidateProfile() {
+  const profileName = document.getElementById('profile-name');
+  const profileNameHeader = document.getElementById('profile-name-header');
+  const profileNameCard = document.getElementById('profile-name-card');
+  const profileEmail = document.getElementById('profile-email');
+  const profileSummary = document.getElementById('profile-summary');
+  const profileCurrentStatus = document.getElementById('profile-current-status');
+  const profileStatusPill = document.getElementById('profile-status-pill');
+  const profileType = document.getElementById('profile-type');
+  const profileDate = document.getElementById('profile-date');
+  const profileSource = document.getElementById('profile-source');
+  const profileAvatar = document.getElementById('profile-avatar');
+  const profileHistory = document.getElementById('profile-history');
+  const profileDoc1 = document.getElementById('profile-doc-1');
+  const profileDoc2 = document.getElementById('profile-doc-2');
+  const statusSelect = document.getElementById('profile-status-select');
+  const updateStatus = document.getElementById('profile-status-update');
+  const saveStatus = document.getElementById('profile-save-status');
+
+  const candidates = {
+    sophie: {
+      name: 'Sophie Martin',
+      email: 's.martin@email.com',
+      summary: 'Candidate sur offre Developpeur Frontend, dossier complet avec portfolio.',
+      status: 'Présélectionnée',
+      statusClass: 'open',
+      type: 'Sur offre',
+      date: '13/08/2026',
+      source: 'Formulaire web',
+      avatar: 'SM',
+      history: ['13/08 - Reçue', '14/08 - Présélectionnée', '17/08 - Test', '21/08 - Entretien', '25/08 - Retenue'],
+      docs: ['CV_Sophie_Martin.pdf', 'Lettre_Motivation.pdf'],
+    },
+    karim: {
+      name: 'Karim Diallo',
+      email: 'k.diallo@email.com',
+      summary: 'Candidat IT Support avec test en attente de planification.',
+      status: 'Planifier test',
+      statusClass: 'pending',
+      type: 'Sur offre',
+      date: '14/08/2026',
+      source: 'API externe',
+      avatar: 'KD',
+      history: ['14/08 - Reçue', '15/08 - Présélectionnée', '18/08 - Planifier test'],
+      docs: ['CV_Karim_Diallo.pdf', 'Certificat_ITIL.pdf'],
+    },
+    nadia: {
+      name: 'Nadia Benali',
+      email: 'n.benali@email.com',
+      summary: 'Candidature spontanee orientee marketing CRM, conservee pour le vivier.',
+      status: 'Vivier',
+      statusClass: 'draft',
+      type: 'Spontanée',
+      date: '11/08/2026',
+      source: 'Formulaire spontané',
+      avatar: 'NB',
+      history: ['11/08 - Reçue', '12/08 - Présélectionnée', '14/08 - Non retenue', '15/08 - Vivier'],
+      docs: ['CV_Nadia_Benali.pdf', 'Portfolio_Marketing.pdf'],
+    },
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('candidat') || 'sophie';
+  const candidate = candidates[key] || candidates.sophie;
+
+  if (profileName) profileName.textContent = candidate.name;
+  if (profileNameHeader) profileNameHeader.textContent = candidate.name;
+  if (profileNameCard) profileNameCard.textContent = candidate.name;
+  if (profileEmail) profileEmail.textContent = candidate.email;
+  if (profileSummary) profileSummary.textContent = candidate.summary;
+  if (profileCurrentStatus) profileCurrentStatus.textContent = candidate.status;
+  if (profileType) profileType.textContent = candidate.type;
+  if (profileDate) profileDate.textContent = candidate.date;
+  if (profileSource) profileSource.textContent = candidate.source;
+  if (profileAvatar) profileAvatar.textContent = candidate.avatar;
+  if (profileDoc1) profileDoc1.textContent = candidate.docs[0];
+  if (profileDoc2) profileDoc2.textContent = candidate.docs[1];
+
+  if (profileStatusPill) {
+    profileStatusPill.textContent = `Statut: ${candidate.status}`;
+    profileStatusPill.className = `status ${candidate.statusClass}`;
+  }
+
+  if (profileHistory) {
+    profileHistory.innerHTML = candidate.history.map((entry) => `<li><strong>${entry.slice(0, 5)}</strong> - ${entry.slice(8)}</li>`).join('');
+  }
+
+  const statusLabels = {
+    recu: 'Reçue',
+    preselection: 'Présélectionnée',
+    test: 'Planifier test',
+    entretien: 'Planifier entretien',
+    retenue: 'Retenue',
+    'non-retenue': 'Non retenue',
+    vivier: 'Vivier',
+  };
+
+  const applyStatusChange = () => {
+    if (!statusSelect || !profileCurrentStatus || !profileStatusPill) {
+      return;
+    }
+    const label = statusLabels[statusSelect.value] || statusSelect.value;
+    profileCurrentStatus.textContent = label;
+    profileStatusPill.textContent = `Statut: ${label}`;
+    showToast(`Statut changé vers: ${label}`);
+  };
+
+  if (updateStatus) {
+    updateStatus.addEventListener('click', applyStatusChange);
+  }
+
+  if (saveStatus) {
+    saveStatus.addEventListener('click', () => {
+      applyStatusChange();
+      showToast('Fiche candidat mise à jour (simulation).');
     });
   }
 }
@@ -374,6 +471,10 @@ if (page === 'public-application') {
 
 if (page === 'candidate-management') {
   wireCandidateManagement();
+}
+
+if (page === 'candidate-profile') {
+  wireCandidateProfile();
 }
 
 showToast('Prototype prêt à explorer.');

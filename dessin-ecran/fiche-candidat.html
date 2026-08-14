@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RecruitFlow - Fiche candidat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body data-page="candidate-profile">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">RF</div>
+          <div>
+            <p class="brand-kicker">Prototype RH</p>
+            <h1>RecruitFlow</h1>
+          </div>
+        </div>
+        <nav class="nav">
+          <a class="nav-item" data-page="dashboard" href="index.html">Dashboard</a>
+          <a class="nav-item" data-page="offers" href="offers.html">Gestion d'offre d'emploi</a>
+          <a class="nav-item" data-page="applications" href="applications.html">Dépôt candidature</a>
+          <a class="nav-item" data-page="candidate-management" href="gestion-candidature.html">Gestion candidature</a>
+          <a class="nav-item active" data-page="candidate-profile" href="fiche-candidat.html">Fiche candidat</a>
+          <a class="nav-item" data-page="planning" href="planning.html">Planification test & entretien</a>
+          <a class="nav-item" data-page="communication" href="communication.html">Gestion communication</a>
+          <a class="nav-item" data-page="settings" href="settings.html">Settings</a>
+        </nav>
+        <div class="sidebar-card">
+          <p class="sidebar-card-label">Statut prototype</p>
+          <strong>Fiche candidat dédiée</strong>
+          <span>Informations personnelles, documents, statuts et historique des étapes.</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Fiche candidat</p>
+            <h2 id="profile-name-header">Profil détaillé</h2>
+          </div>
+          <div class="topbar-actions">
+            <a class="ghost-btn" href="gestion-candidature.html">Retour à la liste</a>
+            <button class="primary-btn" id="profile-save-status">Enregistrer le statut</button>
+          </div>
+        </header>
+
+        <section class="hero panel">
+          <div class="hero-copy">
+            <p class="section-tag">Dossier individuel</p>
+            <h3 id="profile-name">Sophie Martin</h3>
+            <p id="profile-summary">Candidat suivi sur offre avec statut en cours et historique complet des actions RH.</p>
+          </div>
+          <div class="hero-metrics">
+            <article class="metric-card accent">
+              <span>Statut actuel</span>
+              <strong id="profile-current-status">Présélectionnée</strong>
+              <small>modifié par RH</small>
+            </article>
+            <article class="metric-card">
+              <span>Type</span>
+              <strong id="profile-type">Sur offre</strong>
+              <small>ou spontanée</small>
+            </article>
+            <article class="metric-card">
+              <span>Date candidature</span>
+              <strong id="profile-date">13/08/2026</strong>
+              <small>première réception</small>
+            </article>
+            <article class="metric-card">
+              <span>Source</span>
+              <strong id="profile-source">Formulaire web</strong>
+              <small>canal de dépôt</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="split-layout">
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Identité</p>
+                <h3>Informations candidat</h3>
+              </div>
+            </div>
+            <div class="candidate-profile">
+              <div class="candidate-avatar" id="profile-avatar">SM</div>
+              <div>
+                <strong id="profile-name-card">Sophie Martin</strong>
+                <p id="profile-email">s.martin@email.com</p>
+                <span class="status open" id="profile-status-pill">Statut: Présélectionnée</span>
+              </div>
+            </div>
+
+            <div class="inline-actions" style="margin-top: 16px;">
+              <select id="profile-status-select">
+                <option value="recu">Reçue</option>
+                <option value="preselection" selected>Présélectionnée</option>
+                <option value="test">Planifier test</option>
+                <option value="entretien">Planifier entretien</option>
+                <option value="retenue">Retenue</option>
+                <option value="non-retenue">Non retenue</option>
+                <option value="vivier">Vivier</option>
+              </select>
+              <button class="primary-btn" id="profile-status-update">Changer statut</button>
+            </div>
+
+            <div class="template-list" style="margin-top: 16px;">
+              <button class="template-item active">Communiquer</button>
+              <button class="template-item">Planifier test</button>
+              <button class="template-item">Planifier entretien</button>
+            </div>
+          </article>
+
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Documents</p>
+                <h3>Consultation du dossier</h3>
+              </div>
+            </div>
+            <div class="choice-grid" style="grid-template-columns: 1fr;">
+              <div class="choice-card active">
+                <strong id="profile-doc-1">CV_Sophie_Martin.pdf</strong>
+                <p>Curriculum vitae principal du candidat.</p>
+                <div class="inline-actions" style="margin-top: 10px;">
+                  <button class="ghost-btn">Voir</button>
+                  <button class="ghost-btn">Télécharger</button>
+                </div>
+              </div>
+              <div class="choice-card">
+                <strong id="profile-doc-2">Lettre_Motivation.pdf</strong>
+                <p>Pièce complémentaire consultable par les recruteurs.</p>
+                <div class="inline-actions" style="margin-top: 10px;">
+                  <button class="ghost-btn">Voir</button>
+                  <button class="ghost-btn">Télécharger</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel card" style="margin-top: 18px;">
+          <div class="panel-head">
+            <div>
+              <p class="section-tag">Historique</p>
+              <h3>Conservation des changements de statut</h3>
+            </div>
+          </div>
+          <div class="timeline">
+            <ul id="profile-history">
+              <li><strong>13/08</strong> - Reçue</li>
+              <li><strong>14/08</strong> - Présélectionnée</li>
+              <li><strong>17/08</strong> - Test</li>
+              <li><strong>21/08</strong> - Entretien</li>
+              <li><strong>25/08</strong> - Retenue</li>
+            </ul>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" aria-live="polite"></div>
+  </body>
+</html>

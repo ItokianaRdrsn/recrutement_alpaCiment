@@ -291,6 +291,9 @@
 
     ⚠️ Je mettrais IA / matching candidat-offre comme fonctionnalité à confirmer, car ce n'est pas complètement défini dans ton cahier des charges actuel.
 
+### REMRQUE :
+    fiche candidat
+        dossier ,historique ,communication ,test/entretien
 ###  7. Planification
 
     Très bien :
