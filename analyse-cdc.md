@@ -206,6 +206,8 @@
     ↓
     RETENUE
 
+
+
     ou :
 
     REÇUE
@@ -228,6 +230,10 @@
 
 ###  6. Candidatures sur offre
 
+    POUR LE VIVIER ,AVOIR un bouton vivier pour voir tous les viviers
+    A Faire faire un matching sur le poste
+    Faire recherche avant sur les competences
+
     listes des directions : Comptables,IT,Achat
         lorsqu on clique dessus ,menu deroulante avec comme option:
             tous (toutes les offres lier a cette direction)
@@ -235,10 +241,16 @@
             bouton voir plus(les offres des cloturees)
 
     maintenant apres avoir choisi la directions et une otpion ,exemple tous:
-        
-###  7. Candidatures spontanées
+        list des candidats: candidate ,date ,status ,actions (voir fiche ,document ,crud??)
+        dans la fiche candidat:
+            information dessus (avec photo si possible ):nom ,email,status actule(entretien,...)
+            voir ou telecharger document 
+            changer status(preselectionner ,planifier test,planifier entretien, recue)
+            communiquer(si c est pas automatique dans les params ou si on peut envoyer un autre email)
 
-    Ton découpage est également bon :
+
+###  7. Candidatures spontanées -> a etudier pour savoir le domaine car on met poste souhaiter et je pense qu il faut relier a un poste ensuite mettre une colonne poste souhaiter aussi
+
 
     formulaire de candidature spontanée ;
     réception automatique ;
@@ -475,3 +487,4 @@
     Pouvez-vous nous fournir les identifiants et URL des offres actuellement présentes sur le site afin de les associer à notre future application ?
 
     Une fois qu'on a ces réponses, on pourra passer de ton cahier des charges à l'analyse des écrans, puis au MCD, sans construire quelque chose qui devra être refait à cause des contraintes du site externe.
+
