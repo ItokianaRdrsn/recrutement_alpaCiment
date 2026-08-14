@@ -9,44 +9,48 @@
     Quelle période ?
     Quelles statistiques exactement ?
        
-###  2. Gestion des offres d'emploi
+###  2. Gestion des offres d'emploi  -> A ETUDIER
     Fonctionnalités
-    Création
+    CRUD OFFRE D emploi
 
-    Une offre contient actuellement :
+    Création:
 
-    Titre du poste
-    Direction
-    Date de publication
-    Date limite
-    Statut automatique
+        Colonne :
 
-    Je garderais les statuts :
+        Titre du poste
+        Direction
+        Date de publication
+        Date limite
+        Statut automatique:
 
-    BROUILLON
-        ↓
-    PUBLIÉE
-        ↓
-    CLÔTURÉE
+            BROUILLON
+                ↓
+            PUBLIÉE
+                ↓
+            CLÔTURÉE
 
     Le statut ne devrait donc pas être choisi manuellement.
 
-    Modification
+    Modification:
 
-    Permettre de modifier :
+        Permettre de modifier :
 
-    titre
-    direction
-    date de publication
-    date limite
+        titre
+        direction
+        date de publication
+        date limite
 
-    Il faudra cependant décider plus tard ce qui est modifiable après publication.
+        Il faudra cependant décider plus tard ce qui est modifiable après publication.
 
-    Publication
-    Brouillon → Publiée
-    Clôture
-    Publiée → Clôturée
-    Lien de candidature
+        Publication
+        Brouillon → Publiée
+        Clôture
+        Publiée → Clôturée
+        Lien de candidature
+
+
+###    3. Prérequis  — Gestion des offres -> A ETUDIER
+
 
     Permettre au RH de récupérer/copier le lien public de l'offre.
 
@@ -86,8 +90,6 @@
     des candidatures que ton application importe ;
     ou d'une autre source.
 
-###    3. Prérequis API — Gestion des offres
-
     Ici, je séparerais clairement tes questions.
 
     A. API disponible ?
@@ -115,7 +117,7 @@
 
     Et ensuite, lors du développement, on testera avec Postman avant d'intégrer l'API dans Laravel.
 
-###  4. Dépôt de candidature
+###  4. Dépôt de candidature -> A ETUDIER
 
     Ici, ton cahier des charges est correct, mais il manque une information essentielle.
 
@@ -176,23 +178,21 @@
 
     Déterminer le mécanisme de récupération des candidatures : API, webhook ou email.
         
-###  5. Gestion des candidatures
+###  5. Gestion des candidatures liste des candidatures
 
-    Là, ton découpage est bon.
 
     Général
+    Liste candidatures avec pagination
     Recherche d'un candidat
-    Filtrage
-    Consultation du dossier
-    Statut de candidature
-    Historique
-    Candidature sur offre
-    Liste des offres
-    Nombre de candidatures
-    Liste des candidats
-    Consultation CV
-    Consultation documents
-    Modification du statut
+    Filtrage (type,date,status,offre/poste)
+    tableau liste candiatures :
+        colonne:
+        candidat
+        Offre/Poste(le nom de l OFFRE ou du poste)
+        Type(offre ou spontannee)
+        Date de candidature
+        Statut de candidature
+        Consultation documents
 
     Statuts :
 
@@ -200,9 +200,9 @@
     ↓
     PRÉSÉLECTIONNÉE
     ↓
-    TEST
+    PLANIFIER TEST
     ↓
-    ENTRETIEN
+    PLANIFIER ENTRETIEN
     ↓
     RETENUE
 
@@ -226,7 +226,17 @@
     21/08  Entretien
     25/08  Retenue
 
-###  6. Candidatures spontanées
+###  6. Candidatures sur offre
+
+    listes des directions : Comptables,IT,Achat
+        lorsqu on clique dessus ,menu deroulante avec comme option:
+            tous (toutes les offres lier a cette direction)
+            afficher les noms des offres avec leur date(ceux qui ne sont pas encore cloturee)
+            bouton voir plus(les offres des cloturees)
+
+    maintenant apres avoir choisi la directions et une otpion ,exemple tous:
+        
+###  7. Candidatures spontanées
 
     Ton découpage est également bon :
 
