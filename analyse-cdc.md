@@ -295,24 +295,24 @@
 
     Très bien :
 
-    Test
-    Planifier
-    Date
-    Heure
-    Lieu / visioconférence
-    Modifier
-    Reprogrammer
-    Annuler
-    Statut
-    Entretien
+    Test / Entretien
 
-    Même chose.
+    Planifier
+        Date
+        Heure
+        Lieu / visioconférence
+        Responsable => recherche de nom et on lui envoit un email une heure avant 
+    Modifier
+        Reprogrammer
+        Annuler
+        Statut
+
 
     Statuts :
 
-    À VENIR
-    RÉALISÉ
-    ANNULÉ
+        À VENIR
+        RÉALISÉ
+        ANNULÉ
 
     Et calendrier global :
 
