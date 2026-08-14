@@ -40,24 +40,24 @@
         <header class="topbar">
           <div>
             <p class="eyebrow">Gestion candidature</p>
-            <h2>Recherche et suivi</h2>
+            <h2>Liste, vivier et suivi des statuts</h2>
           </div>
           <div class="topbar-actions">
-            <button class="ghost-btn">Filtrer</button>
-            <button class="primary-btn">Ouvrir un dossier</button>
+            <button class="ghost-btn" id="vivier-switch">Voir tous les viviers</button>
+            <button class="primary-btn">Ouvrir une fiche candidat</button>
           </div>
         </header>
 
         <section class="hero panel">
           <div class="hero-copy">
-            <p class="section-tag">Vue dossier</p>
-            <h3>Suivre les candidats, le statut et l'historique des étapes</h3>
-            <p>Cette page sert à visualiser la consultation des dossiers, la recherche multicritère et les statuts de candidatures pour les offres ou le vivier spontané.</p>
+            <p class="section-tag">Section 5 + 6</p>
+            <h3>Gérer les candidatures avec historique, vivier et matching sur poste</h3>
+            <p>Maquette front uniquement: recherche, filtrage, pagination, suivi de statut, consultation des documents et classement des profils par direction/offre.</p>
           </div>
           <div class="hero-metrics">
             <article class="metric-card accent">
               <span>Candidats suivis</span>
-              <strong>162</strong>
+              <strong id="metric-candidates">162</strong>
               <small>sur offres et spontanés</small>
             </article>
             <article class="metric-card">
@@ -83,36 +83,102 @@
             <div class="panel-head">
               <div>
                 <p class="section-tag">Recherche</p>
-                <h3>Liste des candidats</h3>
+                <h3>Liste des candidatures</h3>
               </div>
-              <div class="search-box">
-                <input type="search" placeholder="Nom, domaine, offre, statut..." />
+              <div class="inline-actions">
+                <div class="search-box">
+                  <input id="candidate-search" type="search" placeholder="Rechercher un candidat..." />
+                </div>
+                <button class="ghost-btn" id="candidate-reset">Reset</button>
               </div>
             </div>
-            <div class="candidate-grid">
-              <article class="candidate-card">
-                <h4>Sophie Martin</h4>
-                <p>Développeuse frontend</p>
-                <span class="status open">Présélectionnée</span>
-              </article>
-              <article class="candidate-card">
-                <h4>Karim Diallo</h4>
-                <p>Chef de projet digital</p>
-                <span class="status pending">Test planifié</span>
-              </article>
-              <article class="candidate-card">
-                <h4>Nadia Benali</h4>
-                <p>Spontanée - Marketing</p>
-                <span class="status closed">Non retenue</span>
-              </article>
+
+            <div class="filters-grid">
+              <select id="filter-type">
+                <option value="all">Type: Tous</option>
+                <option value="offre">Sur offre</option>
+                <option value="spontanee">Spontanée</option>
+              </select>
+              <select id="filter-status">
+                <option value="all">Statut: Tous</option>
+                <option value="recu">Reçue</option>
+                <option value="preselection">Présélectionnée</option>
+                <option value="test">Planifier test</option>
+                <option value="entretien">Planifier entretien</option>
+                <option value="retenue">Retenue</option>
+                <option value="non-retenue">Non retenue</option>
+                <option value="vivier">Vivier</option>
+              </select>
+              <select id="filter-offer">
+                <option value="all">Offre/Poste: Tous</option>
+                <option value="dev-frontend">Developpeur Frontend</option>
+                <option value="comptable">Comptable Junior</option>
+                <option value="it-support">IT Support</option>
+              </select>
+              <input id="filter-date" type="date" />
             </div>
-            <div class="status-flow">
+
+            <div class="table-wrap" style="margin-top: 14px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Candidat</th>
+                    <th>Offre / Poste</th>
+                    <th>Type</th>
+                    <th>Date candidature</th>
+                    <th>Statut</th>
+                    <th>Documents</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="candidate-table-body">
+                  <tr>
+                    <td>Sophie Martin</td>
+                    <td>Developpeur Frontend</td>
+                    <td>offre</td>
+                    <td>13/08/2026</td>
+                    <td><span class="status open">Présélectionnée</span></td>
+                    <td><button class="link-btn">Consulter</button></td>
+                    <td><button class="ghost-btn table-action" data-candidate="sophie">Voir fiche</button></td>
+                  </tr>
+                  <tr>
+                    <td>Karim Diallo</td>
+                    <td>IT Support</td>
+                    <td>offre</td>
+                    <td>14/08/2026</td>
+                    <td><span class="status pending">Planifier test</span></td>
+                    <td><button class="link-btn">Consulter</button></td>
+                    <td><button class="ghost-btn table-action" data-candidate="karim">Voir fiche</button></td>
+                  </tr>
+                  <tr>
+                    <td>Nadia Benali</td>
+                    <td>Marketing CRM</td>
+                    <td>spontanee</td>
+                    <td>11/08/2026</td>
+                    <td><span class="status closed">Non retenue</span></td>
+                    <td><button class="link-btn">Consulter</button></td>
+                    <td><button class="ghost-btn table-action" data-candidate="nadia">Voir fiche</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="inline-actions" style="justify-content: space-between; margin-top: 14px;">
+              <span class="section-tag">Pagination: page 1 sur 9</span>
+              <div class="inline-actions">
+                <button class="ghost-btn">Precedent</button>
+                <button class="ghost-btn">Suivant</button>
+              </div>
+            </div>
+
+            <div class="status-flow" style="margin-top: 16px;">
               <span>Reçue</span>
               <span>Présélectionnée</span>
-              <span>Test</span>
-              <span>Entretien</span>
+              <span>Planifier test</span>
+              <span>Planifier entretien</span>
               <span>Retenue</span>
               <span>Non retenue</span>
+              <span>Vivier</span>
             </div>
           </article>
 
@@ -123,27 +189,142 @@
                 <h3>Fiche candidat</h3>
               </div>
             </div>
+            <div class="candidate-profile">
+              <div class="candidate-avatar">SM</div>
+              <div>
+                <strong>Sophie Martin</strong>
+                <p>s.martin@email.com</p>
+                <span class="status open">Statut actuel: Présélectionnée</span>
+              </div>
+            </div>
+
+            <div class="choice-grid" style="margin-top: 16px;">
+              <div class="choice-card active" style="grid-column: span 3;">
+                <strong>Documents du candidat</strong>
+                <p>CV.pdf, LettreMotivation.pdf, Portfolio.zip</p>
+                <div class="inline-actions" style="margin-top: 10px;">
+                  <button class="ghost-btn">Voir</button>
+                  <button class="ghost-btn">Telecharger</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="inline-actions" style="margin-top: 14px;">
+              <select id="candidate-status-select">
+                <option value="recu">Reçue</option>
+                <option value="preselection" selected>Présélectionnée</option>
+                <option value="test">Planifier test</option>
+                <option value="entretien">Planifier entretien</option>
+                <option value="retenue">Retenue</option>
+                <option value="non-retenue">Non retenue</option>
+                <option value="vivier">Vivier</option>
+              </select>
+              <button class="primary-btn" id="candidate-status-update">Changer statut</button>
+            </div>
+
+            <div class="timeline" style="margin-top: 16px;">
+              <p class="section-tag">Historique des changements</p>
+              <ul>
+                <li><strong>13/08</strong> - Reçue</li>
+                <li><strong>14/08</strong> - Présélectionnée</li>
+                <li><strong>17/08</strong> - Test</li>
+                <li><strong>21/08</strong> - Entretien</li>
+                <li><strong>25/08</strong> - Retenue</li>
+              </ul>
+            </div>
+
+            <div class="template-list" style="margin-top: 16px;">
+              <button class="template-item active">Communiquer</button>
+              <button class="template-item">Planifier test</button>
+              <button class="template-item">Planifier entretien</button>
+            </div>
+          </article>
+        </section>
+
+        <section class="split-layout" style="margin-top: 18px;">
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Candidatures sur offre</p>
+                <h3>Directions, offres et matching sur poste</h3>
+              </div>
+            </div>
+
+            <div class="filters-grid">
+              <select id="direction-select">
+                <option value="comptables">Direction: Comptables</option>
+                <option value="it">Direction: IT</option>
+                <option value="achat">Direction: Achat</option>
+              </select>
+              <select id="direction-option-select">
+                <option value="tous">Option: Tous</option>
+                <option value="ouvertes">Offres non cloturees</option>
+                <option value="closed">Voir plus (cloturees)</option>
+              </select>
+              <input id="competence-search" type="search" placeholder="Recherche competence (Laravel, Excel...)" />
+            </div>
+
+            <div class="offers-strip" id="offers-strip">
+              <span class="template-item active">Comptable Junior - 05/08/2026</span>
+              <span class="template-item">Controleur Gestion - 22/07/2026</span>
+              <span class="template-item">Auditeur interne - 18/07/2026</span>
+            </div>
+
+            <div class="table-wrap" style="margin-top: 14px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Candidat</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Rova Andriam</td>
+                    <td>10/08/2026</td>
+                    <td><span class="status pending">Planifier test</span></td>
+                    <td>
+                      <button class="link-btn">Voir fiche</button>
+                      <button class="link-btn">Documents</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Lina Razaf</td>
+                    <td>12/08/2026</td>
+                    <td><span class="status open">Présélectionnée</span></td>
+                    <td>
+                      <button class="link-btn">Voir fiche</button>
+                      <button class="link-btn">Documents</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+
+          <article class="panel card">
+            <div class="panel-head">
+              <div>
+                <p class="section-tag">Vivier</p>
+                <h3>Profils conservés pour futurs postes</h3>
+              </div>
+            </div>
             <div class="note-box">
-              <p>Consultation rapide des CV, documents complémentaires et historique des actions menées par les recruteurs.</p>
+              <p>Le bouton vivier affiche les candidats non retenus mais pertinents, avec recherche par competences et poste cible.</p>
             </div>
-            <div class="choice-grid" style="margin-top: 18px;">
-              <div class="choice-card active">
-                <strong>CV</strong>
-                <p>Lecture et téléchargement du curriculum vitae.</p>
-              </div>
-              <div class="choice-card">
-                <strong>Pièces jointes</strong>
-                <p>Portfolios, lettres, attestations et documents additionnels.</p>
-              </div>
-              <div class="choice-card">
-                <strong>Historique</strong>
-                <p>Traçabilité des changements de statut et communications.</p>
-              </div>
-            </div>
-            <div class="template-list" style="margin-top: 18px;">
-              <span class="template-item active">Planifier un test</span>
-              <span class="template-item">Planifier un entretien</span>
-              <span class="template-item">Envoyer un message</span>
+            <div class="candidate-grid" style="grid-template-columns: 1fr; margin-top: 14px;">
+              <article class="candidate-card">
+                <h4>Joel Ranaivosoa</h4>
+                <p>Comptable - SAP, Excel avance</p>
+                <span class="status draft">Vivier</span>
+              </article>
+              <article class="candidate-card">
+                <h4>Hery Noro</h4>
+                <p>IT support - Reseau, Active Directory</p>
+                <span class="status draft">Vivier</span>
+              </article>
             </div>
           </article>
         </section>

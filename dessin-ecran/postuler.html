@@ -28,7 +28,7 @@
           <div class="hero-copy">
             <p class="section-tag">Formulaire public</p>
             <h3>Déposer une candidature sur offre ou spontanée</h3>
-            <p>Cette page montre le parcours visible par le candidat après clic sur le lien public généré depuis une offre.</p>
+            <p>Cette page simule le parcours candidat avec classement par domaine, poste souhaite et traitement OCR du CV en aval.</p>
           </div>
           <div class="hero-metrics">
             <article class="metric-card accent">
@@ -77,6 +77,14 @@
                 <option>Chef de projet IT</option>
               </select>
               <textarea rows="5" placeholder="Parlez-nous de votre profil, de votre domaine et de votre motivation."></textarea>
+              <select>
+                <option>Domaine cible</option>
+                <option>IT</option>
+                <option>Comptabilite</option>
+                <option>Achat</option>
+                <option>Marketing</option>
+              </select>
+              <input type="text" placeholder="Poste souhaite" />
               <label class="upload-box">
                 <input type="file" multiple />
                 <span>Téléverser CV et documents</span>
@@ -108,6 +116,13 @@
                 <strong>Centralisation</strong>
                 <p>Les candidatures papier ou email pourront rejoindre le même espace plus tard.</p>
               </div>
+            </div>
+            <div class="status-flow" style="margin-top: 16px;">
+              <span>CV</span>
+              <span>OCR</span>
+              <span>Extraction</span>
+              <span>Profil candidat</span>
+              <span>Vivier</span>
             </div>
           </article>
         </section>

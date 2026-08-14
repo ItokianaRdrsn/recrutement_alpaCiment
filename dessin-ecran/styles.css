@@ -387,9 +387,64 @@ th {
 .split-layout,
 .choice-grid,
 .candidate-grid,
-.template-list {
+.template-list,
+.filters-grid,
+.timeline ul,
+.offers-strip,
+.candidate-profile {
   display: grid;
   gap: 12px;
+}
+
+.filters-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.candidate-profile {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.78);
+  padding: 14px;
+}
+
+.candidate-avatar {
+  width: 62px;
+  height: 62px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, var(--accent-2), #49a1ff);
+}
+
+.timeline {
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 14px;
+}
+
+.timeline ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.timeline li {
+  line-height: 1.7;
+}
+
+.offers-strip {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.table-action {
+  padding: 8px 12px;
+  border-radius: 10px;
 }
 
 .form-inline {
@@ -522,6 +577,26 @@ textarea {
   min-width: min(100%, 360px);
 }
 
+#candidate-status-select,
+#direction-select,
+#direction-option-select,
+#filter-type,
+#filter-status,
+#filter-offer,
+#vivier-filter,
+#spontaneous-domain,
+#desired-position,
+#related-offer,
+#application-source,
+#vivier-search,
+#competence-search,
+#filter-date {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px 14px;
+}
+
 .toast {
   position: fixed;
   right: 20px;
@@ -577,7 +652,10 @@ textarea {
   .split-layout,
   .candidate-grid,
   .choice-grid,
-  .settings-grid {
+  .settings-grid,
+  .filters-grid,
+  .offers-strip,
+  .candidate-profile {
     grid-template-columns: 1fr;
   }
 

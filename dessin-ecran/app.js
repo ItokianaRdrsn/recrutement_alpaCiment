@@ -169,6 +169,9 @@ function wireApplications() {
   const sourceSelector = document.getElementById('application-source');
   const sendButton = document.getElementById('application-send');
   const previewButton = document.getElementById('application-preview');
+  const relatedOffer = document.getElementById('related-offer');
+  const desiredPosition = document.getElementById('desired-position');
+  const spontaneousCounter = document.getElementById('spontaneous-counter');
 
   document.querySelectorAll('.choice-card').forEach((card) => {
     card.addEventListener('click', () => {
@@ -180,16 +183,119 @@ function wireApplications() {
 
   if (sourceSelector) {
     sourceSelector.addEventListener('change', () => {
+      const spontaneousMode = sourceSelector.value === 'spontaneous';
+      if (relatedOffer) {
+        relatedOffer.disabled = spontaneousMode;
+      }
+      if (desiredPosition) {
+        desiredPosition.disabled = !spontaneousMode;
+      }
       showToast(sourceSelector.value === 'spontaneous' ? 'Mode candidature spontanée.' : 'Mode candidature sur offre.');
     });
   }
 
-  if (sendButton) {
-    sendButton.addEventListener('click', () => showToast('Candidature simulée comme envoyée.'));
+  if (sourceSelector && desiredPosition) {
+    desiredPosition.disabled = sourceSelector.value !== 'spontaneous';
+  }
+
+  if (sourceSelector && relatedOffer) {
+    relatedOffer.disabled = sourceSelector.value === 'spontaneous';
+  }
+
+  if (sendButton && sourceSelector) {
+    sendButton.addEventListener('click', () => {
+      if (sourceSelector.value === 'spontaneous' && spontaneousCounter) {
+        spontaneousCounter.textContent = String(Number(spontaneousCounter.textContent) + 1);
+      }
+      showToast('Candidature simulée comme envoyée.');
+    });
   }
 
   if (previewButton) {
     previewButton.addEventListener('click', () => showToast("Prévisualisation de l'accusé prête."));
+  }
+}
+
+function wireCandidateManagement() {
+  const search = document.getElementById('candidate-search');
+  const reset = document.getElementById('candidate-reset');
+  const typeFilter = document.getElementById('filter-type');
+  const statusFilter = document.getElementById('filter-status');
+  const offerFilter = document.getElementById('filter-offer');
+  const dateFilter = document.getElementById('filter-date');
+  const vivierSwitch = document.getElementById('vivier-switch');
+  const statusSelect = document.getElementById('candidate-status-select');
+  const updateStatus = document.getElementById('candidate-status-update');
+  const directionSelect = document.getElementById('direction-select');
+  const directionOption = document.getElementById('direction-option-select');
+  const competenceSearch = document.getElementById('competence-search');
+  const tableButtons = document.querySelectorAll('.table-action');
+
+  const notifyFilter = () => showToast('Filtres appliqués (mode démo).');
+
+  [typeFilter, statusFilter, offerFilter, dateFilter].forEach((field) => {
+    if (!field) {
+      return;
+    }
+    field.addEventListener('change', notifyFilter);
+  });
+
+  if (search) {
+    search.addEventListener('input', () => {
+      if (search.value.length > 2) {
+        showToast(`Recherche: ${search.value}`);
+      }
+    });
+  }
+
+  if (reset) {
+    reset.addEventListener('click', () => {
+      if (search) search.value = '';
+      if (typeFilter) typeFilter.value = 'all';
+      if (statusFilter) statusFilter.value = 'all';
+      if (offerFilter) offerFilter.value = 'all';
+      if (dateFilter) dateFilter.value = '';
+      showToast('Filtres réinitialisés.');
+    });
+  }
+
+  if (vivierSwitch) {
+    vivierSwitch.addEventListener('click', () => showToast('Affichage vivier activé (simulation).'));
+  }
+
+  if (updateStatus && statusSelect) {
+    updateStatus.addEventListener('click', () => {
+      const labels = {
+        recu: 'Reçue',
+        preselection: 'Présélectionnée',
+        test: 'Planifier test',
+        entretien: 'Planifier entretien',
+        retenue: 'Retenue',
+        'non-retenue': 'Non retenue',
+        vivier: 'Vivier',
+      };
+      showToast(`Statut changé vers: ${labels[statusSelect.value] || statusSelect.value}`);
+    });
+  }
+
+  tableButtons.forEach((button) => {
+    button.addEventListener('click', () => showToast(`Fiche ${button.dataset.candidate} chargée (démo).`));
+  });
+
+  if (directionSelect) {
+    directionSelect.addEventListener('change', () => showToast(`Direction: ${directionSelect.value}`));
+  }
+
+  if (directionOption) {
+    directionOption.addEventListener('change', () => showToast(`Option: ${directionOption.value}`));
+  }
+
+  if (competenceSearch) {
+    competenceSearch.addEventListener('input', () => {
+      if (competenceSearch.value.length > 2) {
+        showToast(`Matching sur competence: ${competenceSearch.value}`);
+      }
+    });
   }
 }
 
@@ -264,6 +370,10 @@ if (page === 'settings') {
 
 if (page === 'public-application') {
   wirePublicApplication();
+}
+
+if (page === 'candidate-management') {
+  wireCandidateManagement();
 }
 
 showToast('Prototype prêt à explorer.');

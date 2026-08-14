@@ -40,7 +40,7 @@
         <header class="topbar">
           <div>
             <p class="eyebrow">Dépôt candidature</p>
-            <h2>Formulaire candidat</h2>
+            <h2>Sur offre et spontanée</h2>
           </div>
           <div class="topbar-actions">
             <button class="ghost-btn" id="application-preview">Aperçu accusé de réception</button>
@@ -50,9 +50,9 @@
 
         <section class="hero panel">
           <div class="hero-copy">
-            <p class="section-tag">Accès public</p>
-            <h3>Un point d'entrée unique pour candidater sur une offre ou spontanément</h3>
-            <p>La maquette montre l'expérience attendue côté candidat et le chemin de traitement côté RH: dépôt, réception, centralisation et accusé automatique.</p>
+            <p class="section-tag">Section 7</p>
+            <h3>Maquette candidature spontanée avec OCR et mise en vivier</h3>
+            <p>Vue front-end uniquement pour simuler la collecte du CV, la classification par domaine, le poste souhaité et le traitement OCR avant création du profil candidat.</p>
           </div>
           <div class="hero-metrics">
             <article class="metric-card accent">
@@ -62,7 +62,7 @@
             </article>
             <article class="metric-card">
               <span>Spontanées</span>
-              <strong>31</strong>
+              <strong id="spontaneous-counter">31</strong>
               <small>intégrées au vivier</small>
             </article>
             <article class="metric-card">
@@ -83,7 +83,7 @@
             <div class="panel-head">
               <div>
                 <p class="section-tag">Candidature en ligne</p>
-                <h3>Données du candidat</h3>
+                <h3>Formulaire sur offre ou spontané</h3>
               </div>
             </div>
             <div class="form-stack">
@@ -94,7 +94,20 @@
                 <option value="offer">Candidature sur offre</option>
                 <option value="spontaneous">Candidature spontanée</option>
               </select>
-              <select>
+              <select id="spontaneous-domain">
+                <option value="it">Domaine: IT</option>
+                <option value="compta">Domaine: Comptabilite</option>
+                <option value="achat">Domaine: Achat</option>
+                <option value="marketing">Domaine: Marketing</option>
+              </select>
+              <select id="desired-position">
+                <option value="">Poste souhaite</option>
+                <option>Developpeur Frontend</option>
+                <option>Comptable Junior</option>
+                <option>IT Support</option>
+                <option>Assistant Achat</option>
+              </select>
+              <select id="related-offer">
                 <option>Offre liée</option>
                 <option>Développeur Frontend</option>
                 <option>Assistant RH</option>
@@ -113,33 +126,95 @@
             <div class="panel-head">
               <div>
                 <p class="section-tag">Centralisation</p>
-                <h3>Sources de réception</h3>
+                <h3>Classement et pipeline OCR</h3>
               </div>
             </div>
             <div class="choice-grid">
               <div class="choice-card active">
-                <strong>Via API</strong>
-                <p>Récupération automatique des données à partir du système source.</p>
+                <strong>Reception automatique</strong>
+                <p>Accuse de reception envoye apres depot de candidature.</p>
               </div>
               <div class="choice-card">
-                <strong>Via email</strong>
-                <p>Import des candidatures reçues dans une boîte mail dédiée.</p>
+                <strong>Classement domaine</strong>
+                <p>Tri IT, Comptables, Achat, Marketing + ajout au vivier.</p>
               </div>
               <div class="choice-card">
-                <strong>Scan papier</strong>
-                <p>Intégration future avec OCR pour centraliser les dossiers papier.</p>
+                <strong>Recherche & filtre</strong>
+                <p>Recherche candidat, poste souhaite, competences detectees.</p>
               </div>
             </div>
-            <div class="note-box" style="margin-top: 18px;">
-              <p>Le rendu est pensé pour valider l'UX des parcours candidats avant l'automatisation des traitements.</p>
-            </div>
+
             <div class="status-flow" style="margin-top: 18px;">
-              <span>Reçu</span>
-              <span>Accusé envoyé</span>
-              <span>Tri RH</span>
-              <span>Archivage</span>
+              <span>Candidature spontanee</span>
+              <span>CV</span>
+              <span>OCR</span>
+              <span>Extraction infos</span>
+              <span>Profil candidat</span>
+              <span>Vivier</span>
+            </div>
+
+            <div class="timeline" style="margin-top: 16px;">
+              <p class="section-tag">Architecture envisagee</p>
+              <ul>
+                <li><strong>Laravel</strong> - reception et stockage candidat</li>
+                <li><strong>FastAPI</strong> - microservice traitement CV</li>
+                <li><strong>Tesseract</strong> - OCR texte du CV</li>
+                <li><strong>spaCy</strong> - extraction competences, experiences, poste</li>
+                <li><strong>Resultat</strong> - profil enrichi + vivier + matching a confirmer</li>
+              </ul>
+            </div>
+
+            <div class="note-box" style="margin-top: 16px;">
+              <p>IA / matching candidat-offre est affiche ici en previsualisation fonctionnelle, mais reste a confirmer dans le cahier des charges final.</p>
             </div>
           </article>
+        </section>
+
+        <section class="panel card" style="margin-top: 18px;">
+          <div class="panel-head">
+            <div>
+              <p class="section-tag">Vivier spontane</p>
+              <h3>Suivi des profils classes</h3>
+            </div>
+            <div class="inline-actions">
+              <input id="vivier-search" type="search" placeholder="Rechercher profil/competence" />
+              <select id="vivier-filter">
+                <option value="all">Tous domaines</option>
+                <option value="it">IT</option>
+                <option value="compta">Comptabilite</option>
+                <option value="achat">Achat</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Candidat</th>
+                  <th>Domaine</th>
+                  <th>Poste souhaite</th>
+                  <th>Competences extraites</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Nadia Benali</td>
+                  <td>Marketing</td>
+                  <td>CRM Specialist</td>
+                  <td>HubSpot, SEO, Data Studio</td>
+                  <td><span class="status draft">Vivier</span></td>
+                </tr>
+                <tr>
+                  <td>Joel Ranaivosoa</td>
+                  <td>Comptabilite</td>
+                  <td>Comptable Junior</td>
+                  <td>SAP, Excel, Rapprochement bancaire</td>
+                  <td><span class="status draft">Vivier</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>

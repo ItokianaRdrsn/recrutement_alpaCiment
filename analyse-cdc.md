@@ -206,7 +206,7 @@
     ↓
     RETENUE
 
-
+    Ajout de status vivier egalement 
 
     ou :
 
@@ -231,7 +231,7 @@
 ###  6. Candidatures sur offre
 
     POUR LE VIVIER ,AVOIR un bouton vivier pour voir tous les viviers
-    A Faire faire un matching sur le poste
+    A  faire un matching sur le poste
     Faire recherche avant sur les competences
 
     listes des directions : Comptables,IT,Achat
