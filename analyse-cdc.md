@@ -230,9 +230,12 @@
 
 ###  6. Candidatures sur offre
 
+    input :
+        nom email tel et dossiers
+
     POUR LE VIVIER ,AVOIR un bouton vivier pour voir tous les viviers
     A  faire un matching sur le poste
-    Faire recherche avant sur les competences
+    Faire recherche avancer sur les competences
 
     listes des directions : Comptables,IT,Achat
         lorsqu on clique dessus ,menu deroulante avec comme option:
@@ -240,7 +243,7 @@
             afficher les noms des offres avec leur date(ceux qui ne sont pas encore cloturee)
             bouton voir plus(les offres des cloturees)
 
-    maintenant apres avoir choisi la directions et une otpion ,exemple tous:
+    maintenant apres avoir choisi la directions et une option ,exemple tous:
         list des candidats: candidate ,date ,status ,actions (voir fiche ,document ,crud??)
         dans la fiche candidat:
             information dessus (avec photo si possible ):nom ,email,status actule(entretien,...)
@@ -251,6 +254,23 @@
 
 ###  7. Candidatures spontanées -> a etudier pour savoir le domaine car on met poste souhaiter et je pense qu il faut relier a un poste ensuite mettre une colonne poste souhaiter aussi
 
+    input:
+        Nom , email ,tel ,post souhaiter , message et dossiers
+
+    Ici ,tous les candidats aura un status vivier de base 
+    Faire recherche avancer sur les competences
+
+    listes des directions : Comptables,IT,Achat
+        RQ: possibler de rajouter de directions en fonctions du postes demander exemple son poste souhaiter c est cuisinier ,on a pas de direction cuisine mais si il le demande on peut rajouter une nouvelle direction
+      
+
+    maintenant apres avoir choisi la directions on affiche :
+        list des candidats: candidate ,date ,status ,actions (voir fiche ,document ,crud??)
+        dans la fiche candidat:
+            information dessus (avec photo si possible ):nom ,email,status actule(entretien,...)
+            voir ou telecharger document 
+            changer status(preselectionner ,planifier test,planifier entretien, recue)
+            communiquer(si c est pas automatique dans les params ou si on peut envoyer un autre email)
 
     formulaire de candidature spontanée ;
     réception automatique ;
