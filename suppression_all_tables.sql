@@ -1,0 +1,14 @@
+DROP TABLE IF EXISTS communication;
+DROP TABLE IF EXISTS document;
+DROP TABLE IF EXISTS historique_statut;
+DROP TABLE IF EXISTS candidature;
+DROP TABLE IF EXISTS candidat_competence;
+DROP TABLE IF EXISTS competence;
+DROP TABLE IF EXISTS utilisateur;
+DROP TABLE IF EXISTS statut_candidature;
+DROP TABLE IF EXISTS offre;
+DROP TABLE IF EXISTS statut_offre;
+DROP TABLE IF EXISTS type_demande;
+DROP TABLE IF EXISTS candidat;
+DROP TABLE IF EXISTS domaine;
+DROP TABLE IF EXISTS direction;
