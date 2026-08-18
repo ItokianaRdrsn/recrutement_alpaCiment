@@ -1,0 +1,1 @@
+### lorsque on cree une candidature ,et que type offre mais pourtant il n est relier a aucune offre ,ca doit faire une erreur ,peut etre rajouter check ou trigger ,en gros rends ta base solide
