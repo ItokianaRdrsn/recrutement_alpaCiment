@@ -219,7 +219,7 @@ CREATE TABLE profil_formation (
 
 CREATE INDEX idx_profil_formation_profil
     ON profil_formation(id_profil_offre);
-    
+
 -- ============================================================
 -- 7. CANDIDAT
 -- ============================================================
@@ -286,13 +286,13 @@ CREATE TABLE competence_alias (
 CREATE INDEX idx_competence_alias_competence ON competence_alias(id_competence);
 
 -- ============================================================
--- 9. OFFRE_COMPETENCE
+-- 9. PROFIL_COMPETENCE
 -- ============================================================
 -- NB : candidat_competence, experience_professionnelle et formation sont
 -- definies plus loin (apres DOCUMENT), car elles referencent document(id_document)
 -- pour tracer le CV source d'une extraction automatique.
 
-CREATE TABLE offre_competence (
+CREATE TABLE profil_competence (
     id_offre BIGINT NOT NULL
         REFERENCES offre(id_offre)
         ON DELETE CASCADE,
