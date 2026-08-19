@@ -33,11 +33,18 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 2.1. **Dépôt via le site externe** — import automatique (format d'intégration encore à définir, cf points ouverts)
 2.2. **Dépôt manuel par un RH** — formulaire dans le back-office, `canal_depot = 'rh_manuel'`, `id_utilisateur_depot` renseigné
 2.3. **Choisir le type de candidature** — "sur offre" (sélection parmi les offres *publiées* uniquement) ou "spontanée"
+
 2.4. **Candidature spontanée : choisir un domaine** — liste déroulante (synchronisée avec le référentiel) + option "Autre, précisez" (crée un nouveau domaine en attente de validation, cf bloc 5)
+   RQ:finalement juste champ texte ici 
+
 2.5. **Recherche/dédoublonnage du candidat** — recherche automatique par email ; si trouvé, réutilise la fiche existante, sinon en crée une nouvelle
+
 2.6. **Upload des documents** — au choix : joindre un fichier, ou prendre une photo (à traiter ensuite par OCR)
+
 2.7. **Validation des champs obligatoires** — nom, email, tél (+ poste souhaité et message si spontanée) — logique applicative, pas de contrainte DB à part `NOT NULL` de base
+
 2.8. **Création automatique du statut initial** — "Recue" + première ligne dans l'historique
+
 2.9. **Déclenchement de l'accusé de réception** — si un modèle actif+auto existe pour le statut "Recue" (cf bloc 8)
 2.10. **Export pdf
 
@@ -46,9 +53,13 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 ## 3. Gestion des candidatures (back-office)
 
 3.1. **Vue générale** — liste de toutes les candidatures, tous types confondus, avec filtres transverses (statut, direction, période, canal de dépôt)
+
 3.2. **Vue "candidatures sur offre"** — navigation Direction → Offre (tous/publiées/clôturées) → liste des candidats
+
 3.3. **Vue "candidatures spontanées"** — navigation Direction → Domaine → liste des candidats
+
 3.4. **Liste des candidats** (dans chaque vue) — colonnes : nom, date, statut, actions (voir fiche / documents)
+
 3.5. **Fiche candidat** :
    - Informations (nom, email, tél, photo si dispo, adresse, date de naissance)
    - Statut actuel + historique complet des changements
@@ -56,7 +67,9 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
    - Compétences, expériences, formations (déclarées ou extraites — avec indicateur "à valider" si extraction CV, cf bloc 6)
    - Rendez-vous liés (cf bloc 7)
    - Historique des communications (cf bloc 8)
+
 3.6. **Changer le statut d'une candidature** — avec commentaire optionnel, écrit simultanément dans `historique_statut` (pas de trigger : à faire dans la même transaction applicative)
+
 3.7. **Recherche avancée** — par mots-clés (via `document.recherche_texte`, full-text) et/ou par compétences (bloc 6)
 
 ---
