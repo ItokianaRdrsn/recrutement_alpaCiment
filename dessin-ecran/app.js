@@ -172,6 +172,10 @@ function wireApplications() {
   const relatedOffer = document.getElementById('related-offer');
   const desiredPosition = document.getElementById('desired-position');
   const spontaneousCounter = document.getElementById('spontaneous-counter');
+  const spontaneousDomain = document.getElementById('spontaneous-domain');
+  const nameInput = document.getElementById('application-name');
+  const emailInput = document.getElementById('application-email');
+  const phoneInput = document.getElementById('application-phone');
 
   document.querySelectorAll('.choice-card').forEach((card) => {
     card.addEventListener('click', () => {
@@ -190,6 +194,9 @@ function wireApplications() {
       if (desiredPosition) {
         desiredPosition.disabled = !spontaneousMode;
       }
+      if (spontaneousDomain) {
+        spontaneousDomain.disabled = !spontaneousMode;
+      }
       showToast(sourceSelector.value === 'spontaneous' ? 'Mode candidature spontanée.' : 'Mode candidature sur offre.');
     });
   }
@@ -202,12 +209,24 @@ function wireApplications() {
     relatedOffer.disabled = sourceSelector.value === 'spontaneous';
   }
 
+  if (spontaneousDomain) {
+    spontaneousDomain.disabled = sourceSelector?.value !== 'spontaneous';
+  }
+
   if (sendButton && sourceSelector) {
     sendButton.addEventListener('click', () => {
+      if (!nameInput?.value.trim() || !emailInput?.value.trim() || !phoneInput?.value.trim()) {
+        showToast('Nom, email et telephone sont obligatoires.');
+        return;
+      }
+      if (sourceSelector.value === 'spontaneous' && (!desiredPosition?.value || !document.querySelector('textarea')?.value.trim())) {
+        showToast('Poste souhaite et message sont obligatoires en spontanee.');
+        return;
+      }
       if (sourceSelector.value === 'spontaneous' && spontaneousCounter) {
         spontaneousCounter.textContent = String(Number(spontaneousCounter.textContent) + 1);
       }
-      showToast('Candidature simulée comme envoyée.');
+      showToast('Candidature recue : accuse de reception simule.');
     });
   }
 
@@ -443,6 +462,104 @@ function wirePublicApplication() {
   });
 }
 
+function removeTableRow(button) {
+  const row = button.closest('tr');
+  if (row) {
+    row.remove();
+  }
+}
+
+function wirePrototypeActions() {
+  document.querySelectorAll('[data-action]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const action = button.dataset.action;
+
+      if (action === 'approve-extraction' || action === 'validate-domain') {
+        removeTableRow(button);
+        const counter = document.getElementById(action === 'validate-domain' ? 'pending-domains' : 'validation-count');
+        if (counter) counter.textContent = String(Math.max(0, Number(counter.textContent) - 1));
+        showToast(action === 'validate-domain' ? 'Domaine valide et rattache.' : 'Extraction validee et ajoutee au profil.');
+        return;
+      }
+
+      if (action === 'reject-extraction' || action === 'reject-domain') {
+        removeTableRow(button);
+        showToast(action === 'reject-domain' ? 'Proposition rejetee.' : 'Extraction rejetee.');
+        return;
+      }
+
+      if (action === 'edit-extraction' || action === 'edit-skill' || action === 'edit-offer') {
+        showToast('Mode edition active : les champs sont modifiables.');
+        return;
+      }
+
+      if (action === 'publish-offer') {
+        const status = document.getElementById('offer-detail-status');
+        if (status) status.textContent = 'Publiee';
+        showToast("L'offre est maintenant candidatable.");
+        return;
+      }
+
+      if (action === 'close-offer') {
+        const status = document.getElementById('offer-detail-status');
+        if (status) status.textContent = 'Cloturee';
+        showToast('Offre cloturee : aucun nouveau depot accepte.');
+        return;
+      }
+
+      if (action === 'add-skill' || action === 'new-skill' || action === 'add-alias') {
+        showToast('Formulaire de competence pret a etre complete.');
+        return;
+      }
+
+      if (action === 'new-template' || action === 'edit-template') {
+        showToast(action === 'new-template' ? 'Nouveau modele pret a etre configure.' : 'Modele editable sans modifier le modele original.');
+        return;
+      }
+
+      if (action === 'run-matching') {
+        const result = document.getElementById('matching-result');
+        if (result) result.innerHTML = '<p><strong>3 profils trouves</strong> : Sophie Martin 92%, Lea Gourdin 84%, Karim Diallo 71%.</p>';
+        showToast('Matching calcule sur les competences validees.');
+        return;
+      }
+
+      if (action === 'contact-vivier' || action === 'remove-vivier') {
+        if (action === 'remove-vivier') removeTableRow(button);
+        showToast(action === 'contact-vivier' ? 'Communication prete pour ce profil.' : 'Candidat retire du vivier.');
+        return;
+      }
+
+      if (action === 'sync-domains') {
+        showToast('Synchronisation simulee : 14 domaines valides disponibles.');
+        return;
+      }
+
+      if (action === 'new-domain') {
+        const table = document.getElementById('domain-table');
+        if (table) {
+          table.insertAdjacentHTML('afterbegin', '<tr><td><input value="Nouveau domaine" /></td><td><select><option>Autre</option><option>Digital</option></select></td><td>Ajout RH</td><td>Aujourd’hui</td><td><span class="status pending">En attente</span></td><td><button class="link-btn" data-action="validate-domain">Valider</button></td></tr>');
+          wirePrototypeActions();
+        }
+        showToast('Nouveau domaine ajoute a la file.');
+        return;
+      }
+
+      if (action === 'validate-all') {
+        document.querySelectorAll('#validation-table tr').forEach((row) => row.remove());
+        const counter = document.getElementById('validation-count');
+        if (counter) counter.textContent = '0';
+        showToast('Toutes les extractions visibles sont validees.');
+        return;
+      }
+
+      if (action === 'export-vivier') {
+        showToast('Export CSV simule genere.');
+      }
+    });
+  });
+}
+
 setActiveNavigation();
 
 if (page === 'dashboard') {
@@ -476,5 +593,7 @@ if (page === 'candidate-management') {
 if (page === 'candidate-profile') {
   wireCandidateProfile();
 }
+
+wirePrototypeActions();
 
 showToast('Prototype prêt à explorer.');

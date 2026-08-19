@@ -43,8 +43,8 @@
             <h2>Tests et entretiens</h2>
           </div>
           <div class="topbar-actions">
-            <button class="ghost-btn">Reprogrammer</button>
-            <button class="primary-btn">Nouvel événement</button>
+            <button class="ghost-btn" data-action="reschedule-event">Reprogrammer</button>
+            <button class="primary-btn" data-action="schedule-event">Nouvel événement</button>
           </div>
         </header>
 
@@ -103,7 +103,7 @@
                 <option>Téléphone</option>
               </select>
               <textarea rows="5" placeholder="Consignes, lien visio, salle de rendez-vous..."></textarea>
-              <button class="primary-btn">Enregistrer le rendez-vous</button>
+              <button class="primary-btn" data-action="schedule-event">Enregistrer le rendez-vous</button>
             </div>
           </article>
 
@@ -115,8 +115,8 @@
               </div>
             </div>
             <div class="calendar-placeholder">
-              <div class="calendar-day"><strong>08:30</strong><span>Test technique - Sophie Martin</span></div>
-              <div class="calendar-day"><strong>10:00</strong><span>Entretien RH - Karim Diallo</span></div>
+              <div class="calendar-day"><strong>08:30</strong><span>Test technique - Sophie Martin <button class="link-btn" data-action="complete-event">Realise</button></span></div>
+              <div class="calendar-day"><strong>10:00</strong><span>Entretien RH - Karim Diallo <button class="link-btn" data-action="cancel-event">Annuler</button></span></div>
               <div class="calendar-day"><strong>14:00</strong><span>Entretien manager - Nadia Benali</span></div>
               <div class="calendar-day"><strong>16:30</strong><span>Annulation / reprogrammation</span></div>
             </div>

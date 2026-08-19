@@ -7,15 +7,24 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 ## 1. Gestion des offres d'emploi
 
 1.1. **Créer une offre** — formulaire : titre, direction, description, date de publication, date limite. Statut initial = "Brouillon"
+
 1.2. **Éditer une offre** — modifier les champs tant qu'elle n'est pas clôturée
+
 1.3. **Publier une offre** — passage "Brouillon" → "Publiee" (la rend candidatable)
+
 1.4. **Clôturer une offre** — passage → "Cloturee" (ne peut plus recevoir de nouvelles candidatures — règle à faire respecter côté dépôt, cf bloc 2)
+
 1.5. **Lister les offres par direction** — clic sur une direction → menu déroulant :
    - "Tous" (toutes les offres liées à la direction)
    - Offres publiées, avec leur date (celles non clôturées)
    - "Voir plus" → offres clôturées
+
 1.6. **Associer des compétences requises à une offre** — `offre_competence`, avec niveau requis (utile pour le matching, bloc 6)
+
 1.7. **Consulter le détail d'une offre** — infos + liste des candidatures reçues sur cette offre + compétences requises
+
+1.8 **Génération d’un lien** permettant aux candidats d’accéder à l’offre et de postuler en ligne
+
 
 ---
 
@@ -30,6 +39,7 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 2.7. **Validation des champs obligatoires** — nom, email, tél (+ poste souhaité et message si spontanée) — logique applicative, pas de contrainte DB à part `NOT NULL` de base
 2.8. **Création automatique du statut initial** — "Recue" + première ligne dans l'historique
 2.9. **Déclenchement de l'accusé de réception** — si un modèle actif+auto existe pour le statut "Recue" (cf bloc 8)
+2.10. **Export pdf
 
 ---
 
@@ -62,7 +72,7 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 
 ## 5. Domaines (candidature spontanée)
 
-5.1. **Synchronisation avec le site externe** — endpoint exposant la liste des domaines valides, pour alimenter la liste déroulante côté site
+5.1. **Synchronisation avec le site externe** — endpoint exposant la liste des domaines valides, pour alimenter la liste déroulante côté site(ou peut etre juste champ texte aussi)
 5.2. **Création automatique via "Autre"** — quand un candidat tape un domaine non répertorié, création d'un `domaine` avec `valide = false`, direction "Autre" par défaut
 5.3. **Écran RH "domaines à valider"** — liste des domaines en attente
 5.4. **Valider/corriger un domaine** — renommer si besoin, rattacher à la bonne direction, appel à `valider_domaine()`
@@ -132,3 +142,4 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 - L'envoi technique des emails (8.5)
 - Le calcul du score de matching (6.6)
 - La synchronisation des domaines avec le site externe (5.1)
+

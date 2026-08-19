@@ -94,6 +94,29 @@
             <label><span>Canal</span><select><option>Email</option><option>SMS</option><option>Email + SMS</option></select></label>
           </div>
         </section>
+
+        <section class="panel card" style="margin-top: 18px;">
+          <div class="panel-head">
+            <div>
+              <p class="section-tag">Regles d'envoi</p>
+              <h3>Modeles actifs et declencheurs</h3>
+            </div>
+            <button class="primary-btn" data-action="new-template">Nouveau modele</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Modele</th><th>Type</th><th>Statut declencheur</th><th>Mode</th><th>Etat</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Accuse de reception</td><td>Accuse</td><td>Recue</td><td><span class="status open">Auto</span></td><td><span class="status open">Actif</span></td><td><button class="link-btn" data-action="edit-template">Modifier</button></td></tr>
+                <tr><td>Convocation entretien</td><td>Convocation</td><td>Planifier entretien</td><td><span class="status draft">Manuel</span></td><td><span class="status open">Actif</span></td><td><button class="link-btn" data-action="edit-template">Modifier</button></td></tr>
+                <tr><td>Ancien accuse</td><td>Accuse</td><td>Recue</td><td><span class="status draft">Auto</span></td><td><span class="status closed">Inactif</span></td><td><button class="link-btn" data-action="edit-template">Modifier</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note-box"><p>Le statut <strong>Recue</strong> est deja reserve par un modele automatique actif. Un second modele ne peut pas etre active sur ce meme declencheur.</p></div>
+        </section>
       </main>
     </div>
 

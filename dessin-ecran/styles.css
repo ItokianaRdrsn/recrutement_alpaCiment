@@ -224,6 +224,24 @@ button {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 245, 0.88));
 }
 
+body:not([data-page="dashboard"]) .hero {
+  grid-template-columns: 1fr;
+  padding: 18px 20px;
+}
+
+body:not([data-page="dashboard"]) .hero-copy h3 {
+  font-size: 1.65rem;
+  margin: 8px 0 6px;
+}
+
+body:not([data-page="dashboard"]) .hero-copy p:last-child {
+  margin-bottom: 0;
+}
+
+body:not([data-page="dashboard"]) .hero-metrics {
+  display: none;
+}
+
 .hero-copy p {
   color: var(--muted);
   line-height: 1.6;
