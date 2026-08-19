@@ -33,11 +33,12 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 ## 2. Dépôt de candidature
 
 2.1. **Dépôt via le site externe** — import automatique (format d'intégration encore à définir, cf points ouverts)
+
 2.2. **Dépôt manuel par un RH** — formulaire dans le back-office, `canal_depot = 'rh_manuel'`, `id_utilisateur_depot` renseigné
+
 2.3. **Choisir le type de candidature** — "sur offre" (sélection parmi les offres *publiées* uniquement) ou "spontanée"
 
-2.4. **Candidature spontanée : choisir un domaine** — liste déroulante (synchronisée avec le référentiel) + option "Autre, précisez" (crée un nouveau domaine en attente de validation, cf bloc 5)
-   RQ:finalement juste champ texte ici 
+2.4. **Candidature spontanée :** — champ (nom, email, tél, poste souhaité, message, dossiers)
 
 2.5. **Recherche/dédoublonnage du candidat** — recherche automatique par email ; si trouvé, réutilise la fiche existante, sinon en crée une nouvelle
 
