@@ -3,3 +3,4 @@
 ### 14 aout debut etude analyse MLD
 ### 18 aout MLD plutot logique 
 ### 19 aout etude du depot de dossier
+### 19 aout diviser le projet en fonctionnaliter 
