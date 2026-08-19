@@ -46,7 +46,6 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 2.8. **Création automatique du statut initial** — "Recue" + première ligne dans l'historique
 
 2.9. **Déclenchement de l'accusé de réception** — si un modèle actif+auto existe pour le statut "Recue" (cf bloc 8)
-2.10. **Export pdf
 
 ---
 
@@ -67,6 +66,8 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
    - Compétences, expériences, formations (déclarées ou extraites — avec indicateur "à valider" si extraction CV, cf bloc 6)
    - Rendez-vous liés (cf bloc 7)
    - Historique des communications (cf bloc 8)
+   - Export PDF
+
 
 3.6. **Changer le statut d'une candidature** — avec commentaire optionnel, écrit simultanément dans `historique_statut` (pas de trigger : à faire dans la même transaction applicative)
 
