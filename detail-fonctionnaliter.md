@@ -25,6 +25,8 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 
 1.8 **Génération d’un lien** permettant aux candidats d’accéder à l’offre et de postuler en ligne
 
+1.9 **Associer des missions à une offre** `je dois creer la table`
+
 
 ---
 
