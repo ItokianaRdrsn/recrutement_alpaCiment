@@ -94,20 +94,132 @@ INSERT INTO statut_offre (libelle) VALUES
 
 CREATE TABLE offre (
     id_offre BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
     titre_poste VARCHAR(200) NOT NULL,
+
     id_direction BIGINT NOT NULL
         REFERENCES direction(id_direction)
         ON DELETE RESTRICT,
+
+    description TEXT,
+
+    lieu VARCHAR(200),
+
+    type_contrat VARCHAR(50),
+
     date_publication DATE,
+
     date_limite DATE,
+
     id_statut_offre BIGINT NOT NULL
         REFERENCES statut_offre(id_statut_offre)
-        ON DELETE RESTRICT
+        ON DELETE RESTRICT,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    CONSTRAINT chk_offre_dates
+        CHECK (
+            date_limite IS NULL
+            OR date_publication IS NULL
+            OR date_limite >= date_publication
+        )
 );
 
 CREATE INDEX idx_offre_direction ON offre(id_direction);
 CREATE INDEX idx_offre_statut ON offre(id_statut_offre);
 
+
+-- ============================================================
+-- PROFIL RECHERCHE POUR UNE OFFRE
+-- ============================================================
+
+CREATE TABLE profil_offre (
+    id_profil_offre BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+    id_offre BIGINT NOT NULL UNIQUE
+        REFERENCES offre(id_offre)
+        ON DELETE CASCADE,
+
+    description TEXT,
+
+    experience_min_annees NUMERIC(4,1),
+    experience_max_annees NUMERIC(4,1),
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    CONSTRAINT chk_profil_experience_min
+        CHECK (experience_min_annees IS NULL OR experience_min_annees >= 0),
+
+    CONSTRAINT chk_profil_experience_max
+        CHECK (
+            experience_max_annees IS NULL
+            OR experience_max_annees >= COALESCE(experience_min_annees, 0)
+        )
+);
+
+CREATE INDEX idx_profil_offre_offre
+    ON profil_offre(id_offre);
+
+
+-- ============================================================
+-- MISSIONS D'UNE OFFRE
+-- ============================================================
+
+CREATE TABLE mission (
+    id_mission BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+    id_offre BIGINT NOT NULL
+        REFERENCES offre(id_offre)
+        ON DELETE CASCADE,
+
+    description TEXT NOT NULL,
+
+    ordre INTEGER NOT NULL DEFAULT 1,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    CONSTRAINT chk_mission_ordre
+        CHECK (ordre > 0)
+);
+
+CREATE INDEX idx_mission_offre
+    ON mission(id_offre);
+
+
+-- ============================================================
+-- FORMATIONS REQUISES PAR LE PROFIL
+-- ============================================================
+
+CREATE TABLE profil_formation (
+    id_profil_formation BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+    id_profil_offre BIGINT NOT NULL
+        REFERENCES profil_offre(id_profil_offre)
+        ON DELETE CASCADE,
+
+    niveau_min VARCHAR(50),
+    niveau_max VARCHAR(50),
+
+    domaine VARCHAR(150),
+
+    obligatoire BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+    CONSTRAINT chk_profil_formation_niveau
+        CHECK (
+            niveau_min IS NOT NULL
+            OR niveau_max IS NOT NULL
+            OR domaine IS NOT NULL
+        )
+);
+
+CREATE INDEX idx_profil_formation_profil
+    ON profil_formation(id_profil_offre);
+    
 -- ============================================================
 -- 7. CANDIDAT
 -- ============================================================
