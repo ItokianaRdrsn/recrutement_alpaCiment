@@ -19,7 +19,7 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
    - Offres publiées, avec leur date (celles non clôturées)
    - "Voir plus" → offres clôturées
 
-1.6. **Associer des compétences requises à une offre** — `offre_competence`, avec niveau requis (utile pour le matching, bloc 6)
+1.6. **Associer des compétences requises à une offre** — `profil_competence`, avec niveau requis (utile pour le matching, bloc 6)
 
 1.7. **Consulter le détail d'une offre** — infos + liste des candidatures reçues sur cette offre + compétences requises
 
@@ -102,8 +102,8 @@ Chaque bloc du découpage précédent, détaillé en fonctionnalités précises 
 6.2. **Déclarer une compétence manuellement** — RH ou candidat, `source = 'manuel'`, `valide = true` d'emblée
 6.3. **Extraction automatique depuis un CV** — pipeline externe (OCR + dictionnaire/fuzzy pour compétences via `pg_trgm`/`competence_alias`, NER pour expériences/formations) — service à part, écrit dans la base via l'application, `source = 'cv_ocr'`, `valide = false`
 6.4. **Écran de validation RH des extractions** — file d'attente des compétences/expériences/formations `valide = false`, avec le score de confiance affiché ; valider, corriger, ou rejeter
-6.5. **Associer des compétences requises à une offre** — cf 1.6, table `offre_competence`
-6.6. **Matching automatique candidat ↔ offre** — score basé sur le recoupement `candidat_competence` (validées uniquement) vs `offre_competence` — non prioritaire V1
+6.5. **Associer des compétences requises à une offre** — cf 1.6, table `profile_competence`
+6.6. **Matching automatique candidat ↔ offre** — score basé sur le recoupement `candidat_competence` (validées uniquement) vs `profil_competence` — non prioritaire V1
 6.7. **Recherche avancée par compétences** — filtrer candidats/vivier par une ou plusieurs compétences (validées)
 
 ---
