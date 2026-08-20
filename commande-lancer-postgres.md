@@ -1,0 +1,1 @@
+\i 'C:/Users/MdgStagiaireIT/OneDrive/itokiana/projet_stage/recrutement_codeSource/recrutement_alpaCiment/sql/gestion_recrutement.sql'
