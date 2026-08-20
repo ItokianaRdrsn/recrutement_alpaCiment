@@ -157,12 +157,36 @@ CREATE TABLE candidat (
 );
 CREATE INDEX idx_candidat_nom ON candidat(nom);
 -- Plus besoin d'index séparé sur email : UNIQUE en crée un automatiquement
--- ============================================================
--- 8. COMPETENCE
--- ============================================================
+-- ============================================
+-- TABLE TYPE_COMPETENCE
+-- ============================================
+
+CREATE TABLE type_competence (
+    id_type_competence SERIAL PRIMARY KEY,
+    libelle VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- Données initiales
+INSERT INTO type_competence (libelle) VALUES
+('Technique'),
+('Langue'),
+('Logiciel'),
+('Méthodologie'),
+('Autre');
+
+
+-- ============================================
+-- TABLE COMPETENCE
+-- ============================================
+
 CREATE TABLE competence (
-    id_competence BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nom_competence VARCHAR(150) NOT NULL UNIQUE
+    id_competence SERIAL PRIMARY KEY,
+    nom_competence VARCHAR(150) NOT NULL UNIQUE,
+    id_type_competence INTEGER NOT NULL,
+
+    CONSTRAINT fk_competence_type
+        FOREIGN KEY (id_type_competence)
+        REFERENCES type_competence(id_type_competence)
 );
 -- ============================================================
 -- 8bis. MATCHING COMPETENCES : pg_trgm + COMPETENCE_ALIAS
