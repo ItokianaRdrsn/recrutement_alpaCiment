@@ -30,7 +30,7 @@ Regroupement des fonctionnalités (`module-recrutement-fonctionnalites.md`) par 
 
 **Objectif démontrable** : créer, publier et consulter une offre complète (missions, compétences requises, profil recherché) ; gérer le référentiel de domaines pour le futur formulaire spontané.
 
-- 1.1 CRUD des offres
+- 1.1 CRUD des offres 
 - 1.2 Statut des offres (Brouillon → Publiée → Clôturée)
 - 1.3 Compétences requises d'une offre (`profil_competence`)
 - 1.4 Missions d'une offre (`mission`)
