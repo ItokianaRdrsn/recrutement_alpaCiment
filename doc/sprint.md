@@ -72,7 +72,7 @@ Regroupement des fonctionnalités (`module-recrutement-fonctionnalites.md`) par 
 - 3.6 Changement de statut + historique *(hors déclenchement automatique de communication, cf Sprint 4)*
 - 1.6 Gestion des candidatures d'une offre *(dépend de 3.x, regroupé ici)*
 
-
+**Tables déjà prêtes** : rien de nouveau, uniquement les tables des Sprints 1-2.
 
 ---
 
