@@ -5,6 +5,4 @@
         -> le -m permet de faire la migration egalement 
     ensuite aller dans le fichier de migration dans le database/migration 
         -> modifier le schemas de create en rajoutant toutes les colonnes dont on a besoin
-
-        
     
