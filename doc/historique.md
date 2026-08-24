@@ -5,5 +5,5 @@
 ### 19 aout etude du depot de dossier
 ### 19 aout diviser le projet en fonctionnaliter 
 ### 20 aout finalisation de division en fonctionnaliter
-### 21 aout creation des sprint\
+### 21 aout creation des sprint
 ### 24 aout finalisation des sprint
