@@ -59,11 +59,14 @@ Module Recrutement
 | `type_demande` | Référentiel : "Offre" / "Spontanee" |
 | `statut_offre` | Référentiel : Brouillon / Publiee / Cloturee |
 | `offre` | Une offre d'emploi, rattachée à une direction |
+| `profil_offre` | Le profil recherché pour une offre (expérience min/max) — 1:1 avec `offre` |
+| `mission` | Les missions/responsabilités d'une offre (liste ordonnée) |
+| `profil_formation` | Le(s) niveau(x) de formation requis par le profil d'une offre — ⚠️ `profil_formation.domaine` est un champ texte libre, indépendant du référentiel `domaine` utilisé pour les candidatures spontanées, à ne pas confondre |
 | `candidat` | Identité de la personne (indépendante du nombre de candidatures) |
 | `competence` | Référentiel des compétences |
 | `competence_alias` | Rattachements texte brut → compétence déjà validés par un RH (accélère le matching futur) |
 | `candidat_competence` | Compétences déclarées par un candidat, avec traçabilité (`source`, `score_confiance`) et validation RH si extraites d'un CV |
-| `offre_competence` | Compétences requises par une offre (liaison N:N), pour le matching |
+| `profil_competence` | Compétences requises par une offre (liaison N:N), pour le matching |
 | `experience_professionnelle` | Expériences pro d'un candidat — même pattern source/validation |
 | `formation` | Formations/diplômes d'un candidat — même pattern source/validation |
 | `statut_candidature` | Référentiel du workflow : Recue → Preselectionnee → Test → Entretien → Retenue / Non retenue |
@@ -89,7 +92,7 @@ Module Recrutement
 | Le vivier concerne les 2 types de candidature | `candidature.dans_vivier` (booléen), indépendant du statut |
 | Le site propose (ou proposera) une liste déroulante de domaines + option "Autre" | `domaine` est une table de référence, rattachée en N:1 à `direction`. Un domaine créé via "Autre" arrive avec `valide = false`, à valider par un admin (`valide_par`, `date_validation`) via la fonction `valider_domaine()` |
 | Documents liés à la candidature uniquement | `document.id_candidature`, pas de dossier central par candidat |
-| Recherche avancée + matching sur compétences | `competence` + `candidat_competence` + `offre_competence` (liaisons N:N). Fonctionnalité prévue, non prioritaire pour la V1 |
+| Recherche avancée + matching sur compétences | `competence` + `candidat_competence` + `profil_competence` (liaisons N:N). Fonctionnalité prévue, non prioritaire pour la V1 |
 | Rattacher le texte brut d'un CV à une compétence du référentiel, sans NER | `pg_trgm` (extension native, similarité par trigrammes) pour le fuzzy matching sur les nouveaux cas, `competence_alias` pour mémoriser les rattachements déjà validés (même principe que `Domaine_Alias`, abandonné pour les domaines mais pertinent ici) |
 | Les informations extraites d'un CV (compétences, expériences, formations) doivent être validées par un RH avant d'être utilisables pour le matching | Pattern répété sur `candidat_competence`, `experience_professionnelle`, `formation` : `source` (`manuel`/`cv_ocr`), `score_confiance`, `id_document` (CV source), `valide`/`date_validation`/`valide_par` — identique au pattern déjà utilisé pour `domaine.valide` |
 | Tests et entretiens planifiables, avec responsable, mode et statut | `rendez_vous`, rattaché à une `candidature` et à un `utilisateur` responsable |
@@ -110,7 +113,7 @@ Module Recrutement
 - Une `candidature` (0,1) est classée dans `domaine` (0,n) — nul si sur offre
 - Une `offre` (1,1) appartient à `direction` (1,n)
 - Un `domaine` (1,1) appartient à `direction` (1,n)
-- Une `offre` (0,n) ↔ (0,n) `competence` *(via `offre_competence`)*
+- Une `offre` (0,n) ↔ (0,n) `competence` *(via `profil_competence`)*
 - Un `candidat` (0,n) ↔ (0,n) `competence` *(via `candidat_competence`)*
 - Une `candidature` (1,1) a un `statut_candidature` (0,n) actuel + un historique (`historique_statut`, 1,n)
 - Une `candidature` (0,n) possède `document` (1,1)
@@ -167,9 +170,43 @@ OFFRE (
     id_offre            PK,
     titre_poste,
     id_direction          #FK → DIRECTION,
+    description,
+    lieu,
+    type_contrat,
     date_publication,
     date_limite,
-    id_statut_offre        #FK → STATUT_OFFRE
+    id_statut_offre        #FK → STATUT_OFFRE,
+    created_at,
+    updated_at
+)
+
+PROFIL_OFFRE (
+    id_profil_offre      PK,
+    id_offre               #FK → OFFRE,     -- UNIQUE : un profil par offre
+    description,
+    experience_min_annees,
+    experience_max_annees,
+    created_at,
+    updated_at
+)
+
+MISSION (
+    id_mission           PK,
+    id_offre               #FK → OFFRE,
+    description,
+    ordre,
+    created_at,
+    updated_at
+)
+
+PROFIL_FORMATION (
+    id_profil_formation  PK,
+    id_profil_offre        #FK → PROFIL_OFFRE,
+    niveau_min,
+    niveau_max,
+    domaine,             -- texte libre, pas lié au référentiel DOMAINE (candidature)
+    obligatoire,
+    created_at
 )
 
 CANDIDAT (
@@ -210,7 +247,7 @@ CANDIDAT_COMPETENCE (
     PK (id_candidat, id_competence)
 )
 
-OFFRE_COMPETENCE (
+PROFIL_COMPETENCE (
     id_offre              #FK → OFFRE,
     id_competence           #FK → COMPETENCE,
     niveau_requis,
@@ -397,7 +434,7 @@ Cinq `VIEW` ajoutées en fin de script — des requêtes sauvegardées, recalcul
 ## 8. Points encore ouverts
 
 - **Format d'intégration avec le site externe** (API / export / webhook) — non tranché.
-- **Matching compétences** (`candidat_competence` vs `offre_competence`) — modèle prêt, développement non prioritaire pour la V1.
+- **Matching compétences** (`candidat_competence` vs `profil_competence`) — modèle prêt, développement non prioritaire pour la V1.
 - **Envoi technique réel des emails** (SMTP, service d'emailing...) — hors périmètre base de données, à prévoir côté application/worker qui surveille les nouvelles lignes `communication.mode_envoi = 'auto'`.
 - **CHECK de cohérence type/offre/domaine** (point 1 de la section 7) — à ajouter ou non, en discussion.
 - **Qui peut créer/valider un domaine** — la fonction `valider_domaine()` existe, mais les droits d'accès (qui peut l'appeler) sont à définir au niveau de l'application/API, pas de la base.
