@@ -1,162 +1,303 @@
 # Module Recrutement — Découpage fonctionnel détaillé
 
-Chaque bloc du découpage précédent, détaillé en fonctionnalités précises (écrans, actions, règles). Référence au schéma (`module-recrutement-schema.sql`) et à la doc technique (`module-recrutement.md`) entre parenthèses quand utile.
+Chaque bloc correspond à une fonctionnalité du module, avec les principaux écrans et actions associés. Référence croisée avec le schéma (`module-recrutement-schema.sql`) et la doc technique (`module-recrutement.md`).
 
 ---
 
 ## 1. Gestion des offres d'emploi
 
-1.1. **Créer une offre** — formulaire : titre, direction, description, date de publication, date limite. Statut initial = "Brouillon"
+**1.1. CRUD des offres**
+- Consulter la liste des offres
+- Consulter le détail d'une offre
+- Créer une offre
+- Modifier une offre
+- Supprimer une offre
+- Filtrer les offres par direction et statut
 
-1.2. **Éditer une offre** — modifier les champs tant qu'elle n'est pas clôturée
+**1.2. Gestion du statut des offres**
+- Passer une offre de Brouillon à Publiée
+- Clôturer une offre
+- Empêcher le dépôt de nouvelles candidatures sur une offre clôturée
 
-1.3. **Publier une offre** — passage "Brouillon" → "Publiee" (la rend candidatable)
+**1.3. Gestion des compétences requises**
+- Ajouter une compétence requise à une offre (`profil_competence`)
+- Modifier le niveau requis
+- Supprimer une compétence requise
+- Consulter les compétences requises d'une offre
 
-1.4. **Clôturer une offre** — passage → "Cloturee" (ne peut plus recevoir de nouvelles candidatures — règle à faire respecter côté dépôt, cf bloc 2)
+**1.4. Gestion des missions**
+- Ajouter une mission à une offre (`mission`)
+- Modifier une mission
+- Supprimer une mission
+- Réorganiser l'ordre des missions
 
-1.5. **Lister les offres par direction** — clic sur une direction → menu déroulant :
-   - "Tous" (toutes les offres liées à la direction)
-   - Offres publiées, avec leur date (celles non clôturées)
-   - "Voir plus" → offres clôturées
+**1.5. Génération du lien de candidature**
+- Générer un lien permettant d'accéder à une offre
+- Permettre au candidat d'accéder à l'offre via ce lien
+- Permettre le dépôt d'une candidature depuis l'offre
 
-1.6. **Associer des compétences requises à une offre** — `profil_competence`, avec niveau requis (utile pour le matching, bloc 6)
-
-1.7. **Consulter le détail d'une offre** — infos + liste des candidatures reçues sur cette offre + compétences requises
-
-1.8 **Génération d’un lien** permettant aux candidats d’accéder à l’offre et de postuler en ligne
-
-1.9 **Associer des missions à une offre** `je dois creer la table`
-
+**1.6. Gestion des candidatures d'une offre**
+- Consulter les candidatures reçues
+- Filtrer les candidats par statut
+- Accéder à la fiche d'un candidat
+- Accéder au vivier lié à la direction de l'offre
 
 ---
 
 ## 2. Dépôt de candidature
 
-2.1. **Dépôt via le site externe** — import automatique (format d'intégration encore à définir, cf points ouverts)
+**2.1. Dépôt d'une candidature**
+- Déposer une candidature via le site externe
+- Enregistrer une candidature manuellement par un RH
 
-2.2. **Dépôt manuel par un RH** — formulaire dans le back-office, `canal_depot = 'rh_manuel'`, `id_utilisateur_depot` renseigné
+**2.2. Gestion du type de candidature**
+- Candidature sur une offre
+- Candidature spontanée
+- Sélectionner uniquement les offres publiées lors d'une candidature sur offre
 
-2.3. **Choisir le type de candidature** — "sur offre" (sélection parmi les offres *publiées* uniquement) ou "spontanée"
+**2.3. Gestion des informations candidat**
+- Saisir les informations personnelles
+- Saisir le poste souhaité
+- Saisir le message de candidature
+- Sélectionner un domaine pour une candidature spontanée
 
-2.4. **Candidature spontanée :** — champ (nom, email, tél, poste souhaité, message, dossiers)
+**2.4. Gestion des documents**
+- Ajouter un document
+- Importer un fichier
+- Ajouter une photo d'un document
+- Consulter les documents associés à la candidature
 
-2.5. **Recherche/dédoublonnage du candidat** — recherche automatique par email ; si trouvé, réutilise la fiche existante, sinon en crée une nouvelle
+**2.5. Gestion des candidats existants**
+- Rechercher un candidat par email
+- Réutiliser une fiche candidat existante
+- Créer automatiquement une nouvelle fiche candidat si celui-ci n'existe pas
 
-2.6. **Upload des documents** — au choix : joindre un fichier, ou prendre une photo (à traiter ensuite par OCR)
+**2.6. Gestion du statut initial**
+- Créer automatiquement la candidature avec le statut Reçue
+- Enregistrer le premier historique de statut
 
-2.7. **Validation des champs obligatoires** — nom, email, tél (+ poste souhaité et message si spontanée) — logique applicative, pas de contrainte DB à part `NOT NULL` de base
-
-2.8. **Création automatique du statut initial** — "Recue" + première ligne dans l'historique
-
-2.9. **Déclenchement de l'accusé de réception** — si un modèle actif+auto existe pour le statut "Recue" (cf bloc 8)
-
----
-
-## 3. Gestion des candidatures (back-office)
-
-3.1. **Vue générale** — liste de toutes les candidatures, tous types confondus, avec filtres transverses (statut, direction, période, canal de dépôt)
-
-3.2. **Vue "candidatures sur offre"** — navigation Direction → Offre (tous/publiées/clôturées) → liste des candidats
-
-3.3. **Vue "candidatures spontanées"** — navigation Direction → Domaine → liste des candidats
-
-3.4. **Liste des candidats** (dans chaque vue) — colonnes : nom, date, statut, actions (voir fiche / documents)
-
-3.5. **Fiche candidat** :
-   - Informations (nom, email, tél, photo si dispo, adresse, date de naissance)
-   - Statut actuel + historique complet des changements
-   - Documents (consultation/téléchargement)
-   - Compétences, expériences, formations (déclarées ou extraites — avec indicateur "à valider" si extraction CV, cf bloc 6)
-   - Rendez-vous liés (cf bloc 7)
-   - Historique des communications (cf bloc 8)
-   - Export PDF
-
-
-3.6. **Changer le statut d'une candidature** — avec commentaire optionnel, écrit simultanément dans `historique_statut` (pas de trigger : à faire dans la même transaction applicative)
-
-3.7. **Recherche avancée** — par mots-clés (via `document.recherche_texte`, full-text) et/ou par compétences (bloc 6)
+**2.7. Accusé de réception**
+- Identifier le modèle associé au statut Reçue
+- Déclencher l'envoi automatique de l'accusé de réception
 
 ---
 
-## 4. Vivier
+## 3. Gestion des candidatures
 
-4.1. **Marquer/démarquer un candidat "en vivier"** — indépendant du statut de workflow (`dans_vivier`)
-4.2. **Écran vivier général** — tous les candidats en vivier, tous types confondus
-4.3. **Bouton "voir le vivier" depuis une offre** — filtré sur la direction de cette offre (candidatures sur offre *et* spontanées de la même direction)
-4.4. **Recherche dans le vivier** — par compétences, par domaine/direction
+**3.1. CRUD / gestion des candidatures**
+- Consulter les candidatures
+- Consulter le détail d'une candidature
+- Modifier les informations d'une candidature
+- Supprimer une candidature selon les droits
+- Filtrer les candidatures
+
+**3.2. Recherche et filtrage**
+- Filtrer par statut
+- Filtrer par direction
+- Filtrer par période
+- Filtrer par canal de dépôt
+- Filtrer par type de candidature
+
+**3.3. Gestion des candidatures sur offre**
+- Direction → Offre → Candidatures
+- Consulter les candidats d'une offre
+- Filtrer les candidats par statut
+
+**3.4. Gestion des candidatures spontanées**
+- Direction → Domaine → Candidatures
+- Consulter les candidatures spontanées
+- Filtrer les candidats par domaine
+
+**3.5. Fiche candidat**
+- Consulter les informations personnelles
+- Consulter le statut actuel
+- Consulter l'historique des statuts
+- Consulter les documents
+- Consulter les compétences
+- Consulter les expériences
+- Consulter les formations
+- Consulter les rendez-vous
+- Consulter l'historique des communications
+- Exporter la fiche candidat en PDF
+
+**3.6. Gestion du statut des candidatures**
+- Modifier le statut d'une candidature
+- Ajouter un commentaire lors du changement
+- Enregistrer l'historique du changement
+- Déclencher la communication associée au nouveau statut
+
+**3.7. Recherche avancée des candidats**
+- Recherche par mots-clés dans les CV
+- Recherche par compétences
+- Combinaison de plusieurs critères de recherche
 
 ---
 
-## 5. Domaines (candidature spontanée)
+## 4. Gestion du vivier
 
-5.1. **Synchronisation avec le site externe** — endpoint exposant la liste des domaines valides, pour alimenter la liste déroulante côté site(ou peut etre juste champ texte aussi)
-5.2. **Création automatique via "Autre"** — quand un candidat tape un domaine non répertorié, création d'un `domaine` avec `valide = false`, direction "Autre" par défaut
-5.3. **Écran RH "domaines à valider"** — liste des domaines en attente
-5.4. **Valider/corriger un domaine** — renommer si besoin, rattacher à la bonne direction, appel à `valider_domaine()`
+**4.1. Gestion du vivier**
+- Ajouter un candidat au vivier
+- Retirer un candidat du vivier
+- Consulter les candidats du vivier
 
----
+**4.2. Recherche dans le vivier**
+- Rechercher par compétence
+- Rechercher par domaine
+- Rechercher par direction
 
-## 6. Compétences, expériences, formations & matching
-
-6.1. **Référentiel compétences** — CRUD admin sur `competence`
-6.2. **Déclarer une compétence manuellement** — RH ou candidat, `source = 'manuel'`, `valide = true` d'emblée
-6.3. **Extraction automatique depuis un CV** — pipeline externe (OCR + dictionnaire/fuzzy pour compétences via `pg_trgm`/`competence_alias`, NER pour expériences/formations) — service à part, écrit dans la base via l'application, `source = 'cv_ocr'`, `valide = false`
-6.4. **Écran de validation RH des extractions** — file d'attente des compétences/expériences/formations `valide = false`, avec le score de confiance affiché ; valider, corriger, ou rejeter
-6.5. **Associer des compétences requises à une offre** — cf 1.6, table `profile_competence`
-6.6. **Matching automatique candidat ↔ offre** — score basé sur le recoupement `candidat_competence` (validées uniquement) vs `profil_competence` — non prioritaire V1
-6.7. **Recherche avancée par compétences** — filtrer candidats/vivier par une ou plusieurs compétences (validées)
+**4.3. Vivier depuis une offre**
+- Consulter le vivier associé à la direction d'une offre
+- Afficher les candidats provenant des candidatures sur offre et spontanées
 
 ---
 
-## 7. Rendez-vous (tests / entretiens)
+## 5. Gestion des domaines
 
-7.1. **Planifier un rendez-vous** — pour une candidature : type (Test/Entretien), responsable (`utilisateur`), date/heure début-fin, mode (présentiel/visio/tél), lieu ou lien
-7.2. **Modifier un rendez-vous** — reprogrammer, changer de responsable ou de mode
-7.3. **Annuler un rendez-vous** — passage statut → "Annule"
-7.4. **Marquer comme réalisé** — passage statut → "Realise"
-7.5. **Vue agenda** — par utilisateur responsable, ou par candidature
-7.6. **Lien avec la communication** — convoquer un candidat à ce rendez-vous (cf bloc 8, modèle "Convocation")
+**5.1. Consultation des domaines**
+- Consulter les domaines valides
+- Filtrer les domaines par direction
+- Utiliser les domaines dans le formulaire de candidature spontanée
+
+**5.2. Gestion des domaines**
+- Ajouter un domaine
+- Modifier un domaine
+- Rattacher un domaine à une direction
+- Valider un domaine
+- Consulter les domaines en attente de validation
+
+**5.3. Gestion du domaine « Autre »**
+- Permettre la saisie d'un domaine non présent dans le référentiel
+- Créer le domaine avec `valide = false`
+- Affecter le domaine à une direction par défaut
+- Permettre au RH de le corriger et de le valider
+
+**5.4. Synchronisation avec le site externe**
+- Exposer les domaines valides au site externe
+- Permettre au site externe de récupérer la liste des domaines
 
 ---
 
-## 8. Communication
+## 6. Gestion des compétences, expériences et formations
 
-8.1. **Choisir un modèle selon le contexte** — proposer les modèles actifs pertinents pour le type de message (accusé, convocation, demande d'info/document, issue)
-8.2. **Personnaliser avant envoi** — éditer objet/contenu (pré-rempli depuis le modèle) sans jamais modifier le modèle lui-même
-8.3. **Envoyer manuellement** — enregistre la `communication`, `mode_envoi = 'manuel'`, `id_utilisateur` obligatoire
-8.4. **Déclenchement de l'envoi automatique** — à construire : au moment où `candidature.id_statut_candidature` change, chercher un modèle actif+auto pour ce statut et générer la communication (pas de trigger, logique applicative)
-8.5. **Envoi technique réel** — service/worker qui traite les communications `mode_envoi = 'auto'` en attente et les envoie réellement (SMTP/API emailing) — hors périmètre base de données
-8.6. **Historique des communications** — consultable depuis la fiche candidat (3.5)
+**6.1. CRUD du référentiel de compétences**
+- Ajouter / modifier / supprimer / consulter une compétence
+
+**6.2. Gestion des compétences candidat**
+- Ajouter / modifier / supprimer une compétence
+- Valider une compétence extraite automatiquement
+
+**6.3. Gestion des expériences professionnelles**
+- Ajouter / modifier / supprimer une expérience
+- Valider une expérience extraite automatiquement
+
+**6.4. Gestion des formations**
+- Ajouter / modifier / supprimer une formation
+- Valider une formation extraite automatiquement
+
+**6.5. Extraction automatique des données CV**
+- Extraire les informations d'un CV (compétences, expériences, formations)
+- Associer les compétences au référentiel via `pg_trgm` et `competence_alias`
+- Enregistrer les données extraites avec `valide = false`
+
+**6.6. Validation des données extraites**
+- Consulter les éléments extraits et leur score de confiance
+- Valider, modifier ou rejeter une donnée
+
+**6.7. Compétences requises d'une offre**
+- Ajouter / modifier / supprimer une compétence requise
+- Consulter les compétences requises
+
+**6.8. Matching candidat / offre** *(non prioritaire pour la V1)*
+- Comparer les compétences du candidat avec celles demandées par l'offre
+- Calculer un score de correspondance
+- Classer les candidats selon leur score
 
 ---
 
-## 9. Paramètres — Gestion des modèles de communication
+## 7. Gestion des rendez-vous
 
-9.1. **Lister les modèles** — par type de message, avec indicateur actif/inactif et auto/manuel
-9.2. **Créer/éditer un modèle** — nom, type, objet, contenu (avec variables du type `{{nom_candidat}}`)
-9.3. **Activer/désactiver un modèle** — `actif`
-9.4. **Configurer l'auto-envoi** — toggle `envoi_automatique` + sélection du statut déclencheur (`id_statut_candidature`)
-9.5. **Gérer le conflit d'unicité** — un seul modèle actif+auto par statut ; l'écran doit soit désactiver dans l'UI les statuts déjà pris, soit afficher clairement l'erreur renvoyée par la contrainte SQL
+**7.1. CRUD des rendez-vous**
+- Planifier / consulter / modifier / supprimer-annuler un rendez-vous
+
+**7.2. Gestion du type de rendez-vous**
+- Test / Entretien
+
+**7.3. Gestion du rendez-vous**
+- Affecter un responsable, définir date/heure, mode, lieu ou lien, commentaire
+
+**7.4. Gestion du statut**
+- À venir / Réalisé / Annulé
+
+**7.5. Agenda**
+- Consulter les rendez-vous d'un utilisateur, d'une candidature, par période
+
+**7.6. Communication liée au rendez-vous**
+- Sélectionner un modèle de convocation, personnaliser, envoyer
+
+---
+
+## 8. Gestion des communications
+
+**8.1. Gestion des communications**
+- Consulter l'historique, consulter une communication, envoyer manuellement
+
+**8.2. Gestion des modèles de communication**
+- Sélectionner un modèle, préremplir objet/contenu, personnaliser avant envoi
+
+**8.3. Types de communication**
+- Accusé de réception / Convocation / Demande d'information / Demande de document / Issue du recrutement / Autre
+
+**8.4. Envoi automatique**
+- Identifier le modèle associé au statut, générer la communication, `mode_envoi = 'auto'`
+
+**8.5. Envoi manuel**
+- Rédiger/personnaliser, envoyer, enregistrer l'utilisateur ayant effectué l'envoi
+
+**8.6. Historique**
+- Consulter depuis la fiche candidat : type, date, contenu envoyé
+
+---
+
+## 9. Paramétrage des modèles de communication
+
+**9.1. CRUD des modèles**
+- Ajouter / consulter / modifier / supprimer un modèle
+
+**9.2. Gestion de l'état du modèle**
+- Activer / désactiver un modèle
+
+**9.3. Configuration de l'envoi automatique**
+- Activer/désactiver, associer un modèle à un statut, contrôler l'unicité (un seul modèle auto actif par statut)
+
+**9.4. Personnalisation des modèles**
+- Définir objet/contenu, variables type `{{nom_candidat}}`
 
 ---
 
 ## 10. Tableau de bord
 
-10.1. **Afficher les 3 compteurs** — candidatures sur offre, offres en cours, candidatures spontanées (`vue_dashboard_kpis`)
-10.2. **Graphique de tendance mensuelle** — nombre de candidatures par mois (`vue_stats_candidatures_par_mois`)
-10.3. **Répartition par statut** — sur le mois en cours (`vue_stats_repartition_statut_mois_courant`)
-10.4. **Taux de transformation** — retenues / total, par mois (`vue_stats_taux_transformation_mensuel`)
-10.5. **Délai moyen de traitement** — en jours, par mois de réception (`vue_stats_delai_traitement`)
-10.6. **Filtres du tableau de bord** — par période et/ou par direction (à construire — les vues actuelles ne filtrent pas par direction, à voir si besoin)
+**10.1. Indicateurs**
+- Nombre de candidatures sur offre / offres en cours / candidatures spontanées
+
+**10.2. Statistiques**
+- Évolution mensuelle, répartition par statut, taux de transformation, délai moyen de traitement
+
+**10.3. Filtrage du tableau de bord**
+- Filtrer par période, par direction ; appliquer aux indicateurs et graphiques
 
 ---
 
-## Ce qui reste purement applicatif (aucune table à ajouter, juste des écrans/services à construire)
+## Fonctionnalités purement applicatives
 
-- Le processus de dépôt transactionnel (2.5 à 2.9)
-- Le déclenchement de l'envoi automatique (8.4)
-- Le pipeline OCR/NER (6.3) et son écran de validation (6.4)
-- L'envoi technique des emails (8.5)
-- Le calcul du score de matching (6.6)
-- La synchronisation des domaines avec le site externe (5.1)
+Aucune nouvelle table nécessaire, uniquement du code/service à construire :
 
+- Processus de dépôt d'une candidature
+- Détection d'un candidat existant
+- Déclenchement automatique des communications
+- Envoi réel des emails
+- Pipeline OCR
+- Extraction NER des CV
+- Matching candidat/offre
+- Synchronisation avec le site externe
+- Génération des liens de candidature
+- Export PDF
