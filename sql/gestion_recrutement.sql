@@ -675,27 +675,167 @@ VALUES (
         2
     );
 -- Insertion des competences
-INSERT INTO competence (nom_competence)
-VALUES ('Java'),
-    ('Python'),
-    ('JavaScript'),
-    ('React'),
-    ('Node.js'),
-    ('SQL'),
-    ('MongoDB'),
-    ('Docker'),
-    ('Git'),
-    ('Angular'),
-    ('Vue.js'),
-    ('Spring Boot'),
-    ('Django'),
-    ('Flask'),
-    ('Recrutement'),
-    ('Gestion de Projet'),
-    ('Communication'),
-    ('Negociation'),
-    ('Finance'),
-    ('Comptabilite');
+INSERT INTO competence (nom_competence, id_type_competence)
+VALUES (
+        'Java',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'Python',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'JavaScript',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'React',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'Node.js',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'SQL',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'MongoDB',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'Docker',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Logiciel'
+        )
+    ),
+    (
+        'Git',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Logiciel'
+        )
+    ),
+    (
+        'Angular',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'Vue.js',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'Spring Boot',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'Django',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'Flask',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Technique'
+        )
+    ),
+    (
+        'Recrutement',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Autre'
+        )
+    ),
+    (
+        'Gestion de Projet',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Méthodologie'
+        )
+    ),
+    (
+        'Communication',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Autre'
+        )
+    ),
+    (
+        'Negociation',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Autre'
+        )
+    ),
+    (
+        'Finance',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Autre'
+        )
+    ),
+    (
+        'Comptabilite',
+        (
+            SELECT id_type_competence
+            FROM type_competence
+            WHERE libelle = 'Autre'
+        )
+    );
 -- Insertion des candidats
 INSERT INTO candidat (
         nom,
@@ -838,7 +978,7 @@ VALUES -- Candidatures sur offres
         NULL,
         1,
         1,
-        FALSE,
+        TRUE,
         'Developpeur Web',
         'Candidature spontanee'
     ),
@@ -858,33 +998,41 @@ VALUES -- Candidatures sur offres
         NULL,
         8,
         1,
-        FALSE,
+        TRUE,
         'Charge de Marketing',
         NULL
     );
 -- Insertion des competences des candidats
-INSERT INTO candidat_competence (id_candidat, id_competence, niveau)
-VALUES (1, 3, 'Expert'),
-    (1, 4, 'Expert'),
-    (1, 2, 'Avance'),
-    (2, 3, 'Avance'),
-    (2, 4, 'Avance'),
-    (2, 11, 'Intermediaire'),
-    (3, 3, 'Expert'),
-    (3, 4, 'Expert'),
-    (3, 8, 'Avance'),
-    (4, 5, 'Expert'),
-    (4, 7, 'Avance'),
-    (5, 15, 'Expert'),
-    (5, 16, 'Avance'),
-    (6, 17, 'Expert'),
-    (6, 18, 'Avance'),
-    (7, 18, 'Expert'),
-    (7, 17, 'Avance'),
-    (8, 3, 'Avance'),
-    (8, 5, 'Intermediaire'),
-    (9, 15, 'Avance'),
-    (10, 17, 'Expert');
+-- Donnees saisies manuellement par un RH : elles sont donc deja validees.
+INSERT INTO candidat_competence (
+        id_candidat,
+        id_competence,
+        niveau,
+        valide,
+        date_validation,
+        valide_par
+    )
+VALUES (1, 3, 'Expert', TRUE, now(), 2),
+    (1, 4, 'Expert', TRUE, now(), 2),
+    (1, 2, 'Avance', TRUE, now(), 2),
+    (2, 3, 'Avance', TRUE, now(), 2),
+    (2, 4, 'Avance', TRUE, now(), 2),
+    (2, 11, 'Intermediaire', TRUE, now(), 2),
+    (3, 3, 'Expert', TRUE, now(), 2),
+    (3, 4, 'Expert', TRUE, now(), 2),
+    (3, 8, 'Avance', TRUE, now(), 2),
+    (4, 5, 'Expert', TRUE, now(), 2),
+    (4, 7, 'Avance', TRUE, now(), 2),
+    (5, 15, 'Expert', TRUE, now(), 2),
+    (5, 16, 'Avance', TRUE, now(), 2),
+    (6, 17, 'Expert', TRUE, now(), 2),
+    (6, 18, 'Avance', TRUE, now(), 2),
+    (7, 18, 'Expert', TRUE, now(), 2),
+    (7, 17, 'Avance', TRUE, now(), 2),
+    (8, 3, 'Avance', TRUE, now(), 2),
+    (8, 5, 'Intermediaire', TRUE, now(), 2),
+    (9, 15, 'Avance', TRUE, now(), 2),
+    (10, 17, 'Expert', TRUE, now(), 2);
 -- Insertion dans l'historique des statuts
 INSERT INTO historique_statut (
         id_candidature,
