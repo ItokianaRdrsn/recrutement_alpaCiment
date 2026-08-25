@@ -21,7 +21,7 @@ class Offre extends Model
         'id_direction',
         'description',
         'lieu',
-        'type_contrat',
+        'id_type_contrat',
         'date_publication',
         'date_limite',
         'id_statut_offre',
@@ -45,6 +45,11 @@ class Offre extends Model
         return $this->belongsTo(StatutOffre::class, 'id_statut_offre', 'id_statut_offre');
     }
 
+    public function typeContrat(): BelongsTo
+    {
+        return $this->belongsTo(TypeContrat::class, 'id_type_contrat', 'id_type_contrat');
+    }
+
     public function profil(): HasOne
     {
         return $this->hasOne(ProfilOffre::class, 'id_offre', 'id_offre');
@@ -53,5 +58,10 @@ class Offre extends Model
     public function missions(): HasMany
     {
         return $this->hasMany(Mission::class, 'id_offre', 'id_offre')->orderBy('ordre');
+    }
+
+    public function formations(): HasMany
+    {
+        return $this->hasMany(ProfilFormation::class, 'id_offre', 'id_offre');
     }
 }

@@ -26,7 +26,7 @@
 ### **[EN COURS]** Mise en place des migrations principales et des seeders
 
 - **Estimation :** 1,5 j
-- **Notes :** Premières migrations et seeders créés pour utilisateurs, directions, statuts, domaines et offres. Les autres modules viendront ensuite.
+- **Notes :** Premières migrations et seeders créés pour utilisateurs, directions, statuts, domaines, types de contrat, offres, profil d'offre avec valeurs génériques et formations liées aux offres. Les autres modules viendront ensuite.
 
 ---
 
@@ -63,11 +63,10 @@
 ### **[A FAIRE]** Tests et debug
 
 - **Estimation :** 0,5 j
-- **Notes :** Premiers tests Laravel OK : login, dashboard et offres protégées. Les tests du sprint complet restent à faire.
+- **Notes :** Tests Laravel OK : login, dashboard et offres protégées. Migration et seed validés après ajout du référentiel `type_contrat` et correction du profil d'offre. Les tests du sprint complet restent à faire.
 
 ---
 
 ## Total
 
 **Sprint 1 : 8,0 j**
-

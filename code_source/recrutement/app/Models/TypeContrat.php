@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class StatutOffre extends Model
+class TypeContrat extends Model
 {
-    protected $table = 'statut_offre';
+    protected $table = 'type_contrat';
 
-    protected $primaryKey = 'id_statut_offre';
+    protected $primaryKey = 'id_type_contrat';
 
     public $timestamps = false;
 
@@ -18,11 +18,10 @@ class StatutOffre extends Model
      */
     protected $fillable = [
         'libelle',
-        'ordre_workflow',
     ];
 
     public function offres(): HasMany
     {
-        return $this->hasMany(Offre::class, 'id_statut_offre', 'id_statut_offre');
+        return $this->hasMany(Offre::class, 'id_type_contrat', 'id_type_contrat');
     }
 }

@@ -18,7 +18,7 @@ class OffreController extends Controller
         ]);
 
         $offres = Offre::query()
-            ->with(['direction', 'statut'])
+            ->with(['direction', 'statut', 'typeContrat'])
             ->when($filters['direction'] ?? null, function ($query, int $direction): void {
                 $query->where('id_direction', $direction);
             })
@@ -33,7 +33,7 @@ class OffreController extends Controller
         return view('offres.index', [
             'offres' => $offres,
             'directions' => Direction::query()->orderBy('nom_direction')->get(),
-            'statuts' => StatutOffre::query()->orderBy('id_statut_offre')->get(),
+            'statuts' => StatutOffre::query()->orderBy('ordre_workflow')->get(),
             'filters' => $filters,
         ]);
     }

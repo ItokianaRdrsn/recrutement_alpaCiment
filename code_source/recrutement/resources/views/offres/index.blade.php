@@ -203,7 +203,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $offre->direction?->nom_direction }}</td>
-                                    <td>{{ $offre->type_contrat ?? '-' }}</td>
+                                    <td>{{ $offre->typeContrat?->libelle ?? '-' }}</td>
                                     <td>{{ $offre->date_publication?->format('d/m/Y') ?? '-' }}</td>
                                     <td>{{ $offre->date_limite?->format('d/m/Y') ?? '-' }}</td>
                                     <td><span class="status">{{ $offre->statut?->libelle }}</span></td>

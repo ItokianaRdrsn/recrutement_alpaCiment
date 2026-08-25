@@ -43,9 +43,21 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        foreach (['Brouillon', 'Publiee', 'Cloturee'] as $statutOffre) {
+        foreach ([
+            ['Brouillon', 1],
+            ['Publiee', 2],
+            ['Cloturee', 3],
+        ] as [$statutOffre, $ordre]) {
             DB::table('statut_offre')->updateOrInsert([
                 'libelle' => $statutOffre,
+            ], [
+                'ordre_workflow' => $ordre,
+            ]);
+        }
+
+        foreach (['CDI', 'CDD', 'Stage', 'Interim', 'Consultance'] as $typeContrat) {
+            DB::table('type_contrat')->updateOrInsert([
+                'libelle' => $typeContrat,
             ]);
         }
 
@@ -96,6 +108,10 @@ class DatabaseSeeder extends Seeder
             ->where('libelle', $libelle)
             ->value('id_statut_offre');
 
+        $typeContratId = fn (string $libelle): int => (int) DB::table('type_contrat')
+            ->where('libelle', $libelle)
+            ->value('id_type_contrat');
+
         foreach ([
             ['Developpeur Full Stack', 'Informatique', 'Publiee', 'Antananarivo', 'CDI', '2026-01-15', '2026-03-15'],
             ['Developpeur React Native', 'Informatique', 'Publiee', 'Antananarivo', 'CDI', '2026-02-01', '2026-04-01'],
@@ -112,7 +128,7 @@ class DatabaseSeeder extends Seeder
                 'id_statut_offre' => $statutOffreId($statut),
                 'description' => "Offre de recrutement pour le poste {$titre}.",
                 'lieu' => $lieu,
-                'type_contrat' => $contrat,
+                'id_type_contrat' => $typeContratId($contrat),
                 'date_publication' => $publication,
                 'date_limite' => $limite,
                 'created_at' => now(),

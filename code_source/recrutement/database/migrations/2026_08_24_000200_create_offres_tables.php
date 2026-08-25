@@ -20,7 +20,10 @@ return new class extends Migration
                 ->restrictOnDelete();
             $table->text('description')->nullable();
             $table->string('lieu', 200)->nullable();
-            $table->string('type_contrat', 50)->nullable();
+            $table->foreignId('id_type_contrat')
+                ->nullable()
+                ->constrained('type_contrat', 'id_type_contrat')
+                ->restrictOnDelete();
             $table->date('date_publication')->nullable();
             $table->date('date_limite')->nullable();
             $table->foreignId('id_statut_offre')
@@ -29,6 +32,7 @@ return new class extends Migration
             $table->timestampsTz();
 
             $table->index('id_direction', 'idx_offre_direction');
+            $table->index('id_type_contrat', 'idx_offre_type_contrat');
             $table->index('id_statut_offre', 'idx_offre_statut');
         });
 
@@ -43,19 +47,15 @@ return new class extends Migration
                 ->constrained('offre', 'id_offre')
                 ->cascadeOnDelete();
             $table->text('description')->nullable();
-            $table->decimal('experience_min_annees', 4, 1)->nullable();
-            $table->decimal('experience_max_annees', 4, 1)->nullable();
+            $table->string('type_valeur', 50)->nullable();
+            $table->string('valeur_min', 100)->nullable();
+            $table->string('valeur_max', 100)->nullable();
+            $table->string('valeur_attendue', 200)->nullable();
+            $table->string('unite_valeur', 50)->nullable();
             $table->timestampsTz();
 
             $table->index('id_offre', 'idx_profil_offre_offre');
         });
-
-        DB::statement(
-            'ALTER TABLE profil_offre ADD CONSTRAINT chk_profil_experience_min CHECK (experience_min_annees IS NULL OR experience_min_annees >= 0)'
-        );
-        DB::statement(
-            'ALTER TABLE profil_offre ADD CONSTRAINT chk_profil_experience_max CHECK (experience_max_annees IS NULL OR experience_max_annees >= COALESCE(experience_min_annees, 0))'
-        );
 
         Schema::create('mission', function (Blueprint $table) {
             $table->id('id_mission');
@@ -73,8 +73,8 @@ return new class extends Migration
 
         Schema::create('profil_formation', function (Blueprint $table) {
             $table->id('id_profil_formation');
-            $table->foreignId('id_profil_offre')
-                ->constrained('profil_offre', 'id_profil_offre')
+            $table->foreignId('id_offre')
+                ->constrained('offre', 'id_offre')
                 ->cascadeOnDelete();
             $table->string('niveau_min', 50)->nullable();
             $table->string('niveau_max', 50)->nullable();
@@ -82,7 +82,7 @@ return new class extends Migration
             $table->boolean('obligatoire')->default(true);
             $table->timestampTz('created_at')->useCurrent();
 
-            $table->index('id_profil_offre', 'idx_profil_formation_profil');
+            $table->index('id_offre', 'idx_profil_formation_offre');
         });
 
         DB::statement(
