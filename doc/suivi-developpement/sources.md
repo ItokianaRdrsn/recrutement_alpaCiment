@@ -34,3 +34,9 @@ Cette page regroupe les sources officielles ou primaires utilisées pour justifi
 - `[PADDLEOCR-GITHUB]` PaddleOCR - dépôt officiel : https://github.com/PaddlePaddle/PaddleOCR
 - `[PADDLEOCR-VL]` PaddleOCR-VL - pipeline usage : https://github.com/paddlepaddle/paddleocr/blob/main/docs/version3.x/pipeline_usage/PaddleOCR-VL.en.md
 
+## Documentation Markdown
+
+- `[GITHUB-MARKDOWN-TASKS]` GitHub Docs - Basic writing and formatting syntax / task lists : https://docs.github.com/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
+- `[GITHUB-MARKDOWN-TABLES]` GitHub Docs - Organizing information with tables : https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables
+- `[GFM-SPEC]` GitHub Flavored Markdown Spec : https://github.github.com/gfm/
+
