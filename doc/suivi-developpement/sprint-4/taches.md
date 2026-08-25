@@ -2,30 +2,77 @@
 
 ## Avancement
 
-| Statut | Nombre |
-| --- | ---: |
-| **[FAIT]** | 0 |
-| **[EN COURS]** | 0 |
-| **[A FAIRE]** | 8 |
+- **[FAIT]** 0 tâche
+- **[EN COURS]** 0 tâche
+- **[A FAIRE]** 8 tâches
 
 ## Légende
 
-| Badge | Signification |
-| --- | --- |
-| **[FAIT]** | Tâche terminée et utilisable. |
-| **[EN COURS]** | Tâche commencée, mais pas encore totalement terminée. |
-| **[A FAIRE]** | Tâche prévue, non commencée. |
+- **[FAIT]** : tâche terminée et utilisable.
+- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
+- **[A FAIRE]** : tâche prévue, non commencée.
+
+---
 
 ## Back-office
 
-| Tâche | Estimation | Statut | Notes |
-| --- | ---: | --- | --- |
-| Liste générale des candidatures avec pagination | 1,0 j | **[A FAIRE]** | Faciliter la consultation de volumes importants. |
-| Recherche et filtres : statut, direction, période, canal, type | 1,0 j | **[A FAIRE]** | Accélérer le travail RH. |
-| Gestion des candidatures sur offre : Direction -> Offre -> Candidats | 1,0 j | **[A FAIRE]** | Navigation métier pour les candidatures liées à une offre. |
-| Gestion des candidatures spontanées : Direction -> Domaine -> Candidatures | 1,0 j | **[A FAIRE]** | Navigation métier pour les candidatures spontanées. |
-| Fiche candidat : informations, documents, statut, historique statuts et communications | 2,0 j | **[A FAIRE]** | Centraliser les informations utiles au traitement. |
-| Changement de statut avec commentaire et historique | 1,5 j | **[A FAIRE]** | Tracer les décisions RH dans le temps. |
-| Export PDF de la fiche candidat | 0,5 j | **[A FAIRE]** | Produire un document exploitable hors application. |
-| Tests et debug | 1,0 j | **[A FAIRE]** | Tester navigation, filtres, fiche candidat, historique et PDF. |
-| **Total** | **9,0 j** |  |  |
+### **[A FAIRE]** Liste générale des candidatures avec pagination
+
+- **Estimation :** 1,0 j
+- **Notes :** Faciliter la consultation de volumes importants.
+
+---
+
+### **[A FAIRE]** Recherche et filtres : statut, direction, période, canal, type
+
+- **Estimation :** 1,0 j
+- **Notes :** Accélérer le travail RH.
+
+---
+
+### **[A FAIRE]** Gestion des candidatures sur offre : Direction -> Offre -> Candidats
+
+- **Estimation :** 1,0 j
+- **Notes :** Navigation métier pour les candidatures liées à une offre.
+
+---
+
+### **[A FAIRE]** Gestion des candidatures spontanées : Direction -> Domaine -> Candidatures
+
+- **Estimation :** 1,0 j
+- **Notes :** Navigation métier pour les candidatures spontanées.
+
+---
+
+### **[A FAIRE]** Fiche candidat : informations, documents, statut, historique statuts et communications
+
+- **Estimation :** 2,0 j
+- **Notes :** Centraliser les informations utiles au traitement.
+
+---
+
+### **[A FAIRE]** Changement de statut avec commentaire et historique
+
+- **Estimation :** 1,5 j
+- **Notes :** Tracer les décisions RH dans le temps.
+
+---
+
+### **[A FAIRE]** Export PDF de la fiche candidat
+
+- **Estimation :** 0,5 j
+- **Notes :** Produire un document exploitable hors application.
+
+---
+
+### **[A FAIRE]** Tests et debug
+
+- **Estimation :** 1,0 j
+- **Notes :** Tester navigation, filtres, fiche candidat, historique et PDF.
+
+---
+
+## Total
+
+**Sprint 4 : 9,0 j**
+

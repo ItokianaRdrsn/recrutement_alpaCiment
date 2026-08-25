@@ -2,29 +2,70 @@
 
 ## Avancement
 
-| Statut | Nombre |
-| --- | ---: |
-| **[FAIT]** | 0 |
-| **[EN COURS]** | 0 |
-| **[A FAIRE]** | 7 |
+- **[FAIT]** 0 tâche
+- **[EN COURS]** 0 tâche
+- **[A FAIRE]** 7 tâches
 
 ## Légende
 
-| Badge | Signification |
-| --- | --- |
-| **[FAIT]** | Tâche terminée et utilisable. |
-| **[EN COURS]** | Tâche commencée, mais pas encore totalement terminée. |
-| **[A FAIRE]** | Tâche prévue, non commencée. |
+- **[FAIT]** : tâche terminée et utilisable.
+- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
+- **[A FAIRE]** : tâche prévue, non commencée.
+
+---
 
 ## Back-office
 
-| Tâche | Estimation | Statut | Notes |
-| --- | ---: | --- | --- |
-| Tableau de bord et indicateurs principaux | 1,0 j | **[A FAIRE]** | Donner une vue synthétique du recrutement. |
-| Statistiques mensuelles, répartition par statut et taux de transformation | 1,0 j | **[A FAIRE]** | Suivre l'évolution des candidatures. |
-| Délai moyen de traitement et filtres du dashboard | 1,0 j | **[A FAIRE]** | Mesurer l'efficacité du processus RH. |
-| Recherche avancée par mots-clés CV et compétences | 1,0 j | **[A FAIRE]** | Retrouver rapidement les candidats pertinents. |
-| Matching candidat -> offre avec score simple | 1,0 j | **[A FAIRE]** | Proposer une aide au classement des profils. |
-| Tests fonctionnels globaux, corrections et optimisation | 1,5 j | **[A FAIRE]** | Stabiliser la V1 avant livraison. |
-| Documentation et préparation du déploiement | 0,5 j | **[A FAIRE]** | Préparer la remise du projet. |
-| **Total** | **7,0 j** |  |  |
+### **[A FAIRE]** Tableau de bord et indicateurs principaux
+
+- **Estimation :** 1,0 j
+- **Notes :** Donner une vue synthétique du recrutement.
+
+---
+
+### **[A FAIRE]** Statistiques mensuelles, répartition par statut et taux de transformation
+
+- **Estimation :** 1,0 j
+- **Notes :** Suivre l'évolution des candidatures.
+
+---
+
+### **[A FAIRE]** Délai moyen de traitement et filtres du dashboard
+
+- **Estimation :** 1,0 j
+- **Notes :** Mesurer l'efficacité du processus RH.
+
+---
+
+### **[A FAIRE]** Recherche avancée par mots-clés CV et compétences
+
+- **Estimation :** 1,0 j
+- **Notes :** Retrouver rapidement les candidats pertinents.
+
+---
+
+### **[A FAIRE]** Matching candidat -> offre avec score simple
+
+- **Estimation :** 1,0 j
+- **Notes :** Proposer une aide au classement des profils.
+
+---
+
+### **[A FAIRE]** Tests fonctionnels globaux, corrections et optimisation
+
+- **Estimation :** 1,5 j
+- **Notes :** Stabiliser la V1 avant livraison.
+
+---
+
+### **[A FAIRE]** Documentation et préparation du déploiement
+
+- **Estimation :** 0,5 j
+- **Notes :** Préparer la remise du projet.
+
+---
+
+## Total
+
+**Sprint 7 : 7,0 j**
+

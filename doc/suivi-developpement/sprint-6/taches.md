@@ -2,34 +2,72 @@
 
 ## Avancement
 
-| Statut | Nombre |
-| --- | ---: |
-| **[FAIT]** | 0 |
-| **[EN COURS]** | 0 |
-| **[A FAIRE]** | 7 |
+- **[FAIT]** 0 tâche
+- **[EN COURS]** 0 tâche
+- **[A FAIRE]** 7 tâches
 
 ## Légende
 
-| Badge | Signification |
-| --- | --- |
-| **[FAIT]** | Tâche terminée et utilisable. |
-| **[EN COURS]** | Tâche commencée, mais pas encore totalement terminée. |
-| **[A FAIRE]** | Tâche prévue, non commencée. |
+- **[FAIT]** : tâche terminée et utilisable.
+- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
+- **[A FAIRE]** : tâche prévue, non commencée.
+
+---
 
 ## Back-office
 
-| Tâche | Estimation | Statut | Notes |
-| --- | ---: | --- | --- |
-| CRUD des rendez-vous : test, entretien, statut, mode, responsable | 2,0 j | **[A FAIRE]** | Planifier et suivre les étapes d'évaluation. |
-| Vue agenda par utilisateur, candidature et période | 1,0 j | **[A FAIRE]** | Donner une vue claire des rendez-vous. |
-| Communication liée aux rendez-vous | 1,0 j | **[A FAIRE]** | Informer les candidats des tests et entretiens. |
-| CRUD des modèles de communication | 1,0 j | **[A FAIRE]** | Réutiliser des messages standardisés. |
-| Activation, désactivation et configuration de l'envoi automatique | 1,0 j | **[A FAIRE]** | Contrôler les automatismes de communication. |
+### **[A FAIRE]** CRUD des rendez-vous : test, entretien, statut, mode, responsable
+
+- **Estimation :** 2,0 j
+- **Notes :** Planifier et suivre les étapes d'évaluation.
+
+---
+
+### **[A FAIRE]** Vue agenda par utilisateur, candidature et période
+
+- **Estimation :** 1,0 j
+- **Notes :** Donner une vue claire des rendez-vous.
+
+---
+
+### **[A FAIRE]** Communication liée aux rendez-vous
+
+- **Estimation :** 1,0 j
+- **Notes :** Informer les candidats des tests et entretiens.
+
+---
+
+### **[A FAIRE]** CRUD des modèles de communication
+
+- **Estimation :** 1,0 j
+- **Notes :** Réutiliser des messages standardisés.
+
+---
+
+### **[A FAIRE]** Activation, désactivation et configuration de l'envoi automatique
+
+- **Estimation :** 1,0 j
+- **Notes :** Contrôler les automatismes de communication.
+
+---
 
 ## API / Services
 
-| Tâche | Estimation | Statut | Notes |
-| --- | ---: | --- | --- |
-| Envoi manuel, historique des communications et préparation des rappels | 1,5 j | **[A FAIRE]** | Tracer les communications et préparer les rappels. |
-| Tests et debug | 0,5 j | **[A FAIRE]** | Tester création de rendez-vous, modèles, envois et historique. |
-| **Total** | **8,0 j** |  |  |
+### **[A FAIRE]** Envoi manuel, historique des communications et préparation des rappels
+
+- **Estimation :** 1,5 j
+- **Notes :** Tracer les communications et préparer les rappels.
+
+---
+
+### **[A FAIRE]** Tests et debug
+
+- **Estimation :** 0,5 j
+- **Notes :** Tester création de rendez-vous, modèles, envois et historique.
+
+---
+
+## Total
+
+**Sprint 6 : 8,0 j**
+

@@ -13,6 +13,7 @@ Comprendre le besoin, cadrer le périmètre de la V1 et préparer la conception 
 - `taches.md` : liste des tâches prévues.
 - `2026-08-25-organisation-documentation-sprints.md` : mise en place de l'organisation documentaire par sprint.
 - `2026-08-25-lisibilite-statuts-taches.md` : amélioration de la lecture des statuts dans les listes de tâches.
+- `2026-08-25-format-blocs-taches.md` : remplacement des tableaux de tâches par des blocs séparés.
 
 ## Sources utiles
 

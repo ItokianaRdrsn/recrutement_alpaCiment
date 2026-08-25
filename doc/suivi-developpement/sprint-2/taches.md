@@ -2,35 +2,79 @@
 
 ## Avancement
 
-| Statut | Nombre |
-| --- | ---: |
-| **[FAIT]** | 0 |
-| **[EN COURS]** | 0 |
-| **[A FAIRE]** | 8 |
+- **[FAIT]** 0 tâche
+- **[EN COURS]** 0 tâche
+- **[A FAIRE]** 8 tâches
 
 ## Légende
 
-| Badge | Signification |
-| --- | --- |
-| **[FAIT]** | Tâche terminée et utilisable. |
-| **[EN COURS]** | Tâche commencée, mais pas encore totalement terminée. |
-| **[A FAIRE]** | Tâche prévue, non commencée. |
+- **[FAIT]** : tâche terminée et utilisable.
+- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
+- **[A FAIRE]** : tâche prévue, non commencée.
+
+---
 
 ## Back-office
 
-| Tâche | Estimation | Statut | Notes |
-| --- | ---: | --- | --- |
-| CRUD des directions | 0,5 j | **[A FAIRE]** | Créer, modifier, lister et supprimer les directions. |
-| CRUD des domaines et validation des domaines en attente | 1,0 j | **[A FAIRE]** | Gérer les domaines connus et les domaines proposés par les candidats. |
-| CRUD des offres d'emploi | 2,0 j | **[A FAIRE]** | Créer et administrer les offres. |
-| Gestion du statut des offres : brouillon, publiée, clôturée | 1,0 j | **[A FAIRE]** | Contrôler le cycle de vie d'une offre. |
-| Gestion du profil, des missions et des formations requises | 1,5 j | **[A FAIRE]** | Décrire précisément les attentes liées à l'offre. |
-| Gestion des compétences requises par offre | 1,0 j | **[A FAIRE]** | Lier les compétences au besoin de recrutement. |
+### **[A FAIRE]** CRUD des directions
+
+- **Estimation :** 0,5 j
+- **Notes :** Créer, modifier, lister et supprimer les directions.
+
+---
+
+### **[A FAIRE]** CRUD des domaines et validation des domaines en attente
+
+- **Estimation :** 1,0 j
+- **Notes :** Gérer les domaines connus et les domaines proposés par les candidats.
+
+---
+
+### **[A FAIRE]** CRUD des offres d'emploi
+
+- **Estimation :** 2,0 j
+- **Notes :** Créer et administrer les offres.
+
+---
+
+### **[A FAIRE]** Gestion du statut des offres : brouillon, publiée, clôturée
+
+- **Estimation :** 1,0 j
+- **Notes :** Contrôler le cycle de vie d'une offre.
+
+---
+
+### **[A FAIRE]** Gestion du profil, des missions et des formations requises
+
+- **Estimation :** 1,5 j
+- **Notes :** Décrire précisément les attentes liées à l'offre.
+
+---
+
+### **[A FAIRE]** Gestion des compétences requises par offre
+
+- **Estimation :** 1,0 j
+- **Notes :** Lier les compétences au besoin de recrutement.
+
+---
 
 ## Front-office / API
 
-| Tâche | Estimation | Statut | Notes |
-| --- | ---: | --- | --- |
-| Affichage des offres publiées et génération du lien de candidature | 1,0 j | **[A FAIRE]** | Préparer l'accès candidat aux offres ouvertes. |
-| Tests et debug | 1,0 j | **[A FAIRE]** | Tester CRUD, publication, clôture et affichage public. |
-| **Total** | **9,0 j** |  |  |
+### **[A FAIRE]** Affichage des offres publiées et génération du lien de candidature
+
+- **Estimation :** 1,0 j
+- **Notes :** Préparer l'accès candidat aux offres ouvertes.
+
+---
+
+### **[A FAIRE]** Tests et debug
+
+- **Estimation :** 1,0 j
+- **Notes :** Tester CRUD, publication, clôture et affichage public.
+
+---
+
+## Total
+
+**Sprint 2 : 9,0 j**
+

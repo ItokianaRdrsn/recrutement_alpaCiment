@@ -2,35 +2,79 @@
 
 ## Avancement
 
-| Statut | Nombre |
-| --- | ---: |
-| **[FAIT]** | 0 |
-| **[EN COURS]** | 0 |
-| **[A FAIRE]** | 8 |
+- **[FAIT]** 0 tâche
+- **[EN COURS]** 0 tâche
+- **[A FAIRE]** 8 tâches
 
 ## Légende
 
-| Badge | Signification |
-| --- | --- |
-| **[FAIT]** | Tâche terminée et utilisable. |
-| **[EN COURS]** | Tâche commencée, mais pas encore totalement terminée. |
-| **[A FAIRE]** | Tâche prévue, non commencée. |
+- **[FAIT]** : tâche terminée et utilisable.
+- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
+- **[A FAIRE]** : tâche prévue, non commencée.
+
+---
 
 ## Back-office
 
-| Tâche | Estimation | Statut | Notes |
-| --- | ---: | --- | --- |
-| Gestion du vivier : ajout, retrait, consultation | 1,0 j | **[A FAIRE]** | Gérer les candidats conservés pour de futurs besoins. |
-| Recherche dans le vivier par compétence, domaine et direction | 1,0 j | **[A FAIRE]** | Retrouver rapidement des profils pertinents. |
-| CRUD du référentiel des compétences | 1,0 j | **[A FAIRE]** | Maintenir une base de compétences normalisée. |
-| Gestion manuelle des compétences, expériences et formations candidat | 1,5 j | **[A FAIRE]** | Permettre aux RH de corriger ou compléter les données. |
+### **[A FAIRE]** Gestion du vivier : ajout, retrait, consultation
+
+- **Estimation :** 1,0 j
+- **Notes :** Gérer les candidats conservés pour de futurs besoins.
+
+---
+
+### **[A FAIRE]** Recherche dans le vivier par compétence, domaine et direction
+
+- **Estimation :** 1,0 j
+- **Notes :** Retrouver rapidement des profils pertinents.
+
+---
+
+### **[A FAIRE]** CRUD du référentiel des compétences
+
+- **Estimation :** 1,0 j
+- **Notes :** Maintenir une base de compétences normalisée.
+
+---
+
+### **[A FAIRE]** Gestion manuelle des compétences, expériences et formations candidat
+
+- **Estimation :** 1,5 j
+- **Notes :** Permettre aux RH de corriger ou compléter les données.
+
+---
 
 ## OCR / IA
 
-| Tâche | Estimation | Statut | Notes |
-| --- | ---: | --- | --- |
-| Intégration FastAPI et extraction OCR avec PaddleOCR | 1,5 j | **[A FAIRE]** | Externaliser le traitement CV dans un service Python. |
-| Extraction des compétences, expériences et formations depuis le CV | 2,0 j | **[A FAIRE]** | Transformer le CV en données exploitables. |
-| Validation, correction et rejet des données extraites | 1,0 j | **[A FAIRE]** | Garder une validation humaine avant intégration définitive. |
-| Tests et debug | 1,0 j | **[A FAIRE]** | Tester OCR, extraction, validation et corrections. |
-| **Total** | **10,0 j** |  |  |
+### **[A FAIRE]** Intégration FastAPI et extraction OCR avec PaddleOCR
+
+- **Estimation :** 1,5 j
+- **Notes :** Externaliser le traitement CV dans un service Python.
+
+---
+
+### **[A FAIRE]** Extraction des compétences, expériences et formations depuis le CV
+
+- **Estimation :** 2,0 j
+- **Notes :** Transformer le CV en données exploitables.
+
+---
+
+### **[A FAIRE]** Validation, correction et rejet des données extraites
+
+- **Estimation :** 1,0 j
+- **Notes :** Garder une validation humaine avant intégration définitive.
+
+---
+
+### **[A FAIRE]** Tests et debug
+
+- **Estimation :** 1,0 j
+- **Notes :** Tester OCR, extraction, validation et corrections.
+
+---
+
+## Total
+
+**Sprint 5 : 10,0 j**
+
