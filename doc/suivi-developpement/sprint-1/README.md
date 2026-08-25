@@ -11,10 +11,10 @@ Installer une base technique stable pour commencer le développement métier : e
 ## Documents du sprint
 
 - `taches.md` : liste des tâches prévues.
-- `2026-08-25-socle-laravel-postgresql.md` : fiche de suivi sur la préparation Laravel, PostgreSQL, Composer, migrations, seeders et tests.
-- `2026-08-25-referentiel-type-contrat.md` : création du référentiel des types de contrat et liaison avec les offres.
-- `2026-08-25-refonte-profil-offre-criteres.md` : première réflexion sur les critères variables, corrigée ensuite.
-- `2026-08-25-correction-profil-offre-valeurs-generiques.md` : conservation de `profil_offre` avec des champs génériques.
+- `2026-08-25/socle-laravel-postgresql.md` : fiche de suivi sur la préparation Laravel, PostgreSQL, Composer, migrations, seeders et tests.
+- `2026-08-25/referentiel-type-contrat.md` : création du référentiel des types de contrat et liaison avec les offres.
+- `2026-08-25/refonte-profil-offre-criteres.md` : première réflexion sur les critères variables, corrigée ensuite.
+- `2026-08-25/correction-profil-offre-valeurs-generiques.md` : conservation de `profil_offre` avec des champs génériques.
 
 ## Etat actuel
 

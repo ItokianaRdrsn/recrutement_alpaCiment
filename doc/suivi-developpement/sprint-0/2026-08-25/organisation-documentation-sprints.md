@@ -25,18 +25,18 @@ Une organisation par sprint permet de retrouver rapidement :
 - Création d'un `README.md` dans chaque sprint pour expliquer l'objectif du sprint.
 - Création d'un `taches.md` dans chaque sprint avec les tâches, estimations, statuts et notes.
 - Création de `planning-sprints.md` pour garder une vue globale du scope de 70 jours.
-- Déplacement de la fiche `2026-08-25-socle-laravel-postgresql.md` dans `sprint-1`, car elle concerne le socle technique.
+- Déplacement de la fiche `socle-laravel-postgresql.md` dans `sprint-1/2026-08-25`, car elle concerne le socle technique.
 - Mise à jour du `README.md` principal du suivi de développement.
 
 ## Explication simple
 
 Au lieu d'avoir tous les documents mélangés dans un seul dossier, chaque sprint possède maintenant son propre espace.
-Quand une fonctionnalité sera développée, sa fiche de suivi sera ajoutée dans le dossier du sprint correspondant.
+Quand une fonctionnalité sera développée, sa fiche de suivi sera ajoutée dans le dossier daté du sprint correspondant.
 
 Exemple :
 
 ```text
-doc/suivi-developpement/sprint-2/2026-08-XX-crud-offres.md
+doc/suivi-developpement/sprint-2/2026-08-XX/crud-offres.md
 ```
 
 Cette méthode rendra le rapport final plus facile à construire, car chaque sprint aura déjà son historique.
@@ -65,4 +65,3 @@ Cette organisation est aussi cohérente avec l'utilisation de Laravel et des mig
 ## Suite logique
 
 Continuer le Sprint 1 en documentant chaque étape dans `doc/suivi-developpement/sprint-1/`.
-

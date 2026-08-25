@@ -18,6 +18,28 @@ Expliquer le besoin métier ou technique qui justifie la tâche.
 - Action 2.
 - Action 3.
 
+## Fichiers créés ou modifiés
+
+### Fichiers créés
+
+- `chemin/du/fichier` : rôle du fichier.
+
+### Fichiers modifiés
+
+- `chemin/du/fichier` : modification réalisée.
+
+## Explication du code
+
+Expliquer les parties importantes du code :
+
+- contrôleurs ;
+- modèles ;
+- migrations ;
+- seeders ;
+- routes ;
+- vues ;
+- tests.
+
 ## Explication simple
 
 Expliquer avec des mots simples ce que cette tâche apporte au projet.
@@ -38,4 +60,3 @@ Expliquer pourquoi cette solution a été choisie plutôt qu'une autre, en s'app
 ## Suite logique
 
 Décrire ce qu'il faudra faire ensuite.
-

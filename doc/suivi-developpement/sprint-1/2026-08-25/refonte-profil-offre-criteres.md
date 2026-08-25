@@ -5,7 +5,7 @@
 Cette fiche garde la trace d'une piste de modélisation qui a été corrigée ensuite.
 La table séparée `critere_offre` n'a finalement pas été conservée.
 
-La décision retenue est documentée dans `2026-08-25-correction-profil-offre-valeurs-generiques.md` :
+La décision retenue est documentée dans `correction-profil-offre-valeurs-generiques.md` :
 
 - conserver la table `profil_offre` ;
 - remplacer les libellés trop spécifiques à l'expérience par des champs génériques ;
@@ -61,6 +61,26 @@ Mettre uniquement `experience_min_annees` et `experience_max_annees` dans `profi
   - `ProfilFormation::offre()`.
 - Ajout de `ordre_workflow` dans `statut_offre`.
 - Alignement du script SQL `sql/gestion_recrutement.sql`.
+
+## Fichiers concernés pendant cette piste
+
+Cette piste a temporairement concerné les fichiers suivants :
+
+- `code_source/recrutement/database/migrations/2026_08_24_000200_create_offres_tables.php` : ajout temporaire d'une table `critere_offre`.
+- `code_source/recrutement/app/Models/CritereOffre.php` : modèle temporaire supprimé ensuite.
+- `code_source/recrutement/app/Models/Offre.php` : relation temporaire `criteres()` supprimée ensuite.
+- `sql/gestion_recrutement.sql` : ajout temporaire de `critere_offre`, retiré ensuite.
+
+Ces modifications ne représentent pas l'état final.
+La version conservée est décrite dans `correction-profil-offre-valeurs-generiques.md`.
+
+## Explication du code abandonné
+
+L'idée était de créer une table fille `critere_offre` avec plusieurs lignes par offre.
+Chaque ligne aurait représenté un critère : âge, expérience, permis, date ou autre.
+
+Cette solution était plus flexible, mais elle ajoutait une couche de complexité trop tôt pour la V1.
+Après correction, les valeurs génériques ont été replacées directement dans `profil_offre`.
 
 ## Explication simple
 

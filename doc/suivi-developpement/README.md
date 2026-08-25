@@ -14,7 +14,7 @@ Dans chaque dossier de sprint :
 
 - `README.md` : objectif du sprint et documents associés.
 - `taches.md` : liste des tâches, estimation et statut.
-- Les fichiers datés `YYYY-MM-DD-*.md` : fiches de suivi rédigées au fil du développement.
+- Les dossiers datés `YYYY-MM-DD/` : fiches de suivi du jour, avec des noms descriptifs.
 
 ## Règle de documentation
 
@@ -24,6 +24,8 @@ Dans chaque dossier de sprint :
 - la tâche réalisée ;
 - le problème ou besoin de départ ;
 - les actions effectuées ;
+- les fichiers créés ou modifiés ;
+- l'explication du code important ;
 - l'explication simple pour comprendre ;
 - la justification technique ;
 - les sources utilisées ;
@@ -35,11 +37,11 @@ Dans chaque dossier de sprint :
 Format recommandé :
 
 ```text
-YYYY-MM-DD-nom-court-de-la-tache.md
+YYYY-MM-DD/nom-court-de-la-tache.md
 ```
 
 Exemple :
 
 ```text
-sprint-1/2026-08-25-socle-laravel-postgresql.md
+sprint-1/2026-08-25/socle-laravel-postgresql.md
 ```
