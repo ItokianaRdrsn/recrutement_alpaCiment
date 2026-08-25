@@ -12,9 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('direction', function (Blueprint $table) {
-            $table->id();
-            $table->string('nom_direction');
-            $table->timestamps();
+            $table->id('id_direction');
+            $table->string('nom_direction', 150)->unique();
         });
     }
 
@@ -23,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('directions');
+        Schema::dropIfExists('direction');
     }
 };
