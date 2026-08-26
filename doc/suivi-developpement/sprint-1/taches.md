@@ -33,7 +33,7 @@
 ### **[FAIT]** Mise en place de l'architecture API REST
 
 - **Estimation :** 1,0 j
-- **Notes :** Routes API ajoutées pour `/api/me`, `/api/dashboard`, `/api/referentiels/recrutement`, `/api/offres` et `/api/offres/{id}`. Contrôleurs API, resource JSON et conventions de réponse créés.
+- **Notes :** Routes API ajoutées pour `/api/csrf-token`, `/api/me`, `/api/dashboard`, `/api/referentiels/recrutement`, `/api/offres` et `/api/offres/{id}`. Contrôleurs API, resource JSON et conventions de réponse créés.
 
 ---
 
@@ -49,14 +49,14 @@
 ### **[FAIT]** Installation de React avec Vite et structure de navigation
 
 - **Estimation :** 1,0 j
-- **Notes :** Dépendances React installées, plugin React ajouté à Vite, point d'entrée `resources/js/app.jsx` créé, navigation dashboard/offres disponible.
+- **Notes :** React/Vite est séparé de Laravel dans `code_source/recrutement-react`. Le point d'entrée est `src/main.jsx`, avec navigation dashboard/offres disponible.
 
 ---
 
 ### **[FAIT]** Intégration de la mise en page générale du back-office
 
 - **Estimation :** 1,0 j
-- **Notes :** Première mise en page React créée avec sidebar, barre supérieure, cartes KPI, filtres, tableau des offres et pagination. La mise en page pourra être enrichie au fur et à mesure des modules.
+- **Notes :** Première mise en page React créée dans le projet frontend séparé, avec sidebar, barre supérieure, cartes KPI, filtres, tableau des offres et pagination. La mise en page pourra être enrichie au fur et à mesure des modules.
 
 ---
 

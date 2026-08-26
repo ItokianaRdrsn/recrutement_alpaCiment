@@ -6,195 +6,177 @@
 
 ## Tâche
 
-Installer React dans le projet Laravel, configurer Vite pour compiler l'interface, puis créer une première navigation back-office pour le dashboard et les offres.
+Créer un frontend React séparé du projet Laravel, puis y installer la première navigation back-office.
 
 ## Pourquoi faire cela
 
-Le projet doit utiliser Laravel pour le backend/API et React pour l'interface.
+Le projet utilise Laravel pour le backend/API et React pour l'interface.
+Pour éviter de mélanger les responsabilités, React est placé dans un dossier séparé :
 
-Avant de développer les modules métier détaillés, il faut avoir une base front stable :
+- `code_source/recrutement` : backend Laravel, authentification, API, PostgreSQL ;
+- `code_source/recrutement-react` : frontend React, Vite, interface utilisateur.
 
-- un point d'entrée React ;
-- une page Blade qui charge React ;
-- une navigation interne ;
-- des appels API vers Laravel ;
-- une mise en page de back-office réutilisable.
+Cette séparation rend l'architecture plus claire et prépare mieux l'arrivée éventuelle d'un service FastAPI.
 
 ## Actions réalisées
 
-- Installation des dépendances `react`, `react-dom`, `lucide-react` et `@vitejs/plugin-react`.
-- Création du fichier `resources/js/app.jsx`.
-- Configuration de Vite pour compiler React.
-- Création d'une vue Blade `backoffice.blade.php` qui sert de conteneur à React.
-- Remplacement des anciennes vues Blade isolées du dashboard et des offres par le conteneur React.
-- Création d'un premier dashboard React avec KPI et offres récentes.
-- Création d'une page offres React avec recherche, filtres et pagination.
-- Ajout d'un endpoint API `/api/dashboard`.
-- Mise à jour du CSS global pour une interface back-office responsive.
+- Création du dossier `code_source/recrutement-react`.
+- Déplacement du code React vers `code_source/recrutement-react/src/main.jsx`.
+- Déplacement du CSS React vers `code_source/recrutement-react/src/styles.css`.
+- Création d'un projet Vite autonome avec `index.html`, `package.json` et `vite.config.js`.
+- Installation des dépendances React.
+- Configuration d'un proxy Vite vers Laravel pour `/api` et `/logout`.
+- Conservation du login côté Laravel.
+- Redirection Laravel vers le frontend React après authentification.
+- Ajout d'un endpoint `/api/csrf-token` pour permettre la déconnexion depuis React.
 
 ## Fichiers créés ou modifiés
 
-### Fichiers créés
+### Frontend React
 
-- `code_source/recrutement/resources/views/backoffice.blade.php` : conteneur HTML principal de l'application React.
-- `code_source/recrutement/resources/js/app.jsx` : point d'entrée React et composants du back-office.
-- `code_source/recrutement/app/Http/Controllers/Api/DashboardController.php` : endpoint JSON du dashboard.
-- `code_source/recrutement/package-lock.json` : verrouillage des versions npm installées.
+- `code_source/recrutement-react/index.html`
+- `code_source/recrutement-react/package.json`
+- `code_source/recrutement-react/package-lock.json`
+- `code_source/recrutement-react/vite.config.js`
+- `code_source/recrutement-react/.env.example`
+- `code_source/recrutement-react/.gitignore`
+- `code_source/recrutement-react/src/main.jsx`
+- `code_source/recrutement-react/src/styles.css`
+- `code_source/recrutement-react/README.md`
 
-### Fichiers modifiés
+### Backend Laravel
 
-- `code_source/recrutement/package.json` : ajout des dépendances React, ReactDOM, Lucide React et du plugin React pour Vite.
-- `code_source/recrutement/vite.config.js` : ajout du plugin React et remplacement de l'entrée JS par `resources/js/app.jsx`.
-- `code_source/recrutement/resources/css/app.css` : styles de la sidebar, du dashboard, des filtres, des tableaux et des états responsive.
-- `code_source/recrutement/routes/api.php` : ajout de la route `/api/dashboard`.
-- `code_source/recrutement/app/Http/Controllers/DashboardController.php` : retour de la vue React `backoffice`.
-- `code_source/recrutement/app/Http/Controllers/OffreController.php` : retour de la vue React `backoffice`.
-- `doc/suivi-developpement/sources.md` : ajout des sources React/Vite/Lucide.
-- `doc/suivi-developpement/sprint-1/taches.md` : mise à jour de l'avancement.
-- `doc/suivi-developpement/sprint-1/README.md` : ajout de cette fiche.
+- `code_source/recrutement/config/app.php`
+- `code_source/recrutement/.env`
+- `code_source/recrutement/.env.example`
+- `code_source/recrutement/app/Http/Controllers/DashboardController.php`
+- `code_source/recrutement/app/Http/Controllers/OffreController.php`
+- `code_source/recrutement/routes/api.php`
+- `code_source/recrutement/composer.json`
 
-### Fichier supprimé
+### Fichiers supprimés de Laravel
 
-- `code_source/recrutement/resources/js/app.js` : ancien fichier vide remplacé par `app.jsx`.
-- `code_source/recrutement/resources/views/dashboard.blade.php` : ancienne vue Blade remplacée par l'interface React.
-- `code_source/recrutement/resources/views/offres/index.blade.php` : ancienne vue Blade remplacée par l'interface React.
+- `code_source/recrutement/package.json`
+- `code_source/recrutement/package-lock.json`
+- `code_source/recrutement/vite.config.js`
+- `code_source/recrutement/resources/js/app.jsx`
+- `code_source/recrutement/resources/css/app.css`
+- `code_source/recrutement/resources/views/backoffice.blade.php`
+- `code_source/recrutement/resources/views/welcome.blade.php`
+- `code_source/recrutement/node_modules`
+- `code_source/recrutement/public/build`
 
 ## Explication du code
 
-### Configuration Vite
+### Frontend autonome
 
-Dans `vite.config.js`, le plugin React a été ajouté :
+Le frontend est lancé depuis `code_source/recrutement-react`.
+Son point d'entrée est `src/main.jsx`.
 
-```js
-import react from '@vitejs/plugin-react';
-```
-
-Puis l'entrée JavaScript devient :
-
-```js
-input: ['resources/css/app.css', 'resources/js/app.jsx'],
-```
-
-Cela indique à Vite de compiler le CSS global et le point d'entrée React.
-
-### Vue Blade conteneur
-
-`backoffice.blade.php` garde le lien entre Laravel et React.
-
-Elle contient :
-
-- le token CSRF Laravel ;
-- le formulaire de déconnexion Laravel ;
-- la directive `@viteReactRefresh` pour le développement ;
-- la directive `@vite(...)` pour charger le CSS et le JavaScript compilés ;
-- la div `#recrutement-app` dans laquelle React est monté.
-
-### Point d'entrée React
-
-Dans `app.jsx`, React est monté avec :
+React est monté avec :
 
 ```jsx
 createRoot(document.getElementById('recrutement-app')).render(<App />);
 ```
 
-Le composant `App` charge les données de base :
+### Proxy Vite
 
-- `/api/me` pour l'utilisateur connecté ;
-- `/api/referentiels/recrutement` pour les directions, statuts et types de contrat.
+Dans `vite.config.js`, les appels `/api` et `/logout` sont redirigés vers Laravel :
 
-### Navigation
+```js
+proxy: {
+    '/api': {
+        target: backendUrl,
+        changeOrigin: true,
+    },
+    '/logout': {
+        target: backendUrl,
+        changeOrigin: true,
+    },
+}
+```
 
-Le composant `AppShell` crée la structure générale :
+### Redirection Laravel vers React
 
-- sidebar ;
-- navigation dashboard/offres ;
-- barre supérieure ;
-- zone de contenu.
+Laravel garde les routes `/dashboard` et `/offres`, mais elles redirigent vers le frontend :
 
-La navigation utilise l'URL du navigateur avec `history.pushState`.
-Cela permet de garder les routes `/dashboard` et `/offres` côté Laravel, tout en changeant la vue affichée côté React.
+```php
+return redirect()->away($this->frontendUrl('/dashboard'));
+```
 
-### Dashboard
+Ainsi, après connexion, l'utilisateur arrive sur React.
 
-`DashboardView` appelle `/api/dashboard`.
+### Gestion de la déconnexion
 
-Il affiche :
+Comme la session reste gérée par Laravel, React récupère un token CSRF avec :
 
-- les offres publiées ;
-- le total des offres ;
-- les candidatures sur offre ;
-- les domaines en attente ;
-- les offres récentes.
+```text
+GET /api/csrf-token
+```
 
-Les candidatures restent à `0` pour le moment, car les tables de candidature seront traitées dans les sprints suivants.
-
-### Page offres
-
-`OffersView` appelle `/api/offres`.
-
-Elle permet déjà :
-
-- la recherche texte ;
-- le filtre par direction ;
-- le filtre par statut ;
-- le filtre par type de contrat ;
-- la pagination.
-
-Les filtres sont envoyés à Laravel sous forme de query string.
-Laravel valide ensuite ces paramètres dans le contrôleur API.
-
-### Interface et responsive
-
-`app.css` définit une interface de back-office :
-
-- sidebar sombre ;
-- barre supérieure claire ;
-- cartes KPI ;
-- barre de filtres ;
-- tableau de données ;
-- états de chargement et d'erreur ;
-- adaptation mobile.
-
-L'objectif n'est pas de faire une page marketing, mais une interface de travail RH simple à lire et à enrichir.
+Puis il fait un `POST /logout`.
 
 ## Explication simple
 
-Avant, le dashboard et la page offres étaient des vues Blade séparées.
-Maintenant, Laravel sert une seule base HTML, et React construit l'interface du back-office en récupérant les données depuis l'API Laravel.
+Avant, React était dans le dossier Laravel.
+Maintenant, il y a deux projets :
 
-Cela prépare le projet pour les prochains écrans : candidatures, vivier, rendez-vous, communications et matching.
+- Laravel sert les données, la sécurité et les routes API ;
+- React affiche l'interface et consomme ces API.
+
+## Commandes utiles
+
+Backend Laravel :
+
+```bash
+cd code_source/recrutement
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+Frontend React :
+
+```bash
+cd code_source/recrutement-react
+npm install
+npm run dev
+```
+
+Accès :
+
+```text
+http://127.0.0.1:8000/login
+http://127.0.0.1:5173/dashboard
+```
 
 ## Justification technique
 
-Laravel recommande Vite pour compiler les ressources frontend modernes. `[LARAVEL-VITE]`
+Laravel reste responsable de l'authentification, des middlewares et des réponses API. `[LARAVEL-AUTHENTICATION]` `[LARAVEL-MIDDLEWARE]`
 
-Vite permet d'utiliser React avec un plugin officiel dédié. `[VITE-PLUGIN-REACT]`
+React est adapté pour construire une interface à composants réutilisables. `[REACT-COMPONENTS]`
 
-React sépare l'interface en composants réutilisables, ce qui convient aux écrans back-office qui vont grossir progressivement. `[REACT-COMPONENTS]`
+Vite permet de lancer un projet React indépendant avec un serveur de développement rapide. `[VITE-GUIDE]`
 
-`createRoot` est l'API React DOM utilisée pour monter une application React moderne dans une page HTML. `[REACT-CREATE-ROOT]`
+Le proxy Vite permet de rediriger les requêtes frontend vers le backend Laravel pendant le développement. `[VITE-SERVER]`
 
-Les hooks React permettent de gérer l'état local, les chargements API et les effets de bord. `[REACT-HOOKS]`
-
-Lucide React fournit des icônes SVG sous forme de composants React, pratiques pour les boutons et la navigation. `[LUCIDE-REACT]`
+La protection CSRF Laravel reste importante pour les requêtes `POST`, comme la déconnexion. `[LARAVEL-CSRF]`
 
 ## Sources
 
-- `[LARAVEL-VITE]` Laravel 13.x - Vite : https://laravel.com/docs/13.x/vite
-- `[VITE-GUIDE]` Vite - Guide : https://vite.dev/guide/
-- `[VITE-PLUGIN-REACT]` Vite React plugin - Documentation : https://github.com/vitejs/vite-plugin-react
+- `[LARAVEL-AUTHENTICATION]` Laravel 13.x - Authentication : https://laravel.com/docs/13.x/authentication
+- `[LARAVEL-MIDDLEWARE]` Laravel 13.x - Middleware : https://laravel.com/docs/13.x/middleware
+- `[LARAVEL-CSRF]` Laravel 13.x - CSRF Protection : https://laravel.com/docs/13.x/csrf
 - `[REACT-COMPONENTS]` React - Learn / Components and Hooks : https://react.dev/learn
-- `[REACT-CREATE-ROOT]` React DOM - `createRoot` : https://react.dev/reference/react-dom/client/createRoot
-- `[REACT-HOOKS]` React - Built-in Hooks : https://react.dev/reference/react/hooks
-- `[LUCIDE-REACT]` Lucide React - Guide : https://lucide.dev/guide/packages/lucide-react
+- `[VITE-GUIDE]` Vite - Guide : https://vite.dev/guide/
+- `[VITE-SERVER]` Vite - Server options / proxy : https://vite.dev/config/server-options.html#server-proxy
 
 ## Vérifications
 
-- `php -l` sur les contrôleurs et routes modifiés : aucune erreur de syntaxe.
-- `php artisan route:list --path=api` : 5 routes API enregistrées.
-- `npm run build` : build Vite réussi.
-- `php artisan test` : 7 tests réussis.
+- `npm install` dans `code_source/recrutement-react` : dépendances installées.
+- `npm run build` dans `code_source/recrutement-react` : build Vite réussi.
+- `php -l` sur les contrôleurs Laravel modifiés : aucune erreur de syntaxe.
+- `php artisan route:list --path=api` : 6 routes API, dont `/api/csrf-token`.
+- `php artisan test` dans `code_source/recrutement` : 7 tests réussis.
 
 ## Suite logique
 
-Continuer le Sprint 1 avec les permissions plus fines, puis préparer le passage au Sprint 2 : CRUD directions, domaines et offres.
+Lancer Laravel et React séparément, puis continuer le Sprint 1 avec la finalisation des rôles et permissions.

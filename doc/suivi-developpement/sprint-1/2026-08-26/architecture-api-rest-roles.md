@@ -26,6 +26,7 @@ Avant de créer les écrans React, il faut donc définir :
 - Création d'un middleware `role`.
 - Protection des routes back-office web par `auth` + `role:rh,admin`.
 - Création des routes API :
+  - `GET /api/csrf-token` ;
   - `GET /api/me` ;
   - `GET /api/dashboard` ;
   - `GET /api/referentiels/recrutement` ;
@@ -212,7 +213,7 @@ La validation des filtres avec `$request->validate()` évite d'utiliser directem
 ## Vérifications
 
 - `php -l` sur les fichiers PHP ajoutés ou modifiés : aucune erreur de syntaxe.
-- `php artisan route:list --path=api` : 5 routes API enregistrées.
+- `php artisan route:list --path=api` : 6 routes API enregistrées.
 - `php artisan test` : 7 tests réussis.
 
 ## Suite logique

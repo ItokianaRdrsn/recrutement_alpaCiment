@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import './styles.css';
 import {
     BriefcaseBusiness,
     CalendarDays,
@@ -14,18 +15,22 @@ import {
     Users,
 } from 'lucide-react';
 
-const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+const backendUrl = (import.meta.env.VITE_BACKEND_URL ?? '').replace(/\/$/, '');
+
+function backendPath(path) {
+    return backendUrl ? `${backendUrl}${path}` : path;
+}
 
 async function getJson(url) {
     const response = await fetch(url, {
-        credentials: 'same-origin',
+        credentials: 'include',
         headers: {
             Accept: 'application/json',
         },
     });
 
     if (response.status === 401) {
-        window.location.href = '/login';
+        window.location.href = backendPath('/login');
         return null;
     }
 
@@ -44,11 +49,21 @@ function formatDate(value) {
     return new Intl.DateTimeFormat('fr-FR').format(new Date(value));
 }
 
-function submitLogout() {
-    const form = document.getElementById('logout-form');
+async function submitLogout() {
+    try {
+        const csrfResponse = await getJson('/api/csrf-token');
+        const token = csrfResponse?.data?.token ?? '';
 
-    if (form instanceof HTMLFormElement) {
-        form.submit();
+        await fetch('/logout', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': token,
+            },
+        });
+    } finally {
+        window.location.href = backendPath('/login');
     }
 }
 
@@ -478,10 +493,6 @@ function ErrorState({ message, onRetry }) {
             ) : null}
         </div>
     );
-}
-
-if (csrfToken) {
-    window.recrutementCsrfToken = csrfToken;
 }
 
 createRoot(document.getElementById('recrutement-app')).render(<App />);

@@ -9,6 +9,7 @@ Cette page regroupe les sources officielles ou primaires utilisées pour justifi
 - `[LARAVEL-ROUTING]` Laravel 13.x - Routing : https://laravel.com/docs/13.x/routing
 - `[LARAVEL-MIDDLEWARE]` Laravel 13.x - Middleware : https://laravel.com/docs/13.x/middleware
 - `[LARAVEL-AUTHENTICATION]` Laravel 13.x - Authentication : https://laravel.com/docs/13.x/authentication
+- `[LARAVEL-CSRF]` Laravel 13.x - CSRF Protection : https://laravel.com/docs/13.x/csrf
 - `[LARAVEL-RESOURCES]` Laravel 13.x - Eloquent API Resources : https://laravel.com/docs/13.x/eloquent-resources
 - `[LARAVEL-VALIDATION]` Laravel 13.x - Validation : https://laravel.com/docs/13.x/validation
 - `[LARAVEL-VITE]` Laravel 13.x - Vite : https://laravel.com/docs/13.x/vite
@@ -35,6 +36,7 @@ Cette page regroupe les sources officielles ou primaires utilisées pour justifi
 ## Vite et interface
 
 - `[VITE-GUIDE]` Vite - Guide : https://vite.dev/guide/
+- `[VITE-SERVER]` Vite - Server options / proxy : https://vite.dev/config/server-options.html#server-proxy
 - `[VITE-PLUGIN-REACT]` Vite React plugin - Documentation : https://github.com/vitejs/vite-plugin-react
 - `[LUCIDE-REACT]` Lucide React - Guide : https://lucide.dev/guide/packages/lucide-react
 

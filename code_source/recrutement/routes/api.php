@@ -7,6 +7,11 @@ use App\Http\Controllers\Api\ReferentielController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth', 'role:rh,admin'])->group(function (): void {
+    Route::get('/csrf-token', fn () => response()->json([
+        'data' => [
+            'token' => csrf_token(),
+        ],
+    ]))->name('api.csrf-token');
     Route::get('/me', MeController::class)->name('api.me');
     Route::get('/dashboard', DashboardController::class)->name('api.dashboard');
     Route::get('/referentiels/recrutement', ReferentielController::class)->name('api.referentiels.recrutement');
