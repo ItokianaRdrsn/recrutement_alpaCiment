@@ -6,6 +6,12 @@ Cette page regroupe les sources officielles ou primaires utilisées pour justifi
 
 - `[LARAVEL-CONFIG]` Laravel 13.x - Configuration : https://laravel.com/docs/13.x/configuration
 - `[LARAVEL-APP-KEY]` Laravel 13.x - Encryption et `APP_KEY` : https://laravel.com/docs/13.x/encryption
+- `[LARAVEL-ROUTING]` Laravel 13.x - Routing : https://laravel.com/docs/13.x/routing
+- `[LARAVEL-MIDDLEWARE]` Laravel 13.x - Middleware : https://laravel.com/docs/13.x/middleware
+- `[LARAVEL-AUTHENTICATION]` Laravel 13.x - Authentication : https://laravel.com/docs/13.x/authentication
+- `[LARAVEL-RESOURCES]` Laravel 13.x - Eloquent API Resources : https://laravel.com/docs/13.x/eloquent-resources
+- `[LARAVEL-VALIDATION]` Laravel 13.x - Validation : https://laravel.com/docs/13.x/validation
+- `[LARAVEL-VITE]` Laravel 13.x - Vite : https://laravel.com/docs/13.x/vite
 - `[LARAVEL-MIGRATIONS]` Laravel - Database Migrations : https://laravel.com/framework/docs/migrations
 - `[LARAVEL-SEEDING]` Laravel 13.x - Database Seeding : https://laravel.com/docs/13.x/seeding
 
@@ -23,6 +29,14 @@ Cette page regroupe les sources officielles ou primaires utilisées pour justifi
 
 - `[REACT-COMPONENTS]` React - Learn / Components and Hooks : https://react.dev/learn
 - `[REACT-REFERENCE]` React - API Reference : https://react.dev/reference/react
+- `[REACT-CREATE-ROOT]` React DOM - `createRoot` : https://react.dev/reference/react-dom/client/createRoot
+- `[REACT-HOOKS]` React - Built-in Hooks : https://react.dev/reference/react/hooks
+
+## Vite et interface
+
+- `[VITE-GUIDE]` Vite - Guide : https://vite.dev/guide/
+- `[VITE-PLUGIN-REACT]` Vite React plugin - Documentation : https://github.com/vitejs/vite-plugin-react
+- `[LUCIDE-REACT]` Lucide React - Guide : https://lucide.dev/guide/packages/lucide-react
 
 ## FastAPI
 
@@ -39,4 +53,3 @@ Cette page regroupe les sources officielles ou primaires utilisées pour justifi
 - `[GITHUB-MARKDOWN-TASKS]` GitHub Docs - Basic writing and formatting syntax / task lists : https://docs.github.com/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax
 - `[GITHUB-MARKDOWN-TABLES]` GitHub Docs - Organizing information with tables : https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables
 - `[GFM-SPEC]` GitHub Flavored Markdown Spec : https://github.github.com/gfm/
-

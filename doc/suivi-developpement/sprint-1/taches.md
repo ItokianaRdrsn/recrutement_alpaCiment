@@ -2,9 +2,9 @@
 
 ## Avancement
 
-- **[FAIT]** 1 tâche
+- **[FAIT]** 4 tâches
 - **[EN COURS]** 3 tâches
-- **[A FAIRE]** 3 tâches
+- **[A FAIRE]** 0 tâche
 
 ## Légende
 
@@ -30,40 +30,40 @@
 
 ---
 
-### **[A FAIRE]** Mise en place de l'architecture API REST
+### **[FAIT]** Mise en place de l'architecture API REST
 
 - **Estimation :** 1,0 j
-- **Notes :** Préparer les routes API, contrôleurs API, réponses JSON et conventions.
+- **Notes :** Routes API ajoutées pour `/api/me`, `/api/dashboard`, `/api/referentiels/recrutement`, `/api/offres` et `/api/offres/{id}`. Contrôleurs API, resource JSON et conventions de réponse créés.
 
 ---
 
 ### **[EN COURS]** Authentification et gestion des rôles RH / admin
 
 - **Estimation :** 2,0 j
-- **Notes :** Connexion de base créée. Il reste à finaliser les middlewares, permissions et écrans selon rôle.
+- **Notes :** Connexion de base créée. Middleware `role:rh,admin` ajouté pour protéger le back-office et l'API interne. Il reste à finaliser les permissions plus fines selon les futurs écrans.
 
 ---
 
 ## Front-office / Interface
 
-### **[A FAIRE]** Installation de React avec Vite et structure de navigation
+### **[FAIT]** Installation de React avec Vite et structure de navigation
 
 - **Estimation :** 1,0 j
-- **Notes :** Préparer le frontend React.
+- **Notes :** Dépendances React installées, plugin React ajouté à Vite, point d'entrée `resources/js/app.jsx` créé, navigation dashboard/offres disponible.
 
 ---
 
-### **[EN COURS]** Intégration de la mise en page générale du back-office
+### **[FAIT]** Intégration de la mise en page générale du back-office
 
 - **Estimation :** 1,0 j
-- **Notes :** Premières vues Blade de test présentes. La version React/back-office reste à construire.
+- **Notes :** Première mise en page React créée avec sidebar, barre supérieure, cartes KPI, filtres, tableau des offres et pagination. La mise en page pourra être enrichie au fur et à mesure des modules.
 
 ---
 
-### **[A FAIRE]** Tests et debug
+### **[EN COURS]** Tests et debug
 
 - **Estimation :** 0,5 j
-- **Notes :** Tests Laravel OK : login, dashboard et offres protégées. Migration et seed validés après ajout du référentiel `type_contrat` et correction du profil d'offre. Les tests du sprint complet restent à faire.
+- **Notes :** Tests Laravel OK : login, dashboard, offres protégées et accès API par rôle. `php artisan test` passe avec 7 tests. `npm run build` passe également. Les tests du sprint complet restent à faire après les permissions finales.
 
 ---
 

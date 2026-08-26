@@ -10,7 +10,7 @@ Route::get('/login', [SessionController::class, 'create'])->name('login');
 Route::post('/login', [SessionController::class, 'store'])->name('login.store');
 Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('logout');
 
-Route::middleware('auth')->group(function (): void {
+Route::middleware(['auth', 'role:rh,admin'])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/offres', [OffreController::class, 'index'])->name('offres.index');
 });
