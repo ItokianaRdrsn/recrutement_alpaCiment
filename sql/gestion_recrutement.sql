@@ -59,14 +59,28 @@ VALUES ('Offre'),
 -- ============================================================
 CREATE TABLE statut_offre (
     id_statut_offre BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    libelle VARCHAR(50) NOT NULL UNIQUE,
+    ordre_workflow INTEGER NOT NULL DEFAULT 0
+);
+INSERT INTO statut_offre (libelle, ordre_workflow)
+VALUES ('Brouillon', 1),
+    ('Publiee', 2),
+    ('Cloturee', 3);
+-- ============================================================
+-- 6. TYPE DE CONTRAT
+-- ============================================================
+CREATE TABLE type_contrat (
+    id_type_contrat BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL UNIQUE
 );
-INSERT INTO statut_offre (libelle)
-VALUES ('Brouillon'),
-    ('Publiee'),
-    ('Cloturee');
+INSERT INTO type_contrat (libelle)
+VALUES ('CDI'),
+    ('CDD'),
+    ('Stage'),
+    ('Interim'),
+    ('Consultance');
 -- ============================================================
--- 6. OFFRE
+-- 7. OFFRE
 -- ============================================================
 CREATE TABLE offre (
     id_offre BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -74,7 +88,7 @@ CREATE TABLE offre (
     id_direction BIGINT NOT NULL REFERENCES direction(id_direction) ON DELETE RESTRICT,
     description TEXT,
     lieu VARCHAR(200),
-    type_contrat VARCHAR(50),
+    id_type_contrat BIGINT REFERENCES type_contrat(id_type_contrat) ON DELETE RESTRICT,
     date_publication DATE,
     date_limite DATE,
     id_statut_offre BIGINT NOT NULL REFERENCES statut_offre(id_statut_offre) ON DELETE RESTRICT,
@@ -87,6 +101,7 @@ CREATE TABLE offre (
     )
 );
 CREATE INDEX idx_offre_direction ON offre(id_direction);
+CREATE INDEX idx_offre_type_contrat ON offre(id_type_contrat);
 CREATE INDEX idx_offre_statut ON offre(id_statut_offre);
 -- ============================================================
 -- PROFIL RECHERCHE POUR UNE OFFRE
@@ -95,18 +110,13 @@ CREATE TABLE profil_offre (
     id_profil_offre BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_offre BIGINT NOT NULL UNIQUE REFERENCES offre(id_offre) ON DELETE CASCADE,
     description TEXT,
-    experience_min_annees NUMERIC(4, 1),
-    experience_max_annees NUMERIC(4, 1),
+    type_valeur VARCHAR(50),
+    valeur_min VARCHAR(100),
+    valeur_max VARCHAR(100),
+    valeur_attendue VARCHAR(200),
+    unite_valeur VARCHAR(50),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    CONSTRAINT chk_profil_experience_min CHECK (
-        experience_min_annees IS NULL
-        OR experience_min_annees >= 0
-    ),
-    CONSTRAINT chk_profil_experience_max CHECK (
-        experience_max_annees IS NULL
-        OR experience_max_annees >= COALESCE(experience_min_annees, 0)
-    )
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_profil_offre_offre ON profil_offre(id_offre);
 -- ============================================================
@@ -127,7 +137,7 @@ CREATE INDEX idx_mission_offre ON mission(id_offre);
 -- ============================================================
 CREATE TABLE profil_formation (
     id_profil_formation BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_profil_offre BIGINT NOT NULL REFERENCES profil_offre(id_profil_offre) ON DELETE CASCADE,
+    id_offre BIGINT NOT NULL REFERENCES offre(id_offre) ON DELETE CASCADE,
     niveau_min VARCHAR(50),
     niveau_max VARCHAR(50),
     domaine VARCHAR(150),
@@ -139,7 +149,7 @@ CREATE TABLE profil_formation (
         OR domaine IS NOT NULL
     )
 );
-CREATE INDEX idx_profil_formation_profil ON profil_formation(id_profil_offre);
+CREATE INDEX idx_profil_formation_offre ON profil_formation(id_offre);
 -- ============================================================
 -- 7. CANDIDAT
 -- ============================================================
@@ -430,12 +440,13 @@ VALUES ('Test'),
     ('Entretien');
 CREATE TABLE statut_rendez_vous (
     id_statut_rendez_vous BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    libelle VARCHAR(50) NOT NULL UNIQUE
+    libelle VARCHAR(50) NOT NULL UNIQUE,
+    ordre_workflow INTEGER NOT NULL DEFAULT 0
 );
-INSERT INTO statut_rendez_vous (libelle)
-VALUES ('A venir'),
-    ('Realise'),
-    ('Annule');
+INSERT INTO statut_rendez_vous (libelle, ordre_workflow)
+VALUES ('A venir', 1),
+    ('Realise', 2),
+    ('Annule', 3);
 CREATE TABLE mode_realisation (
     id_mode_realisation BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     libelle VARCHAR(50) NOT NULL UNIQUE
@@ -627,12 +638,14 @@ VALUES ('Developpement Web', 1, TRUE),
 INSERT INTO offre (
         titre_poste,
         id_direction,
+        id_type_contrat,
         date_publication,
         date_limite,
         id_statut_offre
     )
 VALUES (
         'Developpeur Full Stack',
+        1,
         1,
         '2026-01-15',
         '2026-03-15',
@@ -641,12 +654,14 @@ VALUES (
     (
         'Developpeur React Native',
         1,
+        1,
         '2026-02-01',
         '2026-04-01',
         2
     ),
     (
         'Data Engineer',
+        1,
         1,
         '2026-01-20',
         '2026-03-20',
@@ -655,14 +670,16 @@ VALUES (
     (
         'Responsable Recrutement',
         2,
+        1,
         '2026-01-10',
         '2026-02-10',
         3
     ),
-    ('Comptable', 3, '2026-02-01', '2026-04-01', 1),
+    ('Comptable', 3, 1, '2026-02-01', '2026-04-01', 1),
     (
         'Chargé de Marketing Digital',
         4,
+        2,
         '2026-01-25',
         '2026-03-25',
         2
@@ -670,6 +687,7 @@ VALUES (
     (
         'Commercial Senior',
         5,
+        1,
         '2026-01-15',
         '2026-03-15',
         2

@@ -19,6 +19,12 @@ return new class extends Migration
         Schema::create('statut_offre', function (Blueprint $table) {
             $table->id('id_statut_offre');
             $table->string('libelle', 50)->unique();
+            $table->integer('ordre_workflow')->default(0);
+        });
+
+        Schema::create('type_contrat', function (Blueprint $table) {
+            $table->id('id_type_contrat');
+            $table->string('libelle', 50)->unique();
         });
 
         Schema::create('statut_candidature', function (Blueprint $table) {
@@ -34,6 +40,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('statut_candidature');
+        Schema::dropIfExists('type_contrat');
         Schema::dropIfExists('statut_offre');
         Schema::dropIfExists('type_demande');
     }

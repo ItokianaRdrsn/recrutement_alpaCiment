@@ -18,6 +18,7 @@ class StatutOffre extends Model
      */
     protected $fillable = [
         'libelle',
+        'ordre_workflow',
     ];
 
     public function offres(): HasMany

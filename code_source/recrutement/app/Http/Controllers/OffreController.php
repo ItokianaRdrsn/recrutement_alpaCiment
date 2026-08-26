@@ -2,39 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Direction;
-use App\Models\Offre;
-use App\Models\StatutOffre;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class OffreController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): RedirectResponse
     {
-        $filters = $request->validate([
-            'direction' => ['nullable', 'integer'],
-            'statut' => ['nullable', 'integer'],
-        ]);
+        return redirect()->away($this->frontendUrl('/offres'));
+    }
 
-        $offres = Offre::query()
-            ->with(['direction', 'statut'])
-            ->when($filters['direction'] ?? null, function ($query, int $direction): void {
-                $query->where('id_direction', $direction);
-            })
-            ->when($filters['statut'] ?? null, function ($query, int $statut): void {
-                $query->where('id_statut_offre', $statut);
-            })
-            ->orderByDesc('date_publication')
-            ->orderBy('titre_poste')
-            ->paginate(10)
-            ->withQueryString();
-
-        return view('offres.index', [
-            'offres' => $offres,
-            'directions' => Direction::query()->orderBy('nom_direction')->get(),
-            'statuts' => StatutOffre::query()->orderBy('id_statut_offre')->get(),
-            'filters' => $filters,
-        ]);
+    private function frontendUrl(string $path): string
+    {
+        return rtrim((string) config('app.frontend_url'), '/').$path;
     }
 }
