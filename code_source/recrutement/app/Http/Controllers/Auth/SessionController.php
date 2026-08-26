@@ -36,7 +36,9 @@ class SessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        $frontendUrl = rtrim((string) config('app.frontend_url'), '/');
+
+        return redirect()->intended($frontendUrl ? $frontendUrl.'/dashboard' : route('dashboard'));
     }
 
     public function destroy(Request $request): RedirectResponse

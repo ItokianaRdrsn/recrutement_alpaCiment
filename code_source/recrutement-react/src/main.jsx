@@ -22,10 +22,23 @@ import {
     X,
 } from 'lucide-react';
 
-const backendUrl = (import.meta.env.VITE_BACKEND_URL ?? '').replace(/\/$/, '');
+const backendUrl = (import.meta.env.VITE_BACKEND_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '');
+
+let redirectingToLogin = false;
 
 function backendPath(path) {
     return backendUrl ? `${backendUrl}${path}` : path;
+}
+
+function redirectToLogin() {
+    const loginUrl = backendPath('/login');
+
+    if (redirectingToLogin || window.location.href === loginUrl) {
+        return;
+    }
+
+    redirectingToLogin = true;
+    window.location.replace(loginUrl);
 }
 
 async function getJson(url) {
@@ -37,7 +50,7 @@ async function getJson(url) {
     });
 
     if (response.status === 401) {
-        window.location.href = backendPath('/login');
+        redirectToLogin();
         return null;
     }
 
@@ -75,7 +88,7 @@ async function sendJson(url, { body, method = 'POST' } = {}) {
     });
 
     if (response.status === 401) {
-        window.location.href = backendPath('/login');
+        redirectToLogin();
         return null;
     }
 
@@ -129,7 +142,8 @@ async function submitLogout() {
     try {
         await sendJson('/logout', { method: 'POST' });
     } finally {
-        window.location.href = backendPath('/login');
+        csrfToken = null;
+        redirectToLogin();
     }
 }
 
@@ -334,6 +348,12 @@ function ReferentialsView({ canManage }) {
     }
 
     async function deleteDirection(direction) {
+        const confirmed = window.confirm(`Supprimer la direction "${direction.nom_direction}" ?`);
+
+        if (!confirmed) {
+            return;
+        }
+
         try {
             await sendJson(`/api/directions/${direction.id}`, { method: 'DELETE' });
             await loadReferentials();
@@ -385,6 +405,12 @@ function ReferentialsView({ canManage }) {
     }
 
     async function deleteDomaine(domaine) {
+        const confirmed = window.confirm(`Supprimer le domaine "${domaine.nom_domaine}" ?`);
+
+        if (!confirmed) {
+            return;
+        }
+
         try {
             await sendJson(`/api/domaines/${domaine.id}`, { method: 'DELETE' });
             await loadReferentials();
@@ -1048,10 +1074,18 @@ function OffersView({ canManage, referentiels }) {
                         <h2>Liste des offres</h2>
                         <p>{meta?.total ?? 0} offre(s) trouvee(s)</p>
                     </div>
-                    <button className="ghost-button" onClick={loadOffers} type="button">
-                        <RefreshCw aria-hidden="true" size={17} />
-                        <span>Actualiser</span>
-                    </button>
+                    <div className="section-heading-actions">
+                        {canManage ? (
+                            <button className="filter-button" onClick={() => { resetOfferForm(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} type="button">
+                                <Plus aria-hidden="true" size={17} />
+                                <span>Nouvelle offre</span>
+                            </button>
+                        ) : null}
+                        <button className="ghost-button" onClick={loadOffers} type="button">
+                            <RefreshCw aria-hidden="true" size={17} />
+                            <span>Actualiser</span>
+                        </button>
+                    </div>
                 </div>
 
                 {error ? (

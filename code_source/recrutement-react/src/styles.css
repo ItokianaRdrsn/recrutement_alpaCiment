@@ -43,6 +43,15 @@ button:disabled {
     opacity: 0.55;
 }
 
+button,
+.kpi-card,
+.data-section,
+.nav-link,
+.row-button,
+.status-pill {
+    transition: all 0.18s ease;
+}
+
 .app-shell {
     display: grid;
     grid-template-columns: 248px minmax(0, 1fr);
@@ -191,7 +200,7 @@ button:disabled {
     align-items: start;
     display: grid;
     gap: 20px;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
 }
 
 .kpi-card {
@@ -202,6 +211,11 @@ button:disabled {
     gap: 9px;
     min-height: 138px;
     padding: 18px;
+}
+
+.kpi-card:hover {
+    box-shadow: 0 4px 16px rgba(31, 95, 115, 0.08);
+    transform: translateY(-2px);
 }
 
 .kpi-card span {
@@ -256,6 +270,7 @@ button:disabled {
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
+    gap: 12px;
     min-height: 74px;
     padding: 16px 18px;
 }
@@ -268,6 +283,13 @@ button:disabled {
 .section-heading p {
     color: var(--muted);
     margin: 3px 0 0;
+}
+
+.section-heading-actions {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .filter-bar {
@@ -362,7 +384,7 @@ button:disabled {
 
 table {
     border-collapse: collapse;
-    min-width: 760px;
+    min-width: 580px;
     width: 100%;
 }
 
@@ -509,9 +531,17 @@ td span {
     color: var(--danger);
 }
 
+.row-button.danger:hover {
+    background: #f5d5d2;
+}
+
 .row-button.success {
     background: var(--soft-green);
     color: var(--accent-green);
+}
+
+.row-button.success:hover {
+    background: #d4edde;
 }
 
 .pagination {
@@ -622,6 +652,10 @@ td span {
 
     .section-heading {
         gap: 12px;
+    }
+
+    .section-heading-actions {
+        flex-wrap: wrap;
     }
 
     .filter-button,

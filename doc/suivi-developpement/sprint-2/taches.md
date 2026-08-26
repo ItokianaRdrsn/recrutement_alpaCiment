@@ -2,9 +2,9 @@
 
 ## Avancement
 
-- **[FAIT]** 2 tâches
+- **[FAIT]** 4 tâches
 - **[EN COURS]** 1 tâche
-- **[A FAIRE]** 5 tâches
+- **[A FAIRE]** 3 tâches
 
 ## Légende
 
@@ -30,17 +30,17 @@
 
 ---
 
-### **[A FAIRE]** CRUD des offres d'emploi
+### **[FAIT]** CRUD des offres d'emploi
 
 - **Estimation :** 2,0 j
-- **Notes :** Créer et administrer les offres.
+- **Notes :** API REST complète (index, store, show, update, destroy) avec filtrage par direction, statut, type de contrat et recherche textuelle. Interface React ajoutée dans l'écran `Offres` avec formulaire de création/modification, pagination et bouton « Nouvelle offre ». Voir [entrée de suivi](./2026-08-26/crud-offres-emploi.md).
 
 ---
 
-### **[A FAIRE]** Gestion du statut des offres : brouillon, publiée, clôturée
+### **[FAIT]** Gestion du statut des offres : brouillon, publiée, clôturée
 
 - **Estimation :** 1,0 j
-- **Notes :** Contrôler le cycle de vie d'une offre.
+- **Notes :** Cycle de vie brouillon → publiée → clôturée implémenté via les endpoints PATCH `/publier` et `/cloturer`. Boutons d'action dans le tableau des offres avec désactivation contextuelle selon le statut courant. Voir [entrée de suivi](./2026-08-26/statut-offres.md).
 
 ---
 
@@ -77,4 +77,3 @@
 ## Total
 
 **Sprint 2 : 9,0 j**
-
