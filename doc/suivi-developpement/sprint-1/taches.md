@@ -63,7 +63,7 @@
 ### **[FAIT]** Tests et debug
 
 - **Estimation :** 0,5 j
-- **Notes :** Tests Laravel OK : login, dashboard, offres protégées, accès API par rôle et permissions. `php artisan test` passe avec 12 tests. `npm run build` passe dans le projet React séparé.
+- **Notes :** Tests Laravel OK : login, dashboard, offres protégées, accès API par rôle, permissions et garde de chargement des offres récentes. `php artisan test` passe avec 14 tests. `npm run build` passe dans le projet React séparé.
 
 ---
 
