@@ -18,6 +18,8 @@ class MeController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'role_label' => $user->roleEnum()?->label(),
+                'permissions' => $user->permissions(),
             ],
         ]);
     }

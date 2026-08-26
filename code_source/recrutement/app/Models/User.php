@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -42,5 +43,33 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function roleEnum(): ?UserRole
+    {
+        return UserRole::tryFrom((string) $this->role);
+    }
+
+    public function hasRole(string|UserRole ...$roles): bool
+    {
+        $acceptedRoles = array_map(
+            fn (string|UserRole $role): string => $role instanceof UserRole ? $role->value : $role,
+            $roles
+        );
+
+        return in_array((string) $this->role, $acceptedRoles, true);
+    }
+
+    public function canPerform(string $permission): bool
+    {
+        return $this->roleEnum()?->allows($permission) ?? false;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function permissions(): array
+    {
+        return $this->roleEnum()?->permissions() ?? [];
     }
 }

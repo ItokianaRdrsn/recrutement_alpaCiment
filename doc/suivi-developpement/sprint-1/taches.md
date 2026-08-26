@@ -2,8 +2,8 @@
 
 ## Avancement
 
-- **[FAIT]** 4 tâches
-- **[EN COURS]** 3 tâches
+- **[FAIT]** 7 tâches
+- **[EN COURS]** 0 tâche
 - **[A FAIRE]** 0 tâche
 
 ## Légende
@@ -23,10 +23,10 @@
 
 ---
 
-### **[EN COURS]** Mise en place des migrations principales et des seeders
+### **[FAIT]** Mise en place des migrations principales et des seeders
 
 - **Estimation :** 1,5 j
-- **Notes :** Premières migrations et seeders créés pour utilisateurs, directions, statuts, domaines, types de contrat, offres, profil d'offre avec valeurs génériques et formations liées aux offres. Les autres modules viendront ensuite.
+- **Notes :** Migrations principales créées et exécutées : utilisateurs, directions, statuts, domaines, types de contrat, offres, profil d'offre avec valeurs génériques et formations liées aux offres. `DatabaseSeeder` prépare les référentiels et données de départ. `php artisan migrate:status` confirme que les 7 migrations sont exécutées.
 
 ---
 
@@ -37,10 +37,10 @@
 
 ---
 
-### **[EN COURS]** Authentification et gestion des rôles RH / admin
+### **[FAIT]** Authentification et gestion des rôles RH / admin
 
 - **Estimation :** 2,0 j
-- **Notes :** Connexion de base créée. Middleware `role:rh,admin` ajouté pour protéger le back-office et l'API interne. Il reste à finaliser les permissions plus fines selon les futurs écrans.
+- **Notes :** Connexion de base créée. Les rôles `admin` et `rh` sont centralisés dans `UserRole`, le middleware `role` protège le back-office et l'API interne, et l'endpoint `/api/me` expose les permissions utiles au frontend.
 
 ---
 
@@ -60,10 +60,10 @@
 
 ---
 
-### **[EN COURS]** Tests et debug
+### **[FAIT]** Tests et debug
 
 - **Estimation :** 0,5 j
-- **Notes :** Tests Laravel OK : login, dashboard, offres protégées et accès API par rôle. `php artisan test` passe avec 7 tests. `npm run build` passe également. Les tests du sprint complet restent à faire après les permissions finales.
+- **Notes :** Tests Laravel OK : login, dashboard, offres protégées, accès API par rôle et permissions. `php artisan test` passe avec 12 tests. `npm run build` passe dans le projet React séparé.
 
 ---
 

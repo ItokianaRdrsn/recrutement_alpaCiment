@@ -17,6 +17,7 @@ Installer une base technique stable pour commencer le développement métier : e
 - `2026-08-25/correction-profil-offre-valeurs-generiques.md` : conservation de `profil_offre` avec des champs génériques.
 - `2026-08-26/architecture-api-rest-roles.md` : mise en place de l'API REST interne et du middleware de rôles.
 - `2026-08-26/installation-react-vite-navigation.md` : installation de React/Vite dans un projet séparé et première interface back-office.
+- `2026-08-26/finalisation-roles-permissions-tests.md` : finalisation des rôles RH/admin, permissions et tests du sprint.
 
 ## Etat actuel
 
@@ -24,7 +25,8 @@ Le socle Laravel/PostgreSQL est lancé et testable.
 L'architecture API REST de base est en place.
 React/Vite est installé dans `code_source/recrutement-react` et une première interface back-office existe pour le dashboard et les offres.
 Laravel reste dans `code_source/recrutement` pour l'API, l'authentification et PostgreSQL.
-Les tâches encore importantes sont la gestion complète des rôles, les permissions plus fines et les tests de fin de sprint.
+Les rôles RH/admin sont centralisés et testés.
+Le Sprint 1 est prêt pour servir de base au Sprint 2.
 
 ## Sources utiles
 

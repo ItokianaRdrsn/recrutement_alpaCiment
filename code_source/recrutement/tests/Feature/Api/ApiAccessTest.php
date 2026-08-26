@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Tests\TestCase;
 
@@ -34,11 +35,31 @@ class ApiAccessTest extends TestCase
             'role' => 'rh',
         ]);
 
-        $this->actingAs($user)
+        $response = $this->actingAs($user)
             ->getJson('/api/me')
             ->assertOk()
             ->assertJsonPath('data.name', 'Responsable RH')
             ->assertJsonPath('data.email', 'rh@example.test')
-            ->assertJsonPath('data.role', 'rh');
+            ->assertJsonPath('data.role', UserRole::Rh->value)
+            ->assertJsonPath('data.role_label', 'Responsable RH');
+
+        $this->assertContains('access_backoffice', $response->json('data.permissions'));
+        $this->assertContains('view_dashboard', $response->json('data.permissions'));
+    }
+
+    public function test_roles_referential_contains_available_roles(): void
+    {
+        $roles = UserRole::toReferentiel();
+
+        $this->assertContains([
+            'code' => UserRole::Admin->value,
+            'label' => 'Administrateur',
+            'permissions' => UserRole::Admin->permissions(),
+        ], $roles);
+        $this->assertContains([
+            'code' => UserRole::Rh->value,
+            'label' => 'Responsable RH',
+            'permissions' => UserRole::Rh->permissions(),
+        ], $roles);
     }
 }

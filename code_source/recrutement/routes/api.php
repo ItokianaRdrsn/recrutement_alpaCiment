@@ -1,12 +1,13 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\MeController;
 use App\Http\Controllers\Api\OffreController;
 use App\Http\Controllers\Api\ReferentielController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['web', 'auth', 'role:rh,admin'])->group(function (): void {
+Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
     Route::get('/csrf-token', fn () => response()->json([
         'data' => [
             'token' => csrf_token(),

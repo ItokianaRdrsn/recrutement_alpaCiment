@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\Direction;
 use App\Models\Domaine;
@@ -28,6 +29,7 @@ class ReferentielController extends Controller
                 'types_contrat' => TypeContrat::query()
                     ->orderBy('libelle')
                     ->get(['id_type_contrat', 'libelle']),
+                'roles' => UserRole::toReferentiel(),
             ],
         ]);
     }

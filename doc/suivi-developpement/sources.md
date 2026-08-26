@@ -13,8 +13,13 @@ Cette page regroupe les sources officielles ou primaires utilisées pour justifi
 - `[LARAVEL-RESOURCES]` Laravel 13.x - Eloquent API Resources : https://laravel.com/docs/13.x/eloquent-resources
 - `[LARAVEL-VALIDATION]` Laravel 13.x - Validation : https://laravel.com/docs/13.x/validation
 - `[LARAVEL-VITE]` Laravel 13.x - Vite : https://laravel.com/docs/13.x/vite
+- `[LARAVEL-HTTP-TESTS]` Laravel 13.x - HTTP Tests : https://laravel.com/docs/13.x/http-tests
 - `[LARAVEL-MIGRATIONS]` Laravel - Database Migrations : https://laravel.com/framework/docs/migrations
 - `[LARAVEL-SEEDING]` Laravel 13.x - Database Seeding : https://laravel.com/docs/13.x/seeding
+
+## PHP
+
+- `[PHP-ENUMERATIONS]` PHP Manual - Enumerations : https://www.php.net/manual/en/language.enumerations.php
 
 ## Composer
 
