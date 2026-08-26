@@ -22,24 +22,24 @@ class DashboardController extends Controller
             'domaines_en_attente' => 0,
         ];
 
-        if (Schema::hasTable('offre')) {
+        if ($this->hasTables('offre')) {
             $kpis['offres_total'] = DB::table('offre')->count();
         }
 
-        if (Schema::hasTable('offre') && Schema::hasTable('statut_offre')) {
+        if ($this->hasTables('offre', 'statut_offre')) {
             $kpis['offres_publiees'] = DB::table('offre')
                 ->join('statut_offre', 'statut_offre.id_statut_offre', '=', 'offre.id_statut_offre')
                 ->where('statut_offre.libelle', 'Publiee')
                 ->count();
         }
 
-        if (Schema::hasTable('domaine')) {
+        if ($this->hasTables('domaine')) {
             $kpis['domaines_en_attente'] = DB::table('domaine')
                 ->where('valide', false)
                 ->count();
         }
 
-        $offresRecentes = Schema::hasTable('offre')
+        $offresRecentes = $this->canLoadRecentOffers()
             ? Offre::query()
                 ->with(['direction', 'statut', 'typeContrat'])
                 ->orderByDesc('date_publication')
@@ -54,5 +54,21 @@ class DashboardController extends Controller
                 'offres_recentes' => OffreResource::collection($offresRecentes)->resolve($request),
             ],
         ]);
+    }
+
+    protected function canLoadRecentOffers(): bool
+    {
+        return $this->hasTables('offre', 'direction', 'statut_offre', 'type_contrat');
+    }
+
+    protected function hasTables(string ...$tables): bool
+    {
+        foreach ($tables as $table) {
+            if (! Schema::hasTable($table)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

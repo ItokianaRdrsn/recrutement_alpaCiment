@@ -18,6 +18,7 @@ Installer une base technique stable pour commencer le développement métier : e
 - `2026-08-26/architecture-api-rest-roles.md` : mise en place de l'API REST interne et du middleware de rôles.
 - `2026-08-26/installation-react-vite-navigation.md` : installation de React/Vite dans un projet séparé et première interface back-office.
 - `2026-08-26/finalisation-roles-permissions-tests.md` : finalisation des rôles RH/admin, permissions et tests du sprint.
+- `2026-08-26/correction-dashboard-offres-recentes-schema.md` : correction suite à revue de code sur le chargement des offres récentes.
 
 ## Etat actuel
 

@@ -150,7 +150,7 @@ Les tests HTTP Laravel permettent de vérifier les statuts `401`, `403` et les r
 - `php -l` sur les fichiers PHP modifiés : aucune erreur de syntaxe.
 - `php artisan route:list --path=api` : 6 routes API enregistrées.
 - `php artisan migrate:status` : les 7 migrations principales sont exécutées.
-- `php artisan test` : 12 tests réussis.
+- `php artisan test` : 14 tests réussis après ajout de la correction de stabilité du dashboard.
 - `npm run build` dans `code_source/recrutement-react` : build React réussi.
 
 ## Suite logique
