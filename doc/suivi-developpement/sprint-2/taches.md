@@ -2,9 +2,9 @@
 
 ## Avancement
 
-- **[FAIT]** 0 tâche
-- **[EN COURS]** 0 tâche
-- **[A FAIRE]** 8 tâches
+- **[FAIT]** 2 tâches
+- **[EN COURS]** 1 tâche
+- **[A FAIRE]** 5 tâches
 
 ## Légende
 
@@ -16,17 +16,17 @@
 
 ## Back-office
 
-### **[A FAIRE]** CRUD des directions
+### **[FAIT]** CRUD des directions
 
 - **Estimation :** 0,5 j
-- **Notes :** Créer, modifier, lister et supprimer les directions.
+- **Notes :** API REST créée pour lister, créer, modifier et supprimer les directions. Interface React ajoutée dans l'écran `Référentiels`. La suppression est bloquée si la direction est déjà utilisée par un domaine ou une offre.
 
 ---
 
-### **[A FAIRE]** CRUD des domaines et validation des domaines en attente
+### **[FAIT]** CRUD des domaines et validation des domaines en attente
 
 - **Estimation :** 1,0 j
-- **Notes :** Gérer les domaines connus et les domaines proposés par les candidats.
+- **Notes :** API REST créée pour lister, créer, modifier, supprimer et valider les domaines. Interface React ajoutée avec formulaire, statut `Valide` / `En attente` et action de validation.
 
 ---
 
@@ -67,10 +67,10 @@
 
 ---
 
-### **[A FAIRE]** Tests et debug
+### **[EN COURS]** Tests et debug
 
 - **Estimation :** 1,0 j
-- **Notes :** Tester CRUD, publication, clôture et affichage public.
+- **Notes :** Tests Laravel existants OK avec 13 tests. `npm run build` OK côté React. Les tests complets du Sprint 2 seront enrichis avec les offres, statuts et affichage public.
 
 ---
 

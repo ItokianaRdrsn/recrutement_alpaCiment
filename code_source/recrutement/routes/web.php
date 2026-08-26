@@ -14,4 +14,6 @@ Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth'
 Route::middleware(['auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/offres', [OffreController::class, 'index'])->name('offres.index');
+    Route::get('/referentiels', fn () => redirect()->away(rtrim((string) config('app.frontend_url'), '/').'/referentiels'))
+        ->name('referentiels.index');
 });
