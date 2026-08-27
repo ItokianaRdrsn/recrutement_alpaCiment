@@ -65,6 +65,10 @@ button,
     flex-direction: column;
     gap: 28px;
     padding: 22px 16px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
 }
 
 .brand-block {
@@ -117,6 +121,38 @@ button,
 .nav-link.active {
     background: #243746;
     color: #fff;
+}
+
+.sidebar-sub-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 28px;
+    margin-top: -2px;
+    margin-bottom: 4px;
+}
+
+.sub-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: none;
+    transition: all 0.18s ease;
+}
+
+.sub-nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.sub-nav-link.active {
+    color: #fff;
+    background: var(--primary);
 }
 
 .content-area {
@@ -196,13 +232,6 @@ button,
     grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.management-grid {
-    align-items: start;
-    display: grid;
-    gap: 20px;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-}
-
 .kpi-card {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -258,11 +287,51 @@ button,
     color: var(--accent-amber);
 }
 
+.management-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
 .data-section {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
+    width: 100%;
+}
+
+.sub-nav-tabs {
+    display: flex;
+    gap: 8px;
+    background: var(--panel);
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    width: 100%;
+}
+
+.sub-nav-tab {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--muted);
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.sub-nav-tab:hover {
+    color: var(--text);
+    background: #f0f4f8;
+}
+
+.sub-nav-tab.active {
+    background: var(--primary);
+    color: #fff;
 }
 
 .section-heading {
@@ -581,8 +650,119 @@ td span {
     margin: 0;
 }
 
-.feedback-state strong {
+.form-sub-header {
+    border-top: 1px solid var(--border);
+    font-size: 15px;
+    font-weight: 700;
+    grid-column: 1 / -1;
+    margin-top: 12px;
+    padding-top: 14px;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dynamic-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.dynamic-row input,
+.dynamic-row select {
+    flex: 1;
+}
+
+.competence-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+    grid-column: 1 / -1;
+}
+
+.competence-item {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #fafbfc;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.competence-item.selected {
+    border-color: var(--primary);
+    background: var(--soft-blue);
+}
+
+.competence-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.competence-item-header span {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--soft-blue);
+    color: var(--primary-dark);
+}
+
+.badge.green {
+    background: var(--soft-green);
+    color: var(--accent-green);
+}
+
+.badge.neutral {
+    background: var(--soft-neutral);
+    color: #4c5b66;
+}
+
+.expanded-details {
+    padding: 14px 18px;
+    background: #f8fafc;
+    border-top: 1px solid #edf1f4;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.detail-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.detail-block strong {
+    font-size: 13px;
+    color: var(--primary);
+}
+
+.detail-block p, .detail-block ul {
+    margin: 0;
+    font-size: 13px;
     color: var(--text);
+}
+
+.detail-block ul {
+    padding-left: 18px;
+}
+
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
 @media (max-width: 1040px) {

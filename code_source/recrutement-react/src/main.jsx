@@ -2,22 +2,32 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import {
+    ArrowLeft,
+    Award,
     BriefcaseBusiness,
     Building2,
     CalendarDays,
+    ChevronDown,
     ChevronLeft,
     ChevronRight,
+    ChevronUp,
     CheckCircle2,
+    Copy,
     Database,
     Edit3,
+    ExternalLink,
     Filter,
+    GraduationCap,
     LayoutDashboard,
+    ListChecks,
     LogOut,
     Plus,
     RefreshCw,
     Save,
     Search,
+    Share2,
     Trash2,
+    UserCheck,
     Users,
     X,
 } from 'lucide-react';
@@ -123,6 +133,10 @@ const emptyOfferForm = {
     date_publication: '',
     date_limite: '',
     id_statut_offre: '',
+    profils: [{ description: '', type_valeur: '', valeur_min: '', valeur_max: '', valeur_attendue: '', unite_valeur: '' }],
+    missions: [{ description: '', ordre: 1 }],
+    formations: [{ niveau_min: '', niveau_max: '', domaine: '', obligatoire: true }],
+    competences: [],
 };
 
 function offerPayload(form) {
@@ -135,6 +149,10 @@ function offerPayload(form) {
         date_publication: form.date_publication || null,
         date_limite: form.date_limite || null,
         id_statut_offre: form.id_statut_offre ? Number(form.id_statut_offre) : null,
+        profils: form.profils.filter((p) => p.description.trim() || p.valeur_attendue.trim()),
+        missions: form.missions.filter((m) => m.description.trim()),
+        formations: form.formations.filter((f) => f.niveau_min.trim() || f.domaine.trim()),
+        competences: form.competences,
     };
 }
 
@@ -155,6 +173,7 @@ function App() {
         statuts_offre: [],
         types_contrat: [],
     });
+    const [competencesData, setCompetencesData] = useState({ competences: [], types: [] });
     const [bootstrapLoading, setBootstrapLoading] = useState(true);
     const [bootstrapError, setBootstrapError] = useState('');
 
@@ -166,37 +185,33 @@ function App() {
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
-    useEffect(() => {
-        let active = true;
+    const loadBaseData = useCallback(async () => {
+        try {
+            const [meResponse, referentielResponse, competencesResponse] = await Promise.all([
+                getJson('/api/me'),
+                getJson('/api/referentiels/recrutement'),
+                getJson('/api/competences'),
+            ]);
 
-        async function loadBaseData() {
-            try {
-                const [meResponse, referentielResponse] = await Promise.all([
-                    getJson('/api/me'),
-                    getJson('/api/referentiels/recrutement'),
-                ]);
-
-                if (!active || !meResponse || !referentielResponse) {
-                    return;
-                }
-
-                setUser(meResponse.data);
-                setReferentiels(referentielResponse.data);
-            } catch (error) {
-                setBootstrapError(error.message);
-            } finally {
-                if (active) {
-                    setBootstrapLoading(false);
-                }
+            if (!meResponse || !referentielResponse) {
+                return;
             }
+
+            setUser(meResponse.data);
+            setReferentiels(referentielResponse.data);
+            if (competencesResponse?.data) {
+                setCompetencesData(competencesResponse.data);
+            }
+        } catch (error) {
+            setBootstrapError(error.message);
+        } finally {
+            setBootstrapLoading(false);
         }
-
-        loadBaseData();
-
-        return () => {
-            active = false;
-        };
     }, []);
+
+    useEffect(() => {
+        loadBaseData();
+    }, [loadBaseData]);
 
     const navigate = useCallback((target) => {
         window.history.pushState({}, '', target);
@@ -205,16 +220,33 @@ function App() {
 
     const activeView = path.startsWith('/offres') ? 'offres' : path.startsWith('/referentiels') ? 'referentiels' : 'dashboard';
 
+    const referentielSubTab = path === '/referentiels/directions'
+        ? 'directions'
+        : path === '/referentiels/domaines'
+        ? 'domaines'
+        : path === '/referentiels/competences'
+        ? 'competences'
+        : 'all';
+
     return (
-        <AppShell activeView={activeView} user={user} onNavigate={navigate}>
+        <AppShell activePath={path} activeView={activeView} user={user} onNavigate={navigate}>
             {bootstrapError ? (
                 <ErrorState message={bootstrapError} />
             ) : bootstrapLoading ? (
                 <LoadingState />
             ) : activeView === 'offres' ? (
-                <OffersView canManage={user?.permissions?.includes('manage_offres') ?? false} referentiels={referentiels} />
+                <OffersView
+                    canManage={user?.permissions?.includes('manage_offres') ?? false}
+                    competencesData={competencesData}
+                    referentiels={referentiels}
+                />
             ) : activeView === 'referentiels' ? (
-                <ReferentialsView canManage={user?.permissions?.includes('manage_referentiels') ?? false} />
+                <ReferentialsView
+                    canManage={user?.permissions?.includes('manage_referentiels') ?? false}
+                    competencesData={competencesData}
+                    initialSubTab={referentielSubTab}
+                    onRefreshBase={loadBaseData}
+                />
             ) : (
                 <DashboardView />
             )}
@@ -222,11 +254,26 @@ function App() {
     );
 }
 
-function AppShell({ activeView, children, onNavigate, user }) {
+function AppShell({ activePath, activeView, children, onNavigate, user }) {
+    const [referentielsOpen, setReferentielsOpen] = useState(activeView === 'referentiels');
+
+    useEffect(() => {
+        if (activeView === 'referentiels') {
+            setReferentielsOpen(true);
+        }
+    }, [activeView]);
+
     const navItems = [
         { id: 'dashboard', label: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
         { id: 'offres', label: 'Offres', href: '/offres', icon: BriefcaseBusiness },
-        { id: 'referentiels', label: 'Referentiels', href: '/referentiels', icon: Building2 },
+        { id: 'referentiels', label: 'Referentiels', href: '/referentiels', icon: Building2, hasSub: true },
+    ];
+
+    const referentielSubLinks = [
+        { id: 'all', label: 'Tous les referentiels', href: '/referentiels' },
+        { id: 'directions', label: 'Directions', href: '/referentiels/directions' },
+        { id: 'domaines', label: 'Domaines', href: '/referentiels/domaines' },
+        { id: 'competences', label: 'Competences', href: '/referentiels/competences' },
     ];
 
     return (
@@ -244,6 +291,51 @@ function AppShell({ activeView, children, onNavigate, user }) {
                     {navItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = activeView === item.id;
+
+                        if (item.hasSub) {
+                            return (
+                                <React.Fragment key={item.id}>
+                                    <div
+                                        className={isActive ? 'nav-link active' : 'nav-link'}
+                                        onClick={() => {
+                                            if (!isActive) {
+                                                onNavigate(item.href);
+                                            }
+                                            setReferentielsOpen((curr) => !curr);
+                                        }}
+                                        style={{ cursor: 'pointer', justifyContent: 'space-between' }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                            <Icon aria-hidden="true" size={18} />
+                                            <span>{item.label}</span>
+                                        </div>
+                                        {referentielsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                    </div>
+
+                                    {referentielsOpen ? (
+                                        <div className="sidebar-sub-menu">
+                                            {referentielSubLinks.map((sub) => {
+                                                const isSubActive = activePath === sub.href;
+
+                                                return (
+                                                    <a
+                                                        className={isSubActive ? 'sub-nav-link active' : 'sub-nav-link'}
+                                                        href={sub.href}
+                                                        key={sub.id}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            onNavigate(sub.href);
+                                                        }}
+                                                    >
+                                                        <span>• {sub.label}</span>
+                                                    </a>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : null}
+                                </React.Fragment>
+                            );
+                        }
 
                         return (
                             <a
@@ -289,13 +381,19 @@ function AppShell({ activeView, children, onNavigate, user }) {
     );
 }
 
-function ReferentialsView({ canManage }) {
+function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', onRefreshBase }) {
+    const [subTab, setSubTab] = useState(initialSubTab);
     const [directions, setDirections] = useState([]);
     const [domaines, setDomaines] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [directionForm, setDirectionForm] = useState({ id: null, nom_direction: '' });
     const [domaineForm, setDomaineForm] = useState({ id: null, nom_domaine: '', id_direction: '', valide: false });
+    const [competenceForm, setCompetenceForm] = useState({ nom_competence: '', id_type_competence: '' });
+
+    useEffect(() => {
+        setSubTab(initialSubTab);
+    }, [initialSubTab]);
 
     const loadReferentials = useCallback(async () => {
         setLoading(true);
@@ -309,12 +407,15 @@ function ReferentialsView({ canManage }) {
 
             setDirections(directionsResponse?.data ?? []);
             setDomaines(domainesResponse?.data ?? []);
+            if (onRefreshBase) {
+                await onRefreshBase();
+            }
         } catch (caughtError) {
             setError(caughtError.message);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [onRefreshBase]);
 
     useEffect(() => {
         loadReferentials();
@@ -324,9 +425,7 @@ function ReferentialsView({ canManage }) {
         event.preventDefault();
         const name = directionForm.nom_direction.trim();
 
-        if (!name) {
-            return;
-        }
+        if (!name) return;
 
         try {
             if (directionForm.id) {
@@ -349,10 +448,7 @@ function ReferentialsView({ canManage }) {
 
     async function deleteDirection(direction) {
         const confirmed = window.confirm(`Supprimer la direction "${direction.nom_direction}" ?`);
-
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         try {
             await sendJson(`/api/directions/${direction.id}`, { method: 'DELETE' });
@@ -366,9 +462,7 @@ function ReferentialsView({ canManage }) {
         event.preventDefault();
         const name = domaineForm.nom_domaine.trim();
 
-        if (!name || !domaineForm.id_direction) {
-            return;
-        }
+        if (!name || !domaineForm.id_direction) return;
 
         const payload = {
             nom_domaine: name,
@@ -406,13 +500,29 @@ function ReferentialsView({ canManage }) {
 
     async function deleteDomaine(domaine) {
         const confirmed = window.confirm(`Supprimer le domaine "${domaine.nom_domaine}" ?`);
-
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         try {
             await sendJson(`/api/domaines/${domaine.id}`, { method: 'DELETE' });
+            await loadReferentials();
+        } catch (caughtError) {
+            setError(caughtError.message);
+        }
+    }
+
+    async function saveCompetence(event) {
+        event.preventDefault();
+        const name = competenceForm.nom_competence.trim();
+        if (!name || !competenceForm.id_type_competence) return;
+
+        try {
+            await sendJson('/api/competences', {
+                body: {
+                    nom_competence: name,
+                    id_type_competence: Number(competenceForm.id_type_competence),
+                },
+            });
+            setCompetenceForm({ nom_competence: '', id_type_competence: '' });
             await loadReferentials();
         } catch (caughtError) {
             setError(caughtError.message);
@@ -427,153 +537,247 @@ function ReferentialsView({ canManage }) {
         <div className="view-stack">
             {error ? <ErrorState message={error} onRetry={loadReferentials} /> : null}
 
-            <section className="management-grid">
-                <div className="data-section">
-                    <div className="section-heading">
-                        <div>
-                            <h2>Directions</h2>
-                            <p>{directions.length} direction(s)</p>
-                        </div>
-                        <button className="ghost-button" onClick={loadReferentials} type="button">
-                            <RefreshCw aria-hidden="true" size={17} />
-                            <span>Actualiser</span>
-                        </button>
-                    </div>
+            {/* Sub-menu navigation for Referentials */}
+            <div className="sub-nav-tabs">
+                <button
+                    className={`sub-nav-tab ${subTab === 'all' ? 'active' : ''}`}
+                    onClick={() => setSubTab('all')}
+                    type="button"
+                >
+                    Tous les referentiels
+                </button>
+                <button
+                    className={`sub-nav-tab ${subTab === 'directions' ? 'active' : ''}`}
+                    onClick={() => setSubTab('directions')}
+                    type="button"
+                >
+                    Directions ({directions.length})
+                </button>
+                <button
+                    className={`sub-nav-tab ${subTab === 'domaines' ? 'active' : ''}`}
+                    onClick={() => setSubTab('domaines')}
+                    type="button"
+                >
+                    Domaines ({domaines.length})
+                </button>
+                <button
+                    className={`sub-nav-tab ${subTab === 'competences' ? 'active' : ''}`}
+                    onClick={() => setSubTab('competences')}
+                    type="button"
+                >
+                    Competences ({competencesData.competences?.length ?? 0})
+                </button>
+            </div>
 
-                    {canManage ? (
-                        <form className="compact-form" onSubmit={saveDirection}>
-                            <label>
-                                <span>Nom de la direction</span>
-                                <input
-                                    onChange={(event) => setDirectionForm((current) => ({ ...current, nom_direction: event.target.value }))}
-                                    placeholder="Ex : Finance"
-                                    value={directionForm.nom_direction}
-                                />
-                            </label>
-                            <div className="form-actions">
-                                <button className="filter-button" type="submit">
-                                    {directionForm.id ? <Save aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
-                                    <span>{directionForm.id ? 'Enregistrer' : 'Ajouter'}</span>
+            {(subTab === 'all' || subTab === 'directions' || subTab === 'domaines') ? (
+                <section className="management-grid">
+                    {(subTab === 'all' || subTab === 'directions') ? (
+                        <div className="data-section">
+                            <div className="section-heading">
+                                <div>
+                                    <h2>Directions</h2>
+                                    <p>{directions.length} direction(s)</p>
+                                </div>
+                                <button className="ghost-button" onClick={loadReferentials} type="button">
+                                    <RefreshCw aria-hidden="true" size={17} />
+                                    <span>Actualiser</span>
                                 </button>
-                                {directionForm.id ? (
-                                    <button className="ghost-button" onClick={() => setDirectionForm({ id: null, nom_direction: '' })} type="button">
-                                        <X aria-hidden="true" size={17} />
-                                        <span>Annuler</span>
-                                    </button>
-                                ) : null}
                             </div>
-                        </form>
+
+                            {canManage ? (
+                                <form className="compact-form" onSubmit={saveDirection}>
+                                    <label>
+                                        <span>Nom de la direction</span>
+                                        <input
+                                            onChange={(event) => setDirectionForm((current) => ({ ...current, nom_direction: event.target.value }))}
+                                            placeholder="Ex : Finance"
+                                            value={directionForm.nom_direction}
+                                        />
+                                    </label>
+                                    <div className="form-actions">
+                                        <button className="filter-button" type="submit">
+                                            {directionForm.id ? <Save aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
+                                            <span>{directionForm.id ? 'Enregistrer' : 'Ajouter'}</span>
+                                        </button>
+                                        {directionForm.id ? (
+                                            <button className="ghost-button" onClick={() => setDirectionForm({ id: null, nom_direction: '' })} type="button">
+                                                <X aria-hidden="true" size={17} />
+                                                <span>Annuler</span>
+                                            </button>
+                                        ) : null}
+                                    </div>
+                                </form>
+                            ) : null}
+
+                            <SimpleTable
+                                columns={['Direction', 'Domaines', 'Offres', 'Actions']}
+                                emptyLabel="Aucune direction."
+                                rows={directions.map((direction) => [
+                                    <strong>{direction.nom_direction}</strong>,
+                                    direction.domaines_count ?? 0,
+                                    direction.offres_count ?? 0,
+                                    canManage ? (
+                                        <RowActions
+                                            onDelete={() => deleteDirection(direction)}
+                                            onEdit={() => setDirectionForm({ id: direction.id, nom_direction: direction.nom_direction })}
+                                        />
+                                    ) : (
+                                        '-'
+                                    ),
+                                ])}
+                            />
+                        </div>
                     ) : null}
 
-                    <SimpleTable
-                        columns={['Direction', 'Domaines', 'Offres', 'Actions']}
-                        emptyLabel="Aucune direction."
-                        rows={directions.map((direction) => [
-                            <strong>{direction.nom_direction}</strong>,
-                            direction.domaines_count ?? 0,
-                            direction.offres_count ?? 0,
-                            canManage ? (
-                                <RowActions
-                                    onDelete={() => deleteDirection(direction)}
-                                    onEdit={() => setDirectionForm({ id: direction.id, nom_direction: direction.nom_direction })}
-                                />
-                            ) : (
-                                '-'
-                            ),
-                        ])}
-                    />
-                </div>
+                    {(subTab === 'all' || subTab === 'domaines') ? (
+                        <div className="data-section">
+                            <div className="section-heading">
+                                <div>
+                                    <h2>Domaines</h2>
+                                    <p>{domaines.filter((domaine) => !domaine.valide).length} en attente</p>
+                                </div>
+                            </div>
 
-                <div className="data-section">
+                            {canManage ? (
+                                <form className="compact-form" onSubmit={saveDomaine}>
+                                    <label>
+                                        <span>Nom du domaine</span>
+                                        <input
+                                            onChange={(event) => setDomaineForm((current) => ({ ...current, nom_domaine: event.target.value }))}
+                                            placeholder="Ex : Comptabilite"
+                                            value={domaineForm.nom_domaine}
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Direction</span>
+                                        <select
+                                            onChange={(event) => setDomaineForm((current) => ({ ...current, id_direction: event.target.value }))}
+                                            value={domaineForm.id_direction}
+                                        >
+                                            <option value="">Choisir</option>
+                                            {directions.map((direction) => (
+                                                <option key={direction.id} value={direction.id}>
+                                                    {direction.nom_direction}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
+                                    <label className="checkbox-line">
+                                        <input
+                                            checked={domaineForm.valide}
+                                            onChange={(event) => setDomaineForm((current) => ({ ...current, valide: event.target.checked }))}
+                                            type="checkbox"
+                                        />
+                                        <span>Domaine valide</span>
+                                    </label>
+                                    <div className="form-actions">
+                                        <button className="filter-button" type="submit">
+                                            {domaineForm.id ? <Save aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
+                                            <span>{domaineForm.id ? 'Enregistrer' : 'Ajouter'}</span>
+                                        </button>
+                                        {domaineForm.id ? (
+                                            <button className="ghost-button" onClick={() => setDomaineForm({ id: null, nom_domaine: '', id_direction: '', valide: false })} type="button">
+                                                <X aria-hidden="true" size={17} />
+                                                <span>Annuler</span>
+                                            </button>
+                                        ) : null}
+                                    </div>
+                                </form>
+                            ) : null}
+
+                            <SimpleTable
+                                columns={['Domaine', 'Direction', 'Statut', 'Actions']}
+                                emptyLabel="Aucun domaine."
+                                rows={domaines.map((domaine) => [
+                                    <strong>{domaine.nom_domaine}</strong>,
+                                    domaine.direction?.nom ?? '-',
+                                    <span className={domaine.valide ? 'status-pill success' : 'status-pill warning'}>
+                                        {domaine.valide ? 'Valide' : 'En attente'}
+                                    </span>,
+                                    canManage ? (
+                                        <RowActions
+                                            extra={
+                                                !domaine.valide ? (
+                                                    <button className="row-button success" onClick={() => validateDomaine(domaine)} title="Valider" type="button">
+                                                        <CheckCircle2 aria-hidden="true" size={16} />
+                                                    </button>
+                                                ) : null
+                                            }
+                                            onDelete={() => deleteDomaine(domaine)}
+                                            onEdit={() =>
+                                                setDomaineForm({
+                                                    id: domaine.id,
+                                                    nom_domaine: domaine.nom_domaine,
+                                                    id_direction: domaine.direction?.id ? String(domaine.direction.id) : '',
+                                                    valide: domaine.valide,
+                                                })
+                                            }
+                                        />
+                                    ) : (
+                                        '-'
+                                    ),
+                                ])}
+                            />
+                        </div>
+                    ) : null}
+                </section>
+            ) : null}
+
+            {(subTab === 'all' || subTab === 'competences') ? (
+                <section className="data-section">
                     <div className="section-heading">
                         <div>
-                            <h2>Domaines</h2>
-                            <p>{domaines.filter((domaine) => !domaine.valide).length} en attente</p>
+                            <h2>Referentiel des Competences</h2>
+                            <p>{competencesData.competences?.length ?? 0} competence(s) enregistree(s)</p>
                         </div>
                     </div>
 
                     {canManage ? (
-                        <form className="compact-form" onSubmit={saveDomaine}>
+                        <form className="compact-form" onSubmit={saveCompetence} style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
                             <label>
-                                <span>Nom du domaine</span>
+                                <span>Nom de la competence</span>
                                 <input
-                                    onChange={(event) => setDomaineForm((current) => ({ ...current, nom_domaine: event.target.value }))}
-                                    placeholder="Ex : Comptabilite"
-                                    value={domaineForm.nom_domaine}
+                                    onChange={(e) => setCompetenceForm((curr) => ({ ...curr, nom_competence: e.target.value }))}
+                                    placeholder="Ex: React.js, Anglais, Docker..."
+                                    required
+                                    value={competenceForm.nom_competence}
                                 />
                             </label>
                             <label>
-                                <span>Direction</span>
+                                <span>Type de competence</span>
                                 <select
-                                    onChange={(event) => setDomaineForm((current) => ({ ...current, id_direction: event.target.value }))}
-                                    value={domaineForm.id_direction}
+                                    onChange={(e) => setCompetenceForm((curr) => ({ ...curr, id_type_competence: e.target.value }))}
+                                    required
+                                    value={competenceForm.id_type_competence}
                                 >
-                                    <option value="">Choisir</option>
-                                    {directions.map((direction) => (
-                                        <option key={direction.id} value={direction.id}>
-                                            {direction.nom_direction}
+                                    <option value="">Choisir le type</option>
+                                    {competencesData.types?.map((type) => (
+                                        <option key={type.id_type_competence} value={type.id_type_competence}>
+                                            {type.libelle}
                                         </option>
                                     ))}
                                 </select>
                             </label>
-                            <label className="checkbox-line">
-                                <input
-                                    checked={domaineForm.valide}
-                                    onChange={(event) => setDomaineForm((current) => ({ ...current, valide: event.target.checked }))}
-                                    type="checkbox"
-                                />
-                                <span>Domaine valide</span>
-                            </label>
-                            <div className="form-actions">
+                            <div className="form-actions" style={{ alignItems: 'flex-end' }}>
                                 <button className="filter-button" type="submit">
-                                    {domaineForm.id ? <Save aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
-                                    <span>{domaineForm.id ? 'Enregistrer' : 'Ajouter'}</span>
+                                    <Plus aria-hidden="true" size={17} />
+                                    <span>Ajouter la competence</span>
                                 </button>
-                                {domaineForm.id ? (
-                                    <button className="ghost-button" onClick={() => setDomaineForm({ id: null, nom_domaine: '', id_direction: '', valide: false })} type="button">
-                                        <X aria-hidden="true" size={17} />
-                                        <span>Annuler</span>
-                                    </button>
-                                ) : null}
                             </div>
                         </form>
                     ) : null}
 
                     <SimpleTable
-                        columns={['Domaine', 'Direction', 'Statut', 'Actions']}
-                        emptyLabel="Aucun domaine."
-                        rows={domaines.map((domaine) => [
-                            <strong>{domaine.nom_domaine}</strong>,
-                            domaine.direction?.nom ?? '-',
-                            <span className={domaine.valide ? 'status-pill success' : 'status-pill warning'}>
-                                {domaine.valide ? 'Valide' : 'En attente'}
-                            </span>,
-                            canManage ? (
-                                <RowActions
-                                    extra={
-                                        !domaine.valide ? (
-                                            <button className="row-button success" onClick={() => validateDomaine(domaine)} title="Valider" type="button">
-                                                <CheckCircle2 aria-hidden="true" size={16} />
-                                            </button>
-                                        ) : null
-                                    }
-                                    onDelete={() => deleteDomaine(domaine)}
-                                    onEdit={() =>
-                                        setDomaineForm({
-                                            id: domaine.id,
-                                            nom_domaine: domaine.nom_domaine,
-                                            id_direction: domaine.direction?.id ? String(domaine.direction.id) : '',
-                                            valide: domaine.valide,
-                                        })
-                                    }
-                                />
-                            ) : (
-                                '-'
-                            ),
+                        columns={['Competence', 'Type', 'Statut']}
+                        emptyLabel="Aucune competence enregistree."
+                        rows={(competencesData.competences ?? []).map((c) => [
+                            <strong>{c.nom}</strong>,
+                            <span className="badge">{c.type ?? 'Technique'}</span>,
+                            <span className="badge green">Actif</span>,
                         ])}
                     />
-                </div>
-            </section>
+                </section>
+            ) : null}
         </div>
     );
 }
@@ -611,12 +815,16 @@ function RowActions({ extra = null, onDelete, onEdit }) {
     return (
         <div className="row-actions">
             {extra}
-            <button className="row-button" onClick={onEdit} title="Modifier" type="button">
-                <Edit3 aria-hidden="true" size={16} />
-            </button>
-            <button className="row-button danger" onClick={onDelete} title="Supprimer" type="button">
-                <Trash2 aria-hidden="true" size={16} />
-            </button>
+            {onEdit ? (
+                <button className="row-button" onClick={onEdit} title="Modifier" type="button">
+                    <Edit3 aria-hidden="true" size={16} />
+                </button>
+            ) : null}
+            {onDelete ? (
+                <button className="row-button danger" onClick={onDelete} title="Supprimer" type="button">
+                    <Trash2 aria-hidden="true" size={16} />
+                </button>
+            ) : null}
         </div>
     );
 }
@@ -657,10 +865,10 @@ function DashboardView() {
     return (
         <div className="view-stack">
             <section className="kpi-grid" aria-label="Indicateurs principaux">
-                <KpiCard icon={BriefcaseBusiness} label="Offres publiees" value={kpis.offres_publiees} tone="blue" />
-                <KpiCard icon={Database} label="Offres total" value={kpis.offres_total} tone="green" />
-                <KpiCard icon={Users} label="Candidatures sur offre" value={kpis.candidatures_sur_offre} tone="neutral" />
-                <KpiCard icon={CalendarDays} label="Domaines en attente" value={kpis.domaines_en_attente} tone="amber" />
+                <KpiCard icon={BriefcaseBusiness} label="Offres publiees" tone="blue" value={kpis.offres_publiees} />
+                <KpiCard icon={Database} label="Offres total" tone="green" value={kpis.offres_total} />
+                <KpiCard icon={Users} label="Candidatures sur offre" tone="neutral" value={kpis.candidatures_sur_offre} />
+                <KpiCard icon={CalendarDays} label="Domaines en attente" tone="amber" value={kpis.domaines_en_attente} />
             </section>
 
             <section className="data-section">
@@ -675,7 +883,7 @@ function DashboardView() {
                     </button>
                 </div>
 
-                <OffersTable offers={dashboard.offres_recentes ?? []} compact />
+                <OffersTable compact offers={dashboard.offres_recentes ?? []} />
             </section>
         </div>
     );
@@ -693,7 +901,8 @@ function KpiCard({ icon: Icon, label, tone, value }) {
     );
 }
 
-function OffersView({ canManage, referentiels }) {
+function OffersView({ canManage, competencesData, referentiels }) {
+    const [viewMode, setViewMode] = useState('list'); // 'list' | 'form'
     const [filters, setFilters] = useState({
         q: '',
         direction: '',
@@ -776,6 +985,95 @@ function OffersView({ canManage, referentiels }) {
         }));
     }
 
+    function addProfil() {
+        setOfferForm((curr) => ({
+            ...curr,
+            profils: [...curr.profils, { description: '', type_valeur: '', valeur_min: '', valeur_max: '', valeur_attendue: '', unite_valeur: '' }],
+        }));
+    }
+
+    function updateProfil(index, field, value) {
+        setOfferForm((curr) => {
+            const updated = [...curr.profils];
+            updated[index] = { ...updated[index], [field]: value };
+            return { ...curr, profils: updated };
+        });
+    }
+
+    function removeProfil(index) {
+        setOfferForm((curr) => ({
+            ...curr,
+            profils: curr.profils.filter((_, i) => i !== index),
+        }));
+    }
+
+    function addMission() {
+        setOfferForm((curr) => ({
+            ...curr,
+            missions: [...curr.missions, { description: '', ordre: curr.missions.length + 1 }],
+        }));
+    }
+
+    function updateMission(index, value) {
+        setOfferForm((curr) => {
+            const updated = [...curr.missions];
+            updated[index] = { ...updated[index], description: value };
+            return { ...curr, missions: updated };
+        });
+    }
+
+    function removeMission(index) {
+        setOfferForm((curr) => ({
+            ...curr,
+            missions: curr.missions.filter((_, i) => i !== index),
+        }));
+    }
+
+    function addFormation() {
+        setOfferForm((curr) => ({
+            ...curr,
+            formations: [...curr.formations, { niveau_min: '', niveau_max: '', domaine: '', obligatoire: true }],
+        }));
+    }
+
+    function updateFormation(index, field, value) {
+        setOfferForm((curr) => {
+            const updated = [...curr.formations];
+            updated[index] = { ...updated[index], [field]: value };
+            return { ...curr, formations: updated };
+        });
+    }
+
+    function removeFormation(index) {
+        setOfferForm((curr) => ({
+            ...curr,
+            formations: curr.formations.filter((_, i) => i !== index),
+        }));
+    }
+
+    function toggleCompetence(id_competence) {
+        setOfferForm((curr) => {
+            const exists = curr.competences.find((c) => c.id_competence === id_competence);
+            if (exists) {
+                return {
+                    ...curr,
+                    competences: curr.competences.filter((c) => c.id_competence !== id_competence),
+                };
+            }
+            return {
+                ...curr,
+                competences: [...curr.competences, { id_competence, niveau_requis: 'Intermediaire' }],
+            };
+        });
+    }
+
+    function updateCompetenceNiveau(id_competence, niveau_requis) {
+        setOfferForm((curr) => ({
+            ...curr,
+            competences: curr.competences.map((c) => (c.id_competence === id_competence ? { ...c, niveau_requis } : c)),
+        }));
+    }
+
     function resetOfferForm() {
         setFormError('');
         setOfferForm({
@@ -784,8 +1082,36 @@ function OffersView({ canManage, referentiels }) {
         });
     }
 
+    function openNewOfferForm() {
+        resetOfferForm();
+        setViewMode('form');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function editOffer(offre) {
         setFormError('');
+        const mappedProfils = offre.profils?.length
+            ? offre.profils.map((p) => ({
+                  description: p.description ?? '',
+                  type_valeur: p.type_valeur ?? '',
+                  valeur_min: p.valeur_min ?? '',
+                  valeur_max: p.valeur_max ?? '',
+                  valeur_attendue: p.valeur_attendue ?? '',
+                  unite_valeur: p.unite_valeur ?? '',
+              }))
+            : offre.profil
+            ? [
+                  {
+                      description: offre.profil.description ?? '',
+                      type_valeur: offre.profil.type_valeur ?? '',
+                      valeur_min: offre.profil.valeur_min ?? '',
+                      valeur_max: offre.profil.valeur_max ?? '',
+                      valeur_attendue: offre.profil.valeur_attendue ?? '',
+                      unite_valeur: offre.profil.unite_valeur ?? '',
+                  },
+              ]
+            : emptyOfferForm.profils;
+
         setOfferForm({
             id: offre.id,
             titre_poste: offre.titre_poste ?? '',
@@ -796,7 +1122,23 @@ function OffersView({ canManage, referentiels }) {
             date_publication: offre.date_publication ?? '',
             date_limite: offre.date_limite ?? '',
             id_statut_offre: offre.statut?.id ? String(offre.statut.id) : defaultStatusId ? String(defaultStatusId) : '',
+            profils: mappedProfils,
+            missions: offre.missions?.length
+                ? offre.missions.map((m) => ({ description: m.description, ordre: m.ordre }))
+                : [{ description: '', ordre: 1 }],
+            formations: offre.formations?.length
+                ? offre.formations.map((f) => ({
+                      niveau_min: f.niveau_min ?? '',
+                      niveau_max: f.niveau_max ?? '',
+                      domaine: f.domaine ?? '',
+                      obligatoire: f.obligatoire ?? true,
+                  }))
+                : [{ niveau_min: '', niveau_max: '', domaine: '', obligatoire: true }],
+            competences: offre.competences?.length
+                ? offre.competences.map((c) => ({ id_competence: c.id, niveau_requis: c.niveau_requis ?? 'Intermediaire' }))
+                : [],
         });
+        setViewMode('form');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -811,6 +1153,7 @@ function OffersView({ canManage, referentiels }) {
                 method: offerForm.id ? 'PUT' : 'POST',
             });
             resetOfferForm();
+            setViewMode('list');
             await loadOffers();
         } catch (caughtError) {
             setFormError(caughtError.message);
@@ -822,9 +1165,7 @@ function OffersView({ canManage, referentiels }) {
     async function deleteOffer(offre) {
         const confirmed = window.confirm(`Supprimer l'offre "${offre.titre_poste}" ?`);
 
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         setFormError('');
 
@@ -859,7 +1200,7 @@ function OffersView({ canManage, referentiels }) {
                                   className="row-button success"
                                   disabled={status === 'Publiee'}
                                   onClick={() => changeOfferStatus(offre, 'publier')}
-                                  title="Publier"
+                                  title="Publier l'offre"
                                   type="button"
                               >
                                   <CheckCircle2 aria-hidden="true" size={16} />
@@ -868,7 +1209,7 @@ function OffersView({ canManage, referentiels }) {
                                   className="row-button"
                                   disabled={status === 'Cloturee'}
                                   onClick={() => changeOfferStatus(offre, 'cloturer')}
-                                  title="Cloturer"
+                                  title="Cloturer l'offre"
                                   type="button"
                               >
                                   <X aria-hidden="true" size={16} />
@@ -884,18 +1225,39 @@ function OffersView({ canManage, referentiels }) {
 
     const meta = offersResponse.meta;
 
-    return (
-        <div className="view-stack">
-            {canManage ? (
+    // View mode 'form': Dedicated Form Page
+    if (viewMode === 'form') {
+        return (
+            <div className="view-stack">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <button
+                        className="ghost-button"
+                        onClick={() => {
+                            resetOfferForm();
+                            setViewMode('list');
+                        }}
+                        type="button"
+                    >
+                        <ArrowLeft size={18} />
+                        <span>Retour a la liste des offres</span>
+                    </button>
+                </div>
+
                 <section className="data-section">
                     <div className="section-heading">
                         <div>
                             <h2>{offerForm.id ? 'Modifier une offre' : 'Nouvelle offre'}</h2>
-                            <p>Creation et mise a jour des offres d'emploi.</p>
+                            <p>Formulaire de saisie complete de l'offre, des profils, missions, formations et competences.</p>
                         </div>
                     </div>
 
                     <form className="compact-form offer-form" onSubmit={saveOffer}>
+                        {/* Information Generale */}
+                        <div className="form-sub-header">
+                            <BriefcaseBusiness size={18} />
+                            <span>Informations Principales</span>
+                        </div>
+
                         <label>
                             <span>Poste</span>
                             <input
@@ -987,33 +1349,225 @@ function OffersView({ canManage, referentiels }) {
                         </label>
 
                         <label className="full-span">
-                            <span>Description</span>
+                            <span>Description du poste</span>
                             <textarea
                                 name="description"
                                 onChange={(event) => updateOfferForm('description', event.target.value)}
-                                rows={4}
+                                rows={3}
                                 value={offerForm.description}
                             />
                         </label>
 
-                        <div className="form-actions full-span">
+                        {/* Profils et Critères Multiples */}
+                        <div className="form-sub-header">
+                            <UserCheck size={18} />
+                            <span>Criteres de profil chiffres / attendus (Multiples)</span>
+                        </div>
+
+                        <div className="full-span" style={{ display: 'grid', gap: '12px' }}>
+                            {offerForm.profils.map((prof, index) => (
+                                <div
+                                    key={index}
+                                    style={{
+                                        border: '1px solid var(--border)',
+                                        borderRadius: '8px',
+                                        padding: '12px',
+                                        background: '#fafbfc',
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                                        gap: '10px',
+                                    }}
+                                >
+                                    <label className="full-span">
+                                        <span>Exigence / Critere #{index + 1}</span>
+                                        <input
+                                            onChange={(e) => updateProfil(index, 'description', e.target.value)}
+                                            placeholder="Ex: Experience en management d'equipe"
+                                            value={prof.description}
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Valeur cible</span>
+                                        <input
+                                            onChange={(e) => updateProfil(index, 'valeur_attendue', e.target.value)}
+                                            placeholder="Ex: 5"
+                                            value={prof.valeur_attendue}
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Valeur Min</span>
+                                        <input
+                                            onChange={(e) => updateProfil(index, 'valeur_min', e.target.value)}
+                                            placeholder="Ex: 2"
+                                            value={prof.valeur_min}
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Valeur Max</span>
+                                        <input
+                                            onChange={(e) => updateProfil(index, 'valeur_max', e.target.value)}
+                                            placeholder="Ex: 10"
+                                            value={prof.valeur_max}
+                                        />
+                                    </label>
+                                    <label>
+                                        <span>Unite</span>
+                                        <input
+                                            onChange={(e) => updateProfil(index, 'unite_valeur', e.target.value)}
+                                            placeholder="Ex: ans, score"
+                                            value={prof.unite_valeur}
+                                        />
+                                    </label>
+
+                                    {offerForm.profils.length > 1 ? (
+                                        <div className="full-span" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                            <button className="ghost-button danger" onClick={() => removeProfil(index)} type="button">
+                                                <Trash2 size={16} />
+                                                <span>Supprimer ce critere</span>
+                                            </button>
+                                        </div>
+                                    ) : null}
+                                </div>
+                            ))}
+                            <button className="ghost-button" onClick={addProfil} style={{ justifySelf: 'start' }} type="button">
+                                <Plus size={16} />
+                                <span>Ajouter un critere de profil</span>
+                            </button>
+                        </div>
+
+                        {/* Missions */}
+                        <div className="form-sub-header">
+                            <ListChecks size={18} />
+                            <span>Missions du poste</span>
+                        </div>
+
+                        <div className="full-span" style={{ display: 'grid', gap: '8px' }}>
+                            {offerForm.missions.map((mission, index) => (
+                                <div className="dynamic-row" key={index}>
+                                    <input
+                                        onChange={(e) => updateMission(index, e.target.value)}
+                                        placeholder={`Mission #${index + 1}...`}
+                                        value={mission.description}
+                                    />
+                                    {offerForm.missions.length > 1 ? (
+                                        <button className="row-button danger" onClick={() => removeMission(index)} type="button">
+                                            <Trash2 size={16} />
+                                        </button>
+                                    ) : null}
+                                </div>
+                            ))}
+                            <button className="ghost-button" onClick={addMission} style={{ justifySelf: 'start' }} type="button">
+                                <Plus size={16} />
+                                <span>Ajouter une mission</span>
+                            </button>
+                        </div>
+
+                        {/* Formations */}
+                        <div className="form-sub-header">
+                            <GraduationCap size={18} />
+                            <span>Formations requises</span>
+                        </div>
+
+                        <div className="full-span" style={{ display: 'grid', gap: '8px' }}>
+                            {offerForm.formations.map((formation, index) => (
+                                <div className="dynamic-row" key={index}>
+                                    <input
+                                        onChange={(e) => updateFormation(index, 'niveau_min', e.target.value)}
+                                        placeholder="Niveau (ex: Bac+5, Master)"
+                                        value={formation.niveau_min}
+                                    />
+                                    <input
+                                        onChange={(e) => updateFormation(index, 'domaine', e.target.value)}
+                                        placeholder="Domaine (ex: Informatique, Finance)"
+                                        value={formation.domaine}
+                                    />
+                                    <label className="checkbox-line" style={{ width: 'auto' }}>
+                                        <input
+                                            checked={formation.obligatoire}
+                                            onChange={(e) => updateFormation(index, 'obligatoire', e.target.checked)}
+                                            type="checkbox"
+                                        />
+                                        <span>Obligatoire</span>
+                                    </label>
+                                    {offerForm.formations.length > 1 ? (
+                                        <button className="row-button danger" onClick={() => removeFormation(index)} type="button">
+                                            <Trash2 size={16} />
+                                        </button>
+                                    ) : null}
+                                </div>
+                            ))}
+                            <button className="ghost-button" onClick={addFormation} style={{ justifySelf: 'start' }} type="button">
+                                <Plus size={16} />
+                                <span>Ajouter une formation</span>
+                            </button>
+                        </div>
+
+                        {/* Competences */}
+                        <div className="form-sub-header">
+                            <Award size={18} />
+                            <span>Competences requises</span>
+                        </div>
+
+                        <div className="competence-selector">
+                            {(competencesData.competences ?? []).map((comp) => {
+                                const selectedObj = offerForm.competences.find((c) => c.id_competence === comp.id);
+                                const isSelected = Boolean(selectedObj);
+
+                                return (
+                                    <div className={`competence-item ${isSelected ? 'selected' : ''}`} key={comp.id}>
+                                        <div className="competence-item-header">
+                                            <span>{comp.nom}</span>
+                                            <input
+                                                checked={isSelected}
+                                                onChange={() => toggleCompetence(comp.id)}
+                                                type="checkbox"
+                                            />
+                                        </div>
+                                        {isSelected ? (
+                                            <select
+                                                onChange={(e) => updateCompetenceNiveau(comp.id, e.target.value)}
+                                                style={{ height: '32px', fontSize: '12px' }}
+                                                value={selectedObj.niveau_requis ?? 'Intermediaire'}
+                                            >
+                                                <option value="Debutant">Debutant</option>
+                                                <option value="Intermediaire">Intermediaire</option>
+                                                <option value="Avance">Avance</option>
+                                                <option value="Expert">Expert</option>
+                                            </select>
+                                        ) : null}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div className="form-actions full-span" style={{ marginTop: '16px' }}>
                             <button className="filter-button" disabled={saving} type="submit">
                                 <Save aria-hidden="true" size={17} />
-                                <span>{saving ? 'Enregistrement...' : 'Enregistrer'}</span>
+                                <span>{saving ? 'Enregistrement...' : "Enregistrer l'offre"}</span>
                             </button>
-                            {offerForm.id ? (
-                                <button className="ghost-button" onClick={resetOfferForm} type="button">
-                                    <X aria-hidden="true" size={17} />
-                                    <span>Annuler</span>
-                                </button>
-                            ) : null}
+                            <button
+                                className="ghost-button"
+                                onClick={() => {
+                                    resetOfferForm();
+                                    setViewMode('list');
+                                }}
+                                type="button"
+                            >
+                                <X aria-hidden="true" size={17} />
+                                <span>Annuler</span>
+                            </button>
                         </div>
 
                         {formError ? <p className="form-error full-span">{formError}</p> : null}
                     </form>
                 </section>
-            ) : null}
+            </div>
+        );
+    }
 
+    // View mode 'list': Offer List Page
+    return (
+        <div className="view-stack">
             <section className="filter-bar" aria-label="Filtres des offres">
                 <label className="search-field">
                     <Search aria-hidden="true" size={18} />
@@ -1076,7 +1630,7 @@ function OffersView({ canManage, referentiels }) {
                     </div>
                     <div className="section-heading-actions">
                         {canManage ? (
-                            <button className="filter-button" onClick={() => { resetOfferForm(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} type="button">
+                            <button className="filter-button" onClick={openNewOfferForm} type="button">
                                 <Plus aria-hidden="true" size={17} />
                                 <span>Nouvelle offre</span>
                             </button>
@@ -1103,8 +1657,20 @@ function OffersView({ canManage, referentiels }) {
 }
 
 function OffersTable({ compact = false, offers, renderActions = null }) {
+    const [expandedRow, setExpandedRow] = useState(null);
+
     if (!offers.length) {
         return <div className="empty-state">Aucune offre a afficher pour le moment.</div>;
+    }
+
+    function toggleExpand(id) {
+        setExpandedRow((curr) => (curr === id ? null : id));
+    }
+
+    function copyCandidateLink(offre) {
+        const publicUrl = backendPath(`/api/public/offres/${offre.id}`);
+        navigator.clipboard?.writeText(publicUrl);
+        window.alert(`Lien public de candidature pour "${offre.titre_poste}" :\n\n${publicUrl}\n\n(Lien copie dans le presse-papier)`);
     }
 
     return (
@@ -1112,6 +1678,7 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
             <table>
                 <thead>
                     <tr>
+                        <th style={{ width: '32px' }}></th>
                         <th>Poste</th>
                         <th>Direction</th>
                         <th>Contrat</th>
@@ -1122,22 +1689,119 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
                     </tr>
                 </thead>
                 <tbody>
-                    {offers.map((offre) => (
-                        <tr key={offre.id}>
-                            <td>
-                                <strong>{offre.titre_poste}</strong>
-                                <span>{offre.lieu ?? '-'}</span>
-                            </td>
-                            <td>{offre.direction?.nom ?? '-'}</td>
-                            <td>{offre.type_contrat?.libelle ?? '-'}</td>
-                            <td>{formatDate(offre.date_publication)}</td>
-                            {!compact ? <td>{formatDate(offre.date_limite)}</td> : null}
-                            <td>
-                                <span className="status-pill">{offre.statut?.libelle ?? '-'}</span>
-                            </td>
-                            {renderActions ? <td>{renderActions(offre)}</td> : null}
-                        </tr>
-                    ))}
+                    {offers.map((offre) => {
+                        const isExpanded = expandedRow === offre.id;
+
+                        const profilsList = offre.profils?.length
+                            ? offre.profils
+                            : offre.profil
+                            ? [offre.profil]
+                            : [];
+
+                        return (
+                            <React.Fragment key={offre.id}>
+                                <tr>
+                                    <td>
+                                        <button
+                                            className="row-button"
+                                            onClick={() => toggleExpand(offre.id)}
+                                            title="Afficher les details"
+                                            type="button"
+                                        >
+                                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <strong>{offre.titre_poste}</strong>
+                                        <span>{offre.lieu ?? '-'}</span>
+                                    </td>
+                                    <td>{offre.direction?.nom ?? '-'}</td>
+                                    <td>{offre.type_contrat?.libelle ?? '-'}</td>
+                                    <td>{formatDate(offre.date_publication)}</td>
+                                    {!compact ? <td>{formatDate(offre.date_limite)}</td> : null}
+                                    <td>
+                                        <span className="status-pill">{offre.statut?.libelle ?? '-'}</span>
+                                    </td>
+                                    {renderActions ? (
+                                        <td>
+                                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                                {offre.statut?.libelle === 'Publiee' ? (
+                                                    <button
+                                                        className="row-button"
+                                                        onClick={() => copyCandidateLink(offre)}
+                                                        title="Copier le lien de candidature"
+                                                        type="button"
+                                                    >
+                                                        <Share2 size={16} />
+                                                    </button>
+                                                ) : null}
+                                                {renderActions(offre)}
+                                            </div>
+                                        </td>
+                                    ) : null}
+                                </tr>
+                                {isExpanded ? (
+                                    <tr>
+                                        <td colSpan={renderActions ? 8 : 7} style={{ padding: 0 }}>
+                                            <div className="expanded-details">
+                                                {profilsList.length ? (
+                                                    <div className="detail-block">
+                                                        <strong>Criteres de profil ({profilsList.length})</strong>
+                                                        <ul>
+                                                            {profilsList.map((p, idx) => (
+                                                                <li key={p.id ?? idx}>
+                                                                    {p.description ? `${p.description} ` : ''}
+                                                                    {p.valeur_attendue ? `(Cible: ${p.valeur_attendue} ${p.unite_valeur ?? ''})` : ''}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                ) : null}
+
+                                                {offre.missions?.length ? (
+                                                    <div className="detail-block">
+                                                        <strong>Missions principales</strong>
+                                                        <ul>
+                                                            {offre.missions.map((m) => (
+                                                                <li key={m.id}>{m.description}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                ) : null}
+
+                                                {offre.formations?.length ? (
+                                                    <div className="detail-block">
+                                                        <strong>Formations requises</strong>
+                                                        <ul>
+                                                            {offre.formations.map((f) => (
+                                                                <li key={f.id}>
+                                                                    {f.niveau_min} {f.domaine ? `(${f.domaine})` : ''} -{' '}
+                                                                    {f.obligatoire ? 'Obligatoire' : 'Souhaitable'}
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                ) : null}
+
+                                                {offre.competences?.length ? (
+                                                    <div className="detail-block">
+                                                        <strong>Competences requises</strong>
+                                                        <div className="tags-list">
+                                                            {offre.competences.map((c) => (
+                                                                <span className="badge green" key={c.id}>
+                                                                    {c.nom} ({c.niveau_requis ?? 'Requis'})
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : null}
+                            </React.Fragment>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>

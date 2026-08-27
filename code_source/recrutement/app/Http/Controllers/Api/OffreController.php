@@ -9,6 +9,7 @@ use App\Models\StatutOffre;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class OffreController extends Controller
@@ -30,7 +31,7 @@ class OffreController extends Controller
         $perPage = (int) ($filters['per_page'] ?? 15);
 
         $offres = Offre::query()
-            ->with(['direction', 'statut', 'typeContrat'])
+            ->with($this->resourceRelations())
             ->when($filters['direction'] ?? null, fn ($query, int $direction) => $query->where('id_direction', $direction))
             ->when($filters['statut'] ?? null, fn ($query, int $statut) => $query->where('id_statut_offre', $statut))
             ->when($filters['type_contrat'] ?? null, fn ($query, int $typeContrat) => $query->where('id_type_contrat', $typeContrat))
@@ -49,12 +50,44 @@ class OffreController extends Controller
         return OffreResource::collection($offres);
     }
 
+    public function publicIndex(Request $request): AnonymousResourceCollection
+    {
+        $publieeStatusId = $this->statusId(self::STATUT_PUBLIEE);
+
+        $offres = Offre::query()
+            ->with($this->resourceRelations())
+            ->where('id_statut_offre', $publieeStatusId)
+            ->where(function ($query): void {
+                $query->whereNull('date_limite')
+                    ->orWhere('date_limite', '>=', today());
+            })
+            ->orderByDesc('date_publication')
+            ->paginate(15);
+
+        return OffreResource::collection($offres);
+    }
+
+    public function publicShow(Offre $offre): OffreResource
+    {
+        $publieeStatusId = $this->statusId(self::STATUT_PUBLIEE);
+
+        if ((int) $offre->id_statut_offre !== $publieeStatusId) {
+            abort(404, "L'offre n'est pas disponible ou est cloturee.");
+        }
+
+        return new OffreResource($offre->load($this->resourceRelations()));
+    }
+
     public function store(Request $request): OffreResource
     {
         $data = $this->validatedData($request);
         $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->statusId(self::STATUT_BROUILLON);
 
-        $offre = Offre::query()->create($data);
+        $offre = DB::transaction(function () use ($request, $data) {
+            $offre = Offre::query()->create($data);
+            $this->syncNestedRelations($request, $offre);
+            return $offre;
+        });
 
         return new OffreResource($offre->load($this->resourceRelations()));
     }
@@ -69,7 +102,10 @@ class OffreController extends Controller
         $data = $this->validatedData($request);
         $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->statusId(self::STATUT_BROUILLON);
 
-        $offre->update($data);
+        DB::transaction(function () use ($request, $offre, $data) {
+            $offre->update($data);
+            $this->syncNestedRelations($request, $offre);
+        });
 
         return new OffreResource($offre->load($this->resourceRelations()));
     }
@@ -130,6 +166,88 @@ class OffreController extends Controller
         return $validator->validate();
     }
 
+    private function syncNestedRelations(Request $request, Offre $offre): void
+    {
+        if ($request->has('profils')) {
+            $offre->profils()->delete();
+            $profils = $request->input('profils', []);
+            if (is_array($profils)) {
+                foreach ($profils as $item) {
+                    if (is_array($item) && (!empty(trim($item['description'] ?? '')) || !empty($item['valeur_attendue']))) {
+                        $offre->profils()->create([
+                            'description' => trim($item['description'] ?? ''),
+                            'type_valeur' => $item['type_valeur'] ?? null,
+                            'valeur_min' => $item['valeur_min'] ?? null,
+                            'valeur_max' => $item['valeur_max'] ?? null,
+                            'valeur_attendue' => $item['valeur_attendue'] ?? null,
+                            'unite_valeur' => $item['unite_valeur'] ?? null,
+                        ]);
+                    }
+                }
+            }
+        } elseif ($request->has('profil')) {
+            $profilData = $request->input('profil');
+            if (is_array($profilData) && !empty(array_filter($profilData))) {
+                $offre->profils()->delete();
+                $offre->profils()->create([
+                    'description' => $profilData['description'] ?? null,
+                    'type_valeur' => $profilData['type_valeur'] ?? null,
+                    'valeur_min' => $profilData['valeur_min'] ?? null,
+                    'valeur_max' => $profilData['valeur_max'] ?? null,
+                    'valeur_attendue' => $profilData['valeur_attendue'] ?? null,
+                    'unite_valeur' => $profilData['unite_valeur'] ?? null,
+                ]);
+            }
+        }
+
+        if ($request->has('missions')) {
+            $offre->missions()->delete();
+            $missions = $request->input('missions', []);
+            if (is_array($missions)) {
+                foreach ($missions as $index => $item) {
+                    if (is_array($item) && !empty(trim($item['description'] ?? ''))) {
+                        $offre->missions()->create([
+                            'description' => trim($item['description']),
+                            'ordre' => (int) ($item['ordre'] ?? ($index + 1)),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        if ($request->has('formations')) {
+            $offre->formations()->delete();
+            $formations = $request->input('formations', []);
+            if (is_array($formations)) {
+                foreach ($formations as $item) {
+                    if (is_array($item) && (!empty($item['niveau_min']) || !empty($item['domaine']))) {
+                        $offre->formations()->create([
+                            'niveau_min' => $item['niveau_min'] ?? null,
+                            'niveau_max' => $item['niveau_max'] ?? null,
+                            'domaine' => $item['domaine'] ?? null,
+                            'obligatoire' => (bool) ($item['obligatoire'] ?? true),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        if ($request->has('competences')) {
+            $competences = $request->input('competences', []);
+            $syncData = [];
+            if (is_array($competences)) {
+                foreach ($competences as $item) {
+                    if (is_array($item) && !empty($item['id_competence'])) {
+                        $syncData[$item['id_competence']] = [
+                            'niveau_requis' => $item['niveau_requis'] ?? null,
+                        ];
+                    }
+                }
+            }
+            $offre->competences()->sync($syncData);
+        }
+    }
+
     private function statusId(string $libelle): int
     {
         $statusId = StatutOffre::query()
@@ -148,6 +266,6 @@ class OffreController extends Controller
      */
     private function resourceRelations(): array
     {
-        return ['direction', 'statut', 'typeContrat', 'profil', 'missions', 'formations'];
+        return ['direction', 'statut', 'typeContrat', 'profil', 'profils', 'missions', 'formations', 'competences.type'];
     }
 }

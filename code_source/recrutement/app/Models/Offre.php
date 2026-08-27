@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
@@ -50,6 +51,11 @@ class Offre extends Model
         return $this->belongsTo(TypeContrat::class, 'id_type_contrat', 'id_type_contrat');
     }
 
+    public function profils(): HasMany
+    {
+        return $this->hasMany(ProfilOffre::class, 'id_offre', 'id_offre');
+    }
+
     public function profil(): HasOne
     {
         return $this->hasOne(ProfilOffre::class, 'id_offre', 'id_offre');
@@ -63,5 +69,11 @@ class Offre extends Model
     public function formations(): HasMany
     {
         return $this->hasMany(ProfilFormation::class, 'id_offre', 'id_offre');
+    }
+
+    public function competences(): BelongsToMany
+    {
+        return $this->belongsToMany(Competence::class, 'profil_competence', 'id_offre', 'id_competence')
+            ->withPivot('niveau_requis');
     }
 }

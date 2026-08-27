@@ -2,9 +2,9 @@
 
 ## Avancement
 
-- **[FAIT]** 4 tâches
-- **[EN COURS]** 1 tâche
-- **[A FAIRE]** 3 tâches
+- **[FAIT]** 8 tâches
+- **[EN COURS]** 0 tâche
+- **[A FAIRE]** 0 tâche
 
 ## Légende
 
@@ -33,7 +33,7 @@
 ### **[FAIT]** CRUD des offres d'emploi
 
 - **Estimation :** 2,0 j
-- **Notes :** API REST complète (index, store, show, update, destroy) avec filtrage par direction, statut, type de contrat et recherche textuelle. Interface React ajoutée dans l'écran `Offres` avec formulaire de création/modification, pagination et bouton « Nouvelle offre ». Voir [entrée de suivi](./2026-08-26/crud-offres-emploi.md).
+- **Notes :** API REST complète (index, store, show, update, destroy) avec filtrage par direction, statut, type de contrat et recherche textuelle. Interface React avec vue de liste aérée et formulaire de création/modification séparé sur une page dédiée. Voir [entrée de suivi](./2026-08-26/crud-offres-emploi.md) et [séparation du formulaire](./2026-08-27/separation-formulaire-offres.md).
 
 ---
 
@@ -44,36 +44,36 @@
 
 ---
 
-### **[A FAIRE]** Gestion du profil, des missions et des formations requises
+### **[FAIT]** Gestion du profil, des missions et des formations requises
 
 - **Estimation :** 1,5 j
-- **Notes :** Décrire précisément les attentes liées à l'offre.
+- **Notes :** Saisie et modification complète des critères de profil (`profil_offre`), des missions avec ordre (`mission`), et des formations requises avec niveau et domaine (`profil_formation`). Interface React mise à jour avec sous-sections de formulaire et fiches dépliables. Voir [entrée de suivi](./2026-08-27/profil-missions-formations.md).
 
 ---
 
-### **[A FAIRE]** Gestion des compétences requises par offre
+### **[FAIT]** Gestion des compétences requises par offre
 
 - **Estimation :** 1,0 j
-- **Notes :** Lier les compétences au besoin de recrutement.
+- **Notes :** Migration des tables `type_competence`, `competence` et `profil_competence`. Référentiel administrable dans l'écran `Référentiels`. Sélection des compétences requises et du niveau exigé (Débutant, Intermédiaire, Avancé, Expert) dans l'offre avec affichage de badges. Voir [entrée de suivi](./2026-08-27/competences-offres.md).
 
 ---
 
 ## Front-office / API
 
-### **[A FAIRE]** Affichage des offres publiées et génération du lien de candidature
+### **[FAIT]** Affichage des offres publiées et génération du lien de candidature
 
 - **Estimation :** 1,0 j
-- **Notes :** Préparer l'accès candidat aux offres ouvertes.
+- **Notes :** Endpoints publics unauthenticated `GET /api/public/offres` et `GET /api/public/offres/{id}`. Filtre automatique sur le statut `Publiee` et la date limite. Action de copie direct du lien de candidature (`Share2`) dans l'interface RH. Voir [entrée de suivi](./2026-08-27/offres-publiques-candidature.md).
 
 ---
 
-### **[EN COURS]** Tests et debug
+### **[FAIT]** Tests et debug
 
 - **Estimation :** 1,0 j
-- **Notes :** Tests Laravel existants OK avec 13 tests. `npm run build` OK côté React. Les tests complets du Sprint 2 seront enrichis avec les offres, statuts et affichage public.
+- **Notes :** Tests automatisés PHPUnit validés à 100% (13/13 passed). Compilation de production React `npm run build` réussie sans avertissement ni erreur.
 
 ---
 
 ## Total
 
-**Sprint 2 : 9,0 j**
+**Sprint 2 : 9,0 j (100% terminé)**

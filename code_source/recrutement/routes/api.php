@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\UserRole;
+use App\Http\Controllers\Api\CompetenceController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DirectionController;
 use App\Http\Controllers\Api\DomaineController;
@@ -9,6 +10,11 @@ use App\Http\Controllers\Api\OffreController;
 use App\Http\Controllers\Api\ReferentielController;
 use Illuminate\Support\Facades\Route;
 
+// Public routes for candidates
+Route::get('/public/offres', [OffreController::class, 'publicIndex'])->name('api.public.offres.index');
+Route::get('/public/offres/{offre}', [OffreController::class, 'publicShow'])->name('api.public.offres.show');
+
+// Protected Back-Office routes
 Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
     Route::get('/csrf-token', fn () => response()->json([
         'data' => [
@@ -23,6 +29,7 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::get('/directions/{direction}', [DirectionController::class, 'show'])->name('api.directions.show');
     Route::get('/domaines', [DomaineController::class, 'index'])->name('api.domaines.index');
     Route::get('/domaines/{domaine}', [DomaineController::class, 'show'])->name('api.domaines.show');
+    Route::get('/competences', [CompetenceController::class, 'index'])->name('api.competences.index');
 
     Route::middleware('permission:manage_referentiels')->group(function (): void {
         Route::post('/directions', [DirectionController::class, 'store'])->name('api.directions.store');
@@ -33,6 +40,8 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
         Route::put('/domaines/{domaine}', [DomaineController::class, 'update'])->name('api.domaines.update');
         Route::patch('/domaines/{domaine}/valider', [DomaineController::class, 'validateDomain'])->name('api.domaines.validate');
         Route::delete('/domaines/{domaine}', [DomaineController::class, 'destroy'])->name('api.domaines.destroy');
+
+        Route::post('/competences', [CompetenceController::class, 'store'])->name('api.competences.store');
     });
 
     Route::get('/offres', [OffreController::class, 'index'])->name('api.offres.index');

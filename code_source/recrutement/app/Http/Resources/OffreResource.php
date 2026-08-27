@@ -40,6 +40,15 @@ class OffreResource extends JsonResource
                 'valeur_attendue' => $this->profil->valeur_attendue,
                 'unite_valeur' => $this->profil->unite_valeur,
             ] : null),
+            'profils' => $this->whenLoaded('profils', fn () => $this->profils->map(fn ($p) => [
+                'id' => $p->id_profil_offre,
+                'description' => $p->description,
+                'type_valeur' => $p->type_valeur,
+                'valeur_min' => $p->valeur_min,
+                'valeur_max' => $p->valeur_max,
+                'valeur_attendue' => $p->valeur_attendue,
+                'unite_valeur' => $p->unite_valeur,
+            ])->values()),
             'missions' => $this->whenLoaded('missions', fn () => $this->missions->map(fn ($mission) => [
                 'id' => $mission->id_mission,
                 'description' => $mission->description,
@@ -51,6 +60,12 @@ class OffreResource extends JsonResource
                 'niveau_max' => $formation->niveau_max,
                 'domaine' => $formation->domaine,
                 'obligatoire' => $formation->obligatoire,
+            ])->values()),
+            'competences' => $this->whenLoaded('competences', fn () => $this->competences->map(fn ($competence) => [
+                'id' => $competence->id_competence,
+                'nom' => $competence->nom_competence,
+                'type' => $competence->type?->libelle,
+                'niveau_requis' => $competence->pivot->niveau_requis,
             ])->values()),
         ];
     }
