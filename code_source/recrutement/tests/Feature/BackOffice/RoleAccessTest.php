@@ -49,7 +49,22 @@ class RoleAccessTest extends TestCase
     public function test_role_enum_defines_expected_permissions(): void
     {
         $this->assertTrue(UserRole::Admin->allows('manage_users'));
+        $this->assertTrue(UserRole::Admin->allows('manage_referentiels'));
         $this->assertTrue(UserRole::Rh->allows('manage_offres'));
+        $this->assertFalse(UserRole::Rh->allows('manage_referentiels'));
         $this->assertFalse(UserRole::Rh->allows('manage_users'));
+    }
+
+    public function test_rh_user_cannot_create_direction_reference(): void
+    {
+        $user = User::factory()->rh()->make([
+            'id' => 1,
+        ]);
+
+        $this->actingAs($user)
+            ->postJson('/api/directions', [
+                'nom_direction' => 'Juridique',
+            ])
+            ->assertForbidden();
     }
 }
