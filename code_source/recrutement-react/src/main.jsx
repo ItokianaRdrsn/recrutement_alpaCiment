@@ -738,7 +738,7 @@ function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', o
                                 <span>Nom de la competence</span>
                                 <input
                                     onChange={(e) => setCompetenceForm((curr) => ({ ...curr, nom_competence: e.target.value }))}
-                                    placeholder="Ex: React.js, Anglais, Docker..."
+                                    placeholder="Ex: Excel, Anglais, Docker..."
                                     required
                                     value={competenceForm.nom_competence}
                                 />
