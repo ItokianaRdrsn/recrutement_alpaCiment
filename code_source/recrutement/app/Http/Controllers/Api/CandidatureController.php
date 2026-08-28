@@ -386,7 +386,16 @@ class CandidatureController extends Controller
         }
 
         if ($request->filled('direction')) {
-            $query->where('id_direction', $request->input('direction'));
+            $directionId = (int) $request->input('direction');
+            $query->where(function ($sub) use ($directionId) {
+                $sub->where('id_direction', $directionId)
+                    ->orWhereHas('offre', function ($o) use ($directionId) {
+                        $o->where('id_direction', $directionId);
+                    })
+                    ->orWhereHas('domaine', function ($d) use ($directionId) {
+                        $d->where('id_direction', $directionId);
+                    });
+            });
         }
 
         $candidatures = $query->orderByDesc('created_at')->paginate($perPage);
