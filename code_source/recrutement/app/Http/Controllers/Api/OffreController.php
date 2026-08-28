@@ -30,6 +30,10 @@ class OffreController extends Controller
 
         $perPage = (int) ($filters['per_page'] ?? 15);
 
+        $publieeId = $this->statusId(self::STATUT_PUBLIEE);
+        $brouillonId = $this->statusId(self::STATUT_BROUILLON);
+        $clotureeId = $this->statusId(self::STATUT_CLOTUREE);
+
         $offres = Offre::query()
             ->with($this->resourceRelations())
             ->when($filters['direction'] ?? null, fn ($query, int $direction) => $query->where('id_direction', $direction))
@@ -42,8 +46,16 @@ class OffreController extends Controller
                         ->orWhere('lieu', 'like', "%{$search}%");
                 });
             })
+            ->orderByRaw("
+                CASE 
+                    WHEN id_statut_offre = {$publieeId} THEN 1
+                    WHEN id_statut_offre = {$brouillonId} THEN 2
+                    WHEN id_statut_offre = {$clotureeId} THEN 3
+                    ELSE 4
+                END ASC
+            ")
             ->orderByDesc('date_publication')
-            ->orderBy('titre_poste')
+            ->orderByDesc('created_at')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -100,7 +112,10 @@ class OffreController extends Controller
     public function update(Request $request, Offre $offre): OffreResource
     {
         $data = $this->validatedData($request);
-        $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->statusId(self::STATUT_BROUILLON);
+        
+        if (isset($data['id_statut_offre']) && (int) $data['id_statut_offre'] !== (int) $offre->id_statut_offre) {
+            $this->validateWorkflowProgression($offre, (int) $data['id_statut_offre']);
+        }
 
         DB::transaction(function () use ($request, $offre, $data) {
             $offre->update($data);
@@ -112,8 +127,11 @@ class OffreController extends Controller
 
     public function publish(Offre $offre): OffreResource
     {
+        $targetId = $this->statusId(self::STATUT_PUBLIEE);
+        $this->validateWorkflowProgression($offre, $targetId);
+
         $offre->forceFill([
-            'id_statut_offre' => $this->statusId(self::STATUT_PUBLIEE),
+            'id_statut_offre' => $targetId,
             'date_publication' => $offre->date_publication ?? today(),
         ])->save();
 
@@ -122,11 +140,30 @@ class OffreController extends Controller
 
     public function close(Offre $offre): OffreResource
     {
+        $targetId = $this->statusId(self::STATUT_CLOTUREE);
+        $this->validateWorkflowProgression($offre, $targetId);
+
         $offre->forceFill([
-            'id_statut_offre' => $this->statusId(self::STATUT_CLOTUREE),
+            'id_statut_offre' => $targetId,
         ])->save();
 
         return new OffreResource($offre->load($this->resourceRelations()));
+    }
+
+    private function validateWorkflowProgression(Offre $offre, int $targetStatusId): void
+    {
+        $currentStatusId = (int) $offre->id_statut_offre;
+
+        if ($currentStatusId === $targetStatusId) {
+            abort(422, "L'offre est deja dans ce statut.");
+        }
+
+        $currentOrder = StatutOffre::where('id_statut_offre', $currentStatusId)->value('ordre_workflow') ?? 0;
+        $targetOrder = StatutOffre::where('id_statut_offre', $targetStatusId)->value('ordre_workflow') ?? 0;
+
+        if ($targetOrder <= $currentOrder) {
+            abort(422, "Regression de statut interdite : le nouveau statut (ordre {$targetOrder}) doit avoir un ordre d'avancement strictement superieur au statut actuel (ordre {$currentOrder}).");
+        }
     }
 
     public function destroy(Offre $offre): Response

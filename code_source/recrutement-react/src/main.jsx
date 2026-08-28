@@ -168,6 +168,7 @@ async function submitLogout() {
 function App() {
     const [path, setPath] = useState(window.location.pathname);
     const [user, setUser] = useState(null);
+    const [editingOffer, setEditingOffer] = useState(null);
     const [referentiels, setReferentiels] = useState({
         directions: [],
         statuts_offre: [],
@@ -228,6 +229,11 @@ function App() {
         ? 'competences'
         : 'all';
 
+    function handleSelectOfferFromDashboard(offre) {
+        setEditingOffer(offre);
+        navigate('/offres');
+    }
+
     return (
         <AppShell activePath={path} activeView={activeView} user={user} onNavigate={navigate}>
             {bootstrapError ? (
@@ -238,6 +244,8 @@ function App() {
                 <OffersView
                     canManage={user?.permissions?.includes('manage_offres') ?? false}
                     competencesData={competencesData}
+                    initialEditingOffer={editingOffer}
+                    onClearEditingOffer={() => setEditingOffer(null)}
                     referentiels={referentiels}
                 />
             ) : activeView === 'referentiels' ? (
@@ -248,7 +256,7 @@ function App() {
                     onRefreshBase={loadBaseData}
                 />
             ) : (
-                <DashboardView />
+                <DashboardView onSelectOffer={handleSelectOfferFromDashboard} />
             )}
         </AppShell>
     );
@@ -829,7 +837,7 @@ function RowActions({ extra = null, onDelete, onEdit }) {
     );
 }
 
-function DashboardView() {
+function DashboardView({ onSelectOffer }) {
     const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -875,7 +883,7 @@ function DashboardView() {
                 <div className="section-heading">
                     <div>
                         <h2>Offres recentes</h2>
-                        <p>Suivi rapide des dernieres offres alimentees dans le socle.</p>
+                        <p>Cliquer sur une offre pour ouvrir son formulaire de modification complet.</p>
                     </div>
                     <button className="ghost-button" onClick={loadDashboard} type="button">
                         <RefreshCw aria-hidden="true" size={17} />
@@ -883,7 +891,7 @@ function DashboardView() {
                     </button>
                 </div>
 
-                <OffersTable compact offers={dashboard.offres_recentes ?? []} />
+                <OffersTable compact offers={dashboard.offres_recentes ?? []} onSelectOffer={onSelectOffer} />
             </section>
         </div>
     );
@@ -901,8 +909,8 @@ function KpiCard({ icon: Icon, label, tone, value }) {
     );
 }
 
-function OffersView({ canManage, competencesData, referentiels }) {
-    const [viewMode, setViewMode] = useState('list'); // 'list' | 'form'
+function OffersView({ canManage, competencesData, initialEditingOffer = null, onClearEditingOffer = null, referentiels }) {
+    const [viewMode, setViewMode] = useState(initialEditingOffer ? 'form' : 'list'); // 'list' | 'form'
     const [filters, setFilters] = useState({
         q: '',
         direction: '',
@@ -953,6 +961,15 @@ function OffersView({ canManage, competencesData, referentiels }) {
     useEffect(() => {
         loadOffers();
     }, [loadOffers]);
+
+    useEffect(() => {
+        if (initialEditingOffer) {
+            editOffer(initialEditingOffer);
+            if (onClearEditingOffer) {
+                onClearEditingOffer();
+            }
+        }
+    }, [initialEditingOffer, onClearEditingOffer]);
 
     useEffect(() => {
         if (!offerForm.id && !offerForm.id_statut_offre && defaultStatusId) {
@@ -1190,30 +1207,38 @@ function OffersView({ canManage, competencesData, referentiels }) {
 
     const renderOfferActions = canManage
         ? (offre) => {
-              const status = offre.statut?.libelle;
+              const currentStatusObj = referentiels.statuts_offre?.find((s) => s.id_statut_offre === offre.statut?.id);
+              const currentOrder = currentStatusObj?.ordre_workflow ?? 0;
+              const publieeOrder = referentiels.statuts_offre?.find((s) => s.libelle === 'Publiee')?.ordre_workflow ?? 2;
+              const clotureeOrder = referentiels.statuts_offre?.find((s) => s.libelle === 'Cloturee')?.ordre_workflow ?? 3;
+
+              const canPublish = currentOrder < publieeOrder;
+              const canClose = currentOrder < clotureeOrder;
 
               return (
                   <RowActions
                       extra={
                           <>
-                              <button
-                                  className="row-button success"
-                                  disabled={status === 'Publiee'}
-                                  onClick={() => changeOfferStatus(offre, 'publier')}
-                                  title="Publier l'offre"
-                                  type="button"
-                              >
-                                  <CheckCircle2 aria-hidden="true" size={16} />
-                              </button>
-                              <button
-                                  className="row-button"
-                                  disabled={status === 'Cloturee'}
-                                  onClick={() => changeOfferStatus(offre, 'cloturer')}
-                                  title="Cloturer l'offre"
-                                  type="button"
-                              >
-                                  <X aria-hidden="true" size={16} />
-                              </button>
+                              {canPublish ? (
+                                  <button
+                                      className="row-button success"
+                                      onClick={() => changeOfferStatus(offre, 'publier')}
+                                      title="Publier l'offre"
+                                      type="button"
+                                  >
+                                      <CheckCircle2 aria-hidden="true" size={16} />
+                                  </button>
+                              ) : null}
+                              {canClose ? (
+                                  <button
+                                      className="row-button"
+                                      onClick={() => changeOfferStatus(offre, 'cloturer')}
+                                      title="Cloturer l'offre"
+                                      type="button"
+                                  >
+                                      <X aria-hidden="true" size={16} />
+                                  </button>
+                              ) : null}
                           </>
                       }
                       onDelete={() => deleteOffer(offre)}
@@ -1310,11 +1335,25 @@ function OffersView({ canManage, competencesData, referentiels }) {
                                 value={offerForm.id_statut_offre}
                             >
                                 <option value="">Brouillon par defaut</option>
-                                {referentiels.statuts_offre?.map((statut) => (
-                                    <option key={statut.id_statut_offre} value={statut.id_statut_offre}>
-                                        {statut.libelle}
-                                    </option>
-                                ))}
+                                {referentiels.statuts_offre?.map((statut) => {
+                                    const currentStatusObj = referentiels.statuts_offre?.find(
+                                        (s) => String(s.id_statut_offre) === String(offerForm.id_statut_offre),
+                                    );
+                                    const currentOrder = currentStatusObj?.ordre_workflow ?? 0;
+                                    const isCurrent = String(statut.id_statut_offre) === String(offerForm.id_statut_offre);
+                                    const isHigherOrder = (statut.ordre_workflow ?? 0) > currentOrder;
+                                    const isDisabled = offerForm.id && !isCurrent && !isHigherOrder;
+
+                                    return (
+                                        <option
+                                            disabled={isDisabled}
+                                            key={statut.id_statut_offre}
+                                            value={statut.id_statut_offre}
+                                        >
+                                            {statut.libelle} {isDisabled ? '(Non autorise - regression)' : ''}
+                                        </option>
+                                    );
+                                })}
                             </select>
                         </label>
 
@@ -1647,7 +1686,7 @@ function OffersView({ canManage, competencesData, referentiels }) {
                 ) : loading ? (
                     <LoadingState />
                 ) : (
-                    <OffersTable offers={offersResponse.data} renderActions={renderOfferActions} />
+                    <OffersTable offers={offersResponse.data} onSelectOffer={editOffer} renderActions={renderOfferActions} />
                 )}
 
                 {meta ? <Pagination meta={meta} onChangePage={changePage} /> : null}
@@ -1656,7 +1695,7 @@ function OffersView({ canManage, competencesData, referentiels }) {
     );
 }
 
-function OffersTable({ compact = false, offers, renderActions = null }) {
+function OffersTable({ compact = false, offers, onSelectOffer = null, renderActions = null }) {
     const [expandedRow, setExpandedRow] = useState(null);
 
     if (!offers.length) {
@@ -1678,14 +1717,14 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
             <table>
                 <thead>
                     <tr>
-                        <th style={{ width: '32px' }}></th>
+                        {!compact ? <th style={{ width: '32px' }}></th> : null}
                         <th>Poste</th>
                         <th>Direction</th>
                         <th>Contrat</th>
                         <th>Publication</th>
                         {!compact ? <th>Limite</th> : null}
                         <th>Statut</th>
-                        {renderActions ? <th>Actions</th> : null}
+                        {renderActions || compact ? <th>Actions</th> : null}
                     </tr>
                 </thead>
                 <tbody>
@@ -1700,17 +1739,25 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
 
                         return (
                             <React.Fragment key={offre.id}>
-                                <tr>
-                                    <td>
-                                        <button
-                                            className="row-button"
-                                            onClick={() => toggleExpand(offre.id)}
-                                            title="Afficher les details"
-                                            type="button"
-                                        >
-                                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                        </button>
-                                    </td>
+                                <tr
+                                    onClick={compact && onSelectOffer ? () => onSelectOffer(offre) : undefined}
+                                    style={compact && onSelectOffer ? { cursor: 'pointer' } : {}}
+                                >
+                                    {!compact ? (
+                                        <td>
+                                            <button
+                                                className="row-button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleExpand(offre.id);
+                                                }}
+                                                title="Afficher les details"
+                                                type="button"
+                                            >
+                                                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                            </button>
+                                        </td>
+                                    ) : null}
                                     <td>
                                         <strong>{offre.titre_poste}</strong>
                                         <span>{offre.lieu ?? '-'}</span>
@@ -1722,10 +1769,23 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
                                     <td>
                                         <span className="status-pill">{offre.statut?.libelle ?? '-'}</span>
                                     </td>
-                                    {renderActions ? (
+                                    {renderActions || compact ? (
                                         <td>
                                             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                                {offre.statut?.libelle === 'Publiee' ? (
+                                                {compact && onSelectOffer ? (
+                                                    <button
+                                                        className="row-button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onSelectOffer(offre);
+                                                        }}
+                                                        title="Voir / Modifier l'offre"
+                                                        type="button"
+                                                    >
+                                                        <Edit3 size={16} />
+                                                    </button>
+                                                ) : null}
+                                                {offre.statut?.libelle === 'Publiee' && !compact ? (
                                                     <button
                                                         className="row-button"
                                                         onClick={() => copyCandidateLink(offre)}
@@ -1735,12 +1795,12 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
                                                         <Share2 size={16} />
                                                     </button>
                                                 ) : null}
-                                                {renderActions(offre)}
+                                                {renderActions && !compact ? renderActions(offre) : null}
                                             </div>
                                         </td>
                                     ) : null}
                                 </tr>
-                                {isExpanded ? (
+                                {!compact && isExpanded ? (
                                     <tr>
                                         <td colSpan={renderActions ? 8 : 7} style={{ padding: 0 }}>
                                             <div className="expanded-details">
