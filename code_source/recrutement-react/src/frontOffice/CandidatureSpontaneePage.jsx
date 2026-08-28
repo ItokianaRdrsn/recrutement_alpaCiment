@@ -7,7 +7,6 @@ export default function CandidatureSpontaneePage({ onNavigate, sendFormData }) {
         prenom: '',
         email: '',
         telephone: '',
-        ville: '',
         poste_souhaite: '',
         message_motivation: '',
     });

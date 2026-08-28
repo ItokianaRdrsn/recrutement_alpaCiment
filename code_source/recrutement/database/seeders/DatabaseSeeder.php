@@ -27,6 +27,23 @@ class DatabaseSeeder extends Seeder
         ]);
 
         foreach ([
+            ['Dupont Jean', 'jean.dupont@entreprise.com', 'admin'],
+            ['Martin Sophie', 'sophie.martin@entreprise.com', 'rh'],
+            ['Bernard Pierre', 'pierre.bernard@entreprise.com', 'manager'],
+            ['Durand Marie', 'marie.durand@entreprise.com', 'rh'],
+            ['Petit Luc', 'luc.petit@entreprise.com', 'manager'],
+        ] as [$nom, $email, $role]) {
+            DB::table('utilisateur')->updateOrInsert([
+                'email' => $email,
+            ], [
+                'nom' => $nom,
+                'role' => $role,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        foreach ([
             'Informatique',
             'Ressources Humaines',
             'Finance',

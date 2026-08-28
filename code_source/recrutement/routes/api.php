@@ -64,4 +64,16 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::get('/candidatures', [CandidatureController::class, 'index'])->name('api.candidatures.index');
     Route::get('/candidatures/{id}', [CandidatureController::class, 'show'])->name('api.candidatures.show');
     Route::patch('/candidatures/{id}/statut', [CandidatureController::class, 'updateStatut'])->name('api.candidatures.update-statut');
+    Route::post('/candidatures/{id}/extract-ocr', [\App\Http\Controllers\Api\VivierController::class, 'extractOcr'])->name('api.candidatures.extract-ocr');
+    Route::post('/candidatures/{id}/validate-ocr', [\App\Http\Controllers\Api\VivierController::class, 'validateOcrData'])->name('api.candidatures.validate-ocr');
+
+    // Vivier & Compétences Candidats
+    Route::get('/vivier', [\App\Http\Controllers\Api\VivierController::class, 'index'])->name('api.vivier.index');
+    Route::post('/vivier', [\App\Http\Controllers\Api\VivierController::class, 'store'])->name('api.vivier.store');
+    Route::delete('/vivier/{id}', [\App\Http\Controllers\Api\VivierController::class, 'destroy'])->name('api.vivier.destroy');
+    Route::get('/vivier/candidat/{idCandidat}/profile', [\App\Http\Controllers\Api\VivierController::class, 'getCandidatProfile'])->name('api.vivier.candidat-profile');
+    Route::post('/vivier/candidat/{idCandidat}/competences', [\App\Http\Controllers\Api\VivierController::class, 'addCompetence'])->name('api.vivier.add-competence');
+    Route::post('/vivier/candidat/{idCandidat}/experiences', [\App\Http\Controllers\Api\VivierController::class, 'addExperience'])->name('api.vivier.add-experience');
+    Route::post('/vivier/candidat/{idCandidat}/formations', [\App\Http\Controllers\Api\VivierController::class, 'addFormation'])->name('api.vivier.add-formation');
 });
+

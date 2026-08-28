@@ -14,6 +14,9 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'utilisateur';
+    protected $primaryKey = 'id_utilisateur';
+
     /**
      * @var list<string>
      */

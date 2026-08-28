@@ -30,7 +30,7 @@ CREATE TABLE utilisateur (
 CREATE TABLE domaine (
     id_domaine BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nom_domaine VARCHAR(150) NOT NULL UNIQUE,
-    id_direction BIGINT NOT NULL REFERENCES direction(id_direction) ON DELETE RESTRICT,
+    id_direction BIGINT REFERENCES direction(id_direction) ON DELETE RESTRICT,
     valide BOOLEAN NOT NULL DEFAULT FALSE,
     date_validation TIMESTAMPTZ,
     valide_par BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE

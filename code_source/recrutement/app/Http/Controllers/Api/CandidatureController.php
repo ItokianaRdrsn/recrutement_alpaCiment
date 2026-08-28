@@ -49,8 +49,6 @@ class CandidatureController extends Controller
             'prenom' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150'],
             'telephone' => ['nullable', 'string', 'max:50'],
-            'ville' => ['nullable', 'string', 'max:100'],
-            'linkedin_url' => ['nullable', 'string', 'max:255'],
             'message_motivation' => ['nullable', 'string'],
             'cv' => ['required', 'file', 'max:10240'], // max 10MB
             'photo' => ['nullable', 'file', 'image', 'max:5120'], // max 5MB
@@ -65,8 +63,6 @@ class CandidatureController extends Controller
                     'nom' => trim($validated['nom']),
                     'prenom' => trim($validated['prenom']),
                     'telephone' => $validated['telephone'] ?? null,
-                    'ville' => $validated['ville'] ?? null,
-                    'linkedin_url' => $validated['linkedin_url'] ?? null,
                 ]
             );
 
@@ -85,21 +81,24 @@ class CandidatureController extends Controller
                 'id_candidat' => $candidat->id_candidat,
                 'id_type_demande' => $typeDemandeId,
                 'id_offre' => $offre->id_offre,
-                'id_direction' => $offre->id_direction,
+                'id_domaine' => null,
                 'id_statut_candidature' => $recueStatusId,
+                'dans_vivier' => false,
+                'poste_souhaite' => null,
+                'message' => $validated['message_motivation'] ?? null,
+                'canal_depot' => 'site_externe',
+                'id_utilisateur_depot' => null,
                 'date_candidature' => now(),
-                'message_motivation' => $validated['message_motivation'] ?? null,
-                'postule_depuis' => 'Formulaire web (temporaire)',
+                'date_maj' => now(),
             ]);
 
             // Create initial status history
             HistoriqueStatut::create([
                 'id_candidature' => $candidature->id_candidature,
-                'id_statut_precedent' => null,
-                'id_statut_nouveau' => $recueStatusId,
-                'modifie_par' => auth()->id() ?? null,
+                'id_statut_candidature' => $recueStatusId,
+                'date_changement' => now(),
                 'commentaire' => 'Candidature déposée sur l\'offre: ' . $offre->titre_poste,
-                'created_at' => now(),
+                'id_utilisateur' => auth()->id() ?? null,
             ]);
 
             // Save CV
@@ -170,7 +169,6 @@ class CandidatureController extends Controller
             'prenom' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150'],
             'telephone' => ['nullable', 'string', 'max:50'],
-            'ville' => ['nullable', 'string', 'max:100'],
             'poste_souhaite' => ['nullable', 'string', 'max:150'],
             'message_motivation' => ['nullable', 'string'],
             'cv' => ['required', 'file', 'max:10240'],
@@ -184,7 +182,6 @@ class CandidatureController extends Controller
                     'nom' => trim($validated['nom']),
                     'prenom' => trim($validated['prenom']),
                     'telephone' => $validated['telephone'] ?? null,
-                    'ville' => $validated['ville'] ?? null,
                 ]
             );
 
@@ -212,21 +209,23 @@ class CandidatureController extends Controller
                 'id_candidat' => $candidat->id_candidat,
                 'id_type_demande' => $typeDemandeId,
                 'id_offre' => null,
-                'id_direction' => null,
                 'id_domaine' => $domaineId,
                 'id_statut_candidature' => $recueStatusId,
+                'dans_vivier' => true,
+                'poste_souhaite' => $validated['poste_souhaite'] ?? null,
+                'message' => $validated['message_motivation'] ?? null,
+                'canal_depot' => 'site_externe',
+                'id_utilisateur_depot' => null,
                 'date_candidature' => now(),
-                'message_motivation' => $validated['message_motivation'] ?? null,
-                'postule_depuis' => 'Formulaire web spontané (temporaire)',
+                'date_maj' => now(),
             ]);
 
             HistoriqueStatut::create([
                 'id_candidature' => $candidature->id_candidature,
-                'id_statut_precedent' => null,
-                'id_statut_nouveau' => $recueStatusId,
-                'modifie_par' => auth()->id() ?? null,
+                'id_statut_candidature' => $recueStatusId,
+                'date_changement' => now(),
                 'commentaire' => 'Dépôt de candidature spontanée' . (!empty($validated['poste_souhaite']) ? ' (Poste souhaité: ' . $validated['poste_souhaite'] . ')' : ''),
-                'created_at' => now(),
+                'id_utilisateur' => auth()->id() ?? null,
             ]);
 
             if ($request->hasFile('cv')) {
@@ -295,7 +294,6 @@ class CandidatureController extends Controller
                     'nom' => trim($validated['nom']),
                     'prenom' => trim($validated['prenom']),
                     'telephone' => $validated['telephone'] ?? null,
-                    'ville' => $validated['ville'] ?? null,
                 ]
             );
 
@@ -315,20 +313,23 @@ class CandidatureController extends Controller
                 'id_candidat' => $candidat->id_candidat,
                 'id_type_demande' => $typeDemandeId,
                 'id_offre' => $validated['id_offre'] ?? null,
-                'id_direction' => $validated['id_direction'] ?? null,
+                'id_domaine' => $validated['id_domaine'] ?? null,
                 'id_statut_candidature' => $recueStatusId,
+                'dans_vivier' => empty($validated['id_offre']),
+                'poste_souhaite' => $validated['poste_souhaite'] ?? null,
+                'message' => $validated['message_motivation'] ?? null,
+                'canal_depot' => 'site_externe',
+                'id_utilisateur_depot' => null,
                 'date_candidature' => now(),
-                'message_motivation' => $validated['message_motivation'] ?? null,
-                'postule_depuis' => $validated['source'] ?? 'Import Webmail / Site Externe',
+                'date_maj' => now(),
             ]);
 
             HistoriqueStatut::create([
                 'id_candidature' => $candidature->id_candidature,
-                'id_statut_precedent' => null,
-                'id_statut_nouveau' => $recueStatusId,
-                'modifie_par' => null,
+                'id_statut_candidature' => $recueStatusId,
+                'date_changement' => now(),
                 'commentaire' => 'Réception et importation automatique depuis ' . ($validated['source'] ?? 'e-mail / site externe'),
-                'created_at' => now(),
+                'id_utilisateur' => null,
             ]);
 
             if ($request->hasFile('cv')) {
@@ -366,7 +367,7 @@ class CandidatureController extends Controller
     {
         $perPage = (int) ($request->input('per_page', 15));
         $query = Candidature::query()
-            ->with(['candidat', 'offre', 'direction', 'domaine', 'statut', 'documents']);
+            ->with(['candidat', 'offre.direction', 'domaine.direction', 'typeDemande', 'statut', 'documents']);
 
         if ($request->filled('q')) {
             $q = trim($request->input('q'));
@@ -388,17 +389,16 @@ class CandidatureController extends Controller
         if ($request->filled('direction')) {
             $directionId = (int) $request->input('direction');
             $query->where(function ($sub) use ($directionId) {
-                $sub->where('id_direction', $directionId)
-                    ->orWhereHas('offre', function ($o) use ($directionId) {
-                        $o->where('id_direction', $directionId);
-                    })
-                    ->orWhereHas('domaine', function ($d) use ($directionId) {
-                        $d->where('id_direction', $directionId);
-                    });
+                $sub->whereHas('offre', function ($o) use ($directionId) {
+                    $o->where('id_direction', $directionId);
+                })
+                ->orWhereHas('domaine', function ($d) use ($directionId) {
+                    $d->where('id_direction', $directionId);
+                });
             });
         }
 
-        $candidatures = $query->orderByDesc('created_at')->paginate($perPage);
+        $candidatures = $query->orderByDesc('date_candidature')->paginate($perPage);
 
         return response()->json($candidatures);
     }
@@ -408,7 +408,7 @@ class CandidatureController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $candidature = Candidature::with(['candidat', 'offre', 'direction', 'domaine', 'statut', 'documents', 'historique.statutNouveau', 'historique.statutPrecedent', 'historique.utilisateur'])
+        $candidature = Candidature::with(['candidat', 'offre.direction', 'domaine.direction', 'typeDemande', 'statut', 'documents', 'historique.statut', 'historique.utilisateur'])
             ->findOrFail($id);
 
         return response()->json(['data' => $candidature]);
@@ -437,11 +437,10 @@ class CandidatureController extends Controller
 
             HistoriqueStatut::create([
                 'id_candidature' => $candidature->id_candidature,
-                'id_statut_precedent' => $oldStatusId,
-                'id_statut_nouveau' => $newStatusId,
-                'modifie_par' => auth()->id() ?? null,
+                'id_statut_candidature' => $newStatusId,
+                'date_changement' => now(),
                 'commentaire' => $validated['commentaire'] ?? 'Changement de statut',
-                'created_at' => now(),
+                'id_utilisateur' => auth()->id() ?? null,
             ]);
         });
 
@@ -458,5 +457,23 @@ class CandidatureController extends Controller
     {
         $statuts = StatutCandidature::orderBy('ordre_workflow')->get();
         return response()->json(['data' => $statuts]);
+    }
+
+    /**
+     * Toggle dans_vivier boolean on candidature
+     */
+    public function updateVivierStatus(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'dans_vivier' => ['required', 'boolean'],
+        ]);
+
+        $candidature = Candidature::findOrFail($id);
+        $candidature->update(['dans_vivier' => $validated['dans_vivier']]);
+
+        return response()->json([
+            'message' => $validated['dans_vivier'] ? 'Candidature marquée comme étant dans le vivier.' : 'Candidature retirée du vivier.',
+            'data' => $candidature,
+        ]);
     }
 }

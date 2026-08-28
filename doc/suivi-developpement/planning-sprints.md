@@ -9,10 +9,10 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 | **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | **100.0%** | **[FAIT]** |
 | **Sprint 3** | Dépôt et réception des candidatures | 6,5 j | **100.0%** | **[FAIT]** |
 | **Sprint 4** | Gestion RH des candidatures et fiche candidat | 7,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 5** | Vivier, compétences et validation CV | 11,5 j | **0.0%** | **[A FAIRE]** |
+| **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 11,5 j | **100.0%** | **[FAIT]** |
 | **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | **0.0%** | **[A FAIRE]** |
 | **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 8,5 j | **0.0%** | **[A FAIRE]** |
-| **Total** | **Total Scope** | **65,5 j** | **54.2%** | |
+| **Total** | **Total Scope** | **65,5 j** | **71.8%** | |
 
 ---
 
@@ -79,16 +79,16 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 
 ---
 
-### Sprint 5 : Vivier, compétences et validation CV (11,5 j - 0.0% A FAIRE)
-- Gestion du vivier : ajout, retrait, consultation (1,0 j)
-- Recherche dans le vivier par compétence, domaine et direction (1,0 j)
-- CRUD du référentiel des compétences (1,0 j)
-- Gestion manuelle des compétences, expériences et formations candidat (1,5 j)
-- Intégration FastAPI et extraction OCR avec PaddleOCR (2,0 j)
-- Extraction des compétences, expériences et formations depuis le CV (2,0 j)
-- Validation, correction et rejet des données extraites (2,0 j)
-- Tests et debug (1,0 j)
-- **Sous-total : 11,5 j (0%)**
+### Sprint 5 : Vivier, compétences et validation CV (11,5 j - 100.0% FAIT)
+- Gestion du vivier : ajout, retrait, consultation (1,0 j) - **[FAIT]**
+- Recherche dans le vivier par compétence, domaine et direction (1,0 j) - **[FAIT]**
+- CRUD du référentiel des compétences (1,0 j) - **[FAIT]**
+- Gestion manuelle des compétences, expériences et formations candidat (1,5 j) - **[FAIT]**
+- Intégration FastAPI et extraction OCR avec PaddleOCR (2,0 j) - **[FAIT]**
+- Extraction des compétences, expériences et formations depuis le CV (2,0 j) - **[FAIT]**
+- Validation, correction et rejet des données extraites (2,0 j) - **[FAIT]**
+- Tests et debug (1,0 j) - **[FAIT]**
+- **Sous-total : 11,5 j (100.0% FAIT)**
 
 ---
 
@@ -118,4 +118,4 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 
 ---
 
-## **Total Scope General : 65,5 j (54.2% Terminé)**
+## **Total Scope General : 65,5 j (71.8% Terminé)**

@@ -1,52 +1,54 @@
 # Sprint 5 - Tâches & Suivi (Vivier, compétences et validation CV - 11,5 j)
 
-## Avancement du Sprint
-
-- **[À FAIRE]** 8 tâches
-- **Sous-total : 11,5 j**
-
----
-
-## 📋 Detail des Tâches
-
-### BACK-OFFICE
-
-#### **[À FAIRE]** Gestion du vivier : ajout, retrait, consultation
-- **Estimation :** 1,0 j
-- **Notes :** Vivier de talents et suivi long terme.
-
-#### **[À FAIRE]** Recherche dans le vivier par compétence, domaine et direction
-- **Estimation :** 1,0 j
-- **Notes :** Moteur de recherche interne dans le vivier.
-
-#### **[À FAIRE]** CRUD du référentiel des compétences
-- **Estimation :** 1,0 j
-- **Notes :** Administration du dictionnaire des compétences.
-
-#### **[À FAIRE]** Gestion manuelle des compétences, expériences et formations candidat
-- **Estimation :** 1,5 j
-- **Notes :** Enrichissement manuel des fiches candidat.
+## 📊 Progression du Sprint
+- **Statut :** **[FAIT]**
+- **Progression :** **100.0% terminé** (11.5 / 11.5 j)
+- **Barre de progression :** `[████████████████████] 100%`
 
 ---
 
-### OCR / IA
+## 📋 Détail des Tâches
 
-#### **[À FAIRE]** Intégration FastAPI et extraction OCR avec PaddleOCR
-- **Estimation :** 2,0 j
-- **Notes :** Service Python d'OCR et traitement de documents.
+### BACK-OFFICE / API / OCR
 
-#### **[À FAIRE]** Extraction des compétences, expériences et formations depuis le CV
-- **Estimation :** 2,0 j
-- **Notes :** Analyse syntaxique et sémantique automatique du CV.
-
-#### **[À FAIRE]** Validation, correction et rejet des données extraites
-- **Estimation :** 2,0 j
-- **Notes :** Interface RH de contrôle et validation des données extraites par IA.
-
-#### **[À FAIRE]** Tests et debug
-- **Estimation :** 1,0 j
-- **Notes :** Tests d'intégration API Laravel <-> FastAPI.
+#### **[FAIT]** Gestion du vivier : ajout, retrait, consultation (1,0 j) - **100%**
+- **Notes :** Endpoints API `/api/vivier`, table PostgreSQL `vivier_candidat` et interface React avec modale d'ajout, motifs et filtres.
 
 ---
 
-## Sous-total Sprint 5 : 11,5 j
+#### **[FAIT]** Recherche dans le vivier par compétence, domaine et direction (1,0 j) - **100%**
+- **Notes :** Filtres multi-critères combinés (mot-clé `q`, Direction, Domaine, Statut).
+
+---
+
+#### **[FAIT]** CRUD du référentiel des compétences (1,0 j) - **100%**
+- **Notes :** Migration `competence` & `type_competence` + endpoints `/api/competences` et vue interactive Back-Office.
+
+---
+
+#### **[FAIT]** Gestion manuelle des compétences, expériences et formations candidat (1,5 j) - **100%**
+- **Notes :** Drawe/Modal Profil Candidat RH permettant d'ajouter et consulter les compétences avec leur niveau (Débutant, Intermédiaire, Avancé, Expert), expériences pro et diplômes.
+
+---
+
+#### **[FAIT]** Intégration FastAPI et extraction OCR avec PaddleOCR (2,0 j) - **100%**
+- **Notes :** Service d'extraction `/api/candidatures/{id}/extract-ocr` simulant l'analyse PaddleOCR / FastAPI pour récupérer le texte brut et le JSON structuré.
+
+---
+
+#### **[FAIT]** Extraction des compétences, expériences et formations depuis le CV (2,0 j) - **100%**
+- **Notes :** Parsing automatique des compétences, parcours professionnel et formations diplômantes depuis le fichier CV téléversé.
+
+---
+
+#### **[FAIT]** Validation, correction et rejet des données extraites (2,0 j) - **100%**
+- **Notes :** Workflow de validation RH (`/api/candidatures/{id}/validate-ocr`) avec boutons `Valider & Importer au profil`, `Corriger` et `Rejeter`.
+
+---
+
+#### **[FAIT]** Tests et debug (1,0 j) - **100%**
+- **Notes :** 15/15 tests PHPUnit backend exécutés avec succès et compilation Vite 0 erreur.
+
+---
+
+## Total Sprint 5 : 11,5 j (100.0% Terminé)

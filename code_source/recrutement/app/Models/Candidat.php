@@ -10,7 +10,7 @@ class Candidat extends Model
 {
     use HasFactory;
 
-    protected $table = 'candidats';
+    protected $table = 'candidat';
     protected $primaryKey = 'id_candidat';
 
     protected $fillable = [
@@ -19,11 +19,7 @@ class Candidat extends Model
         'email',
         'telephone',
         'adresse',
-        'ville',
-        'code_postal',
-        'pays',
         'date_naissance',
-        'linkedin_url',
     ];
 
     public function candidatures(): HasMany

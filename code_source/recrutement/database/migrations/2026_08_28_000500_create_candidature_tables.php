@@ -2,93 +2,84 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Run the migrations for candidat, candidature, historique_statut, document matching exact gestion_recrutement.sql
      */
     public function up(): void
     {
-        if (! Schema::hasTable('statut_candidature')) {
-            Schema::create('statut_candidature', function (Blueprint $table) {
-                $table->id('id_statut_candidature');
-                $table->string('libelle', 100)->unique();
-                $table->integer('ordre_workflow')->default(0);
-                $table->timestamps();
-            });
-
-            DB::table('statut_candidature')->insert([
-                ['libelle' => 'Reçue', 'ordre_workflow' => 1, 'created_at' => now(), 'updated_at' => now()],
-                ['libelle' => 'En cours d\'examen', 'ordre_workflow' => 2, 'created_at' => now(), 'updated_at' => now()],
-                ['libelle' => 'Présélectionné', 'ordre_workflow' => 3, 'created_at' => now(), 'updated_at' => now()],
-                ['libelle' => 'Entretien', 'ordre_workflow' => 4, 'created_at' => now(), 'updated_at' => now()],
-                ['libelle' => 'Offre faite', 'ordre_workflow' => 5, 'created_at' => now(), 'updated_at' => now()],
-                ['libelle' => 'Embauché', 'ordre_workflow' => 6, 'created_at' => now(), 'updated_at' => now()],
-                ['libelle' => 'Refusé', 'ordre_workflow' => 7, 'created_at' => now(), 'updated_at' => now()],
-                ['libelle' => 'En vivier', 'ordre_workflow' => 8, 'created_at' => now(), 'updated_at' => now()],
-            ]);
-        }
-
-        if (! Schema::hasTable('candidats')) {
-            Schema::create('candidats', function (Blueprint $table) {
+        if (! Schema::hasTable('candidat')) {
+            Schema::create('candidat', function (Blueprint $table) {
                 $table->id('id_candidat');
                 $table->string('nom', 100);
                 $table->string('prenom', 100);
-                $table->string('email', 150)->unique();
-                $table->string('telephone', 50)->nullable();
-                $table->string('adresse', 255)->nullable();
-                $table->string('ville', 100)->nullable();
-                $table->string('code_postal', 20)->nullable();
-                $table->string('pays', 100)->default('Madagascar');
+                $table->string('email', 200)->unique();
+                $table->string('telephone', 30)->nullable();
+                $table->text('adresse')->nullable();
                 $table->date('date_naissance')->nullable();
-                $table->string('linkedin_url', 255)->nullable();
-                $table->timestamps();
+                $table->timestampsTz();
+
+                $table->index('nom', 'idx_candidat_nom');
             });
         }
 
-        if (! Schema::hasTable('candidatures')) {
-            Schema::create('candidatures', function (Blueprint $table) {
+        if (! Schema::hasTable('candidature')) {
+            Schema::create('candidature', function (Blueprint $table) {
                 $table->id('id_candidature');
-                $table->foreignId('id_candidat')->constrained('candidats', 'id_candidat')->onDelete('cascade');
-                $table->foreignId('id_type_demande')->nullable()->constrained('type_demande', 'id_type_demande')->onDelete('set null');
-                $table->foreignId('id_offre')->nullable()->constrained('offre', 'id_offre')->onDelete('set null');
-                $table->foreignId('id_direction')->nullable()->constrained('direction', 'id_direction')->onDelete('set null');
-                $table->foreignId('id_domaine')->nullable()->constrained('domaine', 'id_domaine')->onDelete('set null');
-                $table->foreignId('id_statut_candidature')->constrained('statut_candidature', 'id_statut_candidature')->onDelete('restrict');
-                $table->timestamp('date_candidature')->useCurrent();
-                $table->text('message_motivation')->nullable();
-                $table->string('postule_depuis', 100)->default('Formulaire web');
-                $table->foreignId('id_recruteur_assigne')->nullable()->constrained('users')->onDelete('set null');
-                $table->timestamps();
+                $table->foreignId('id_candidat')->constrained('candidat', 'id_candidat')->cascadeOnDelete();
+                $table->foreignId('id_type_demande')->constrained('type_demande', 'id_type_demande')->restrictOnDelete();
+                $table->foreignId('id_offre')->nullable()->constrained('offre', 'id_offre')->restrictOnDelete();
+                $table->foreignId('id_domaine')->nullable()->constrained('domaine', 'id_domaine')->restrictOnDelete();
+                $table->foreignId('id_statut_candidature')->constrained('statut_candidature', 'id_statut_candidature')->restrictOnDelete();
+                $table->boolean('dans_vivier')->default(false);
+                $table->string('poste_souhaite', 200)->nullable();
+                $table->text('message')->nullable();
+                $table->string('canal_depot', 20)->default('site_externe');
+                $table->foreignId('id_utilisateur_depot')->nullable()->constrained('utilisateur', 'id_utilisateur')->nullOnDelete();
+                $table->timestampTz('date_candidature')->useCurrent();
+                $table->timestampTz('date_maj')->useCurrent();
+
+                $table->index('id_candidat', 'idx_candidature_candidat');
+                $table->index('id_offre', 'idx_candidature_offre');
+                $table->index('id_domaine', 'idx_candidature_domaine');
+                $table->index('id_type_demande', 'idx_candidature_type_demande');
+                $table->index('id_statut_candidature', 'idx_candidature_statut');
+                $table->index('canal_depot', 'idx_candidature_canal');
             });
         }
 
         if (! Schema::hasTable('historique_statut')) {
             Schema::create('historique_statut', function (Blueprint $table) {
-                $table->id('id_historique_statut');
-                $table->foreignId('id_candidature')->constrained('candidatures', 'id_candidature')->onDelete('cascade');
-                $table->foreignId('id_statut_precedent')->nullable()->constrained('statut_candidature', 'id_statut_candidature')->onDelete('set null');
-                $table->foreignId('id_statut_nouveau')->constrained('statut_candidature', 'id_statut_candidature')->onDelete('restrict');
-                $table->foreignId('modifie_par')->nullable()->constrained('users')->onDelete('set null');
+                $table->id('id_historique');
+                $table->foreignId('id_candidature')->constrained('candidature', 'id_candidature')->cascadeOnDelete();
+                $table->foreignId('id_statut_candidature')->constrained('statut_candidature', 'id_statut_candidature')->restrictOnDelete();
+                $table->timestampTz('date_changement')->useCurrent();
                 $table->text('commentaire')->nullable();
-                $table->timestamp('created_at')->useCurrent();
+                $table->foreignId('id_utilisateur')->nullable()->constrained('utilisateur', 'id_utilisateur')->nullOnDelete();
+
+                $table->index('id_candidature', 'idx_historique_candidature');
             });
         }
 
-        if (! Schema::hasTable('documents')) {
-            Schema::create('documents', function (Blueprint $table) {
+        if (! Schema::hasTable('document')) {
+            Schema::create('document', function (Blueprint $table) {
                 $table->id('id_document');
-                $table->foreignId('id_candidature')->constrained('candidatures', 'id_candidature')->onDelete('cascade');
-                $table->string('type_document', 50); // CV, Photo, Lettre_Motivation, Autre
+                $table->foreignId('id_candidature')->constrained('candidature', 'id_candidature')->cascadeOnDelete();
+                $table->string('type_document', 50);
                 $table->string('nom_fichier', 255);
-                $table->string('chemin_fichier', 255);
-                $table->bigInteger('taille_octets')->nullable();
+                $table->text('chemin_fichier');
                 $table->string('mime_type', 100)->nullable();
-                $table->string('description', 255)->nullable();
+                $table->bigInteger('taille_octets')->nullable();
+                $table->string('mode_acquisition', 20)->default('fichier');
+                $table->text('contenu_texte_extrait')->nullable();
+                $table->text('description')->nullable();
+                $table->timestampTz('date_upload')->useCurrent();
                 $table->timestamps();
+
+                $table->index('id_candidature', 'idx_document_candidature');
             });
         }
     }
@@ -98,10 +89,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::dropIfExists('document');
         Schema::dropIfExists('historique_statut');
-        Schema::dropIfExists('candidatures');
-        Schema::dropIfExists('candidats');
-        Schema::dropIfExists('statut_candidature');
+        Schema::dropIfExists('candidature');
+        Schema::dropIfExists('candidat');
     }
 };
