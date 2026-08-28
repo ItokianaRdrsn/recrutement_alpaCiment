@@ -28,6 +28,7 @@ import {
     ListChecks,
     LogOut,
     Plus,
+    Printer,
     RefreshCw,
     Save,
     Search,
@@ -544,7 +545,18 @@ function CandidaturesView({ referentiels }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedCandidatureId, setSelectedCandidatureId] = useState(null);
-    const [filters, setFilters] = useState({ q: '', statut: '', direction: '' });
+    const [viewMode, setViewMode] = useState('toutes'); // 'toutes', 'par_offre', 'spontanees'
+    const [page, setPage] = useState(1);
+    const [perPage, setPerPage] = useState(15);
+    const [paginationMeta, setPaginationMeta] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
+    const [filters, setFilters] = useState({
+        q: '',
+        statut: '',
+        direction: '',
+        type_candidature: '',
+        date_debut: '',
+        date_fin: '',
+    });
 
     const loadCandidatures = useCallback(async () => {
         setLoading(true);
@@ -552,9 +564,14 @@ function CandidaturesView({ referentiels }) {
 
         try {
             const params = new URLSearchParams();
+            params.set('page', String(page));
+            params.set('per_page', String(perPage));
             if (filters.q) params.set('q', filters.q);
             if (filters.statut) params.set('statut', filters.statut);
             if (filters.direction) params.set('direction', filters.direction);
+            if (filters.type_candidature) params.set('type_candidature', filters.type_candidature);
+            if (filters.date_debut) params.set('date_debut', filters.date_debut);
+            if (filters.date_fin) params.set('date_fin', filters.date_fin);
 
             const [candResponse, statutsResponse] = await Promise.all([
                 getJson(`/api/candidatures?${params.toString()}`),
@@ -562,13 +579,20 @@ function CandidaturesView({ referentiels }) {
             ]);
 
             setCandidatures(candResponse?.data ?? []);
+            setPaginationMeta({
+                current_page: candResponse?.current_page ?? page,
+                last_page: candResponse?.last_page ?? 1,
+                total: candResponse?.total ?? (candResponse?.data?.length ?? 0),
+                from: candResponse?.from ?? 1,
+                to: candResponse?.to ?? (candResponse?.data?.length ?? 0),
+            });
             setStatutsList(statutsResponse?.data ?? []);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }, [filters]);
+    }, [filters, page, perPage]);
 
     useEffect(() => {
         loadCandidatures();
@@ -585,14 +609,82 @@ function CandidaturesView({ referentiels }) {
         );
     }
 
+    // Grouping for Direction -> Offre -> Candidats
+    const candidaturesSurOffre = candidatures.filter((c) => c.type_candidature === 'offre' || c.offre);
+    const candidaturesSpontanees = candidatures.filter((c) => c.type_candidature === 'spontanee' || !c.offre);
+
+    // Tree mapping for Direction -> Offre
+    const treeByOffre = {};
+    candidaturesSurOffre.forEach((c) => {
+        const dirName = c.offre?.direction?.nom_direction ?? 'Direction Générale';
+        const offreTitle = c.offre?.titre_poste ?? 'Offre sans titre';
+        if (!treeByOffre[dirName]) treeByOffre[dirName] = {};
+        if (!treeByOffre[dirName][offreTitle]) treeByOffre[dirName][offreTitle] = [];
+        treeByOffre[dirName][offreTitle].push(c);
+    });
+
+    // Tree mapping for Direction -> Domaine
+    const treeByDomaine = {};
+    candidaturesSpontanees.forEach((c) => {
+        const dirName = c.domaine?.direction?.nom_direction ?? 'Candidatures Spontanées Générales';
+        const domaineName = c.domaine?.nom_domaine ?? 'Poste Souhaité Libre';
+        if (!treeByDomaine[dirName]) treeByDomaine[dirName] = {};
+        if (!treeByDomaine[dirName][domaineName]) treeByDomaine[dirName][domaineName] = [];
+        treeByDomaine[dirName][domaineName].push(c);
+    });
+
     return (
         <div className="view-stack">
-            <section className="filter-bar">
-                <label className="search-field">
+            {/* SUB-NAVIGATION TABS FOR SPRINT 4 */}
+            <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid var(--border)', paddingBottom: '8px', marginBottom: '12px' }}>
+                <button
+                    className={`ghost-button ${viewMode === 'toutes' ? 'primary' : ''}`}
+                    onClick={() => setViewMode('toutes')}
+                    style={{
+                        fontWeight: viewMode === 'toutes' ? 'bold' : 'normal',
+                        borderBottom: viewMode === 'toutes' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <ListChecks size={17} />
+                    <span>Toutes les candidatures ({candidatures.length})</span>
+                </button>
+                <button
+                    className={`ghost-button ${viewMode === 'par_offre' ? 'primary' : ''}`}
+                    onClick={() => setViewMode('par_offre')}
+                    style={{
+                        fontWeight: viewMode === 'par_offre' ? 'bold' : 'normal',
+                        borderBottom: viewMode === 'par_offre' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <BriefcaseBusiness size={17} />
+                    <span>Direction → Offre → Candidats ({candidaturesSurOffre.length})</span>
+                </button>
+                <button
+                    className={`ghost-button ${viewMode === 'spontanees' ? 'primary' : ''}`}
+                    onClick={() => setViewMode('spontanees')}
+                    style={{
+                        fontWeight: viewMode === 'spontanees' ? 'bold' : 'normal',
+                        borderBottom: viewMode === 'spontanees' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <Building2 size={17} />
+                    <span>Direction → Domaine → Candidatures ({candidaturesSpontanees.length})</span>
+                </button>
+            </div>
+
+            {/* FULL FILTERS BAR (Statut, Direction, Période, Canal/Type, Mot-clé) */}
+            <section className="filter-bar" style={{ flexWrap: 'wrap', gap: '12px' }}>
+                <label className="search-field" style={{ minWidth: '220px' }}>
                     <Search size={18} />
                     <input
                         onChange={(e) => setFilters((curr) => ({ ...curr, q: e.target.value }))}
-                        placeholder="Rechercher un candidat (nom, email)..."
+                        placeholder="Candidat (nom, email, tel)..."
                         type="search"
                         value={filters.q}
                     />
@@ -619,13 +711,43 @@ function CandidaturesView({ referentiels }) {
                         onChange={(e) => setFilters((curr) => ({ ...curr, direction: e.target.value }))}
                         value={filters.direction}
                     >
-                        <option value="">Toutes</option>
+                        <option value="">Toutes les directions</option>
                         {referentiels.directions?.map((dir) => (
                             <option key={dir.id_direction} value={dir.id_direction}>
                                 {dir.nom_direction}
                             </option>
                         ))}
                     </select>
+                </label>
+
+                <label>
+                    <span>Canal / Type</span>
+                    <select
+                        onChange={(e) => setFilters((curr) => ({ ...curr, type_candidature: e.target.value }))}
+                        value={filters.type_candidature}
+                    >
+                        <option value="">Tous les canaux</option>
+                        <option value="offre">Candidature sur offre</option>
+                        <option value="spontanee">Candidature spontanée</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>Date début</span>
+                    <input
+                        onChange={(e) => setFilters((curr) => ({ ...curr, date_debut: e.target.value }))}
+                        type="date"
+                        value={filters.date_debut}
+                    />
+                </label>
+
+                <label>
+                    <span>Date fin</span>
+                    <input
+                        onChange={(e) => setFilters((curr) => ({ ...curr, date_fin: e.target.value }))}
+                        type="date"
+                        value={filters.date_fin}
+                    />
                 </label>
 
                 <button className="filter-button" onClick={loadCandidatures} type="button">
@@ -637,8 +759,14 @@ function CandidaturesView({ referentiels }) {
             <section className="data-section">
                 <div className="section-heading">
                     <div>
-                        <h2>Candidatures reçues</h2>
-                        <p>Gestion et suivi des dossiers de candidatures sur offre et spontanées.</p>
+                        <h2>
+                            {viewMode === 'toutes'
+                                ? 'Liste générale des candidatures'
+                                : viewMode === 'par_offre'
+                                ? 'Arborescence des candidatures par Offre'
+                                : 'Arborescence des candidatures Spontanées par Domaine'}
+                        </h2>
+                        <p>Gestion RH des dossiers de candidatures avec suivi du workflow de statut et pièces jointes.</p>
                     </div>
                     <button className="ghost-button" onClick={loadCandidatures} type="button">
                         <RefreshCw size={17} />
@@ -651,60 +779,233 @@ function CandidaturesView({ referentiels }) {
                 ) : error ? (
                     <ErrorState message={error} onRetry={loadCandidatures} />
                 ) : !candidatures.length ? (
-                    <div className="empty-state">Aucune candidature trouvée.</div>
-                ) : (
-                    <div className="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Candidat</th>
-                                    <th>Type / Poste / Direction</th>
-                                    <th>Date</th>
-                                    <th>Documents</th>
-                                    <th>Origine</th>
-                                    <th>Statut</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {candidatures.map((c) => (
-                                    <tr key={c.id_candidature}>
-                                        <td>
-                                            <strong>{c.candidat?.prenom} {c.candidat?.nom}</strong>
-                                            <span>{c.candidat?.email}</span>
-                                        </td>
-                                        <td>
-                                            {c.offre ? (
-                                                <strong style={{ color: 'var(--primary)' }}>Offre: {c.offre.titre_poste}</strong>
-                                            ) : (
-                                                <span className="badge amber">Spontanee ({c.direction?.nom_direction ?? 'Generale'})</span>
-                                            )}
-                                        </td>
-                                        <td>{formatDate(c.date_candidature ?? c.created_at)}</td>
-                                        <td>
-                                            <span className="badge">{c.documents?.length ?? 0} fichier(s)</span>
-                                        </td>
-                                        <td>
-                                            <small>{c.postule_depuis ?? 'Web'}</small>
-                                        </td>
-                                        <td>
-                                            <span className="status-pill success">{c.statut?.libelle ?? 'Reçue'}</span>
-                                        </td>
-                                        <td>
-                                            <button
-                                                className="filter-button"
-                                                onClick={() => setSelectedCandidatureId(c.id_candidature)}
-                                                style={{ padding: '6px 12px', fontSize: '13px' }}
-                                                type="button"
-                                            >
-                                                <Eye size={15} />
-                                                <span>Voir dossier</span>
-                                            </button>
-                                        </td>
+                    <div className="empty-state">Aucune candidature trouvée avec les filtres sélectionnés.</div>
+                ) : viewMode === 'toutes' ? (
+                    /* MODE 1: LISTE GÉNÉRALE AVEC PAGINATION */
+                    <>
+                        <div className="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Candidat</th>
+                                        <th>Poste / Domaine & Direction</th>
+                                        <th>Canal</th>
+                                        <th>Date</th>
+                                        <th>Documents</th>
+                                        <th>Statut RH</th>
+                                        <th>Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {candidatures.map((c) => (
+                                        <tr key={c.id_candidature}>
+                                            <td>
+                                                <strong>{c.candidat?.prenom} {c.candidat?.nom}</strong>
+                                                <br />
+                                                <small>{c.candidat?.email}</small>
+                                            </td>
+                                            <td>
+                                                {c.offre ? (
+                                                    <strong style={{ color: 'var(--primary)' }}>Offre: {c.offre.titre_poste}</strong>
+                                                ) : (
+                                                    <span className="badge amber">
+                                                        Poste: {c.domaine?.nom_domaine ?? 'Spontanée'}
+                                                    </span>
+                                                )}
+                                                <br />
+                                                <small>{c.offre?.direction?.nom_direction ?? c.domaine?.direction?.nom_direction ?? 'Non spécifiée'}</small>
+                                            </td>
+                                            <td>
+                                                <span className={`badge ${c.type_candidature === 'spontanee' ? 'amber' : 'blue'}`}>
+                                                    {c.type_candidature === 'spontanee' ? 'Spontanée' : 'Sur offre'}
+                                                </span>
+                                            </td>
+                                            <td>{formatDate(c.date_candidature ?? c.created_at)}</td>
+                                            <td>
+                                                <span className="badge">{c.documents?.length ?? 0} fichier(s)</span>
+                                            </td>
+                                            <td>
+                                                <span className="status-pill success">{c.statut?.libelle ?? 'Reçue'}</span>
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className="filter-button"
+                                                    onClick={() => setSelectedCandidatureId(c.id_candidature)}
+                                                    style={{ padding: '6px 12px', fontSize: '13px' }}
+                                                    type="button"
+                                                >
+                                                    <Eye size={15} />
+                                                    <span>Voir dossier</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* BARRE DE PAGINATION INTERACTIVE */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px', padding: '12px 16px', background: '#fff', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <span style={{ fontSize: '13px', color: 'var(--muted)' }}>
+                                    Affichage de {paginationMeta.from ?? 1} à {paginationMeta.to ?? candidatures.length} sur {paginationMeta.total ?? candidatures.length} candidature(s)
+                                </span>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px' }}>
+                                    <span>Par page :</span>
+                                    <select
+                                        onChange={(e) => {
+                                            setPerPage(Number(e.target.value));
+                                            setPage(1);
+                                        }}
+                                        style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border)' }}
+                                        value={perPage}
+                                    >
+                                        <option value={15}>15</option>
+                                        <option value={25}>25</option>
+                                        <option value={50}>50</option>
+                                        <option value={100}>100</option>
+                                    </select>
+                                </label>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <button
+                                    className="ghost-button"
+                                    disabled={page <= 1}
+                                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                    style={{ padding: '6px 12px', fontSize: '13px' }}
+                                    type="button"
+                                >
+                                    <ChevronLeft size={16} />
+                                    <span>Précédent</span>
+                                </button>
+                                <span style={{ fontSize: '13px', fontWeight: 'bold' }}>
+                                    Page {paginationMeta.current_page} / {paginationMeta.last_page}
+                                </span>
+                                <button
+                                    className="ghost-button"
+                                    disabled={page >= paginationMeta.last_page}
+                                    onClick={() => setPage((p) => p + 1)}
+                                    style={{ padding: '6px 12px', fontSize: '13px' }}
+                                    type="button"
+                                >
+                                    <span>Suivant</span>
+                                    <ChevronRight size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                ) : viewMode === 'par_offre' ? (
+                    /* MODE 2: ARBORESCENCE DIRECTION -> OFFRE -> CANDIDATS */
+                    <div style={{ display: 'grid', gap: '20px' }}>
+                        {Object.entries(treeByOffre).map(([dirName, offresMap]) => (
+                            <div key={dirName} className="data-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                <h3 style={{ margin: '0 0 12px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Building2 size={18} />
+                                    <span>Direction : {dirName}</span>
+                                </h3>
+                                <div style={{ display: 'grid', gap: '16px', paddingLeft: '12px' }}>
+                                    {Object.entries(offresMap).map(([offreTitle, items]) => (
+                                        <div key={offreTitle} style={{ background: '#fff', padding: '14px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                                <strong style={{ fontSize: '15px' }}>Offre : {offreTitle}</strong>
+                                                <span className="status-pill success">{items.length} candidat(s)</span>
+                                            </div>
+                                            <div className="table-wrap">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Candidat</th>
+                                                            <th>Email & Tel</th>
+                                                            <th>Date de dépôt</th>
+                                                            <th>Statut RH</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {items.map((item) => (
+                                                            <tr key={item.id_candidature}>
+                                                                <td><strong>{item.candidat?.prenom} {item.candidat?.nom}</strong></td>
+                                                                <td>{item.candidat?.email} ({item.candidat?.telephone ?? '-'})</td>
+                                                                <td>{formatDate(item.date_candidature ?? item.created_at)}</td>
+                                                                <td><span className="status-pill success">{item.statut?.libelle ?? 'Reçue'}</span></td>
+                                                                <td>
+                                                                    <button
+                                                                        className="filter-button"
+                                                                        onClick={() => setSelectedCandidatureId(item.id_candidature)}
+                                                                        style={{ padding: '4px 10px', fontSize: '12px' }}
+                                                                        type="button"
+                                                                    >
+                                                                        <Eye size={13} />
+                                                                        <span>Consulter</span>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    /* MODE 3: ARBORESCENCE DIRECTION -> DOMAINE -> CANDIDATURES SPONTANÉES */
+                    <div style={{ display: 'grid', gap: '20px' }}>
+                        {Object.entries(treeByDomaine).map(([dirName, domainesMap]) => (
+                            <div key={dirName} className="data-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                <h3 style={{ margin: '0 0 12px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Building2 size={18} />
+                                    <span>Direction : {dirName}</span>
+                                </h3>
+                                <div style={{ display: 'grid', gap: '16px', paddingLeft: '12px' }}>
+                                    {Object.entries(domainesMap).map(([domaineName, items]) => (
+                                        <div key={domaineName} style={{ background: '#fff', padding: '14px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                                                <strong style={{ fontSize: '15px' }}>Domaine / Poste souhaité : {domaineName}</strong>
+                                                <span className="status-pill warning">{items.length} candidature(s) spontanée(s)</span>
+                                            </div>
+                                            <div className="table-wrap">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Candidat</th>
+                                                            <th>Coordonnées</th>
+                                                            <th>Date</th>
+                                                            <th>Statut RH</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {items.map((item) => (
+                                                            <tr key={item.id_candidature}>
+                                                                <td><strong>{item.candidat?.prenom} {item.candidat?.nom}</strong></td>
+                                                                <td>{item.candidat?.email} ({item.candidat?.telephone ?? '-'})</td>
+                                                                <td>{formatDate(item.date_candidature ?? item.created_at)}</td>
+                                                                <td><span className="status-pill success">{item.statut?.libelle ?? 'Reçue'}</span></td>
+                                                                <td>
+                                                                    <button
+                                                                        className="filter-button"
+                                                                        onClick={() => setSelectedCandidatureId(item.id_candidature)}
+                                                                        style={{ padding: '4px 10px', fontSize: '12px' }}
+                                                                        type="button"
+                                                                    >
+                                                                        <Eye size={13} />
+                                                                        <span>Consulter</span>
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
             </section>
@@ -716,6 +1017,7 @@ function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsLi
     const [details, setDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [activeTab, setActiveTab] = useState('informations'); // 'informations', 'documents', 'statut', 'historique_statuts', 'communications'
     const [newStatusId, setNewStatusId] = useState('');
     const [commentaire, setCommentaire] = useState('');
     const [updating, setUpdating] = useState(false);
@@ -782,157 +1084,306 @@ function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsLi
 
     return (
         <div className="view-stack">
+            {/* EN-TÊTE FICHE CANDIDAT & BOUTON IMPRESSIONS / RETOUR */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <button className="ghost-button" onClick={onBack} type="button">
                     <ArrowLeft size={18} />
-                    <span>Retour a la liste des candidatures</span>
+                    <span>Retour à la liste des candidatures</span>
                 </button>
-                <div className="section-heading-actions">
+                <div className="section-heading-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <button className="filter-button" onClick={() => window.print()} style={{ gap: '6px', fontSize: '13px' }} type="button">
+                        <Printer size={16} />
+                        <span>Exporter en PDF / Imprimer</span>
+                    </button>
                     <span className="status-pill success" style={{ fontSize: '14px', padding: '6px 14px' }}>
                         Statut actuel : {details.statut?.libelle ?? 'Reçue'}
                     </span>
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '20px', alignItems: 'start' }}>
-                {/* COLONNE GAUCHE: Image/Avatar, Nom, Coordonnées & Statut RH */}
-                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                        {photoDoc ? (
-                            <img
-                                alt="Photo candidat"
-                                src={backendPath(`/storage/${photoDoc.chemin_fichier}`)}
-                                style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', margin: '0 auto' }}
-                            />
-                        ) : (
-                            <div
-                                style={{
-                                    width: '100px',
-                                    height: '100px',
-                                    borderRadius: '50%',
-                                    background: 'var(--soft-blue)',
-                                    color: 'var(--primary)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    margin: '0 auto',
-                                }}
-                            >
-                                <User size={48} />
-                            </div>
-                        )}
-                        <h2 style={{ fontSize: '20px', margin: '12px 0 4px 0', color: 'var(--text)' }}>
-                            {details.candidat?.prenom} {details.candidat?.nom}
-                        </h2>
-                        <span className="badge">{details.postule_depuis ?? 'Candidature Web'}</span>
-                    </div>
+            {/* DEUXIÈME BARRE DE NAVIGATION PAR SECTIONS FICHE CANDIDAT (Informations, Documents, Statut, Historique statuts, Communications) */}
+            <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid var(--border)', paddingBottom: '8px', marginBottom: '16px', background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                <button
+                    className={`ghost-button ${activeTab === 'informations' ? 'primary' : ''}`}
+                    onClick={() => setActiveTab('informations')}
+                    style={{
+                        fontWeight: activeTab === 'informations' ? 'bold' : 'normal',
+                        borderBottom: activeTab === 'informations' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <User size={16} />
+                    <span>Informations</span>
+                </button>
 
-                    <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', gap: '10px' }}>
-                        <strong>Coordonnées du candidat</strong>
-                        <p style={{ margin: 0 }}><strong>Email:</strong> {details.candidat?.email}</p>
-                        <p style={{ margin: 0 }}><strong>Telephone:</strong> {details.candidat?.telephone ?? '-'}</p>
-                        <p style={{ margin: 0 }}><strong>Ville:</strong> {details.candidat?.ville ?? '-'}</p>
-                        {details.candidat?.linkedin_url ? (
-                            <p style={{ margin: 0 }}>
-                                <strong>LinkedIn:</strong>{' '}
-                                <a href={details.candidat.linkedin_url} rel="noreferrer" target="_blank">
-                                    Voir profil <ExternalLink size={13} />
-                                </a>
-                            </p>
-                        ) : null}
-                    </div>
+                <button
+                    className={`ghost-button ${activeTab === 'documents' ? 'primary' : ''}`}
+                    onClick={() => setActiveTab('documents')}
+                    style={{
+                        fontWeight: activeTab === 'documents' ? 'bold' : 'normal',
+                        borderBottom: activeTab === 'documents' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <FileText size={16} />
+                    <span>Documents ({details.documents?.length ?? 0})</span>
+                </button>
 
-                    <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
-                        <strong>Mise a jour du statut RH</strong>
-                        <form onSubmit={handleStatusUpdate} style={{ display: 'grid', gap: '10px', marginTop: '8px' }}>
-                            <select
-                                onChange={(e) => setNewStatusId(e.target.value)}
-                                value={newStatusId}
-                            >
-                                {statutsList.map((st) => (
-                                    <option key={st.id_statut_candidature} value={st.id_statut_candidature}>
-                                        {st.libelle}
-                                    </option>
-                                ))}
-                            </select>
-                            <textarea
-                                onChange={(e) => setCommentaire(e.target.value)}
-                                placeholder="Note ou commentaire d'evaluation RH..."
-                                rows={3}
-                                value={commentaire}
-                            />
-                            <button className="filter-button" disabled={updating} style={{ width: '100%' }} type="submit">
-                                <Save size={16} />
-                                <span>{updating ? 'Enregistrement...' : 'Valider le nouveau statut'}</span>
-                            </button>
-                        </form>
-                    </div>
-                </div>
+                <button
+                    className={`ghost-button ${activeTab === 'historique_statuts' ? 'primary' : ''}`}
+                    onClick={() => setActiveTab('historique_statuts')}
+                    style={{
+                        fontWeight: activeTab === 'historique_statuts' ? 'bold' : 'normal',
+                        borderBottom: activeTab === 'historique_statuts' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <CalendarDays size={16} />
+                    <span>Historique statuts ({details.historique?.length ?? 0})</span>
+                </button>
 
-                {/* COLONNE DROITE: Détails Candidature, Documents & Historique */}
-                <div style={{ display: 'grid', gap: '20px' }}>
+                <button
+                    className={`ghost-button ${activeTab === 'communications' ? 'primary' : ''}`}
+                    onClick={() => setActiveTab('communications')}
+                    style={{
+                        fontWeight: activeTab === 'communications' ? 'bold' : 'normal',
+                        borderBottom: activeTab === 'communications' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <Send size={16} />
+                    <span>Communications</span>
+                </button>
+            </div>
+
+            {/* CONTENU PRINCIPAL DE LA SECTION SÉLECTIONNÉE */}
+            {activeTab === 'informations' && (
+                <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '20px', alignItems: 'start' }}>
+                    {/* CARTE CANDIDAT GAUCHE */}
                     <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                        <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Details de la candidature</h3>
-                        <p>
-                            <strong>Intitule :</strong>{' '}
-                            {details.offre ? (
-                                <strong style={{ color: 'var(--primary)' }}>Offre d'emploi : {details.offre.titre_poste}</strong>
+                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                            {photoDoc ? (
+                                <img
+                                    alt="Photo candidat"
+                                    src={backendPath(`/storage/${photoDoc.chemin_fichier}`)}
+                                    style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', margin: '0 auto' }}
+                                />
                             ) : (
-                                <span className="badge amber">Candidature Spontanee {details.domaine ? `(${details.domaine.nom_domaine})` : ''}</span>
+                                <div
+                                    style={{
+                                        width: '100px',
+                                        height: '100px',
+                                        borderRadius: '50%',
+                                        background: 'var(--soft-blue)',
+                                        color: 'var(--primary)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        margin: '0 auto',
+                                    }}
+                                >
+                                    <User size={48} />
+                                </div>
                             )}
-                        </p>
-                        {details.direction ? <p><strong>Direction :</strong> {details.direction.nom_direction}</p> : null}
-                        <p><strong>Date de soumission :</strong> {formatDate(details.date_candidature ?? details.created_at)}</p>
+                            <h2 style={{ fontSize: '20px', margin: '12px 0 4px 0', color: 'var(--text)' }}>
+                                {details.candidat?.prenom} {details.candidat?.nom}
+                            </h2>
+                            <span className="badge">{details.postule_depuis ?? 'Candidature Web'}</span>
+                        </div>
 
-                        <div style={{ marginTop: '14px' }}>
-                            <strong style={{ display: 'block', marginBottom: '6px' }}>Message de presentation / motivation :</strong>
-                            <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '14px', lineHeight: '1.5' }}>
-                                {details.message_motivation ?? 'Aucun message specifique fourni.'}
-                            </div>
+                        <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', gap: '10px' }}>
+                            <strong>Coordonnées du candidat</strong>
+                            <p style={{ margin: 0 }}><strong>Email:</strong> {details.candidat?.email}</p>
+                            <p style={{ margin: 0 }}><strong>Téléphone:</strong> {details.candidat?.telephone ?? '-'}</p>
+                            <p style={{ margin: 0 }}><strong>Ville:</strong> {details.candidat?.ville ?? '-'}</p>
+                            {details.candidat?.linkedin_url ? (
+                                <p style={{ margin: 0 }}>
+                                    <strong>LinkedIn:</strong>{' '}
+                                    <a href={details.candidat.linkedin_url} rel="noreferrer" target="_blank">
+                                        Voir profil <ExternalLink size={13} />
+                                    </a>
+                                </p>
+                            ) : null}
+                        </div>
+
+                        {/* FORMULAIRE DE MISE À JOUR DU STATUT RH INCLUS DANS INFORMATIONS */}
+                        <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
+                            <strong style={{ color: 'var(--primary)' }}>Mise à jour du statut RH</strong>
+                            <form onSubmit={handleStatusUpdate} style={{ display: 'grid', gap: '10px', marginTop: '8px' }}>
+                                <select
+                                    onChange={(e) => setNewStatusId(e.target.value)}
+                                    style={{ padding: '8px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                    value={newStatusId}
+                                >
+                                    {statutsList.map((st) => (
+                                        <option key={st.id_statut_candidature} value={st.id_statut_candidature}>
+                                            {st.libelle}
+                                        </option>
+                                    ))}
+                                </select>
+                                <textarea
+                                    onChange={(e) => setCommentaire(e.target.value)}
+                                    placeholder="Note ou commentaire d'évaluation RH..."
+                                    rows={3}
+                                    style={{ padding: '8px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                    value={commentaire}
+                                />
+                                <button className="filter-button" disabled={updating} style={{ width: '100%', padding: '10px', fontSize: '13px' }} type="submit">
+                                    <Save size={15} />
+                                    <span>{updating ? 'Enregistrement...' : 'Valider le statut'}</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
 
-                    <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                        <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>
-                            Documents & Pieces Jointes ({details.documents?.length ?? 0})
-                        </h3>
+                    {/* DÉTAILS CANDIDATURE DROITE */}
+                    <div style={{ display: 'grid', gap: '20px' }}>
+                        <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                            <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Informations sur le dossier de candidature</h3>
+                            <p>
+                                <strong>Canal de soumission :</strong>{' '}
+                                {details.type_candidature === 'spontanee' || !details.offre ? (
+                                    <span className="badge amber">Candidature Spontanée</span>
+                                ) : (
+                                    <span className="badge blue">Candidature sur offre</span>
+                                )}
+                            </p>
+                            <p>
+                                <strong>Intitulé du poste :</strong>{' '}
+                                {details.offre ? (
+                                    <strong style={{ color: 'var(--primary)' }}>Offre : {details.offre.titre_poste}</strong>
+                                ) : (
+                                    <strong>Domaine : {details.domaine?.nom_domaine ?? 'Spontanée générale'}</strong>
+                                )}
+                            </p>
+                            <p><strong>Direction de rattachement :</strong> {details.direction?.nom_direction ?? details.offre?.direction?.nom_direction ?? details.domaine?.direction?.nom_direction ?? 'Direction Générale'}</p>
+                            <p><strong>Date de dépôt :</strong> {formatDate(details.date_candidature ?? details.created_at)}</p>
+
+                            <div style={{ marginTop: '16px' }}>
+                                <strong style={{ display: 'block', marginBottom: '6px' }}>Message de présentation / Lettre de motivation :</strong>
+                                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '14px', lineHeight: '1.6' }}>
+                                    {details.message_motivation ?? 'Aucun message spécifique fourni.'}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* PIÈCES JOINTES ET DOCUMENTS INCLUS DANS INFORMATIONS */}
+                        <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                            <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '17px' }}>
+                                Documents & Pièces Jointes du Candidat ({details.documents?.length ?? 0})
+                            </h3>
+                            {!details.documents?.length ? (
+                                <div className="empty-state">Aucun document joint.</div>
+                            ) : (
+                                <div className="document-grid">
+                                    {(details.documents ?? []).map((doc) => (
+                                        <div className="document-card" key={doc.id_document} style={{ padding: '14px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                            <div className="document-card-info" style={{ marginBottom: '8px' }}>
+                                                <strong style={{ display: 'block', fontSize: '14px' }}>{doc.nom_fichier}</strong>
+                                                <span className="badge" style={{ marginTop: '2px' }}>{doc.type_document}</span>
+                                            </div>
+                                            <a
+                                                className="filter-button"
+                                                href={backendPath(`/storage/${doc.chemin_fichier}`)}
+                                                rel="noreferrer"
+                                                style={{ padding: '6px 12px', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                                target="_blank"
+                                                title="Consulter le document"
+                                            >
+                                                <Download size={14} />
+                                                <span>Consulter / Ouvrir</span>
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* SECTION DOCUMENTS */}
+            {activeTab === 'documents' && (
+                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>
+                        Documents & Pièces Jointes du Candidat ({details.documents?.length ?? 0})
+                    </h3>
+                    {!details.documents?.length ? (
+                        <div className="empty-state">Aucun document joint à cette candidature.</div>
+                    ) : (
                         <div className="document-grid">
                             {(details.documents ?? []).map((doc) => (
-                                <div className="document-card" key={doc.id_document} style={{ padding: '14px' }}>
-                                    <div className="document-card-info">
-                                        <strong>{doc.nom_fichier}</strong>
+                                <div className="document-card" key={doc.id_document} style={{ padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                    <div className="document-card-info" style={{ marginBottom: '10px' }}>
+                                        <strong style={{ display: 'block', fontSize: '15px' }}>{doc.nom_fichier}</strong>
                                         <span className="badge" style={{ marginTop: '4px' }}>{doc.type_document}</span>
+                                        <small style={{ display: 'block', color: 'var(--muted)', marginTop: '4px' }}>
+                                            {doc.taille_octets ? `${Math.round(doc.taille_octets / 1024)} KB` : ''} - {doc.mime_type ?? 'Fichier'}
+                                        </small>
                                     </div>
                                     <a
                                         className="filter-button"
                                         href={backendPath(`/storage/${doc.chemin_fichier}`)}
                                         rel="noreferrer"
-                                        style={{ padding: '8px 12px', fontSize: '13px' }}
+                                        style={{ padding: '8px 14px', fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                         target="_blank"
-                                        title="Telecharger / Consulter"
+                                        title="Télécharger / Consulter le document"
                                     >
                                         <Download size={15} />
-                                        <span>Ouvrir</span>
+                                        <span>Consulter / Télécharger</span>
                                     </a>
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    )}
+                </div>
+            )}
 
-                    <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                        <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Historique du traitement RH</h3>
-                        <div className="history-timeline">
+            {/* SECTION HISTORIQUE STATUTS */}
+            {activeTab === 'historique_statuts' && (
+                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Historique Chronologique des Statuts RH</h3>
+                    {!details.historique?.length ? (
+                        <div className="empty-state">Aucun historique enregistré pour le moment.</div>
+                    ) : (
+                        <div className="history-timeline" style={{ borderLeft: '3px solid var(--primary)', paddingLeft: '16px', display: 'grid', gap: '16px' }}>
                             {(details.historique ?? []).map((h) => (
-                                <div className="history-item" key={h.id_historique_statut}>
-                                    <strong style={{ color: 'var(--primary)' }}>{h.statut_nouveau?.libelle ?? 'Statut mis a jour'}</strong>
-                                    <small style={{ color: 'var(--text-muted)' }}>{formatDate(h.created_at)}</small>
-                                    {h.commentaire ? <p style={{ margin: '4px 0 0 0', fontSize: '13px' }}>{h.commentaire}</p> : null}
+                                <div className="history-item" key={h.id_historique_statut} style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <strong style={{ color: 'var(--primary)', fontSize: '15px' }}>{h.statut_nouveau?.libelle ?? 'Changement de statut'}</strong>
+                                        <small style={{ color: 'var(--muted)' }}>{formatDate(h.created_at)}</small>
+                                    </div>
+                                    {h.commentaire ? (
+                                        <p style={{ margin: '6px 0 0 0', fontSize: '14px', background: '#fff', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}>
+                                            {h.commentaire}
+                                        </p>
+                                    ) : null}
                                 </div>
                             ))}
                         </div>
+                    )}
+                </div>
+            )}
+
+            {/* SECTION COMMUNICATIONS */}
+            {activeTab === 'communications' && (
+                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Historique des Communications avec le Candidat</h3>
+                    <div className="empty-state" style={{ textAlign: 'left', padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                            <CheckCircle2 color="green" size={20} />
+                            <strong>E-mail automatique d'accusé de réception envoyé lors du dépôt.</strong>
+                        </div>
+                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--muted)' }}>
+                            Date d'envoi : {formatDate(details.date_candidature ?? details.created_at)} | Destinataire : {details.candidat?.email}
+                        </p>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
