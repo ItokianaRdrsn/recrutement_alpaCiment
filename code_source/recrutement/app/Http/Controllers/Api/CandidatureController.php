@@ -355,6 +355,107 @@ class CandidatureController extends Controller
     }
 
     /**
+     * Saisie manuelle d'une candidature par un utilisateur RH
+     */
+    public function saisirRh(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'nom' => ['required', 'string', 'max:100'],
+            'prenom' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:150'],
+            'telephone' => ['nullable', 'string', 'max:50'],
+            'id_offre' => ['nullable', 'integer', 'exists:offre,id_offre'],
+            'id_domaine' => ['nullable', 'integer', 'exists:domaine,id_domaine'],
+            'poste_souhaite' => ['nullable', 'string', 'max:200'],
+            'message_motivation' => ['nullable', 'string'],
+            'cv' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
+            'photo' => ['nullable', 'file', 'image', 'max:5120'],
+        ]);
+
+        $candidature = DB::transaction(function () use ($request, $validated) {
+            $candidat = Candidat::firstOrCreate(
+                ['email' => strtolower(trim($validated['email']))],
+                [
+                    'nom' => trim($validated['nom']),
+                    'prenom' => trim($validated['prenom']),
+                    'telephone' => $validated['telephone'] ?? null,
+                ]
+            );
+
+            $recueStatusId = DB::table('statut_candidature')->whereIn('libelle', ['Reçue', 'Recue'])->value('id_statut_candidature');
+            if (!$recueStatusId) {
+                $recueStatusId = DB::table('statut_candidature')->insertGetId([
+                    'libelle' => 'Reçue',
+                    'ordre_workflow' => 1,
+                ], 'id_statut_candidature');
+            }
+
+            $typeDemandeId = !empty($validated['id_offre'])
+                ? DB::table('type_demande')->where('libelle', 'Offre')->value('id_type_demande')
+                : DB::table('type_demande')->where('libelle', 'Spontanee')->value('id_type_demande');
+
+            $candidature = Candidature::create([
+                'id_candidat' => $candidat->id_candidat,
+                'id_type_demande' => $typeDemandeId,
+                'id_offre' => $validated['id_offre'] ?? null,
+                'id_domaine' => $validated['id_domaine'] ?? null,
+                'id_statut_candidature' => $recueStatusId,
+                'dans_vivier' => empty($validated['id_offre']),
+                'poste_souhaite' => $validated['poste_souhaite'] ?? null,
+                'message' => $validated['message_motivation'] ?? null,
+                'canal_depot' => 'rh_manuel',
+                'id_utilisateur_depot' => auth()->id(),
+            ]);
+
+            HistoriqueStatut::create([
+                'id_candidature' => $candidature->id_candidature,
+                'id_statut_candidature' => $recueStatusId,
+                'date_changement' => now(),
+                'commentaire' => 'Candidature saisie manuellement par l\'agent RH',
+                'id_utilisateur' => auth()->id(),
+            ]);
+
+            if ($request->hasFile('cv')) {
+                $file = $request->file('cv');
+                $path = $file->store('documents/cv', 'public');
+                Document::create([
+                    'id_candidature' => $candidature->id_candidature,
+                    'type_document' => 'CV',
+                    'nom_fichier' => $file->getClientOriginalName(),
+                    'chemin_fichier' => $path,
+                    'taille_octets' => $file->getSize(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'description' => 'Curriculum Vitae (Saisie RH)',
+                ]);
+            }
+
+            if ($request->hasFile('photo')) {
+                $file = $request->file('photo');
+                $path = $file->store('documents/photos', 'public');
+                Document::create([
+                    'id_candidature' => $candidature->id_candidature,
+                    'type_document' => 'Photo',
+                    'nom_fichier' => $file->getClientOriginalName(),
+                    'chemin_fichier' => $path,
+                    'taille_octets' => $file->getSize(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'description' => 'Photo de profil (Saisie RH)',
+                ]);
+            }
+
+            return $candidature;
+        });
+
+        return response()->json([
+            'message' => 'Candidature saisie manuellement avec succès par le service RH.',
+            'data' => [
+                'id_candidature' => $candidature->id_candidature,
+                'candidat' => $candidature->candidat->only(['nom', 'prenom', 'email']),
+            ],
+        ], 201);
+    }
+
+    /**
      * List all candidatures for Back-Office RH
      */
     public function index(Request $request): JsonResponse

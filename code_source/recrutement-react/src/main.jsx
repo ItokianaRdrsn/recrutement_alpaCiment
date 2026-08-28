@@ -42,6 +42,7 @@ import {
     Upload,
     User,
     UserCheck,
+    UserPlus,
     Users,
     X,
 } from 'lucide-react';
@@ -548,12 +549,224 @@ function AppShell({ activePath, activeView, children, onNavigate, user }) {
     );
 }
 
+function SaisirRhCandidatureModal({ initialOffreId = '', onClose, onSuccess, referentiels }) {
+    const [form, setForm] = useState({
+        nom: '',
+        prenom: '',
+        email: '',
+        telephone: '',
+        id_offre: initialOffreId ? String(initialOffreId) : '',
+        id_domaine: '',
+        poste_souhaite: '',
+        message_motivation: '',
+    });
+    const [cvFile, setCvFile] = useState(null);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [offresList, setOffresList] = useState([]);
+
+    useEffect(() => {
+        getJson('/api/offres?per_page=100')
+            .then((res) => setOffresList(res?.data ?? []))
+            .catch(() => {});
+    }, []);
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setSubmitting(true);
+        setError('');
+
+        try {
+            const formData = new FormData();
+            formData.append('nom', form.nom.trim());
+            formData.append('prenom', form.prenom.trim());
+            formData.append('email', form.email.trim());
+            if (form.telephone) formData.append('telephone', form.telephone.trim());
+            if (form.id_offre) formData.append('id_offre', form.id_offre);
+            if (form.id_domaine) formData.append('id_domaine', form.id_domaine);
+            if (form.poste_souhaite) formData.append('poste_souhaite', form.poste_souhaite.trim());
+            if (form.message_motivation) formData.append('message_motivation', form.message_motivation.trim());
+            if (cvFile) formData.append('cv', cvFile);
+
+            await sendFormData('/api/candidatures/saisir-rh', formData);
+            if (onSuccess) onSuccess();
+            onClose();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    const meDomaines = referentiels?.domaines ?? [];
+
+    return (
+        <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 1100, position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '650px', width: '90%', zIndex: 1101, background: '#ffffff', borderRadius: '12px', padding: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)' }}>
+                <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ background: '#ede9fe', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <UserPlus color="#6d28d9" size={22} />
+                        </div>
+                        <h3 style={{ margin: 0, color: '#1e1b4b', fontSize: '18px', fontWeight: '700' }}>Saisie Manuelle d'une Candidature (RH)</h3>
+                    </div>
+                    <button className="icon-button" onClick={onClose} type="button">
+                        <X size={18} />
+                    </button>
+                </div>
+
+                {error ? <p className="form-error" style={{ marginBottom: '14px', padding: '10px', background: '#fef2f2', color: '#991b1b', borderRadius: '6px', fontSize: '13px' }}>{error}</p> : null}
+
+                <form className="compact-form" onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '14px' }}>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Nom du candidat *</span>
+                        <input
+                            onChange={(e) => setForm((c) => ({ ...c, nom: e.target.value }))}
+                            placeholder="Nom"
+                            required
+                            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                            value={form.nom}
+                        />
+                    </label>
+
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Prénom du candidat *</span>
+                        <input
+                            onChange={(e) => setForm((c) => ({ ...c, prenom: e.target.value }))}
+                            placeholder="Prénom"
+                            required
+                            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                            value={form.prenom}
+                        />
+                    </label>
+
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Adresse E-mail *</span>
+                        <input
+                            onChange={(e) => setForm((c) => ({ ...c, email: e.target.value }))}
+                            placeholder="email@exemple.com"
+                            required
+                            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                            type="email"
+                            value={form.email}
+                        />
+                    </label>
+
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Téléphone</span>
+                        <input
+                            onChange={(e) => setForm((c) => ({ ...c, telephone: e.target.value }))}
+                            placeholder="+261 34 00 000 00"
+                            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                            value={form.telephone}
+                        />
+                    </label>
+
+                    <label style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Rattachement à une Offre de recrutement</span>
+                        <select
+                            onChange={(e) => setForm((c) => ({ ...c, id_offre: e.target.value }))}
+                            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                            value={form.id_offre}
+                        >
+                            <option value="">Candidature Spontanée (Aucune offre spécifique)</option>
+                            {offresList.map((off) => (
+                                <option key={off.id ?? off.id_offre} value={off.id ?? off.id_offre}>
+                                    Offre: {off.titre_poste} ({off.direction?.nom ?? off.direction?.nom_direction ?? 'Générale'})
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    {!form.id_offre ? (
+                        <>
+                            <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <span style={{ fontSize: '13px', fontWeight: '600' }}>Domaine (si spontanée)</span>
+                                <select
+                                    onChange={(e) => setForm((c) => ({ ...c, id_domaine: e.target.value }))}
+                                    style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                                    value={form.id_domaine}
+                                >
+                                    <option value="">Domaines validés RH</option>
+                                    {meDomaines.filter((d) => d.valide !== false).map((dom) => (
+                                        <option key={dom.id_domaine} value={dom.id_domaine}>
+                                            {dom.nom_domaine}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+
+                            <label style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                <span style={{ fontSize: '13px', fontWeight: '600' }}>Poste souhaité</span>
+                                <input
+                                    onChange={(e) => setForm((c) => ({ ...c, poste_souhaite: e.target.value }))}
+                                    placeholder="Ex: Chef de projet IT"
+                                    style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                                    value={form.poste_souhaite}
+                                />
+                            </label>
+                        </>
+                    ) : null}
+
+                    <label style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Document CV (PDF, DOC, DOCX)</span>
+                        <input
+                            accept=".pdf,.doc,.docx"
+                            onChange={(e) => setCvFile(e.target.files?.[0] ?? null)}
+                            style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                            type="file"
+                        />
+                    </label>
+
+                    <label style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Message de présentation / Note RH</span>
+                        <textarea
+                            onChange={(e) => setForm((c) => ({ ...c, message_motivation: e.target.value }))}
+                            placeholder="Saisir un commentaire ou la lettre de motivation du candidat..."
+                            rows={3}
+                            style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                            value={form.message_motivation}
+                        />
+                    </label>
+
+                    <div style={{ gridColumn: 'span 2', display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+                        <button className="ghost-button" onClick={onClose} type="button">
+                            <span>Annuler</span>
+                        </button>
+                        <button
+                            disabled={submitting}
+                            style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '9px 18px',
+                                fontWeight: '600',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.35)',
+                                cursor: 'pointer',
+                            }}
+                            type="submit"
+                        >
+                            <Save size={16} />
+                            <span>{submitting ? 'Enregistrement...' : 'Enregistrer la candidature RH'}</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
+
 function CandidaturesView({ referentiels }) {
     const [candidatures, setCandidatures] = useState([]);
     const [statutsList, setStatutsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedCandidatureId, setSelectedCandidatureId] = useState(null);
+    const [showSaisirModal, setShowSaisirModal] = useState(false);
     const [viewMode, setViewMode] = useState('toutes'); // 'toutes', 'par_offre', 'spontanees'
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState(15);
@@ -810,10 +1023,33 @@ function CandidaturesView({ referentiels }) {
                         </h2>
                         <p>Gestion RH des dossiers de candidatures avec suivi du workflow de statut et pièces jointes.</p>
                     </div>
-                    <button className="ghost-button" onClick={loadCandidatures} type="button">
-                        <RefreshCw size={17} />
-                        <span>Actualiser</span>
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button
+                            onClick={() => setShowSaisirModal(true)}
+                            style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '9px 18px',
+                                fontWeight: '600',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.35)',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                            }}
+                            type="button"
+                        >
+                            <UserPlus size={18} />
+                            <span>Saisir une candidature (RH)</span>
+                        </button>
+                        <button className="ghost-button" onClick={loadCandidatures} type="button">
+                            <RefreshCw size={17} />
+                            <span>Actualiser</span>
+                        </button>
+                    </div>
                 </div>
 
                 {loading ? (
@@ -1061,6 +1297,14 @@ function CandidaturesView({ referentiels }) {
                     </div>
                 )}
             </section>
+
+            {showSaisirModal ? (
+                <SaisirRhCandidatureModal
+                    onClose={() => setShowSaisirModal(false)}
+                    onSuccess={loadCandidatures}
+                    referentiels={referentiels}
+                />
+            ) : null}
         </div>
     );
 }
@@ -1558,15 +1802,355 @@ function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsLi
     );
 }
 
+function DirectionModal({ direction = null, onClose, onSuccess }) {
+    const [nomDirection, setNomDirection] = useState(direction?.nom_direction ?? '');
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState('');
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const name = nomDirection.trim();
+        if (!name) return;
+
+        setSubmitting(true);
+        setError('');
+
+        try {
+            if (direction?.id) {
+                await sendJson(`/api/directions/${direction.id}`, {
+                    method: 'PUT',
+                    body: { nom_direction: name },
+                });
+            } else {
+                await sendJson('/api/directions', {
+                    body: { nom_direction: name },
+                });
+            }
+            if (onSuccess) await onSuccess();
+            onClose();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    return (
+        <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 1100, position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%', background: '#ffffff', borderRadius: '12px', padding: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+                <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ background: '#ede9fe', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Building2 color="#6d28d9" size={22} />
+                        </div>
+                        <h3 style={{ margin: 0, color: '#1e1b4b', fontSize: '18px', fontWeight: '700' }}>
+                            {direction ? 'Modifier la Direction' : 'Nouvelle Direction'}
+                        </h3>
+                    </div>
+                    <button className="icon-button" onClick={onClose} type="button">
+                        <X size={18} />
+                    </button>
+                </div>
+
+                {error ? <p className="form-error" style={{ marginBottom: '14px', padding: '10px', background: '#fef2f2', color: '#991b1b', borderRadius: '6px', fontSize: '13px' }}>{error}</p> : null}
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Nom de la direction *</span>
+                        <input
+                            onChange={(e) => setNomDirection(e.target.value)}
+                            placeholder="Ex : Direction Informatique & SI"
+                            required
+                            style={{ padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '14px' }}
+                            value={nomDirection}
+                        />
+                    </label>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px', paddingTop: '14px', borderTop: '1px solid var(--border)' }}>
+                        <button className="ghost-button" onClick={onClose} type="button">
+                            <span>Annuler</span>
+                        </button>
+                        <button
+                            disabled={submitting}
+                            style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '9px 18px',
+                                fontWeight: '600',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.35)',
+                                cursor: 'pointer',
+                            }}
+                            type="submit"
+                        >
+                            <Save size={16} />
+                            <span>{submitting ? 'Enregistrement...' : direction ? 'Mettre à jour' : 'Créer la direction'}</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
+
+function DomaineModal({ directionsList = [], domaine = null, onClose, onSuccess }) {
+    const [nomDomaine, setNomDomaine] = useState(domaine?.nom_domaine ?? '');
+    const [idDirection, setIdDirection] = useState(domaine?.direction?.id ? String(domaine.direction.id) : '');
+    const [valide, setValide] = useState(domaine?.valide ?? true);
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState('');
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const name = nomDomaine.trim();
+        if (!name || !idDirection) return;
+
+        setSubmitting(true);
+        setError('');
+
+        const payload = {
+            nom_domaine: name,
+            id_direction: Number(idDirection),
+            valide: valide,
+        };
+
+        try {
+            if (domaine?.id) {
+                await sendJson(`/api/domaines/${domaine.id}`, {
+                    method: 'PUT',
+                    body: payload,
+                });
+            } else {
+                await sendJson('/api/domaines', {
+                    body: payload,
+                });
+            }
+            if (onSuccess) await onSuccess();
+            onClose();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    return (
+        <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 1100, position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px', width: '90%', background: '#ffffff', borderRadius: '12px', padding: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+                <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ background: '#ede9fe', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Layers color="#6d28d9" size={22} />
+                        </div>
+                        <h3 style={{ margin: 0, color: '#1e1b4b', fontSize: '18px', fontWeight: '700' }}>
+                            {domaine ? 'Modifier le Domaine' : 'Nouveau Domaine d\'Expertise'}
+                        </h3>
+                    </div>
+                    <button className="icon-button" onClick={onClose} type="button">
+                        <X size={18} />
+                    </button>
+                </div>
+
+                {error ? <p className="form-error" style={{ marginBottom: '14px', padding: '10px', background: '#fef2f2', color: '#991b1b', borderRadius: '6px', fontSize: '13px' }}>{error}</p> : null}
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Nom du domaine *</span>
+                        <input
+                            onChange={(e) => setNomDomaine(e.target.value)}
+                            placeholder="Ex : Développement Web & Mobile"
+                            required
+                            style={{ padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '14px' }}
+                            value={nomDomaine}
+                        />
+                    </label>
+
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Direction de rattachement *</span>
+                        <select
+                            onChange={(e) => setIdDirection(e.target.value)}
+                            required
+                            style={{ padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '14px' }}
+                            value={idDirection}
+                        >
+                            <option value="">Sélectionner une direction</option>
+                            {directionsList.map((dir) => (
+                                <option key={dir.id} value={dir.id}>
+                                    {dir.nom_direction}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <label className="checkbox-line" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', cursor: 'pointer', marginTop: '4px' }}>
+                        <input
+                            checked={valide}
+                            onChange={(e) => setValide(e.target.checked)}
+                            type="checkbox"
+                        />
+                        <span>Domaine validé par la Direction RH</span>
+                    </label>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px', paddingTop: '14px', borderTop: '1px solid var(--border)' }}>
+                        <button className="ghost-button" onClick={onClose} type="button">
+                            <span>Annuler</span>
+                        </button>
+                        <button
+                            disabled={submitting}
+                            style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '9px 18px',
+                                fontWeight: '600',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.35)',
+                                cursor: 'pointer',
+                            }}
+                            type="submit"
+                        >
+                            <Save size={16} />
+                            <span>{submitting ? 'Enregistrement...' : domaine ? 'Mettre à jour' : 'Créer le domaine'}</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
+
+function CompetenceModal({ competence = null, onClose, onSuccess, typesList = [] }) {
+    const [nomCompetence, setNomCompetence] = useState(competence?.nom ?? '');
+    const [idTypeCompetence, setIdTypeCompetence] = useState(competence?.id_type_competence ? String(competence.id_type_competence) : '1');
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState('');
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const name = nomCompetence.trim();
+        if (!name || !idTypeCompetence) return;
+
+        setSubmitting(true);
+        setError('');
+
+        try {
+            await sendJson('/api/competences', {
+                body: {
+                    nom_competence: name,
+                    id_type_competence: Number(idTypeCompetence),
+                },
+            });
+            if (onSuccess) await onSuccess();
+            onClose();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    return (
+        <div className="modal-backdrop" onClick={onClose} style={{ zIndex: 1100, position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%', background: '#ffffff', borderRadius: '12px', padding: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+                <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', paddingBottom: '12px', borderBottom: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <div style={{ background: '#ede9fe', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Sparkles color="#6d28d9" size={22} />
+                        </div>
+                        <h3 style={{ margin: 0, color: '#1e1b4b', fontSize: '18px', fontWeight: '700' }}>
+                            Nouvelle Compétence
+                        </h3>
+                    </div>
+                    <button className="icon-button" onClick={onClose} type="button">
+                        <X size={18} />
+                    </button>
+                </div>
+
+                {error ? <p className="form-error" style={{ marginBottom: '14px', padding: '10px', background: '#fef2f2', color: '#991b1b', borderRadius: '6px', fontSize: '13px' }}>{error}</p> : null}
+
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Nom de la compétence *</span>
+                        <input
+                            onChange={(e) => setNomCompetence(e.target.value)}
+                            placeholder="Ex : React.js, Management, Anglais courant..."
+                            required
+                            style={{ padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '14px' }}
+                            value={nomCompetence}
+                        />
+                    </label>
+
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Type de compétence *</span>
+                        <select
+                            onChange={(e) => setIdTypeCompetence(e.target.value)}
+                            required
+                            style={{ padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '14px' }}
+                            value={idTypeCompetence}
+                        >
+                            {typesList.length ? (
+                                typesList.map((t) => (
+                                    <option key={t.id_type_competence} value={t.id_type_competence}>
+                                        {t.libelle}
+                                    </option>
+                                ))
+                            ) : (
+                                <>
+                                    <option value="1">Savoir-faire Technique</option>
+                                    <option value="2">Soft Skill / Humaine</option>
+                                    <option value="3">Langue vivante</option>
+                                </>
+                            )}
+                        </select>
+                    </label>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px', paddingTop: '14px', borderTop: '1px solid var(--border)' }}>
+                        <button className="ghost-button" onClick={onClose} type="button">
+                            <span>Annuler</span>
+                        </button>
+                        <button
+                            disabled={submitting}
+                            style={{
+                                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                padding: '9px 18px',
+                                fontWeight: '600',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.35)',
+                                cursor: 'pointer',
+                            }}
+                            type="submit"
+                        >
+                            <Save size={16} />
+                            <span>{submitting ? 'Enregistrement...' : 'Ajouter la compétence'}</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
+
 function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', onRefreshBase }) {
     const [subTab, setSubTab] = useState(initialSubTab);
     const [directions, setDirections] = useState([]);
     const [domaines, setDomaines] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [directionForm, setDirectionForm] = useState({ id: null, nom_direction: '' });
-    const [domaineForm, setDomaineForm] = useState({ id: null, nom_domaine: '', id_direction: '', valide: false });
-    const [competenceForm, setCompetenceForm] = useState({ nom_competence: '', id_type_competence: '' });
+    const [showDirectionModal, setShowDirectionModal] = useState(false);
+    const [showDomaineModal, setShowDomaineModal] = useState(false);
+    const [showCompetenceModal, setShowCompetenceModal] = useState(false);
 
     useEffect(() => {
         setSubTab(initialSubTab);
@@ -1755,36 +2339,36 @@ function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', o
                                     <h2>Directions</h2>
                                     <p>{directions.length} direction(s)</p>
                                 </div>
-                                <button className="ghost-button" onClick={loadReferentials} type="button">
-                                    <RefreshCw aria-hidden="true" size={17} />
-                                    <span>Actualiser</span>
-                                </button>
-                            </div>
-
-                            {canManage ? (
-                                <form className="compact-form" onSubmit={saveDirection}>
-                                    <label>
-                                        <span>Nom de la direction</span>
-                                        <input
-                                            onChange={(event) => setDirectionForm((current) => ({ ...current, nom_direction: event.target.value }))}
-                                            placeholder="Ex : Finance"
-                                            value={directionForm.nom_direction}
-                                        />
-                                    </label>
-                                    <div className="form-actions">
-                                        <button className="filter-button" type="submit">
-                                            {directionForm.id ? <Save aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
-                                            <span>{directionForm.id ? 'Enregistrer' : 'Ajouter'}</span>
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    {canManage ? (
+                                        <button
+                                            onClick={() => setShowDirectionModal({ direction: null })}
+                                            style={{
+                                                background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                                color: '#ffffff',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                padding: '8px 14px',
+                                                fontWeight: '600',
+                                                fontSize: '13px',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '6px',
+                                                boxShadow: '0 4px 10px rgba(99, 102, 241, 0.25)',
+                                                cursor: 'pointer',
+                                            }}
+                                            type="button"
+                                        >
+                                            <Plus size={16} />
+                                            <span>Nouvelle Direction</span>
                                         </button>
-                                        {directionForm.id ? (
-                                            <button className="ghost-button" onClick={() => setDirectionForm({ id: null, nom_direction: '' })} type="button">
-                                                <X aria-hidden="true" size={17} />
-                                                <span>Annuler</span>
-                                            </button>
-                                        ) : null}
-                                    </div>
-                                </form>
-                            ) : null}
+                                    ) : null}
+                                    <button className="ghost-button" onClick={loadReferentials} type="button">
+                                        <RefreshCw aria-hidden="true" size={17} />
+                                        <span>Actualiser</span>
+                                    </button>
+                                </div>
+                            </div>
 
                             <SimpleTable
                                 columns={['Direction', 'Domaines', 'Offres', 'Actions']}
@@ -1796,7 +2380,7 @@ function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', o
                                     canManage ? (
                                         <RowActions
                                             onDelete={() => deleteDirection(direction)}
-                                            onEdit={() => setDirectionForm({ id: direction.id, nom_direction: direction.nom_direction })}
+                                            onEdit={() => setShowDirectionModal({ direction })}
                                         />
                                     ) : (
                                         '-'
@@ -1813,54 +2397,30 @@ function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', o
                                     <h2>Domaines</h2>
                                     <p>{domaines.filter((domaine) => !domaine.valide).length} en attente</p>
                                 </div>
+                                {canManage ? (
+                                    <button
+                                        onClick={() => setShowDomaineModal({ domaine: null })}
+                                        style={{
+                                            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                            color: '#ffffff',
+                                            border: 'none',
+                                            borderRadius: '8px',
+                                            padding: '8px 14px',
+                                            fontWeight: '600',
+                                            fontSize: '13px',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            boxShadow: '0 4px 10px rgba(99, 102, 241, 0.25)',
+                                            cursor: 'pointer',
+                                        }}
+                                        type="button"
+                                    >
+                                        <Plus size={16} />
+                                        <span>Nouveau Domaine</span>
+                                    </button>
+                                ) : null}
                             </div>
-
-                            {canManage ? (
-                                <form className="compact-form" onSubmit={saveDomaine}>
-                                    <label>
-                                        <span>Nom du domaine</span>
-                                        <input
-                                            onChange={(event) => setDomaineForm((current) => ({ ...current, nom_domaine: event.target.value }))}
-                                            placeholder="Ex : Comptabilite"
-                                            value={domaineForm.nom_domaine}
-                                        />
-                                    </label>
-                                    <label>
-                                        <span>Direction</span>
-                                        <select
-                                            onChange={(event) => setDomaineForm((current) => ({ ...current, id_direction: event.target.value }))}
-                                            value={domaineForm.id_direction}
-                                        >
-                                            <option value="">Choisir</option>
-                                            {directions.map((direction) => (
-                                                <option key={direction.id} value={direction.id}>
-                                                    {direction.nom_direction}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </label>
-                                    <label className="checkbox-line">
-                                        <input
-                                            checked={domaineForm.valide}
-                                            onChange={(event) => setDomaineForm((current) => ({ ...current, valide: event.target.checked }))}
-                                            type="checkbox"
-                                        />
-                                        <span>Domaine valide</span>
-                                    </label>
-                                    <div className="form-actions">
-                                        <button className="filter-button" type="submit">
-                                            {domaineForm.id ? <Save aria-hidden="true" size={17} /> : <Plus aria-hidden="true" size={17} />}
-                                            <span>{domaineForm.id ? 'Enregistrer' : 'Ajouter'}</span>
-                                        </button>
-                                        {domaineForm.id ? (
-                                            <button className="ghost-button" onClick={() => setDomaineForm({ id: null, nom_domaine: '', id_direction: '', valide: false })} type="button">
-                                                <X aria-hidden="true" size={17} />
-                                                <span>Annuler</span>
-                                            </button>
-                                        ) : null}
-                                    </div>
-                                </form>
-                            ) : null}
 
                             <SimpleTable
                                 columns={['Domaine', 'Direction', 'Statut', 'Actions']}
@@ -1881,14 +2441,7 @@ function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', o
                                                 ) : null
                                             }
                                             onDelete={() => deleteDomaine(domaine)}
-                                            onEdit={() =>
-                                                setDomaineForm({
-                                                    id: domaine.id,
-                                                    nom_domaine: domaine.nom_domaine,
-                                                    id_direction: domaine.direction?.id ? String(domaine.direction.id) : '',
-                                                    valide: domaine.valide,
-                                                })
-                                            }
+                                            onEdit={() => setShowDomaineModal({ domaine })}
                                         />
                                     ) : (
                                         '-'
@@ -1907,42 +2460,30 @@ function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', o
                             <h2>Referentiel des Competences</h2>
                             <p>{competencesData.competences?.length ?? 0} competence(s) enregistree(s)</p>
                         </div>
+                        {canManage ? (
+                            <button
+                                onClick={() => setShowCompetenceModal({ competence: null })}
+                                style={{
+                                    background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '8px 14px',
+                                    fontWeight: '600',
+                                    fontSize: '13px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    boxShadow: '0 4px 10px rgba(99, 102, 241, 0.25)',
+                                    cursor: 'pointer',
+                                }}
+                                type="button"
+                            >
+                                <Plus size={16} />
+                                <span>Nouvelle Compétence</span>
+                            </button>
+                        ) : null}
                     </div>
-
-                    {canManage ? (
-                        <form className="compact-form" onSubmit={saveCompetence} style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
-                            <label>
-                                <span>Nom de la competence</span>
-                                <input
-                                    onChange={(e) => setCompetenceForm((curr) => ({ ...curr, nom_competence: e.target.value }))}
-                                    placeholder="Ex: Excel, Anglais, Docker..."
-                                    required
-                                    value={competenceForm.nom_competence}
-                                />
-                            </label>
-                            <label>
-                                <span>Type de competence</span>
-                                <select
-                                    onChange={(e) => setCompetenceForm((curr) => ({ ...curr, id_type_competence: e.target.value }))}
-                                    required
-                                    value={competenceForm.id_type_competence}
-                                >
-                                    <option value="">Choisir le type</option>
-                                    {competencesData.types?.map((type) => (
-                                        <option key={type.id_type_competence} value={type.id_type_competence}>
-                                            {type.libelle}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-                            <div className="form-actions" style={{ alignItems: 'flex-end' }}>
-                                <button className="filter-button" type="submit">
-                                    <Plus aria-hidden="true" size={17} />
-                                    <span>Ajouter la competence</span>
-                                </button>
-                            </div>
-                        </form>
-                    ) : null}
 
                     <SimpleTable
                         columns={['Competence', 'Type', 'Statut']}
@@ -1954,6 +2495,32 @@ function ReferentialsView({ canManage, competencesData, initialSubTab = 'all', o
                         ])}
                     />
                 </section>
+            ) : null}
+
+            {showDirectionModal ? (
+                <DirectionModal
+                    direction={showDirectionModal.direction}
+                    onClose={() => setShowDirectionModal(false)}
+                    onSuccess={loadReferentials}
+                />
+            ) : null}
+
+            {showDomaineModal ? (
+                <DomaineModal
+                    directionsList={directions}
+                    domaine={showDomaineModal.domaine}
+                    onClose={() => setShowDomaineModal(false)}
+                    onSuccess={loadReferentials}
+                />
+            ) : null}
+
+            {showCompetenceModal ? (
+                <CompetenceModal
+                    competence={showCompetenceModal.competence}
+                    onClose={() => setShowCompetenceModal(false)}
+                    onSuccess={loadReferentials}
+                    typesList={competencesData.types ?? []}
+                />
             ) : null}
         </div>
     );
@@ -2571,6 +3138,7 @@ function OffersView({ canManage, competencesData, initialEditingOffer = null, on
         type_contrat: '',
         page: 1,
     });
+    const [saisirRhOffreId, setSaisirRhOffreId] = useState(null);
     const [offersResponse, setOffersResponse] = useState({ data: [], meta: null });
     const [offerForm, setOfferForm] = useState(emptyOfferForm);
     const [loading, setLoading] = useState(true);
@@ -3346,6 +3914,7 @@ function OffersView({ canManage, competencesData, initialEditingOffer = null, on
                     <OffersTable
                         offers={offersResponse.data}
                         onNavigate={onNavigate}
+                        onSaisirRh={(id) => setSaisirRhOffreId(id)}
                         onSelectOffer={editOffer}
                         renderActions={renderOfferActions}
                     />
@@ -3353,11 +3922,20 @@ function OffersView({ canManage, competencesData, initialEditingOffer = null, on
 
                 {meta ? <Pagination meta={meta} onChangePage={changePage} /> : null}
             </section>
+
+            {saisirRhOffreId ? (
+                <SaisirRhCandidatureModal
+                    initialOffreId={saisirRhOffreId}
+                    onClose={() => setSaisirRhOffreId(null)}
+                    onSuccess={loadOffers}
+                    referentiels={referentiels}
+                />
+            ) : null}
         </div>
     );
 }
 
-function OffersTable({ compact = false, offers, onNavigate = null, onSelectOffer = null, renderActions = null }) {
+function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = null, onSelectOffer = null, renderActions = null }) {
     const [expandedRow, setExpandedRow] = useState(null);
 
     if (!offers.length) {
@@ -3456,6 +4034,33 @@ function OffersTable({ compact = false, offers, onNavigate = null, onSelectOffer
                                                         type="button"
                                                     >
                                                         <Share2 size={16} />
+                                                    </button>
+                                                ) : null}
+                                                {!compact ? (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            if (onSaisirRh) onSaisirRh(offre.id);
+                                                        }}
+                                                        style={{
+                                                            background: '#ede9fe',
+                                                            color: '#6d28d9',
+                                                            border: '1px solid #ddd6fe',
+                                                            borderRadius: '6px',
+                                                            padding: '6px 10px',
+                                                            fontWeight: '600',
+                                                            fontSize: '12px',
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: '5px',
+                                                            cursor: 'pointer',
+                                                            boxShadow: '0 1px 2px rgba(109, 40, 217, 0.08)',
+                                                        }}
+                                                        title="Saisir manuellement une candidature RH pour cette offre"
+                                                        type="button"
+                                                    >
+                                                        <UserPlus size={14} />
+                                                        <span>+ Candidature RH</span>
                                                     </button>
                                                 ) : null}
                                                 {renderActions && !compact ? renderActions(offre) : null}

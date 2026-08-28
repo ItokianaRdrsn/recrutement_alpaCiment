@@ -58,9 +58,8 @@ class VivierController extends Controller
         }
         if ($directionId) {
             $candQuery->where(function ($sub) use ($directionId) {
-                $sub->where('id_direction', $directionId)
-                    ->orWhereHas('offre', fn($o) => $o->where('id_direction', $directionId))
-                    ->orWhereHas('domaine', fn($d) => $d->where('id_direction', $directionId));
+                $sub->whereHas('offre', fn($o) => $o->where('id_direction', $directionId))
+                    ->orWhereHas('domaine', fn($d) => $d->where('id_direction', $directionId)->where('valide', true));
             });
         }
         if ($domaineId) {
