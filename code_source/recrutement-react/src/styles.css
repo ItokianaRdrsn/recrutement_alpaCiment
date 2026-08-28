@@ -765,6 +765,160 @@ td span {
     gap: 6px;
 }
 
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+}
+
+.modal-content {
+    background: var(--panel);
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+}
+
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    justify-content: flex-end;
+    z-index: 100;
+}
+
+.drawer-content {
+    background: var(--panel);
+    width: 580px;
+    max-width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+}
+
+.drawer-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+}
+
+.drawer-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
+}
+
+.document-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.document-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    background: #fcfdfe;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.compact-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.compact-form input,
+.compact-form select,
+.compact-form textarea {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 12px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.compact-form input:focus,
+.compact-form select:focus,
+.compact-form textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(31, 95, 115, 0.15);
+}
+
+.document-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.document-card-info strong {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-left: 2px solid var(--border);
+    padding-left: 16px;
+    margin-left: 8px;
+}
+
+.history-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+}
+
+.history-item::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
 @media (max-width: 1040px) {
     .app-shell {
         grid-template-columns: 1fr;
@@ -843,4 +997,47 @@ td span {
     .pagination button {
         width: 100%;
     }
+}
+
+/* Front-Office High-Contrast Readability & Standalone Candidate Portal */
+.portal-container {
+    background-color: #f8fafc;
+    min-height: 100vh;
+    color: #0f172a;
+    font-family: var(--font-base, system-ui, -apple-system, sans-serif);
+}
+
+.portal-container h1,
+.portal-container h2,
+.portal-container h3,
+.portal-container h4 {
+    color: #0f172a !important;
+    font-weight: 700;
+}
+
+.portal-container p,
+.portal-container span {
+    color: #334155 !important;
+}
+
+.portal-container input,
+.portal-container select,
+.portal-container textarea {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #94a3b8 !important;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.portal-container input::placeholder,
+.portal-container textarea::placeholder {
+    color: #64748b !important;
+}
+
+.portal-container input:focus,
+.portal-container select:focus,
+.portal-container textarea:focus {
+    border-color: #1f5f73 !important;
+    box-shadow: 0 0 0 3px rgba(31, 95, 115, 0.15) !important;
 }

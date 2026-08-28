@@ -1,71 +1,44 @@
-# Sprint 7 - Tâches
+# Sprint 7 - Tâches & Suivi (Dashboard, recherche avancée, matching et finalisation - 8,5 j)
 
-## Avancement
+## Avancement du Sprint
 
-- **[FAIT]** 0 tâche
-- **[EN COURS]** 0 tâche
-- **[A FAIRE]** 7 tâches
-
-## Légende
-
-- **[FAIT]** : tâche terminée et utilisable.
-- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
-- **[A FAIRE]** : tâche prévue, non commencée.
+- **[À FAIRE]** 7 tâches
+- **Sous-total : 8,5 j**
 
 ---
 
-## Back-office
+## 📋 Detail des Tâches
 
-### **[A FAIRE]** Tableau de bord et indicateurs principaux
+### BACK-OFFICE
 
+#### **[À FAIRE]** Tableau de bord et indicateurs principaux
 - **Estimation :** 1,0 j
-- **Notes :** Donner une vue synthétique du recrutement.
+- **Notes :** KPI principaux et santé du recrutement.
 
----
-
-### **[A FAIRE]** Statistiques mensuelles, répartition par statut et taux de transformation
-
-- **Estimation :** 1,0 j
-- **Notes :** Suivre l'évolution des candidatures.
-
----
-
-### **[A FAIRE]** Délai moyen de traitement et filtres du dashboard
-
-- **Estimation :** 1,0 j
-- **Notes :** Mesurer l'efficacité du processus RH.
-
----
-
-### **[A FAIRE]** Recherche avancée par mots-clés CV et compétences
-
-- **Estimation :** 1,0 j
-- **Notes :** Retrouver rapidement les candidats pertinents.
-
----
-
-### **[A FAIRE]** Matching candidat -> offre avec score simple
-
-- **Estimation :** 1,0 j
-- **Notes :** Proposer une aide au classement des profils.
-
----
-
-### **[A FAIRE]** Tests fonctionnels globaux, corrections et optimisation
-
+#### **[À FAIRE]** Statistiques mensuelles, répartition par statut et taux de transformation
 - **Estimation :** 1,5 j
-- **Notes :** Stabiliser la V1 avant livraison.
+- **Notes :** Reporting analytique RH.
 
----
+#### **[À FAIRE]** Délai moyen de traitement et filtres du dashboard
+- **Estimation :** 1,0 j
+- **Notes :** Calcul des délais de recrutement.
 
-### **[A FAIRE]** Documentation et préparation du déploiement
+#### **[À FAIRE]** Recherche avancée par mots-clés CV et compétences
+- **Estimation :** 1,0 j
+- **Notes :** Recherche globale full-text dans la base de candidatures.
 
+#### **[À FAIRE]** Matching candidat -> offre avec score simple
+- **Estimation :** 2,0 j
+- **Notes :** Calcul de correspondance candidat / offre.
+
+#### **[À FAIRE]** Tests fonctionnels globaux, corrections et optimisation
+- **Estimation :** 1,5 j
+- **Notes :** Recette générale du projet.
+
+#### **[À FAIRE]** Documentation et préparation du déploiement
 - **Estimation :** 0,5 j
-- **Notes :** Préparer la remise du projet.
+- **Notes :** Documentation finale et mise en production.
 
 ---
 
-## Total
-
-**Sprint 7 : 7,0 j**
-
+## Sous-total Sprint 7 : 8,5 j

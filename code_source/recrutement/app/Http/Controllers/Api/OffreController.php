@@ -14,10 +14,6 @@ use Illuminate\Support\Facades\Validator;
 
 class OffreController extends Controller
 {
-    private const STATUT_BROUILLON = 'Brouillon';
-    private const STATUT_PUBLIEE = 'Publiee';
-    private const STATUT_CLOTUREE = 'Cloturee';
-
     public function index(Request $request): AnonymousResourceCollection
     {
         $filters = $request->validate([
@@ -25,14 +21,14 @@ class OffreController extends Controller
             'statut' => ['nullable', 'integer', 'exists:statut_offre,id_statut_offre'],
             'type_contrat' => ['nullable', 'integer', 'exists:type_contrat,id_type_contrat'],
             'q' => ['nullable', 'string', 'max:150'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:200'],
         ]);
 
         $perPage = (int) ($filters['per_page'] ?? 15);
 
-        $publieeId = $this->statusId(self::STATUT_PUBLIEE);
-        $brouillonId = $this->statusId(self::STATUT_BROUILLON);
-        $clotureeId = $this->statusId(self::STATUT_CLOTUREE);
+        $publieeId = $this->statusId('Publiee');
+        $brouillonId = $this->statusId('Brouillon');
+        $clotureeId = $this->statusId('Cloturee');
 
         $offres = Offre::query()
             ->with($this->resourceRelations())
@@ -64,36 +60,44 @@ class OffreController extends Controller
 
     public function publicIndex(Request $request): AnonymousResourceCollection
     {
-        $publieeStatusId = $this->statusId(self::STATUT_PUBLIEE);
+        $publieeId = $this->statusId('Publiee');
 
         $offres = Offre::query()
             ->with($this->resourceRelations())
-            ->where('id_statut_offre', $publieeStatusId)
-            ->where(function ($query): void {
-                $query->whereNull('date_limite')
-                    ->orWhere('date_limite', '>=', today());
-            })
+            ->where('id_statut_offre', $publieeId)
             ->orderByDesc('date_publication')
-            ->paginate(15);
+            ->orderByDesc('created_at')
+            ->paginate((int) ($request->input('per_page', 100)));
 
         return OffreResource::collection($offres);
     }
 
-    public function publicShow(Offre $offre): OffreResource
+    public function publicShow(string $identifier): OffreResource
     {
-        $publieeStatusId = $this->statusId(self::STATUT_PUBLIEE);
+        $publieeId = $this->statusId('Publiee');
+        $query = Offre::query()->with($this->resourceRelations())->where('id_statut_offre', $publieeId);
 
-        if ((int) $offre->id_statut_offre !== $publieeStatusId) {
-            abort(404, "L'offre n'est pas disponible ou est cloturee.");
+        if (is_numeric($identifier)) {
+            $offre = $query->where('id_offre', (int) $identifier)->firstOrFail();
+        } else {
+            $offres = $query->get();
+            $offre = $offres->first(function ($o) use ($identifier) {
+                return \Illuminate\Support\Str::slug($o->titre_poste) === $identifier ||
+                       \Illuminate\Support\Str::slug($o->id_offre . '-' . $o->titre_poste) === $identifier;
+            });
+
+            if (!$offre) {
+                abort(404, "L'offre n'est pas disponible ou est cloturee.");
+            }
         }
 
-        return new OffreResource($offre->load($this->resourceRelations()));
+        return new OffreResource($offre);
     }
 
     public function store(Request $request): OffreResource
     {
         $data = $this->validatedData($request);
-        $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->statusId(self::STATUT_BROUILLON);
+        $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->statusId('Brouillon');
 
         $offre = DB::transaction(function () use ($request, $data) {
             $offre = Offre::query()->create($data);
@@ -112,7 +116,7 @@ class OffreController extends Controller
     public function update(Request $request, Offre $offre): OffreResource
     {
         $data = $this->validatedData($request);
-        
+
         if (isset($data['id_statut_offre']) && (int) $data['id_statut_offre'] !== (int) $offre->id_statut_offre) {
             $this->validateWorkflowProgression($offre, (int) $data['id_statut_offre']);
         }
@@ -127,7 +131,7 @@ class OffreController extends Controller
 
     public function publish(Offre $offre): OffreResource
     {
-        $targetId = $this->statusId(self::STATUT_PUBLIEE);
+        $targetId = $this->statusId('Publiee');
         $this->validateWorkflowProgression($offre, $targetId);
 
         $offre->forceFill([
@@ -140,7 +144,7 @@ class OffreController extends Controller
 
     public function close(Offre $offre): OffreResource
     {
-        $targetId = $this->statusId(self::STATUT_CLOTUREE);
+        $targetId = $this->statusId('Cloturee');
         $this->validateWorkflowProgression($offre, $targetId);
 
         $offre->forceFill([
@@ -158,11 +162,11 @@ class OffreController extends Controller
             abort(422, "L'offre est deja dans ce statut.");
         }
 
-        $currentOrder = StatutOffre::where('id_statut_offre', $currentStatusId)->value('ordre_workflow') ?? 0;
-        $targetOrder = StatutOffre::where('id_statut_offre', $targetStatusId)->value('ordre_workflow') ?? 0;
+        $currentOrder = StatutOffre::where('id_statut_offre', $currentStatusId)->value('ordre_workflow') ?? $currentStatusId;
+        $targetOrder = StatutOffre::where('id_statut_offre', $targetStatusId)->value('ordre_workflow') ?? $targetStatusId;
 
         if ($targetOrder <= $currentOrder) {
-            abort(422, "Regression de statut interdite : le nouveau statut (ordre {$targetOrder}) doit avoir un ordre d'avancement strictement superieur au statut actuel (ordre {$currentOrder}).");
+            abort(422, "Regression de statut interdite : le nouveau statut (ordre {$targetOrder}) doit avoir un ordre d'avancement strictly superieur au statut actuel (ordre {$currentOrder}).");
         }
     }
 
@@ -182,21 +186,37 @@ class OffreController extends Controller
             'titre_poste' => ['required', 'string', 'max:200'],
             'id_direction' => ['required', 'integer', 'exists:direction,id_direction'],
             'description' => ['nullable', 'string'],
-            'lieu' => ['nullable', 'string', 'max:200'],
+            'lieu' => ['nullable', 'string', 'max:150'],
             'id_type_contrat' => ['nullable', 'integer', 'exists:type_contrat,id_type_contrat'],
             'date_publication' => ['nullable', 'date'],
-            'date_limite' => ['nullable', 'date'],
+            'date_limite' => ['nullable', 'date', 'after_or_equal:date_publication'],
             'id_statut_offre' => ['nullable', 'integer', 'exists:statut_offre,id_statut_offre'],
         ]);
 
         $validator->after(function ($validator) use ($request): void {
-            $datePublication = $request->input('date_publication');
-            $dateLimite = $request->input('date_limite');
-            $publicationTimestamp = strtotime((string) $datePublication);
-            $limiteTimestamp = strtotime((string) $dateLimite);
-
-            if ($publicationTimestamp !== false && $limiteTimestamp !== false && $limiteTimestamp < $publicationTimestamp) {
-                $validator->errors()->add('date_limite', 'La date limite doit etre posterieure ou egale a la date de publication.');
+            if ($request->has('profils')) {
+                $profils = $request->input('profils');
+                if (!is_array($profils)) {
+                    $validator->errors()->add('profils', 'Le champ profils doit etre un tableau.');
+                }
+            }
+            if ($request->has('missions')) {
+                $missions = $request->input('missions');
+                if (!is_array($missions)) {
+                    $validator->errors()->add('missions', 'Le champ missions doit etre un tableau.');
+                }
+            }
+            if ($request->has('formations')) {
+                $formations = $request->input('formations');
+                if (!is_array($formations)) {
+                    $validator->errors()->add('formations', 'Le champ formations doit etre un tableau.');
+                }
+            }
+            if ($request->has('competences')) {
+                $competences = $request->input('competences');
+                if (!is_array($competences)) {
+                    $validator->errors()->add('competences', 'Le champ competences doit etre un tableau.');
+                }
             }
         });
 
@@ -285,17 +305,31 @@ class OffreController extends Controller
         }
     }
 
-    private function statusId(string $libelle): int
+    /**
+     * Dynamic database lookup for statut_offre ID
+     */
+    private function statusId(string $type): int
     {
-        $statusId = StatutOffre::query()
-            ->where('libelle', $libelle)
-            ->value('id_statut_offre');
-
-        if (! $statusId) {
-            abort(422, "Le statut {$libelle} n'existe pas dans le referentiel.");
+        $query = DB::table('statut_offre');
+        if ($type === 'Publiee') {
+            $query->whereIn('libelle', ['Publiee', 'Publiée']);
+        } elseif ($type === 'Cloturee') {
+            $query->whereIn('libelle', ['Cloturee', 'Clôturée']);
+        } else {
+            $query->whereIn('libelle', ['Brouillon', 'brouillon']);
         }
 
-        return (int) $statusId;
+        $id = $query->value('id_statut_offre');
+
+        if (!$id) {
+            return match ($type) {
+                'Publiee' => 2,
+                'Cloturee' => 3,
+                default => 1,
+            };
+        }
+
+        return (int) $id;
     }
 
     /**

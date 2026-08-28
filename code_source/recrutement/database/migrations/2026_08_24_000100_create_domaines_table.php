@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('id_domaine');
             $table->string('nom_domaine', 150)->unique();
             $table->foreignId('id_direction')
+                ->nullable()
                 ->constrained('direction', 'id_direction')
                 ->restrictOnDelete();
             $table->boolean('valide')->default(false);

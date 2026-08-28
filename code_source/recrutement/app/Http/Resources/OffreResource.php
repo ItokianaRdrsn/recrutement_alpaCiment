@@ -14,6 +14,7 @@ class OffreResource extends JsonResource
     {
         return [
             'id' => $this->id_offre,
+            'slug' => \Illuminate\Support\Str::slug($this->titre_poste),
             'titre_poste' => $this->titre_poste,
             'description' => $this->description,
             'lieu' => $this->lieu,

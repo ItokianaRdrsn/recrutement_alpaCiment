@@ -11,6 +11,15 @@ Route::get('/login', [SessionController::class, 'create'])->name('login');
 Route::post('/login', [SessionController::class, 'store'])->name('login.store');
 Route::post('/logout', [SessionController::class, 'destroy'])->middleware('auth')->name('logout');
 
+// Direct public file serving route for storage (CVs, Photos, Annexes)
+Route::get('/storage/{path}', function (string $path) {
+    $fullPath = storage_path('app/public/' . $path);
+    if (!file_exists($fullPath)) {
+        abort(404, 'Fichier introuvable');
+    }
+    return response()->file($fullPath);
+})->where('path', '.*')->name('storage.local');
+
 Route::middleware(['auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::get('/offres', [OffreController::class, 'index'])->name('offres.index');

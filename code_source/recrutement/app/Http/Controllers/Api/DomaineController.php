@@ -18,7 +18,7 @@ class DomaineController extends Controller
             'direction' => ['nullable', 'integer', 'exists:direction,id_direction'],
             'valide' => ['nullable', 'boolean'],
             'q' => ['nullable', 'string', 'max:150'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
+            'per_page' => ['nullable', 'integer', 'min:1', 'max:200'],
         ]);
 
         $domaines = Domaine::query()

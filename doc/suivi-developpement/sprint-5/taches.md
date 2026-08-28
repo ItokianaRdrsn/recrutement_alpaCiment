@@ -1,80 +1,52 @@
-# Sprint 5 - Tâches
+# Sprint 5 - Tâches & Suivi (Vivier, compétences et validation CV - 11,5 j)
 
-## Avancement
+## Avancement du Sprint
 
-- **[FAIT]** 0 tâche
-- **[EN COURS]** 0 tâche
-- **[A FAIRE]** 8 tâches
-
-## Légende
-
-- **[FAIT]** : tâche terminée et utilisable.
-- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
-- **[A FAIRE]** : tâche prévue, non commencée.
+- **[À FAIRE]** 8 tâches
+- **Sous-total : 11,5 j**
 
 ---
 
-## Back-office
+## 📋 Detail des Tâches
 
-### **[A FAIRE]** Gestion du vivier : ajout, retrait, consultation
+### BACK-OFFICE
 
+#### **[À FAIRE]** Gestion du vivier : ajout, retrait, consultation
 - **Estimation :** 1,0 j
-- **Notes :** Gérer les candidats conservés pour de futurs besoins.
+- **Notes :** Vivier de talents et suivi long terme.
 
----
-
-### **[A FAIRE]** Recherche dans le vivier par compétence, domaine et direction
-
+#### **[À FAIRE]** Recherche dans le vivier par compétence, domaine et direction
 - **Estimation :** 1,0 j
-- **Notes :** Retrouver rapidement des profils pertinents.
+- **Notes :** Moteur de recherche interne dans le vivier.
 
----
-
-### **[A FAIRE]** CRUD du référentiel des compétences
-
+#### **[À FAIRE]** CRUD du référentiel des compétences
 - **Estimation :** 1,0 j
-- **Notes :** Maintenir une base de compétences normalisée.
+- **Notes :** Administration du dictionnaire des compétences.
 
----
-
-### **[A FAIRE]** Gestion manuelle des compétences, expériences et formations candidat
-
+#### **[À FAIRE]** Gestion manuelle des compétences, expériences et formations candidat
 - **Estimation :** 1,5 j
-- **Notes :** Permettre aux RH de corriger ou compléter les données.
+- **Notes :** Enrichissement manuel des fiches candidat.
 
 ---
 
-## OCR / IA
+### OCR / IA
 
-### **[A FAIRE]** Intégration FastAPI et extraction OCR avec PaddleOCR
-
-- **Estimation :** 1,5 j
-- **Notes :** Externaliser le traitement CV dans un service Python.
-
----
-
-### **[A FAIRE]** Extraction des compétences, expériences et formations depuis le CV
-
+#### **[À FAIRE]** Intégration FastAPI et extraction OCR avec PaddleOCR
 - **Estimation :** 2,0 j
-- **Notes :** Transformer le CV en données exploitables.
+- **Notes :** Service Python d'OCR et traitement de documents.
 
----
+#### **[À FAIRE]** Extraction des compétences, expériences et formations depuis le CV
+- **Estimation :** 2,0 j
+- **Notes :** Analyse syntaxique et sémantique automatique du CV.
 
-### **[A FAIRE]** Validation, correction et rejet des données extraites
+#### **[À FAIRE]** Validation, correction et rejet des données extraites
+- **Estimation :** 2,0 j
+- **Notes :** Interface RH de contrôle et validation des données extraites par IA.
 
+#### **[À FAIRE]** Tests et debug
 - **Estimation :** 1,0 j
-- **Notes :** Garder une validation humaine avant intégration définitive.
+- **Notes :** Tests d'intégration API Laravel <-> FastAPI.
 
 ---
 
-### **[A FAIRE]** Tests et debug
-
-- **Estimation :** 1,0 j
-- **Notes :** Tester OCR, extraction, validation et corrections.
-
----
-
-## Total
-
-**Sprint 5 : 10,0 j**
-
+## Sous-total Sprint 5 : 11,5 j
