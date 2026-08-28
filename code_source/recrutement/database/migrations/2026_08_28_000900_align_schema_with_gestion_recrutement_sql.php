@@ -56,7 +56,7 @@ return new class extends Migration
 
             // View vue_stats_candidatures_par_mois
             DB::statement("CREATE OR REPLACE VIEW vue_stats_candidatures_par_mois AS
-                SELECT date_trunc('month', date_candidature)::date AS mois,
+                SELECT date_trunc('month', created_at)::date AS mois,
                     COUNT(*) AS nombre_candidatures
                 FROM candidature
                 GROUP BY 1
@@ -70,7 +70,7 @@ return new class extends Migration
                     COUNT(*) AS nombre
                 FROM candidature c
                     JOIN statut_candidature sc ON sc.id_statut_candidature = c.id_statut_candidature
-                WHERE date_trunc('month', c.date_candidature) = date_trunc('month', CURRENT_DATE)
+                WHERE date_trunc('month', c.created_at) = date_trunc('month', CURRENT_DATE)
                 GROUP BY sc.libelle,
                     sc.ordre_workflow
                 ORDER BY sc.ordre_workflow;
@@ -78,7 +78,7 @@ return new class extends Migration
 
             // View vue_stats_taux_transformation_mensuel
             DB::statement("CREATE OR REPLACE VIEW vue_stats_taux_transformation_mensuel AS
-                SELECT date_trunc('month', c.date_candidature)::date AS mois,
+                SELECT date_trunc('month', c.created_at)::date AS mois,
                     COUNT(*) AS total_candidatures,
                     COUNT(*) FILTER (
                         WHERE sc.libelle = 'Retenue'

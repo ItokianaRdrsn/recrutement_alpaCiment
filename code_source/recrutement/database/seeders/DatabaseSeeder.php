@@ -21,9 +21,9 @@ class DatabaseSeeder extends Seeder
         $admin = User::query()->updateOrCreate([
             'email' => 'admin@alphaciment.local',
         ], [
-            'name' => 'Administrateur RH',
+            'nom' => 'Administrateur RH',
             'role' => UserRole::Admin->value,
-            'password' => Hash::make('password'),
+            'mot_de_passe' => Hash::make('password'),
         ]);
 
         foreach ([

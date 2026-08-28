@@ -14,8 +14,6 @@ class Candidature extends Model
     protected $table = 'candidature';
     protected $primaryKey = 'id_candidature';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'id_candidat',
         'id_type_demande',
@@ -27,14 +25,12 @@ class Candidature extends Model
         'message',
         'canal_depot',
         'id_utilisateur_depot',
-        'date_candidature',
-        'date_maj',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [
         'dans_vivier' => 'boolean',
-        'date_candidature' => 'datetime',
-        'date_maj' => 'datetime',
     ];
 
     public function candidat(): BelongsTo
@@ -62,7 +58,7 @@ class Candidature extends Model
         if ($this->offre && $this->offre->direction) {
             return $this->offre->direction();
         }
-        if ($this->domaine && $this->domaine->direction) {
+        if ($this->domaine && $this->domaine->valide && $this->domaine->direction) {
             return $this->domaine->direction();
         }
         return $this->belongsTo(Direction::class, 'id_direction', 'id_direction');

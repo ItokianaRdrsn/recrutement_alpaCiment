@@ -274,8 +274,9 @@ CREATE TABLE candidature (
     -- Rempli uniquement si canal_depot = 'rh_manuel' : qui a saisi la candidature
     id_utilisateur_depot BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE
     SET NULL,
-        date_candidature TIMESTAMPTZ NOT NULL DEFAULT now(),
-        date_maj TIMESTAMPTZ NOT NULL DEFAULT now(),
+  
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         CONSTRAINT chk_candidature_canal CHECK (
             canal_depot = 'site_externe'
             OR id_utilisateur_depot IS NOT NULL
@@ -299,7 +300,9 @@ CREATE TABLE historique_statut (
     date_changement TIMESTAMPTZ NOT NULL DEFAULT now(),
     commentaire TEXT,
     id_utilisateur BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE
-    SET NULL
+    SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_historique_candidature ON historique_statut(id_candidature);
 -- ============================================================
@@ -1132,7 +1135,7 @@ SELECT (
     ) AS candidatures_spontanees;
 -- Statistiques mensuelles (1/4) : tendance du nombre de candidatures par mois
 CREATE VIEW vue_stats_candidatures_par_mois AS
-SELECT date_trunc('month', date_candidature)::date AS mois,
+SELECT date_trunc('month', created_at)::date AS mois,
     COUNT(*) AS nombre_candidatures
 FROM candidature
 GROUP BY 1
@@ -1144,13 +1147,13 @@ SELECT sc.libelle AS statut,
     COUNT(*) AS nombre
 FROM candidature c
     JOIN statut_candidature sc ON sc.id_statut_candidature = c.id_statut_candidature
-WHERE date_trunc('month', c.date_candidature) = date_trunc('month', CURRENT_DATE)
+WHERE date_trunc('month', c.created_at) = date_trunc('month', CURRENT_DATE)
 GROUP BY sc.libelle,
     sc.ordre_workflow
 ORDER BY sc.ordre_workflow;
 -- Statistiques mensuelles (3/4) : taux de transformation (retenues / total) par mois
 CREATE VIEW vue_stats_taux_transformation_mensuel AS
-SELECT date_trunc('month', c.date_candidature)::date AS mois,
+SELECT date_trunc('month', c.created_at)::date AS mois,
     COUNT(*) AS total_candidatures,
     COUNT(*) FILTER (
         WHERE sc.libelle = 'Retenue'

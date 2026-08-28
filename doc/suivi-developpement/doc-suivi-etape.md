@@ -1,19 +1,21 @@
 # Document Central de Suivi par Étape et d'Avancement Global (65,5 j)
 
-Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et la séparation claire des colonnes `Type de demande` et `Canal de dépôt` ainsi que le chargement dynamique de la Direction.
+Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 4** & **Sprint 5** et le retrait définitif des colonnes redondantes `date_candidature` et `date_maj`.
 
 ---
 
-## 📌 Séparation de Type & Canal et Affichage Réel de la Direction
+## 📌 Suppression Définitive de `date_candidature` et `date_maj`
 
-1. **Séparation Distincte des Colonnes** :
-   - **Type de demande** : `Offre` vs `Spontanée` (badge distinct `blue` ou `amber`).
-   - **Canal de dépôt** : `Portail Web` (`site_externe`) vs `Saisie Manuelle RH` (`rh_manuel`, badge distinct `gray` ou `purple`).
-   - Séparés dans le tableau principal et la fiche détaillée RH ([src/main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx)).
+À la demande explicite, les colonnes redondantes `date_candidature` et `date_maj` ont été totalement retirées de l'ensemble de l'application au profit des colonnes d'horodatage standards Laravel **`created_at`** et **`updated_at`** :
 
-2. **Affichage Dynamique et Réel de la Direction** :
-   - Correction de l'eager loading dans [CandidatureController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/CandidatureController.php) (`offre.direction`, `domaine.direction`).
-   - Résolution du problème d'affichage "Non spécifiée" : la direction de l'offre ou du domaine associé s'affiche correctement lorsque le domaine ou l'offre est validé.
+1. **Fichier SQL ([gestion_recrutement.sql](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql))** :
+   - Suppression de `date_candidature` et `date_maj` dans la table `candidature`.
+   - Vues statistiques (`vue_stats_candidatures_par_mois`, `vue_stats_repartition_statut_mois_courant`, `vue_stats_taux_transformation_mensuel`) basées désormais sur `created_at`.
+2. **Migrations & Modèles Backend** :
+   - Migration [2026_08_28_000500_create_candidature_tables.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_08_28_000500_create_candidature_tables.php) nettoyée.
+   - Modèle [Candidature.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Candidature.php) et contrôleur [CandidatureController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/CandidatureController.php) réalignés sur `created_at`.
+3. **Frontend React ([main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+   - Remplacement de tout affichage de `c.date_candidature` par `c.created_at`.
 
 ---
 

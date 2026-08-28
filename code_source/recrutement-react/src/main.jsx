@@ -32,6 +32,7 @@ import {
     Plus,
     Printer,
     RefreshCw,
+    RotateCcw,
     Save,
     Search,
     Send,
@@ -561,10 +562,23 @@ function CandidaturesView({ referentiels }) {
         q: '',
         statut: '',
         direction: '',
-        type_candidature: '',
+        type_demande: '',
+        canal_depot: '',
         date_debut: '',
         date_fin: '',
     });
+
+    const resetFilters = () => {
+        setFilters({
+            q: '',
+            statut: '',
+            direction: '',
+            type_demande: '',
+            canal_depot: '',
+            date_debut: '',
+            date_fin: '',
+        });
+    };
 
     const loadCandidatures = useCallback(async () => {
         setLoading(true);
@@ -577,7 +591,8 @@ function CandidaturesView({ referentiels }) {
             if (filters.q) params.set('q', filters.q);
             if (filters.statut) params.set('statut', filters.statut);
             if (filters.direction) params.set('direction', filters.direction);
-            if (filters.type_candidature) params.set('type_candidature', filters.type_candidature);
+            if (filters.type_demande) params.set('type_demande', filters.type_demande);
+            if (filters.canal_depot) params.set('canal_depot', filters.canal_depot);
             if (filters.date_debut) params.set('date_debut', filters.date_debut);
             if (filters.date_fin) params.set('date_fin', filters.date_fin);
 
@@ -634,8 +649,9 @@ function CandidaturesView({ referentiels }) {
     // Tree mapping for Direction -> Domaine
     const treeByDomaine = {};
     candidaturesSpontanees.forEach((c) => {
-        const dirName = c.domaine?.direction?.nom_direction ?? 'Candidatures Spontanées Générales';
-        const domaineName = c.domaine?.nom_domaine ?? 'Poste Souhaité Libre';
+        const isValide = c.domaine && (c.domaine.valide === true);
+        const dirName = isValide && c.domaine?.direction?.nom_direction ? c.domaine.direction.nom_direction : 'Non spécifiée';
+        const domaineName = isValide && c.domaine?.nom_domaine ? c.domaine.nom_domaine : 'Non spécifiée';
         if (!treeByDomaine[dirName]) treeByDomaine[dirName] = {};
         if (!treeByDomaine[dirName][domaineName]) treeByDomaine[dirName][domaineName] = [];
         treeByDomaine[dirName][domaineName].push(c);
@@ -686,8 +702,8 @@ function CandidaturesView({ referentiels }) {
                 </button>
             </div>
 
-            {/* FULL FILTERS BAR (Statut, Direction, Période, Canal/Type, Mot-clé) */}
-            <section className="filter-bar" style={{ flexWrap: 'wrap', gap: '12px' }}>
+            {/* FULL FILTERS BAR (Statut, Direction, Période, Type, Canal, Mot-clé) */}
+            <section className="filter-bar" style={{ flexWrap: 'wrap', gap: '12px', alignItems: 'flex-end' }}>
                 <label className="search-field" style={{ minWidth: '220px' }}>
                     <Search size={18} />
                     <input
@@ -729,14 +745,26 @@ function CandidaturesView({ referentiels }) {
                 </label>
 
                 <label>
-                    <span>Canal / Type</span>
+                    <span>Type de demande</span>
                     <select
-                        onChange={(e) => setFilters((curr) => ({ ...curr, type_candidature: e.target.value }))}
-                        value={filters.type_candidature}
+                        onChange={(e) => setFilters((curr) => ({ ...curr, type_demande: e.target.value }))}
+                        value={filters.type_demande}
+                    >
+                        <option value="">Tous les types</option>
+                        <option value="offre">Sur offre</option>
+                        <option value="spontanee">Spontanée</option>
+                    </select>
+                </label>
+
+                <label>
+                    <span>Canal de dépôt</span>
+                    <select
+                        onChange={(e) => setFilters((curr) => ({ ...curr, canal_depot: e.target.value }))}
+                        value={filters.canal_depot}
                     >
                         <option value="">Tous les canaux</option>
-                        <option value="offre">Candidature sur offre</option>
-                        <option value="spontanee">Candidature spontanée</option>
+                        <option value="site_externe">Portail Web</option>
+                        <option value="rh_manuel">Saisie RH</option>
                     </select>
                 </label>
 
@@ -758,10 +786,16 @@ function CandidaturesView({ referentiels }) {
                     />
                 </label>
 
-                <button className="filter-button" onClick={loadCandidatures} type="button">
-                    <Filter size={17} />
-                    <span>Filtrer</span>
-                </button>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button className="filter-button" onClick={loadCandidatures} type="button">
+                        <Filter size={17} />
+                        <span>Filtrer</span>
+                    </button>
+                    <button className="ghost-button" onClick={resetFilters} title="Réinitialiser tous les filtres" type="button">
+                        <RotateCcw size={16} />
+                        <span>Réinitialiser</span>
+                    </button>
+                </div>
             </section>
 
             <section className="data-section">
@@ -816,14 +850,16 @@ function CandidaturesView({ referentiels }) {
                                             <td>
                                                 {c.offre ? (
                                                     <strong style={{ color: 'var(--primary)' }}>Offre: {c.offre.titre_poste}</strong>
+                                                ) : c.domaine && (c.domaine.valide === true || c.domaine.valide === 1) ? (
+                                                    <span className="badge blue">Domaine: {c.domaine.nom_domaine}</span>
                                                 ) : (
                                                     <span className="badge amber">
-                                                        Poste: {c.poste_souhaite ?? c.domaine?.nom_domaine ?? 'Spontanée'}
+                                                        {c.poste_souhaite ? `Poste: ${c.poste_souhaite}` : 'Non spécifié'}
                                                     </span>
                                                 )}
                                                 <br />
                                                 <small style={{ color: 'var(--text-muted)' }}>
-                                                    Direction: {c.offre?.direction?.nom_direction ?? c.domaine?.direction?.nom_direction ?? (c.offre ? 'Attribuée à l\'offre' : 'Non assignée')}
+                                                    Direction: {c.offre?.direction?.nom_direction ?? (c.domaine && (c.domaine.valide === true || c.domaine.valide === 1) ? c.domaine?.direction?.nom_direction : 'Non spécifiée')}
                                                 </small>
                                             </td>
                                             <td>
@@ -836,7 +872,7 @@ function CandidaturesView({ referentiels }) {
                                                     {c.canal_depot === 'rh_manuel' ? 'Saisie RH' : 'Portail Web'}
                                                 </span>
                                             </td>
-                                            <td>{formatDate(c.date_candidature ?? c.created_at)}</td>
+                                            <td>{formatDate(c.created_at)}</td>
                                             <td>
                                                 <span className="badge">{c.documents?.length ?? 0} fichier(s)</span>
                                             </td>
@@ -943,7 +979,7 @@ function CandidaturesView({ referentiels }) {
                                                             <tr key={item.id_candidature}>
                                                                 <td><strong>{item.candidat?.prenom} {item.candidat?.nom}</strong></td>
                                                                 <td>{item.candidat?.email} ({item.candidat?.telephone ?? '-'})</td>
-                                                                <td>{formatDate(item.date_candidature ?? item.created_at)}</td>
+                                                                <td>{formatDate(item.created_at)}</td>
                                                                 <td><span className="status-pill success">{item.statut?.libelle ?? 'Reçue'}</span></td>
                                                                 <td>
                                                                     <button
@@ -999,7 +1035,7 @@ function CandidaturesView({ referentiels }) {
                                                             <tr key={item.id_candidature}>
                                                                 <td><strong>{item.candidat?.prenom} {item.candidat?.nom}</strong></td>
                                                                 <td>{item.candidat?.email} ({item.candidat?.telephone ?? '-'})</td>
-                                                                <td>{formatDate(item.date_candidature ?? item.created_at)}</td>
+                                                                <td>{formatDate(item.created_at)}</td>
                                                                 <td><span className="status-pill success">{item.statut?.libelle ?? 'Reçue'}</span></td>
                                                                 <td>
                                                                     <button
@@ -1310,15 +1346,17 @@ function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsLi
                                 <strong>Poste / Domaine :</strong>{' '}
                                 {details.offre ? (
                                     <strong style={{ color: 'var(--primary)' }}>Offre : {details.offre.titre_poste}</strong>
+                                ) : details.domaine && (details.domaine.valide === true || details.domaine.valide === 1) ? (
+                                    <strong>Domaine : {details.domaine.nom_domaine}</strong>
                                 ) : (
-                                    <strong>Poste souhaité : {details.poste_souhaite ?? details.domaine?.nom_domaine ?? 'Non spécifié'}</strong>
+                                    <span>Poste souhaité : {details.poste_souhaite ?? 'Non spécifié'} <span className="badge amber" style={{ marginLeft: '6px' }}>En attente de validation RH</span></span>
                                 )}
                             </p>
                             <p style={{ margin: '6px 0' }}>
                                 <strong>Direction de rattachement :</strong>{' '}
-                                {details.offre?.direction?.nom_direction ?? details.domaine?.direction?.nom_direction ?? (details.offre ? 'Direction de l\'offre' : 'Non assignée (En attente RH)')}
+                                {details.offre?.direction?.nom_direction ?? (details.domaine && (details.domaine.valide === true || details.domaine.valide === 1) ? details.domaine?.direction?.nom_direction : 'Non spécifiée (En attente de validation RH)')}
                             </p>
-                            <p style={{ margin: '6px 0' }}><strong>Date de dépôt :</strong> {formatDate(details.date_candidature ?? details.created_at)}</p>
+                            <p style={{ margin: '6px 0' }}><strong>Date de dépôt :</strong> {formatDate(details.created_at)}</p>
 
                             <div style={{ marginTop: '16px' }}>
                                 <strong style={{ display: 'block', marginBottom: '6px' }}>Message de présentation / Lettre de motivation :</strong>
@@ -1511,7 +1549,7 @@ function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsLi
                             <strong>E-mail automatique d'accusé de réception envoyé lors du dépôt.</strong>
                         </div>
                         <p style={{ margin: 0, fontSize: '13px', color: 'var(--muted)' }}>
-                            Date d'envoi : {formatDate(details.date_candidature ?? details.created_at)} | Destinataire : {details.candidat?.email}
+                            Date d'envoi : {formatDate(details.created_at)} | Destinataire : {details.candidat?.email}
                         </p>
                     </div>
                 </div>
@@ -2061,12 +2099,16 @@ function VivierView({ competencesData, referentiels }) {
         }
     }
 
+    const resetVivierFilters = () => {
+        setFilters({ q: '', direction: '', domaine: '', statut: '' });
+    };
+
     return (
         <div className="view-stack">
             {/* Header & Button */}
-            <section className="filter-bar" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', flex: 1 }}>
-                    <label className="search-field">
+            <section className="filter-bar" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end', flex: 1 }}>
+                    <label className="search-field" style={{ flex: '1 1 240px', minWidth: '200px' }}>
                         <Search size={18} />
                         <input
                             onChange={(e) => setFilters((curr) => ({ ...curr, q: e.target.value }))}
@@ -2076,7 +2118,7 @@ function VivierView({ competencesData, referentiels }) {
                         />
                     </label>
 
-                    <label>
+                    <label style={{ minWidth: '180px' }}>
                         <span>Direction</span>
                         <select
                             onChange={(e) => setFilters((curr) => ({ ...curr, direction: e.target.value }))}
@@ -2091,10 +2133,31 @@ function VivierView({ competencesData, referentiels }) {
                         </select>
                     </label>
 
-                    <button className="filter-button" onClick={loadVivier} type="button">
-                        <Filter size={17} />
-                        <span>Filtrer</span>
-                    </button>
+                    <label style={{ minWidth: '180px' }}>
+                        <span>Domaine d'expertise</span>
+                        <select
+                            onChange={(e) => setFilters((curr) => ({ ...curr, domaine: e.target.value }))}
+                            value={filters.domaine}
+                        >
+                            <option value="">Tous les domaines validés</option>
+                            {referentiels.domaines?.filter((d) => d.valide !== false).map((dom) => (
+                                <option key={dom.id_domaine} value={dom.id_domaine}>
+                                    {dom.nom_domaine}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <button className="filter-button" onClick={loadVivier} type="button">
+                            <Filter size={17} />
+                            <span>Filtrer</span>
+                        </button>
+                        <button className="ghost-button" onClick={resetVivierFilters} title="Réinitialiser les filtres" type="button">
+                            <RotateCcw size={16} />
+                            <span>Réinitialiser</span>
+                        </button>
+                    </div>
                 </div>
 
                 <button className="primary-button" onClick={() => setShowAddModal(true)} type="button">
@@ -3238,10 +3301,21 @@ function OffersView({ canManage, competencesData, initialEditingOffer = null, on
                     </select>
                 </label>
 
-                <button className="filter-button" onClick={loadOffers} type="button">
-                    <Filter aria-hidden="true" size={17} />
-                    <span>Filtrer</span>
-                </button>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button className="filter-button" onClick={loadOffers} type="button">
+                        <Filter aria-hidden="true" size={17} />
+                        <span>Filtrer</span>
+                    </button>
+                    <button
+                        className="ghost-button"
+                        onClick={() => setFilters({ q: '', direction: '', statut: '', type_contrat: '', page: 1 })}
+                        title="Réinitialiser les filtres"
+                        type="button"
+                    >
+                        <RotateCcw aria-hidden="true" size={16} />
+                        <span>Réinitialiser</span>
+                    </button>
+                </div>
             </section>
 
             <section className="data-section">

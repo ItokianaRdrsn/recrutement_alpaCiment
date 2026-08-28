@@ -39,8 +39,7 @@ return new class extends Migration
                 $table->text('message')->nullable();
                 $table->string('canal_depot', 20)->default('site_externe');
                 $table->foreignId('id_utilisateur_depot')->nullable()->constrained('utilisateur', 'id_utilisateur')->nullOnDelete();
-                $table->timestampTz('date_candidature')->useCurrent();
-                $table->timestampTz('date_maj')->useCurrent();
+                $table->timestampsTz();
 
                 $table->index('id_candidat', 'idx_candidature_candidat');
                 $table->index('id_offre', 'idx_candidature_offre');
@@ -59,6 +58,7 @@ return new class extends Migration
                 $table->timestampTz('date_changement')->useCurrent();
                 $table->text('commentaire')->nullable();
                 $table->foreignId('id_utilisateur')->nullable()->constrained('utilisateur', 'id_utilisateur')->nullOnDelete();
+                $table->timestampsTz();
 
                 $table->index('id_candidature', 'idx_historique_candidature');
             });

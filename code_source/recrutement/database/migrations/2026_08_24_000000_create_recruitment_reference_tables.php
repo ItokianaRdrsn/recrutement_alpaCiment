@@ -17,6 +17,7 @@ return new class extends Migration
                 $table->id('id_utilisateur');
                 $table->string('nom', 150);
                 $table->string('email', 200)->unique();
+                $table->string('mot_de_passe', 255)->nullable();
                 $table->string('role', 30)->default('rh');
                 $table->timestampsTz();
             });

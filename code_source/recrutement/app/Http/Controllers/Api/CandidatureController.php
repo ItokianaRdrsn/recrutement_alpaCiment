@@ -88,8 +88,6 @@ class CandidatureController extends Controller
                 'message' => $validated['message_motivation'] ?? null,
                 'canal_depot' => 'site_externe',
                 'id_utilisateur_depot' => null,
-                'date_candidature' => now(),
-                'date_maj' => now(),
             ]);
 
             // Create initial status history
@@ -216,8 +214,6 @@ class CandidatureController extends Controller
                 'message' => $validated['message_motivation'] ?? null,
                 'canal_depot' => 'site_externe',
                 'id_utilisateur_depot' => null,
-                'date_candidature' => now(),
-                'date_maj' => now(),
             ]);
 
             HistoriqueStatut::create([
@@ -320,8 +316,6 @@ class CandidatureController extends Controller
                 'message' => $validated['message_motivation'] ?? null,
                 'canal_depot' => 'site_externe',
                 'id_utilisateur_depot' => null,
-                'date_candidature' => now(),
-                'date_maj' => now(),
             ]);
 
             HistoriqueStatut::create([
@@ -386,6 +380,19 @@ class CandidatureController extends Controller
             $query->where('id_offre', $request->input('offre'));
         }
 
+        if ($request->filled('type_demande')) {
+            $type = strtolower($request->input('type_demande'));
+            if ($type === 'offre' || $type === '1') {
+                $query->whereNotNull('id_offre');
+            } elseif ($type === 'spontanee' || $type === '2') {
+                $query->whereNull('id_offre');
+            }
+        }
+
+        if ($request->filled('canal_depot')) {
+            $query->where('canal_depot', $request->input('canal_depot'));
+        }
+
         if ($request->filled('direction')) {
             $directionId = (int) $request->input('direction');
             $query->where(function ($sub) use ($directionId) {
@@ -393,12 +400,13 @@ class CandidatureController extends Controller
                     $o->where('id_direction', $directionId);
                 })
                 ->orWhereHas('domaine', function ($d) use ($directionId) {
-                    $d->where('id_direction', $directionId);
+                    $d->where('id_direction', $directionId)
+                      ->where('valide', true);
                 });
             });
         }
 
-        $candidatures = $query->orderByDesc('date_candidature')->paginate($perPage);
+        $candidatures = $query->orderByDesc('created_at')->paginate($perPage);
 
         return response()->json($candidatures);
     }

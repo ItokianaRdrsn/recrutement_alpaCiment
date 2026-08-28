@@ -7,6 +7,12 @@
 
 ---
 
+## 📑 Documentation Technique Détaillée du Sprint 5
+- [Vivier de talents RH, référentiel des compétences et profil candidat (2026-08-28)](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-08-28/vivier-rh-competences.md)
+- [Intégration OCR CV (FastAPI / PaddleOCR) & workflow de validation RH (2026-08-28)](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-08-28/ocr-fastapi-validation-cv.md)
+
+---
+
 ## 📋 Détail des Tâches
 
 ### BACK-OFFICE / API / OCR

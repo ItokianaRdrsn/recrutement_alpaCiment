@@ -12,7 +12,6 @@ class HistoriqueStatut extends Model
 
     protected $table = 'historique_statut';
     protected $primaryKey = 'id_historique';
-    public $timestamps = false;
 
     protected $fillable = [
         'id_candidature',
@@ -20,6 +19,8 @@ class HistoriqueStatut extends Model
         'date_changement',
         'commentaire',
         'id_utilisateur',
+        'created_at',
+        'updated_at',
     ];
 
     protected $casts = [

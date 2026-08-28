@@ -21,31 +21,23 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
+        'nom',
         'email',
         'role',
-        'password',
+        'mot_de_passe',
     ];
 
     /**
      * @var list<string>
      */
     protected $hidden = [
-        'password',
+        'mot_de_passe',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    public function getAuthPasswordName(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
+        return 'mot_de_passe';
     }
 
     public function roleEnum(): ?UserRole

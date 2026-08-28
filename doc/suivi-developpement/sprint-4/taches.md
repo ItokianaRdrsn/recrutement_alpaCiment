@@ -7,6 +7,12 @@
 
 ---
 
+## 📑 Documentation Technique Détaillée du Sprint 4
+- [Gestion des candidatures, arborescences et filtrage avancé (2026-08-28)](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-4/2026-08-28/gestion-candidatures-filtres.md)
+- [Fiche candidat détaillée, historique des statuts et export PDF (2026-08-28)](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-4/2026-08-28/fiche-candidat-historique.md)
+
+---
+
 ## 📋 Détail des Tâches
 
 ### BACK-OFFICE
