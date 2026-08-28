@@ -10,9 +10,14 @@ use App\Http\Controllers\Api\OffreController;
 use App\Http\Controllers\Api\ReferentielController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\CandidatureController;
+
 // Public routes for candidates
 Route::get('/public/offres', [OffreController::class, 'publicIndex'])->name('api.public.offres.index');
 Route::get('/public/offres/{offre}', [OffreController::class, 'publicShow'])->name('api.public.offres.show');
+Route::post('/public/offres/{id}/postuler', [CandidatureController::class, 'postulerOffre'])->name('api.public.offres.postuler');
+Route::post('/public/candidature-spontanee', [CandidatureController::class, 'candidatureSpontanee'])->name('api.public.candidature-spontanee');
+Route::post('/public/import-candidature', [CandidatureController::class, 'importExternalCandidature'])->name('api.public.import-candidature');
 
 // Protected Back-Office routes
 Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
@@ -24,6 +29,7 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::get('/me', MeController::class)->name('api.me');
     Route::get('/dashboard', DashboardController::class)->name('api.dashboard');
     Route::get('/referentiels/recrutement', ReferentielController::class)->name('api.referentiels.recrutement');
+    Route::get('/referentiels/statuts-candidature', [CandidatureController::class, 'statuts'])->name('api.referentiels.statuts-candidature');
 
     Route::get('/directions', [DirectionController::class, 'index'])->name('api.directions.index');
     Route::get('/directions/{direction}', [DirectionController::class, 'show'])->name('api.directions.show');
@@ -54,4 +60,8 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
         Route::patch('/offres/{offre}/cloturer', [OffreController::class, 'close'])->name('api.offres.close');
         Route::delete('/offres/{offre}', [OffreController::class, 'destroy'])->name('api.offres.destroy');
     });
+
+    Route::get('/candidatures', [CandidatureController::class, 'index'])->name('api.candidatures.index');
+    Route::get('/candidatures/{id}', [CandidatureController::class, 'show'])->name('api.candidatures.show');
+    Route::patch('/candidatures/{id}/statut', [CandidatureController::class, 'updateStatut'])->name('api.candidatures.update-statut');
 });

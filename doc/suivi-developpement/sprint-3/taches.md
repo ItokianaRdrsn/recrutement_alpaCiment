@@ -1,89 +1,56 @@
-# Sprint 3 - Tâches
+# Sprint 3 - Tâches & Suivi (Dépôt et réception des candidatures - 7,5 j)
 
-## Avancement
+## Avancement du Sprint
 
-- **[FAIT]** 0 tâche
-- **[EN COURS]** 0 tâche
-- **[A FAIRE]** 9 tâches
-
-## Légende
-
-- **[FAIT]** : tâche terminée et utilisable.
-- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
-- **[A FAIRE]** : tâche prévue, non commencée.
+- **[FAIT]** 8 tâches
+- **Sous-total : 7,5 j**
 
 ---
 
-## Front-office
+## 📋 Detail des Tâches
 
-### **[A FAIRE]** Formulaire de candidature sur offre
+### FRONT-OFFICE
 
-- **Estimation :** 1,5 j
-- **Notes :** Permettre au candidat de postuler à une offre précise.
+#### **[FAIT]** Formulaire de candidature sur offre (temporaire)
+- **Estimation :** 0,5 j
+- **Notes :** Dépôt direct autonome via `/offre/:slug`.
 
----
+#### **[FAIT]** Formulaire de candidature spontanée avec domaine (temporaire)
+- **Estimation :** 0,5 j
+- **Notes :** Champ libre poste souhaité avec domaine temporaire `id_direction = null`.
 
-### **[A FAIRE]** Formulaire de candidature spontanée avec domaine ou autre domaine
-
-- **Estimation :** 1,5 j
-- **Notes :** Gérer les candidatures sans offre liée.
-
----
-
-### **[A FAIRE]** Upload des CV, photos et documents
-
+#### **[FAIT]** Upload des CV, photos et documents
 - **Estimation :** 1,0 j
-- **Notes :** Stocker les documents nécessaires au traitement RH.
+- **Notes :** Stockage sécurisé et consultation HTTP 200 OK.
 
 ---
 
-## Back-office
+### BACK-OFFICE
 
-### **[A FAIRE]** Saisie manuelle d'une candidature par un RH
-
+#### **[FAIT]** Saisie manuelle d'une candidature par un RH
 - **Estimation :** 1,0 j
-- **Notes :** Permettre aux RH d'ajouter une candidature reçue hors formulaire.
+- **Notes :** Ajout manuel direct dans l'interface RH.
 
 ---
 
-## API / Services
+### API / SERVICES
 
-### **[A FAIRE]** Détection d'un candidat existant et dédoublonnage par email
-
+#### **[FAIT]** Détection d'un candidat existant et dédoublonnage par email
 - **Estimation :** 1,0 j
-- **Notes :** Eviter de créer plusieurs candidats identiques.
+- **Notes :** Contrôle par email candidat pour réutiliser la fiche ou mettre à jour.
 
----
-
-### **[A FAIRE]** Création transactionnelle : candidat, candidature, statut initial, historique
-
+#### **[FAIT]** Création transactionnelle : candidat, candidature, statut initial, historique
 - **Estimation :** 2,0 j
-- **Notes :** Garantir une création cohérente du dossier.
+- **Notes :** Transaction SQL garantissant l'intégrité de la candidature.
 
----
-
-### **[A FAIRE]** Préparation de la réception/import depuis le site externe
-
+#### **[FAIT]** Préparation de la réception/import depuis le site externe
 - **Estimation :** 0,5 j
-- **Notes :** Prévoir l'intégration avec un site externe.
+- **Notes :** Préparation du connecteur d'ingestion.
 
----
-
-### **[A FAIRE]** Accusé de réception et première communication automatique
-
-- **Estimation :** 0,5 j
-- **Notes :** Informer automatiquement le candidat de la réception.
-
----
-
-### **[A FAIRE]** Tests et debug
-
+#### **[FAIT]** Tests et debug
 - **Estimation :** 1,0 j
-- **Notes :** Tester formulaires, documents, dédoublonnage et transaction.
+- **Notes :** Validation des tests d'upload et création candidatures.
 
 ---
 
-## Total
-
-**Sprint 3 : 10,0 j**
-
+## Sous-total Sprint 3 : 7,5 j

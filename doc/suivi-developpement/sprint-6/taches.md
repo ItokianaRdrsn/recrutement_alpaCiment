@@ -1,73 +1,56 @@
-# Sprint 6 - Tâches
+# Sprint 6 - Tâches & Suivi (Rendez-vous, communications et modèles - 10,0 j)
 
-## Avancement
+## Avancement du Sprint
 
-- **[FAIT]** 0 tâche
-- **[EN COURS]** 0 tâche
-- **[A FAIRE]** 7 tâches
-
-## Légende
-
-- **[FAIT]** : tâche terminée et utilisable.
-- **[EN COURS]** : tâche commencée, mais pas encore totalement terminée.
-- **[A FAIRE]** : tâche prévue, non commencée.
+- **[À FAIRE]** 9 tâches
+- **Sous-total : 10,0 j**
 
 ---
 
-## Back-office
+## 📋 Detail des Tâches
 
-### **[A FAIRE]** CRUD des rendez-vous : test, entretien, statut, mode, responsable
+### BACK-OFFICE
 
+#### **[À FAIRE]** CRUD des rendez-vous : test, entretien, statut, mode, responsable
 - **Estimation :** 2,0 j
-- **Notes :** Planifier et suivre les étapes d'évaluation.
+- **Notes :** Planification des entretiens et tests.
 
----
-
-### **[A FAIRE]** Vue agenda par utilisateur, candidature et période
-
+#### **[À FAIRE]** Vue agenda par utilisateur, candidature et période
 - **Estimation :** 1,0 j
-- **Notes :** Donner une vue claire des rendez-vous.
+- **Notes :** Agenda interactif des entretiens.
 
----
-
-### **[A FAIRE]** Communication liée aux rendez-vous
-
+#### **[À FAIRE]** Communication liée aux rendez-vous
 - **Estimation :** 1,0 j
-- **Notes :** Informer les candidats des tests et entretiens.
+- **Notes :** Convocations et rappels automatiques.
 
----
-
-### **[A FAIRE]** CRUD des modèles de communication
-
+#### **[À FAIRE]** CRUD des modèles de communication
 - **Estimation :** 1,0 j
-- **Notes :** Réutiliser des messages standardisés.
+- **Notes :** Modèles d'emails personnalisables.
 
----
-
-### **[A FAIRE]** Activation, désactivation et configuration de l'envoi automatique
-
-- **Estimation :** 1,0 j
-- **Notes :** Contrôler les automatismes de communication.
-
----
-
-## API / Services
-
-### **[A FAIRE]** Envoi manuel, historique des communications et préparation des rappels
-
-- **Estimation :** 1,5 j
-- **Notes :** Tracer les communications et préparer les rappels.
-
----
-
-### **[A FAIRE]** Tests et debug
-
+#### **[À FAIRE]** Accusé de réception et première communication automatique
 - **Estimation :** 0,5 j
-- **Notes :** Tester création de rendez-vous, modèles, envois et historique.
+- **Notes :** Confirmation automatique de réception de candidature.
+
+#### **[À FAIRE]** Activation, désactivation et configuration de l'envoi automatique
+- **Estimation :** 1,0 j
+- **Notes :** Paramétrage des déclencheurs automatiques.
 
 ---
 
-## Total
+### API / SERVICES
 
-**Sprint 6 : 8,0 j**
+#### **[À FAIRE]** Récupération et ingestion des candidatures par E-mail
+- **Estimation :** 1,5 j
+- **Notes :** Relève automatique des e-mails à heure fixe (Batch/Cron).
 
+#### **[À FAIRE]** Envoi manuel, historique des communications et préparation des rappels
+- **Estimation :** 1,5 j
+- **Notes :** Historique complet des échanges candidats.
+
+#### **[À FAIRE]** Tests et debug
+- **Estimation :** 0,5 j
+- **Notes :** Validation des flux d'envoi et de réception.
+
+---
+
+## Sous-total Sprint 6 : 10,0 j

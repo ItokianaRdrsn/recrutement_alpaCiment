@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
+import PostulerOffrePage from './frontOffice/PostulerOffrePage';
+import CandidatureSpontaneePage from './frontOffice/CandidatureSpontaneePage';
+import PublicOffresPage from './frontOffice/PublicOffresPage';
 import {
     ArrowLeft,
     Award,
@@ -14,8 +17,11 @@ import {
     CheckCircle2,
     Copy,
     Database,
+    Download,
     Edit3,
     ExternalLink,
+    Eye,
+    FileText,
     Filter,
     GraduationCap,
     LayoutDashboard,
@@ -25,8 +31,11 @@ import {
     RefreshCw,
     Save,
     Search,
+    Send,
     Share2,
     Trash2,
+    Upload,
+    User,
     UserCheck,
     Users,
     X,
@@ -49,6 +58,43 @@ function redirectToLogin() {
 
     redirectingToLogin = true;
     window.location.replace(loginUrl);
+}
+
+async function getPublicJson(url) {
+    const response = await fetch(url, {
+        headers: {
+            Accept: 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Erreur HTTP ${response.status}`);
+    }
+
+    return response.json();
+}
+
+async function sendPublicFormData(url, formData, method = 'POST') {
+    const response = await fetch(url, {
+        method,
+        headers: {
+            Accept: 'application/json',
+        },
+        body: formData,
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        let msg = payload.message ?? `Erreur HTTP ${response.status}`;
+        if (payload.errors) {
+            const errList = Object.values(payload.errors).flat().join(' | ');
+            msg += ` (${errList})`;
+        }
+        throw new Error(msg);
+    }
+
+    return payload;
 }
 
 async function getJson(url) {
@@ -115,6 +161,37 @@ async function sendJson(url, { body, method = 'POST' } = {}) {
     return payload;
 }
 
+async function sendFormData(url, formData, method = 'POST') {
+    const token = await getCsrfToken();
+    const response = await fetch(url, {
+        method,
+        credentials: 'include',
+        headers: {
+            Accept: 'application/json',
+            'X-CSRF-TOKEN': token,
+        },
+        body: formData,
+    });
+
+    if (response.status === 401) {
+        redirectToLogin();
+        return null;
+    }
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        let msg = payload.message ?? `Erreur HTTP ${response.status}`;
+        if (payload.errors) {
+            const errList = Object.values(payload.errors).flat().join(' | ');
+            msg += ` (${errList})`;
+        }
+        throw new Error(msg);
+    }
+
+    return payload;
+}
+
 function formatDate(value) {
     if (!value) {
         return '-';
@@ -168,6 +245,7 @@ async function submitLogout() {
 function App() {
     const [path, setPath] = useState(window.location.pathname);
     const [user, setUser] = useState(null);
+    const [editingOffer, setEditingOffer] = useState(null);
     const [referentiels, setReferentiels] = useState({
         directions: [],
         statuts_offre: [],
@@ -177,15 +255,28 @@ function App() {
     const [bootstrapLoading, setBootstrapLoading] = useState(true);
     const [bootstrapError, setBootstrapError] = useState('');
 
+    const isPublicPath = path.startsWith('/candidat/offres') ||
+                         path.startsWith('/candidature-spontanee') ||
+                         Boolean(path.match(/\/offres\/(\d+)\/postuler/)) ||
+                         Boolean(path.match(/\/offre\/([^\/]+)/));
+
     useEffect(() => {
         const handlePopState = () => setPath(window.location.pathname);
-
         window.addEventListener('popstate', handlePopState);
-
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
+    const navigate = useCallback((target) => {
+        window.history.pushState({}, '', target);
+        setPath(target);
+    }, []);
+
+    // Back-Office Load Base Data
     const loadBaseData = useCallback(async () => {
+        if (isPublicPath) {
+            setBootstrapLoading(false);
+            return;
+        }
         try {
             const [meResponse, referentielResponse, competencesResponse] = await Promise.all([
                 getJson('/api/me'),
@@ -207,18 +298,48 @@ function App() {
         } finally {
             setBootstrapLoading(false);
         }
-    }, []);
+    }, [isPublicPath]);
 
     useEffect(() => {
-        loadBaseData();
-    }, [loadBaseData]);
+        if (!isPublicPath) {
+            loadBaseData();
+        } else {
+            setBootstrapLoading(false);
+        }
+    }, [loadBaseData, isPublicPath]);
 
-    const navigate = useCallback((target) => {
-        window.history.pushState({}, '', target);
-        setPath(target);
-    }, []);
+    // Front-Office Routing (Public Candidates) - Placed AFTER ALL hooks to adhere to React Rules of Hooks
+    if (path.startsWith('/candidat/offres')) {
+        return <PublicOffresPage getJson={getPublicJson} onNavigate={navigate} />;
+    }
 
-    const activeView = path.startsWith('/offres') ? 'offres' : path.startsWith('/referentiels') ? 'referentiels' : 'dashboard';
+    if (path.startsWith('/candidature-spontanee')) {
+        return <CandidatureSpontaneePage getJson={getPublicJson} onNavigate={navigate} sendFormData={sendPublicFormData} />;
+    }
+
+    const offreSlugMatch = path.match(/\/offre\/([^\/]+)/);
+    const postulerMatch = path.match(/\/offres\/(\d+)\/postuler/);
+    const targetSlugOrId = offreSlugMatch ? offreSlugMatch[1] : (postulerMatch ? postulerMatch[1] : null);
+
+    if (targetSlugOrId) {
+        return (
+            <PostulerOffrePage
+                backendPath={backendPath}
+                getJson={getPublicJson}
+                idOffre={targetSlugOrId}
+                onNavigate={navigate}
+                sendFormData={sendPublicFormData}
+            />
+        );
+    }
+
+    const activeView = path.startsWith('/offres')
+        ? 'offres'
+        : path.startsWith('/candidatures')
+        ? 'candidatures'
+        : path.startsWith('/referentiels')
+        ? 'referentiels'
+        : 'dashboard';
 
     const referentielSubTab = path === '/referentiels/directions'
         ? 'directions'
@@ -228,8 +349,18 @@ function App() {
         ? 'competences'
         : 'all';
 
+    function handleSelectOfferFromDashboard(offre) {
+        setEditingOffer(offre);
+        navigate('/offres');
+    }
+
     return (
-        <AppShell activePath={path} activeView={activeView} user={user} onNavigate={navigate}>
+        <AppShell
+            activePath={path}
+            activeView={activeView}
+            onNavigate={navigate}
+            user={user}
+        >
             {bootstrapError ? (
                 <ErrorState message={bootstrapError} />
             ) : bootstrapLoading ? (
@@ -238,8 +369,13 @@ function App() {
                 <OffersView
                     canManage={user?.permissions?.includes('manage_offres') ?? false}
                     competencesData={competencesData}
+                    initialEditingOffer={editingOffer}
+                    onClearEditingOffer={() => setEditingOffer(null)}
+                    onNavigate={navigate}
                     referentiels={referentiels}
                 />
+            ) : activeView === 'candidatures' ? (
+                <CandidaturesView referentiels={referentiels} />
             ) : activeView === 'referentiels' ? (
                 <ReferentialsView
                     canManage={user?.permissions?.includes('manage_referentiels') ?? false}
@@ -248,7 +384,7 @@ function App() {
                     onRefreshBase={loadBaseData}
                 />
             ) : (
-                <DashboardView />
+                <DashboardView onSelectOffer={handleSelectOfferFromDashboard} />
             )}
         </AppShell>
     );
@@ -266,6 +402,7 @@ function AppShell({ activePath, activeView, children, onNavigate, user }) {
     const navItems = [
         { id: 'dashboard', label: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
         { id: 'offres', label: 'Offres', href: '/offres', icon: BriefcaseBusiness },
+        { id: 'candidatures', label: 'Candidatures', href: '/candidatures', icon: UserCheck },
         { id: 'referentiels', label: 'Referentiels', href: '/referentiels', icon: Building2, hasSub: true },
     ];
 
@@ -354,13 +491,33 @@ function AppShell({ activePath, activeView, children, onNavigate, user }) {
                         );
                     })}
                 </nav>
+
+                <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #243746' }}>
+                    <button
+                        className="ghost-button"
+                        onClick={() => onNavigate('/candidat/offres')}
+                        style={{ width: '100%', justifyContent: 'center', color: '#f2b84b' }}
+                        type="button"
+                    >
+                        <ExternalLink size={16} />
+                        <span>Portail Candidats (Front)</span>
+                    </button>
+                </div>
             </aside>
 
             <div className="content-area">
                 <header className="topbar">
                     <div>
                         <p className="eyebrow">Back-office RH</p>
-                        <h1>{activeView === 'offres' ? "Offres d'emploi" : activeView === 'referentiels' ? 'Referentiels' : 'Tableau de bord'}</h1>
+                        <h1>
+                            {activeView === 'offres'
+                                ? "Offres d'emploi"
+                                : activeView === 'candidatures'
+                                ? 'Candidatures'
+                                : activeView === 'referentiels'
+                                ? 'Referentiels'
+                                : 'Tableau de bord'}
+                        </h1>
                     </div>
 
                     <div className="topbar-actions">
@@ -376,6 +533,405 @@ function AppShell({ activePath, activeView, children, onNavigate, user }) {
                 </header>
 
                 <main className="workspace">{children}</main>
+            </div>
+        </div>
+    );
+}
+
+function CandidaturesView({ referentiels }) {
+    const [candidatures, setCandidatures] = useState([]);
+    const [statutsList, setStatutsList] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [selectedCandidatureId, setSelectedCandidatureId] = useState(null);
+    const [filters, setFilters] = useState({ q: '', statut: '', direction: '' });
+
+    const loadCandidatures = useCallback(async () => {
+        setLoading(true);
+        setError('');
+
+        try {
+            const params = new URLSearchParams();
+            if (filters.q) params.set('q', filters.q);
+            if (filters.statut) params.set('statut', filters.statut);
+            if (filters.direction) params.set('direction', filters.direction);
+
+            const [candResponse, statutsResponse] = await Promise.all([
+                getJson(`/api/candidatures?${params.toString()}`),
+                getJson('/api/referentiels/statuts-candidature'),
+            ]);
+
+            setCandidatures(candResponse?.data ?? []);
+            setStatutsList(statutsResponse?.data ?? []);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [filters]);
+
+    useEffect(() => {
+        loadCandidatures();
+    }, [loadCandidatures]);
+
+    if (selectedCandidatureId) {
+        return (
+            <CandidatureDetailView
+                idCandidature={selectedCandidatureId}
+                onBack={() => setSelectedCandidatureId(null)}
+                onRefreshList={loadCandidatures}
+                statutsList={statutsList}
+            />
+        );
+    }
+
+    return (
+        <div className="view-stack">
+            <section className="filter-bar">
+                <label className="search-field">
+                    <Search size={18} />
+                    <input
+                        onChange={(e) => setFilters((curr) => ({ ...curr, q: e.target.value }))}
+                        placeholder="Rechercher un candidat (nom, email)..."
+                        type="search"
+                        value={filters.q}
+                    />
+                </label>
+
+                <label>
+                    <span>Statut</span>
+                    <select
+                        onChange={(e) => setFilters((curr) => ({ ...curr, statut: e.target.value }))}
+                        value={filters.statut}
+                    >
+                        <option value="">Tous les statuts</option>
+                        {statutsList.map((st) => (
+                            <option key={st.id_statut_candidature} value={st.id_statut_candidature}>
+                                {st.libelle}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                <label>
+                    <span>Direction</span>
+                    <select
+                        onChange={(e) => setFilters((curr) => ({ ...curr, direction: e.target.value }))}
+                        value={filters.direction}
+                    >
+                        <option value="">Toutes</option>
+                        {referentiels.directions?.map((dir) => (
+                            <option key={dir.id_direction} value={dir.id_direction}>
+                                {dir.nom_direction}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                <button className="filter-button" onClick={loadCandidatures} type="button">
+                    <Filter size={17} />
+                    <span>Filtrer</span>
+                </button>
+            </section>
+
+            <section className="data-section">
+                <div className="section-heading">
+                    <div>
+                        <h2>Candidatures reçues</h2>
+                        <p>Gestion et suivi des dossiers de candidatures sur offre et spontanées.</p>
+                    </div>
+                    <button className="ghost-button" onClick={loadCandidatures} type="button">
+                        <RefreshCw size={17} />
+                        <span>Actualiser</span>
+                    </button>
+                </div>
+
+                {loading ? (
+                    <LoadingState />
+                ) : error ? (
+                    <ErrorState message={error} onRetry={loadCandidatures} />
+                ) : !candidatures.length ? (
+                    <div className="empty-state">Aucune candidature trouvée.</div>
+                ) : (
+                    <div className="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Candidat</th>
+                                    <th>Type / Poste / Direction</th>
+                                    <th>Date</th>
+                                    <th>Documents</th>
+                                    <th>Origine</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {candidatures.map((c) => (
+                                    <tr key={c.id_candidature}>
+                                        <td>
+                                            <strong>{c.candidat?.prenom} {c.candidat?.nom}</strong>
+                                            <span>{c.candidat?.email}</span>
+                                        </td>
+                                        <td>
+                                            {c.offre ? (
+                                                <strong style={{ color: 'var(--primary)' }}>Offre: {c.offre.titre_poste}</strong>
+                                            ) : (
+                                                <span className="badge amber">Spontanee ({c.direction?.nom_direction ?? 'Generale'})</span>
+                                            )}
+                                        </td>
+                                        <td>{formatDate(c.date_candidature ?? c.created_at)}</td>
+                                        <td>
+                                            <span className="badge">{c.documents?.length ?? 0} fichier(s)</span>
+                                        </td>
+                                        <td>
+                                            <small>{c.postule_depuis ?? 'Web'}</small>
+                                        </td>
+                                        <td>
+                                            <span className="status-pill success">{c.statut?.libelle ?? 'Reçue'}</span>
+                                        </td>
+                                        <td>
+                                            <button
+                                                className="filter-button"
+                                                onClick={() => setSelectedCandidatureId(c.id_candidature)}
+                                                style={{ padding: '6px 12px', fontSize: '13px' }}
+                                                type="button"
+                                            >
+                                                <Eye size={15} />
+                                                <span>Voir dossier</span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </section>
+        </div>
+    );
+}
+
+function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsList }) {
+    const [details, setDetails] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [newStatusId, setNewStatusId] = useState('');
+    const [commentaire, setCommentaire] = useState('');
+    const [updating, setUpdating] = useState(false);
+
+    const loadDetails = useCallback(async () => {
+        setLoading(true);
+        setError('');
+
+        try {
+            const res = await getJson(`/api/candidatures/${idCandidature}`);
+            setDetails(res?.data ?? null);
+            if (res?.data?.statut?.id_statut_candidature) {
+                setNewStatusId(String(res.data.statut.id_statut_candidature));
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [idCandidature]);
+
+    useEffect(() => {
+        loadDetails();
+    }, [loadDetails]);
+
+    async function handleStatusUpdate(e) {
+        e.preventDefault();
+        if (!newStatusId) return;
+
+        setUpdating(true);
+        try {
+            await sendJson(`/api/candidatures/${idCandidature}/statut`, {
+                method: 'PATCH',
+                body: {
+                    id_statut_candidature: Number(newStatusId),
+                    commentaire: commentaire.trim() || null,
+                },
+            });
+            setCommentaire('');
+            await loadDetails();
+            if (onRefreshList) onRefreshList();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setUpdating(false);
+        }
+    }
+
+    if (loading) {
+        return <LoadingState />;
+    }
+
+    if (error) {
+        return <ErrorState message={error} onRetry={loadDetails} />;
+    }
+
+    if (!details) {
+        return <div className="empty-state">Dossier introuvable.</div>;
+    }
+
+    const photoDoc = (details.documents ?? []).find(
+        (d) => d.type_document === 'Photo' || (d.mime_type && d.mime_type.startsWith('image/'))
+    );
+
+    return (
+        <div className="view-stack">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <button className="ghost-button" onClick={onBack} type="button">
+                    <ArrowLeft size={18} />
+                    <span>Retour a la liste des candidatures</span>
+                </button>
+                <div className="section-heading-actions">
+                    <span className="status-pill success" style={{ fontSize: '14px', padding: '6px 14px' }}>
+                        Statut actuel : {details.statut?.libelle ?? 'Reçue'}
+                    </span>
+                </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '20px', alignItems: 'start' }}>
+                {/* COLONNE GAUCHE: Image/Avatar, Nom, Coordonnées & Statut RH */}
+                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                        {photoDoc ? (
+                            <img
+                                alt="Photo candidat"
+                                src={backendPath(`/storage/${photoDoc.chemin_fichier}`)}
+                                style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', margin: '0 auto' }}
+                            />
+                        ) : (
+                            <div
+                                style={{
+                                    width: '100px',
+                                    height: '100px',
+                                    borderRadius: '50%',
+                                    background: 'var(--soft-blue)',
+                                    color: 'var(--primary)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    margin: '0 auto',
+                                }}
+                            >
+                                <User size={48} />
+                            </div>
+                        )}
+                        <h2 style={{ fontSize: '20px', margin: '12px 0 4px 0', color: 'var(--text)' }}>
+                            {details.candidat?.prenom} {details.candidat?.nom}
+                        </h2>
+                        <span className="badge">{details.postule_depuis ?? 'Candidature Web'}</span>
+                    </div>
+
+                    <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', gap: '10px' }}>
+                        <strong>Coordonnées du candidat</strong>
+                        <p style={{ margin: 0 }}><strong>Email:</strong> {details.candidat?.email}</p>
+                        <p style={{ margin: 0 }}><strong>Telephone:</strong> {details.candidat?.telephone ?? '-'}</p>
+                        <p style={{ margin: 0 }}><strong>Ville:</strong> {details.candidat?.ville ?? '-'}</p>
+                        {details.candidat?.linkedin_url ? (
+                            <p style={{ margin: 0 }}>
+                                <strong>LinkedIn:</strong>{' '}
+                                <a href={details.candidat.linkedin_url} rel="noreferrer" target="_blank">
+                                    Voir profil <ExternalLink size={13} />
+                                </a>
+                            </p>
+                        ) : null}
+                    </div>
+
+                    <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
+                        <strong>Mise a jour du statut RH</strong>
+                        <form onSubmit={handleStatusUpdate} style={{ display: 'grid', gap: '10px', marginTop: '8px' }}>
+                            <select
+                                onChange={(e) => setNewStatusId(e.target.value)}
+                                value={newStatusId}
+                            >
+                                {statutsList.map((st) => (
+                                    <option key={st.id_statut_candidature} value={st.id_statut_candidature}>
+                                        {st.libelle}
+                                    </option>
+                                ))}
+                            </select>
+                            <textarea
+                                onChange={(e) => setCommentaire(e.target.value)}
+                                placeholder="Note ou commentaire d'evaluation RH..."
+                                rows={3}
+                                value={commentaire}
+                            />
+                            <button className="filter-button" disabled={updating} style={{ width: '100%' }} type="submit">
+                                <Save size={16} />
+                                <span>{updating ? 'Enregistrement...' : 'Valider le nouveau statut'}</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                {/* COLONNE DROITE: Détails Candidature, Documents & Historique */}
+                <div style={{ display: 'grid', gap: '20px' }}>
+                    <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                        <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Details de la candidature</h3>
+                        <p>
+                            <strong>Intitule :</strong>{' '}
+                            {details.offre ? (
+                                <strong style={{ color: 'var(--primary)' }}>Offre d'emploi : {details.offre.titre_poste}</strong>
+                            ) : (
+                                <span className="badge amber">Candidature Spontanee {details.domaine ? `(${details.domaine.nom_domaine})` : ''}</span>
+                            )}
+                        </p>
+                        {details.direction ? <p><strong>Direction :</strong> {details.direction.nom_direction}</p> : null}
+                        <p><strong>Date de soumission :</strong> {formatDate(details.date_candidature ?? details.created_at)}</p>
+
+                        <div style={{ marginTop: '14px' }}>
+                            <strong style={{ display: 'block', marginBottom: '6px' }}>Message de presentation / motivation :</strong>
+                            <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '14px', lineHeight: '1.5' }}>
+                                {details.message_motivation ?? 'Aucun message specifique fourni.'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                        <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>
+                            Documents & Pieces Jointes ({details.documents?.length ?? 0})
+                        </h3>
+                        <div className="document-grid">
+                            {(details.documents ?? []).map((doc) => (
+                                <div className="document-card" key={doc.id_document} style={{ padding: '14px' }}>
+                                    <div className="document-card-info">
+                                        <strong>{doc.nom_fichier}</strong>
+                                        <span className="badge" style={{ marginTop: '4px' }}>{doc.type_document}</span>
+                                    </div>
+                                    <a
+                                        className="filter-button"
+                                        href={backendPath(`/storage/${doc.chemin_fichier}`)}
+                                        rel="noreferrer"
+                                        style={{ padding: '8px 12px', fontSize: '13px' }}
+                                        target="_blank"
+                                        title="Telecharger / Consulter"
+                                    >
+                                        <Download size={15} />
+                                        <span>Ouvrir</span>
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                        <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Historique du traitement RH</h3>
+                        <div className="history-timeline">
+                            {(details.historique ?? []).map((h) => (
+                                <div className="history-item" key={h.id_historique_statut}>
+                                    <strong style={{ color: 'var(--primary)' }}>{h.statut_nouveau?.libelle ?? 'Statut mis a jour'}</strong>
+                                    <small style={{ color: 'var(--text-muted)' }}>{formatDate(h.created_at)}</small>
+                                    {h.commentaire ? <p style={{ margin: '4px 0 0 0', fontSize: '13px' }}>{h.commentaire}</p> : null}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -829,7 +1385,7 @@ function RowActions({ extra = null, onDelete, onEdit }) {
     );
 }
 
-function DashboardView() {
+function DashboardView({ onSelectOffer }) {
     const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -875,7 +1431,7 @@ function DashboardView() {
                 <div className="section-heading">
                     <div>
                         <h2>Offres recentes</h2>
-                        <p>Suivi rapide des dernieres offres alimentees dans le socle.</p>
+                        <p>Cliquer sur une offre pour ouvrir son formulaire de modification complet.</p>
                     </div>
                     <button className="ghost-button" onClick={loadDashboard} type="button">
                         <RefreshCw aria-hidden="true" size={17} />
@@ -883,7 +1439,7 @@ function DashboardView() {
                     </button>
                 </div>
 
-                <OffersTable compact offers={dashboard.offres_recentes ?? []} />
+                <OffersTable compact offers={dashboard.offres_recentes ?? []} onSelectOffer={onSelectOffer} />
             </section>
         </div>
     );
@@ -901,8 +1457,8 @@ function KpiCard({ icon: Icon, label, tone, value }) {
     );
 }
 
-function OffersView({ canManage, competencesData, referentiels }) {
-    const [viewMode, setViewMode] = useState('list'); // 'list' | 'form'
+function OffersView({ canManage, competencesData, initialEditingOffer = null, onClearEditingOffer = null, onNavigate = null, referentiels }) {
+    const [viewMode, setViewMode] = useState(initialEditingOffer ? 'form' : 'list');
     const [filters, setFilters] = useState({
         q: '',
         direction: '',
@@ -953,6 +1509,15 @@ function OffersView({ canManage, competencesData, referentiels }) {
     useEffect(() => {
         loadOffers();
     }, [loadOffers]);
+
+    useEffect(() => {
+        if (initialEditingOffer) {
+            editOffer(initialEditingOffer);
+            if (onClearEditingOffer) {
+                onClearEditingOffer();
+            }
+        }
+    }, [initialEditingOffer, onClearEditingOffer]);
 
     useEffect(() => {
         if (!offerForm.id && !offerForm.id_statut_offre && defaultStatusId) {
@@ -1190,30 +1755,38 @@ function OffersView({ canManage, competencesData, referentiels }) {
 
     const renderOfferActions = canManage
         ? (offre) => {
-              const status = offre.statut?.libelle;
+              const currentStatusObj = referentiels.statuts_offre?.find((s) => s.id_statut_offre === offre.statut?.id);
+              const currentOrder = currentStatusObj?.ordre_workflow ?? 0;
+              const publieeOrder = referentiels.statuts_offre?.find((s) => s.libelle === 'Publiee' || s.libelle === 'Publiée')?.ordre_workflow ?? 2;
+              const clotureeOrder = referentiels.statuts_offre?.find((s) => s.libelle === 'Cloturee' || s.libelle === 'Clôturée')?.ordre_workflow ?? 3;
+
+              const canPublish = currentOrder < publieeOrder;
+              const canClose = currentOrder < clotureeOrder;
 
               return (
                   <RowActions
                       extra={
                           <>
-                              <button
-                                  className="row-button success"
-                                  disabled={status === 'Publiee'}
-                                  onClick={() => changeOfferStatus(offre, 'publier')}
-                                  title="Publier l'offre"
-                                  type="button"
-                              >
-                                  <CheckCircle2 aria-hidden="true" size={16} />
-                              </button>
-                              <button
-                                  className="row-button"
-                                  disabled={status === 'Cloturee'}
-                                  onClick={() => changeOfferStatus(offre, 'cloturer')}
-                                  title="Cloturer l'offre"
-                                  type="button"
-                              >
-                                  <X aria-hidden="true" size={16} />
-                              </button>
+                              {canPublish ? (
+                                  <button
+                                      className="row-button success"
+                                      onClick={() => changeOfferStatus(offre, 'publier')}
+                                      title="Publier l'offre"
+                                      type="button"
+                                  >
+                                      <CheckCircle2 aria-hidden="true" size={16} />
+                                  </button>
+                              ) : null}
+                              {canClose ? (
+                                  <button
+                                      className="row-button"
+                                      onClick={() => changeOfferStatus(offre, 'cloturer')}
+                                      title="Cloturer l'offre"
+                                      type="button"
+                                  >
+                                      <X aria-hidden="true" size={16} />
+                                  </button>
+                              ) : null}
                           </>
                       }
                       onDelete={() => deleteOffer(offre)}
@@ -1225,7 +1798,6 @@ function OffersView({ canManage, competencesData, referentiels }) {
 
     const meta = offersResponse.meta;
 
-    // View mode 'form': Dedicated Form Page
     if (viewMode === 'form') {
         return (
             <div className="view-stack">
@@ -1252,7 +1824,6 @@ function OffersView({ canManage, competencesData, referentiels }) {
                     </div>
 
                     <form className="compact-form offer-form" onSubmit={saveOffer}>
-                        {/* Information Generale */}
                         <div className="form-sub-header">
                             <BriefcaseBusiness size={18} />
                             <span>Informations Principales</span>
@@ -1310,11 +1881,25 @@ function OffersView({ canManage, competencesData, referentiels }) {
                                 value={offerForm.id_statut_offre}
                             >
                                 <option value="">Brouillon par defaut</option>
-                                {referentiels.statuts_offre?.map((statut) => (
-                                    <option key={statut.id_statut_offre} value={statut.id_statut_offre}>
-                                        {statut.libelle}
-                                    </option>
-                                ))}
+                                {referentiels.statuts_offre?.map((statut) => {
+                                    const currentStatusObj = referentiels.statuts_offre?.find(
+                                        (s) => String(s.id_statut_offre) === String(offerForm.id_statut_offre),
+                                    );
+                                    const currentOrder = currentStatusObj?.ordre_workflow ?? 0;
+                                    const isCurrent = String(statut.id_statut_offre) === String(offerForm.id_statut_offre);
+                                    const isHigherOrder = (statut.ordre_workflow ?? 0) > currentOrder;
+                                    const isDisabled = offerForm.id && !isCurrent && !isHigherOrder;
+
+                                    return (
+                                        <option
+                                            disabled={isDisabled}
+                                            key={statut.id_statut_offre}
+                                            value={statut.id_statut_offre}
+                                        >
+                                            {statut.libelle} {isDisabled ? '(Non autorise - regression)' : ''}
+                                        </option>
+                                    );
+                                })}
                             </select>
                         </label>
 
@@ -1358,7 +1943,6 @@ function OffersView({ canManage, competencesData, referentiels }) {
                             />
                         </label>
 
-                        {/* Profils et Critères Multiples */}
                         <div className="form-sub-header">
                             <UserCheck size={18} />
                             <span>Criteres de profil chiffres / attendus (Multiples)</span>
@@ -1435,7 +2019,6 @@ function OffersView({ canManage, competencesData, referentiels }) {
                             </button>
                         </div>
 
-                        {/* Missions */}
                         <div className="form-sub-header">
                             <ListChecks size={18} />
                             <span>Missions du poste</span>
@@ -1462,7 +2045,6 @@ function OffersView({ canManage, competencesData, referentiels }) {
                             </button>
                         </div>
 
-                        {/* Formations */}
                         <div className="form-sub-header">
                             <GraduationCap size={18} />
                             <span>Formations requises</span>
@@ -1502,7 +2084,6 @@ function OffersView({ canManage, competencesData, referentiels }) {
                             </button>
                         </div>
 
-                        {/* Competences */}
                         <div className="form-sub-header">
                             <Award size={18} />
                             <span>Competences requises</span>
@@ -1565,7 +2146,6 @@ function OffersView({ canManage, competencesData, referentiels }) {
         );
     }
 
-    // View mode 'list': Offer List Page
     return (
         <div className="view-stack">
             <section className="filter-bar" aria-label="Filtres des offres">
@@ -1647,7 +2227,12 @@ function OffersView({ canManage, competencesData, referentiels }) {
                 ) : loading ? (
                     <LoadingState />
                 ) : (
-                    <OffersTable offers={offersResponse.data} renderActions={renderOfferActions} />
+                    <OffersTable
+                        offers={offersResponse.data}
+                        onNavigate={onNavigate}
+                        onSelectOffer={editOffer}
+                        renderActions={renderOfferActions}
+                    />
                 )}
 
                 {meta ? <Pagination meta={meta} onChangePage={changePage} /> : null}
@@ -1656,7 +2241,7 @@ function OffersView({ canManage, competencesData, referentiels }) {
     );
 }
 
-function OffersTable({ compact = false, offers, renderActions = null }) {
+function OffersTable({ compact = false, offers, onNavigate = null, onSelectOffer = null, renderActions = null }) {
     const [expandedRow, setExpandedRow] = useState(null);
 
     if (!offers.length) {
@@ -1668,9 +2253,10 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
     }
 
     function copyCandidateLink(offre) {
-        const publicUrl = backendPath(`/api/public/offres/${offre.id}`);
+        const slug = offre.slug || (offre.titre_poste ? offre.titre_poste.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : offre.id);
+        const publicUrl = `${window.location.origin}/offre/${slug}`;
         navigator.clipboard?.writeText(publicUrl);
-        window.alert(`Lien public de candidature pour "${offre.titre_poste}" :\n\n${publicUrl}\n\n(Lien copie dans le presse-papier)`);
+        window.alert(`Lien public de candidature pour "${offre.titre_poste}" :\n\n${publicUrl}\n\n(Lien copié dans le presse-papier)`);
     }
 
     return (
@@ -1678,14 +2264,14 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
             <table>
                 <thead>
                     <tr>
-                        <th style={{ width: '32px' }}></th>
+                        {!compact ? <th style={{ width: '32px' }}></th> : null}
                         <th>Poste</th>
                         <th>Direction</th>
                         <th>Contrat</th>
                         <th>Publication</th>
                         {!compact ? <th>Limite</th> : null}
                         <th>Statut</th>
-                        {renderActions ? <th>Actions</th> : null}
+                        {renderActions || compact || onNavigate ? <th>Actions</th> : null}
                     </tr>
                 </thead>
                 <tbody>
@@ -1700,17 +2286,25 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
 
                         return (
                             <React.Fragment key={offre.id}>
-                                <tr>
-                                    <td>
-                                        <button
-                                            className="row-button"
-                                            onClick={() => toggleExpand(offre.id)}
-                                            title="Afficher les details"
-                                            type="button"
-                                        >
-                                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                        </button>
-                                    </td>
+                                <tr
+                                    onClick={compact && onSelectOffer ? () => onSelectOffer(offre) : undefined}
+                                    style={compact && onSelectOffer ? { cursor: 'pointer' } : {}}
+                                >
+                                    {!compact ? (
+                                        <td>
+                                            <button
+                                                className="row-button"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleExpand(offre.id);
+                                                }}
+                                                title="Afficher les details"
+                                                type="button"
+                                            >
+                                                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                            </button>
+                                        </td>
+                                    ) : null}
                                     <td>
                                         <strong>{offre.titre_poste}</strong>
                                         <span>{offre.lieu ?? '-'}</span>
@@ -1722,10 +2316,23 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
                                     <td>
                                         <span className="status-pill">{offre.statut?.libelle ?? '-'}</span>
                                     </td>
-                                    {renderActions ? (
+                                    {renderActions || compact || onNavigate ? (
                                         <td>
                                             <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                                                {offre.statut?.libelle === 'Publiee' ? (
+                                                {compact && onSelectOffer ? (
+                                                    <button
+                                                        className="row-button"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onSelectOffer(offre);
+                                                        }}
+                                                        title="Voir / Modifier l'offre"
+                                                        type="button"
+                                                    >
+                                                        <Edit3 size={16} />
+                                                    </button>
+                                                ) : null}
+                                                {(offre.statut?.libelle === 'Publiee' || offre.statut?.libelle === 'Publiée') && !compact ? (
                                                     <button
                                                         className="row-button"
                                                         onClick={() => copyCandidateLink(offre)}
@@ -1735,12 +2342,12 @@ function OffersTable({ compact = false, offers, renderActions = null }) {
                                                         <Share2 size={16} />
                                                     </button>
                                                 ) : null}
-                                                {renderActions(offre)}
+                                                {renderActions && !compact ? renderActions(offre) : null}
                                             </div>
                                         </td>
                                     ) : null}
                                 </tr>
-                                {isExpanded ? (
+                                {!compact && isExpanded ? (
                                     <tr>
                                         <td colSpan={renderActions ? 8 : 7} style={{ padding: 0 }}>
                                             <div className="expanded-details">
