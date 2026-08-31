@@ -22,31 +22,55 @@ class DashboardController extends Controller
             'domaines_en_attente' => 0,
         ];
 
-        if ($this->hasTables('offre')) {
-            $kpis['offres_total'] = DB::table('offre')->count();
-        }
+        try {
+            if ($this->hasTables('offre')) {
+                $kpis['offres_total'] = DB::table('offre')->count();
+            }
+        } catch (\Throwable $e) {}
 
-        if ($this->hasTables('offre', 'statut_offre')) {
-            $kpis['offres_publiees'] = DB::table('offre')
-                ->join('statut_offre', 'statut_offre.id_statut_offre', '=', 'offre.id_statut_offre')
-                ->where('statut_offre.libelle', 'Publiee')
-                ->count();
-        }
+        try {
+            if ($this->hasTables('offre', 'statut_offre')) {
+                $kpis['offres_publiees'] = DB::table('offre')
+                    ->join('statut_offre', 'statut_offre.id_statut_offre', '=', 'offre.id_statut_offre')
+                    ->where('statut_offre.libelle', 'Publiee')
+                    ->count();
+            }
+        } catch (\Throwable $e) {}
 
-        if ($this->hasTables('domaine')) {
-            $kpis['domaines_en_attente'] = DB::table('domaine')
-                ->where('valide', false)
-                ->count();
-        }
+        try {
+            if ($this->hasTables('domaine')) {
+                $kpis['domaines_en_attente'] = DB::table('domaine')
+                    ->where('valide', false)
+                    ->count();
+            }
+        } catch (\Throwable $e) {}
 
-        $offresRecentes = $this->canLoadRecentOffers()
-            ? Offre::query()
-                ->with(['direction', 'statut', 'typeContrat'])
-                ->orderByDesc('date_publication')
-                ->orderBy('titre_poste')
-                ->limit(5)
-                ->get()
-            : collect();
+        try {
+            if ($this->hasTables('candidature')) {
+                $kpis['candidatures_sur_offre'] = DB::table('candidature')
+                    ->whereNotNull('id_offre')
+                    ->where('id_type_demande', '!=', 2)
+                    ->count();
+
+                $kpis['candidatures_spontanees'] = DB::table('candidature')
+                    ->where(function ($q) {
+                        $q->whereNull('id_offre')->orWhere('id_type_demande', 2);
+                    })
+                    ->count();
+            }
+        } catch (\Throwable $e) {}
+
+        $offresRecentes = collect();
+        try {
+            if ($this->canLoadRecentOffers()) {
+                $offresRecentes = Offre::query()
+                    ->with(['direction', 'statut', 'typeContrat'])
+                    ->orderByDesc('date_publication')
+                    ->orderBy('titre_poste')
+                    ->limit(5)
+                    ->get();
+            }
+        } catch (\Throwable $e) {}
 
         return response()->json([
             'data' => [
