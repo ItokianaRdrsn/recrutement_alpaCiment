@@ -372,6 +372,18 @@ class CandidatureController extends Controller
             'photo' => ['nullable', 'file', 'image', 'max:5120'],
         ]);
 
+        if (!empty($validated['id_offre'])) {
+            $offre = Offre::find($validated['id_offre']);
+            if ($offre) {
+                $publieeStatusIds = DB::table('statut_offre')->whereIn('libelle', ['Publiee', 'Publiée'])->pluck('id_statut_offre')->toArray();
+                if (!empty($publieeStatusIds) && !in_array((int) $offre->id_statut_offre, $publieeStatusIds, true)) {
+                    return response()->json([
+                        'message' => 'Une candidature RH ne peut être enregistrée que sur une offre avec le statut Publiée.',
+                    ], 422);
+                }
+            }
+        }
+
         $candidature = DB::transaction(function () use ($request, $validated) {
             $candidat = Candidat::firstOrCreate(
                 ['email' => strtolower(trim($validated['email']))],
@@ -520,7 +532,28 @@ class CandidatureController extends Controller
         $candidature = Candidature::with(['candidat', 'offre.direction', 'domaine.direction', 'typeDemande', 'statut', 'documents', 'historique.statut', 'historique.utilisateur'])
             ->findOrFail($id);
 
+        if (! $candidature->vue) {
+            $candidature->update(['vue' => true]);
+        }
+
         return response()->json(['data' => $candidature]);
+    }
+
+    /**
+     * Marquer une candidature comme vue par le RH
+     */
+    public function marquerVue(int $id): JsonResponse
+    {
+        $candidature = Candidature::findOrFail($id);
+
+        if (! $candidature->vue) {
+            $candidature->update(['vue' => true]);
+        }
+
+        return response()->json([
+            'message' => 'Candidature marquée comme vue.',
+            'data' => $candidature,
+        ]);
     }
 
     /**

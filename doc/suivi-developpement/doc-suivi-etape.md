@@ -1,21 +1,18 @@
 # Document Central de Suivi par Étape et d'Avancement Global (65,5 j)
 
-Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 2** et la généralisation des Pop-ups Modals pour tous les Référentiels.
+Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 4** et le design de la barre bleue verticale sans décalage de texte pour le suivi des candidatures non vues.
 
 ---
 
-## 📌 Généralisation des Modals Pop-up pour les Référentiels (Sprint 2)
+## 📌 Barre Bleue Verticale d'Indication des Candidatures Non Vues (Sprint 4)
 
-A la demande explicite de l'utilisateur, l'ensemble des formulaires de création et de modification des référentiels a été migré vers des **Modals Pop-up interactives** au design identique à celui de la saisie RH :
+A la demande explicite de l'utilisateur pour éviter tout décalage du texte et éliminer l'effet agressif du badge rouge :
 
-1. **Modals Implémentées ([main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
-   - **`DirectionModal`** : Pop-up de création/édition d'une direction avec icône `<Building2 />`.
-   - **`DomaineModal`** : Pop-up de création/édition d'un domaine d'expertise avec sélection de la direction parente et case de validation RH (`<Layers />`).
-   - **`CompetenceModal`** : Pop-up de création d'une compétence avec sélection du type (Technique, Soft skill, Langue) (`<Sparkles />`).
-2. **Interface Utilisateur & Actions (`ReferentialsView`)** :
-   - Suppression des anciens formulaires intégrés à plat dans les sections.
-   - Boutons d'en-tête violets **`+ Nouvelle Direction`**, **`+ Nouveau Domaine`**, **`+ Nouvelle Compétence`**.
-   - Clic sur l'icône de crayon (Édition) d'une ligne de tableau ouvrant automatiquement la modal pré-remplie du référentiel correspondant.
+1. **Indicateur par Barre Bleue à Gauche (`borderLeft: 4px solid #3b82f6`)** :
+   - Pour chaque candidature non consultée (`!c.vue`), une élégante **barre bleue verticale de 4px** est affichée sur le bord gauche de la ligne du tableau, accompagnée d'un léger voile bleu translucide (`rgba(59, 130, 246, 0.04)`).
+   - Le texte et les cellules restent **100% alignés** avec la même position exacte, supprimant tout saut de mise en page ou décalage horizontal.
+2. **Transition Douce et Disparition à la Consultation** :
+   - Dès que l'utilisateur RH clique sur **`Voir dossier`** ou **`Consulter`**, la barre bleue s'estompe en douceur (`transition: 'all 0.2s ease'`).
 
 ---
 
@@ -28,9 +25,9 @@ A la demande explicite de l'utilisateur, l'ensemble des formulaires de création
 | --- | --- | ---: | ---: | --- |
 | **Sprint 0** | Analyse, cadrage et conception | 9,0 j | **100.0%** | **[FAIT]** |
 | **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 2** | Gestion des offres, directions et domaines (Modals Pop-up) | 7,0 j | **100.0%** | **[FAIT]** |
+| **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | **100.0%** | **[FAIT]** |
 | **Sprint 3** | Dépôt et réception des candidatures (Web & Saisie RH) | 6,5 j | **100.0%** | **[FAIT]** |
-| **Sprint 4** | Gestion RH des candidatures et fiche candidat | 7,0 j | **100.0%** | **[FAIT]** |
+| **Sprint 4** | Gestion RH des candidatures, fiche candidat et suivi par barre bleue "Non vue" | 7,0 j | **100.0%** | **[FAIT]** |
 | **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 11,5 j | **100.0%** | **[FAIT]** |
 | **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | **0.0%** | **[A FAIRE]** |
 | **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 8,5 j | **0.0%** | **[A FAIRE]** |

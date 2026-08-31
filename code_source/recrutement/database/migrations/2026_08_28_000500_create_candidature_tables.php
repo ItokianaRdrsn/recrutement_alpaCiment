@@ -35,6 +35,7 @@ return new class extends Migration
                 $table->foreignId('id_domaine')->nullable()->constrained('domaine', 'id_domaine')->restrictOnDelete();
                 $table->foreignId('id_statut_candidature')->constrained('statut_candidature', 'id_statut_candidature')->restrictOnDelete();
                 $table->boolean('dans_vivier')->default(false);
+                $table->boolean('vue')->default(false);
                 $table->string('poste_souhaite', 200)->nullable();
                 $table->text('message')->nullable();
                 $table->string('canal_depot', 20)->default('site_externe');

@@ -64,6 +64,7 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::get('/candidatures', [CandidatureController::class, 'index'])->name('api.candidatures.index');
     Route::post('/candidatures/saisir-rh', [CandidatureController::class, 'saisirRh'])->name('api.candidatures.saisir-rh');
     Route::get('/candidatures/{id}', [CandidatureController::class, 'show'])->name('api.candidatures.show');
+    Route::patch('/candidatures/{id}/marquer-vue', [CandidatureController::class, 'marquerVue'])->name('api.candidatures.marquer-vue');
     Route::patch('/candidatures/{id}/statut', [CandidatureController::class, 'updateStatut'])->name('api.candidatures.update-statut');
     Route::post('/candidatures/{id}/extract-ocr', [\App\Http\Controllers\Api\VivierController::class, 'extractOcr'])->name('api.candidatures.extract-ocr');
     Route::post('/candidatures/{id}/validate-ocr', [\App\Http\Controllers\Api\VivierController::class, 'validateOcrData'])->name('api.candidatures.validate-ocr');

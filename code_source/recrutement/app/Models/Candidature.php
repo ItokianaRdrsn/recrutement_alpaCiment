@@ -21,6 +21,7 @@ class Candidature extends Model
         'id_domaine',
         'id_statut_candidature',
         'dans_vivier',
+        'vue',
         'poste_souhaite',
         'message',
         'canal_depot',
@@ -31,6 +32,7 @@ class Candidature extends Model
 
     protected $casts = [
         'dans_vivier' => 'boolean',
+        'vue' => 'boolean',
     ];
 
     public function candidat(): BelongsTo

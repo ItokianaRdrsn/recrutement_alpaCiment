@@ -663,14 +663,14 @@ function SaisirRhCandidatureModal({ initialOffreId = '', onClose, onSuccess, ref
                     </label>
 
                     <label style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Rattachement à une Offre de recrutement</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600' }}>Rattachement à une Offre de recrutement (Publiée uniquement)</span>
                         <select
                             onChange={(e) => setForm((c) => ({ ...c, id_offre: e.target.value }))}
                             style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)' }}
                             value={form.id_offre}
                         >
                             <option value="">Candidature Spontanée (Aucune offre spécifique)</option>
-                            {offresList.map((off) => (
+                            {offresList.filter((off) => off.statut?.libelle === 'Publiee' || off.statut?.libelle === 'Publiée').map((off) => (
                                 <option key={off.id ?? off.id_offre} value={off.id ?? off.id_offre}>
                                     Offre: {off.titre_poste} ({off.direction?.nom ?? off.direction?.nom_direction ?? 'Générale'})
                                 </option>
@@ -780,6 +780,18 @@ function CandidaturesView({ referentiels }) {
         date_debut: '',
         date_fin: '',
     });
+
+    const handleOpenDossier = useCallback(async (id) => {
+        setSelectedCandidatureId(id);
+        setCandidatures((prev) =>
+            prev.map((item) => (item.id_candidature === id ? { ...item, vue: true } : item))
+        );
+        try {
+            await sendJson(`/api/candidatures/${id}/marquer-vue`, { method: 'PATCH' });
+        } catch (err) {
+            // silent
+        }
+    }, []);
 
     const resetFilters = () => {
         setFilters({
@@ -1077,7 +1089,15 @@ function CandidaturesView({ referentiels }) {
                                 </thead>
                                 <tbody>
                                     {candidatures.map((c) => (
-                                        <tr key={c.id_candidature}>
+                                        <tr
+                                            key={c.id_candidature}
+                                            style={{
+                                                borderLeft: !c.vue ? '4px solid #3b82f6' : '4px solid transparent',
+                                                background: !c.vue ? 'rgba(59, 130, 246, 0.04)' : 'transparent',
+                                                transition: 'all 0.2s ease',
+                                            }}
+                                            title={!c.vue ? 'Candidature non encore consultée' : undefined}
+                                        >
                                             <td>
                                                 <strong>{c.candidat?.prenom} {c.candidat?.nom}</strong>
                                                 <br />
@@ -1118,7 +1138,7 @@ function CandidaturesView({ referentiels }) {
                                             <td>
                                                 <button
                                                     className="filter-button"
-                                                    onClick={() => setSelectedCandidatureId(c.id_candidature)}
+                                                    onClick={() => handleOpenDossier(c.id_candidature)}
                                                     style={{ padding: '6px 12px', fontSize: '13px' }}
                                                     type="button"
                                                 >
@@ -1212,7 +1232,15 @@ function CandidaturesView({ referentiels }) {
                                                     </thead>
                                                     <tbody>
                                                         {items.map((item) => (
-                                                            <tr key={item.id_candidature}>
+                                                            <tr
+                                                                key={item.id_candidature}
+                                                                style={{
+                                                                    borderLeft: !item.vue ? '4px solid #3b82f6' : '4px solid transparent',
+                                                                    background: !item.vue ? 'rgba(59, 130, 246, 0.04)' : 'transparent',
+                                                                    transition: 'all 0.2s ease',
+                                                                }}
+                                                                title={!item.vue ? 'Candidature non encore consultée' : undefined}
+                                                            >
                                                                 <td><strong>{item.candidat?.prenom} {item.candidat?.nom}</strong></td>
                                                                 <td>{item.candidat?.email} ({item.candidat?.telephone ?? '-'})</td>
                                                                 <td>{formatDate(item.created_at)}</td>
@@ -1268,7 +1296,15 @@ function CandidaturesView({ referentiels }) {
                                                     </thead>
                                                     <tbody>
                                                         {items.map((item) => (
-                                                            <tr key={item.id_candidature}>
+                                                            <tr
+                                                                key={item.id_candidature}
+                                                                style={{
+                                                                    borderLeft: !item.vue ? '4px solid #3b82f6' : '4px solid transparent',
+                                                                    background: !item.vue ? 'rgba(59, 130, 246, 0.04)' : 'transparent',
+                                                                    transition: 'all 0.2s ease',
+                                                                }}
+                                                                title={!item.vue ? 'Candidature non encore consultée' : undefined}
+                                                            >
                                                                 <td><strong>{item.candidat?.prenom} {item.candidat?.nom}</strong></td>
                                                                 <td>{item.candidat?.email} ({item.candidat?.telephone ?? '-'})</td>
                                                                 <td>{formatDate(item.created_at)}</td>
@@ -1276,7 +1312,7 @@ function CandidaturesView({ referentiels }) {
                                                                 <td>
                                                                     <button
                                                                         className="filter-button"
-                                                                        onClick={() => setSelectedCandidatureId(item.id_candidature)}
+                                                                        onClick={() => handleOpenDossier(item.id_candidature)}
                                                                         style={{ padding: '4px 10px', fontSize: '12px' }}
                                                                         type="button"
                                                                     >
@@ -3965,12 +4001,13 @@ function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = 
                         <th>Publication</th>
                         {!compact ? <th>Limite</th> : null}
                         <th>Statut</th>
-                        {renderActions || compact || onNavigate ? <th>Actions</th> : null}
+                        {renderActions || compact || onNavigate ? <th style={{ whiteSpace: 'nowrap', width: '1%' }}>Actions</th> : null}
                     </tr>
                 </thead>
                 <tbody>
                     {offers.map((offre) => {
                         const isExpanded = expandedRow === offre.id;
+                        const isPublished = offre.statut?.libelle === 'Publiee' || offre.statut?.libelle === 'Publiée';
 
                         const profilsList = offre.profils?.length
                             ? offre.profils
@@ -4011,8 +4048,8 @@ function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = 
                                         <span className="status-pill">{offre.statut?.libelle ?? '-'}</span>
                                     </td>
                                     {renderActions || compact || onNavigate ? (
-                                        <td>
-                                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                        <td style={{ whiteSpace: 'nowrap', width: '1%' }}>
+                                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
                                                 {compact && onSelectOffer ? (
                                                     <button
                                                         className="row-button"
@@ -4026,11 +4063,15 @@ function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = 
                                                         <Edit3 size={16} />
                                                     </button>
                                                 ) : null}
-                                                {(offre.statut?.libelle === 'Publiee' || offre.statut?.libelle === 'Publiée') && !compact ? (
+                                                {!compact ? (
                                                     <button
                                                         className="row-button"
-                                                        onClick={() => copyCandidateLink(offre)}
-                                                        title="Copier le lien de candidature"
+                                                        disabled={!isPublished}
+                                                        onClick={() => {
+                                                            if (isPublished) copyCandidateLink(offre);
+                                                        }}
+                                                        style={!isPublished ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
+                                                        title={isPublished ? "Copier le lien de candidature" : "Lien indisponible (Offre non publiée)"}
                                                         type="button"
                                                     >
                                                         <Share2 size={16} />
@@ -4038,25 +4079,28 @@ function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = 
                                                 ) : null}
                                                 {!compact ? (
                                                     <button
+                                                        disabled={!isPublished}
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            if (onSaisirRh) onSaisirRh(offre.id);
+                                                            if (isPublished && onSaisirRh) onSaisirRh(offre.id);
                                                         }}
                                                         style={{
-                                                            background: '#ede9fe',
-                                                            color: '#6d28d9',
-                                                            border: '1px solid #ddd6fe',
+                                                            background: isPublished ? '#ede9fe' : '#f1f5f9',
+                                                            color: isPublished ? '#6d28d9' : '#94a3b8',
+                                                            border: isPublished ? '1px solid #ddd6fe' : '1px solid #e2e8f0',
                                                             borderRadius: '6px',
-                                                            padding: '6px 10px',
+                                                            padding: '4px 8px',
                                                             fontWeight: '600',
                                                             fontSize: '12px',
                                                             display: 'inline-flex',
                                                             alignItems: 'center',
-                                                            gap: '5px',
-                                                            cursor: 'pointer',
-                                                            boxShadow: '0 1px 2px rgba(109, 40, 217, 0.08)',
+                                                            gap: '4px',
+                                                            cursor: isPublished ? 'pointer' : 'not-allowed',
+                                                            whiteSpace: 'nowrap',
+                                                            boxShadow: isPublished ? '0 1px 2px rgba(109, 40, 217, 0.08)' : 'none',
+                                                            opacity: isPublished ? 1 : 0.65,
                                                         }}
-                                                        title="Saisir manuellement une candidature RH pour cette offre"
+                                                        title={isPublished ? "Saisir manuellement une candidature RH pour cette offre" : "Saisie RH impossible (Offre non publiée)"}
                                                         type="button"
                                                     >
                                                         <UserPlus size={14} />

@@ -11,6 +11,8 @@ class Domaine extends Model
 
     protected $primaryKey = 'id_domaine';
 
+    public $timestamps = false;
+
     /**
      * @var list<string>
      */

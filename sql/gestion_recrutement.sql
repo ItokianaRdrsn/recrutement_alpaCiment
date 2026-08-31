@@ -267,6 +267,7 @@ CREATE TABLE candidature (
     id_domaine BIGINT REFERENCES domaine(id_domaine) ON DELETE RESTRICT,
     id_statut_candidature BIGINT NOT NULL REFERENCES statut_candidature(id_statut_candidature) ON DELETE RESTRICT,
     dans_vivier BOOLEAN NOT NULL DEFAULT FALSE,
+    vue BOOLEAN NOT NULL DEFAULT FALSE,
     poste_souhaite VARCHAR(200),
     message TEXT,
     -- D'ou vient ce depot : import du site externe, ou saisie manuelle par un RH
