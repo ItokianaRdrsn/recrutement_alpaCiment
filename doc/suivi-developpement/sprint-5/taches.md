@@ -1,9 +1,9 @@
 # Sprint 5 - Tâches & Suivi (Vivier, compétences et validation CV - 11,5 j)
 
 ## 📊 Progression du Sprint
-- **Statut :** **[FAIT]**
+- **Statut :** **[EN COURS]**
 - **Progression :** **100.0% terminé** (11.5 / 11.5 j)
-- **Barre de progression :** `[████████████████████] 100%`
+- **Barre de progression :** `[████████             ] 20%`
 
 ---
 
@@ -22,7 +22,7 @@
 
 ---
 
-#### **[FAIT]** Recherche dans le vivier par compétence, domaine et direction (1,0 j) - **100%**
+#### **[À FAIRE]** Recherche dans le vivier par compétence, domaine et direction (1,0 j) - **100%**
 - **Notes :** Filtres multi-critères combinés (mot-clé `q`, Direction, Domaine, Statut).
 
 ---
@@ -32,29 +32,29 @@
 
 ---
 
-#### **[FAIT]** Gestion manuelle des compétences, expériences et formations candidat (1,5 j) - **100%**
+#### **[À FAIRE]** Gestion manuelle des compétences, expériences et formations candidat (1,5 j) - **100%**
 - **Notes :** Drawe/Modal Profil Candidat RH permettant d'ajouter et consulter les compétences avec leur niveau (Débutant, Intermédiaire, Avancé, Expert), expériences pro et diplômes.
 
 ---
 
-#### **[FAIT]** Intégration FastAPI et extraction OCR avec PaddleOCR (2,0 j) - **100%**
+#### **[À FAIRE]** Intégration FastAPI et extraction OCR avec PaddleOCR (2,0 j) - **100%**
 - **Notes :** Service d'extraction `/api/candidatures/{id}/extract-ocr` simulant l'analyse PaddleOCR / FastAPI pour récupérer le texte brut et le JSON structuré.
 
 ---
 
-#### **[FAIT]** Extraction des compétences, expériences et formations depuis le CV (2,0 j) - **100%**
+#### **[À FAIRE]** Extraction des compétences, expériences et formations depuis le CV (2,0 j) - **100%**
 - **Notes :** Parsing automatique des compétences, parcours professionnel et formations diplômantes depuis le fichier CV téléversé.
 
 ---
 
-#### **[FAIT]** Validation, correction et rejet des données extraites (2,0 j) - **100%**
+#### **[À FAIRE]** Validation, correction et rejet des données extraites (2,0 j) - **100%**
 - **Notes :** Workflow de validation RH (`/api/candidatures/{id}/validate-ocr`) avec boutons `Valider & Importer au profil`, `Corriger` et `Rejeter`.
 
 ---
 
-#### **[FAIT]** Tests et debug (1,0 j) - **100%**
+#### **[À FAIRE]** Tests et debug (1,0 j) - **100%**
 - **Notes :** 15/15 tests PHPUnit backend exécutés avec succès et compilation Vite 0 erreur.
 
 ---
 
-## Total Sprint 5 : 11,5 j (100.0% Terminé)
+## Total Sprint 5 : 11,5 j (20.0% Terminé)

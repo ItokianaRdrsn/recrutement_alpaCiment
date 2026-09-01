@@ -80,12 +80,12 @@ class DatabaseSeeder extends Seeder
         }
 
         foreach ([
-            ['Recue', 1],
-            ['Preselectionnee', 2],
-            ['Test', 3],
-            ['Entretien', 4],
-            ['Retenue', 5],
-            ['Non retenue', 6],
+            ['Recue', 10],
+            ['Preselectionnee', 20],
+            ['Test', 30],
+            ['Entretien', 40],
+            ['Retenue', 50],
+            ['Non retenue', 50],
         ] as [$libelle, $ordre]) {
             DB::table('statut_candidature')->updateOrInsert([
                 'libelle' => $libelle,

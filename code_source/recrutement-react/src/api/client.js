@@ -7,13 +7,14 @@ export function backendPath(path) {
 }
 
 export function redirectToLogin() {
-    if (redirectingToLogin || window.location.pathname === '/login') {
+    const loginUrl = backendPath('/login');
+
+    if (redirectingToLogin || window.location.href === loginUrl) {
         return;
     }
 
     redirectingToLogin = true;
-    window.history.pushState({}, '', '/login');
-    window.dispatchEvent(new PopStateEvent('popstate'));
+    window.location.href = loginUrl;
 }
 
 export async function getPublicJson(url) {

@@ -1,8 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+    BookmarkCheck,
     BriefcaseBusiness,
+    Check,
+    CheckCircle2,
     Filter,
     GraduationCap,
+    Layers,
     Plus,
     RefreshCw,
     RotateCcw,
@@ -22,10 +26,15 @@ export function VivierView({ competencesData, referentiels }) {
     const [error, setError] = useState('');
     const [selectedCandidat, setSelectedCandidat] = useState(null);
     const [profileData, setProfileData] = useState(null);
+
+    // Modal state for searching & adding candidature to Vivier
     const [showAddModal, setShowAddModal] = useState(false);
-    const [addForm, setAddForm] = useState({ id_candidat: '', id_direction: '', id_domaine: '', motif_ajout: '' });
+    const [candSearchQuery, setCandSearchQuery] = useState('');
+    const [candSearchResults, setCandSearchResults] = useState([]);
+    const [searchingCands, setSearchingCands] = useState(false);
+    const [addingCandId, setAddingCandId] = useState(null);
+
     const [filters, setFilters] = useState({ q: '', direction: '', domaine: '', statut: '' });
-    const [allCandidats, setAllCandidats] = useState([]);
 
     const [newComp, setNewComp] = useState({ id_competence: '', niveau: 'Intermédiaire' });
     const [newExp, setNewExp] = useState({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
@@ -41,15 +50,8 @@ export function VivierView({ competencesData, referentiels }) {
             if (filters.domaine) params.set('domaine', filters.domaine);
             if (filters.statut) params.set('statut', filters.statut);
 
-            const [vivRes, candRes] = await Promise.all([
-                getJson(`/api/vivier?${params.toString()}`),
-                getJson('/api/candidatures?per_page=100'),
-            ]);
-
+            const vivRes = await getJson(`/api/vivier?${params.toString()}`);
             setVivierList(vivRes?.data ?? []);
-            const candidatsExtracted = (candRes?.data ?? []).map((c) => c.candidat).filter(Boolean);
-            const uniqueCandidats = Array.from(new Map(candidatsExtracted.map((item) => [item.id_candidat, item])).values());
-            setAllCandidats(uniqueCandidats);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -61,6 +63,27 @@ export function VivierView({ competencesData, referentiels }) {
         loadVivier();
     }, [loadVivier]);
 
+    // Live search candidatures for Add Modal
+    const searchCandidaturesModal = useCallback(async (query = '') => {
+        setSearchingCands(true);
+        try {
+            const params = new URLSearchParams({ per_page: '30' });
+            if (query.trim()) params.set('q', query.trim());
+            const res = await getJson(`/api/candidatures?${params.toString()}`);
+            setCandSearchResults(res?.data ?? []);
+        } catch (err) {
+            console.error('Erreur recherche candidatures modal:', err);
+        } finally {
+            setSearchingCands(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (showAddModal) {
+            searchCandidaturesModal(candSearchQuery);
+        }
+    }, [showAddModal, candSearchQuery, searchCandidaturesModal]);
+
     const loadCandidateProfile = useCallback(async (idCandidat) => {
         try {
             const res = await getJson(`/api/vivier/candidat/${idCandidat}/profile`);
@@ -70,30 +93,33 @@ export function VivierView({ competencesData, referentiels }) {
         }
     }, []);
 
-    async function handleAddToVivier(e) {
-        e.preventDefault();
-        if (!addForm.id_candidat) return;
+    async function handleAddCandidatureToVivier(idCandidature) {
+        setAddingCandId(idCandidature);
         try {
-            await sendJson('/api/vivier', {
-                body: {
-                    id_candidat: Number(addForm.id_candidat),
-                    id_direction: addForm.id_direction ? Number(addForm.id_direction) : null,
-                    id_domaine: addForm.id_domaine ? Number(addForm.id_domaine) : null,
-                    motif_ajout: addForm.motif_ajout.trim() || 'Ajouté au vivier RH',
-                },
+            await sendJson(`/api/candidatures/${idCandidature}/vivier`, {
+                method: 'PATCH',
+                body: { dans_vivier: true },
             });
-            setShowAddModal(false);
-            setAddForm({ id_candidat: '', id_direction: '', id_domaine: '', motif_ajout: '' });
             await loadVivier();
+            await searchCandidaturesModal(candSearchQuery);
         } catch (err) {
             setError(err.message);
+        } finally {
+            setAddingCandId(null);
         }
     }
 
-    async function handleRemoveFromVivier(idVivier) {
-        if (!window.confirm('Retirer ce candidat du vivier ?')) return;
+    async function handleRemoveFromVivier(item) {
+        if (!window.confirm('Retirer cette candidature/candidat du vivier ?')) return;
         try {
-            await sendJson(`/api/vivier/${idVivier}`, { method: 'DELETE' });
+            if (item.id_candidature) {
+                await sendJson(`/api/candidatures/${item.id_candidature}/vivier`, {
+                    method: 'PATCH',
+                    body: { dans_vivier: false },
+                });
+            } else if (item.id_vivier_candidat && !String(item.id_vivier_candidat).startsWith('cand_')) {
+                await sendJson(`/api/vivier/${item.id_vivier_candidat}`, { method: 'DELETE' });
+            }
             await loadVivier();
         } catch (err) {
             setError(err.message);
@@ -162,7 +188,7 @@ export function VivierView({ competencesData, referentiels }) {
 
     return (
         <div className="view-stack">
-            {/* Header & Button */}
+            {/* BARRE DE FILTRES ET BOUTON AJOUTER AU VIVIER STYLISÉ */}
             <section className="filter-bar" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end', flex: 1 }}>
                     <label className="search-field" style={{ flex: '1 1 240px', minWidth: '200px' }}>
@@ -217,17 +243,37 @@ export function VivierView({ competencesData, referentiels }) {
                     </div>
                 </div>
 
-                <button className="primary-button" onClick={() => setShowAddModal(true)} type="button">
-                    <Plus size={17} />
-                    <span>Ajouter au vivier</span>
+                {/* BOUTON AJOUTER AU VIVIER HAUTEMENT STYLISÉ (VIBRANT GRADIENT & OMBERE GLOUIANTE) */}
+                <button
+                    className="primary-button"
+                    onClick={() => setShowAddModal(true)}
+                    style={{
+                        padding: '12px 20px',
+                        borderRadius: '10px',
+                        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                        color: '#ffffff',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        boxShadow: '0 6px 18px rgba(99, 102, 241, 0.35)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        transition: 'transform 0.15s ease, boxShadow 0.15s ease',
+                    }}
+                    type="button"
+                >
+                    <Plus size={18} />
+                    <span>Ajouter au vivier RH</span>
                 </button>
             </section>
 
             <section className="data-section">
                 <div className="section-heading">
                     <div>
-                        <h2>Vivier de Talents RH & Compétences</h2>
-                        <p>Gestion des candidats qualifiés conservés en vivier pour de futurs recrutements.</p>
+                        <h2>Vivier de Talents RH & Candidatures Sélectionnées</h2>
+                        <p>Gestion des candidatures qualifiées conservées en vivier pour de futurs recrutements.</p>
                     </div>
                     <button className="ghost-button" onClick={loadVivier} type="button">
                         <RefreshCw size={17} />
@@ -240,23 +286,23 @@ export function VivierView({ competencesData, referentiels }) {
                 ) : error ? (
                     <ErrorState message={error} onRetry={loadVivier} />
                 ) : !vivierList.length ? (
-                    <div className="empty-state">Aucun candidat dans le vivier avec les filtres actuels.</div>
+                    <div className="empty-state">Aucune candidature dans le vivier avec les filtres actuels.</div>
                 ) : (
                     <div className="table-wrap">
                         <table>
                             <thead>
                                 <tr>
                                     <th>Candidat</th>
-                                    <th>Direction & Domaine Target</th>
-                                    <th>Motif d'ajout</th>
+                                    <th>Candidature / Direction & Domaine</th>
+                                    <th>Motif / Contexte d'ajout</th>
                                     <th>Date d'ajout</th>
-                                    <th>Statut</th>
+                                    <th>Statut Vivier</th>
                                     <th>Actions RH</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {vivierList.map((item) => (
-                                    <tr key={item.id_vivier_candidat}>
+                                    <tr key={item.id_vivier_candidat ?? `cand_${item.id_candidature}`}>
                                         <td>
                                             <strong>{item.candidat?.prenom} {item.candidat?.nom}</strong>
                                             <br />
@@ -272,21 +318,23 @@ export function VivierView({ competencesData, referentiels }) {
                                         <td><span className="status-pill success">{item.statut ?? 'Actif'}</span></td>
                                         <td>
                                             <div style={{ display: 'flex', gap: '6px' }}>
-                                                <button
-                                                    className="filter-button"
-                                                    onClick={() => {
-                                                        setSelectedCandidat(item.candidat);
-                                                        loadCandidateProfile(item.candidat.id_candidat);
-                                                    }}
-                                                    style={{ padding: '6px 12px', fontSize: '13px' }}
-                                                    type="button"
-                                                >
-                                                    <User size={15} />
-                                                    <span>Profil & Compétences</span>
-                                                </button>
+                                                {item.candidat?.id_candidat ? (
+                                                    <button
+                                                        className="filter-button"
+                                                        onClick={() => {
+                                                            setSelectedCandidat(item.candidat);
+                                                            loadCandidateProfile(item.candidat.id_candidat);
+                                                        }}
+                                                        style={{ padding: '6px 12px', fontSize: '13px' }}
+                                                        type="button"
+                                                    >
+                                                        <User size={15} />
+                                                        <span>Profil & Compétences</span>
+                                                    </button>
+                                                ) : null}
                                                 <button
                                                     className="row-button danger"
-                                                    onClick={() => handleRemoveFromVivier(item.id_vivier_candidat)}
+                                                    onClick={() => handleRemoveFromVivier(item)}
                                                     title="Retirer du vivier"
                                                     type="button"
                                                 >
@@ -302,67 +350,155 @@ export function VivierView({ competencesData, referentiels }) {
                 )}
             </section>
 
-            {/* MODAL AJOUT CANDIDAT VIVIER */}
+            {/* POPUP MODAL : RECHERCHE ET SELECTION DE CANDIDATURE A METTRE EN VIVIER */}
             {showAddModal && (
                 <div className="modal-backdrop" onClick={() => setShowAddModal(false)}>
-                    <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '100%' }}>
+                    <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '680px', width: '100%', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
                         <div className="modal-header">
-                            <h3>Ajouter un candidat au vivier</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5' }}>
+                                    <Layers size={20} />
+                                </div>
+                                <div>
+                                    <h3 style={{ margin: 0, fontSize: '18px' }}>Ajouter une candidature au vivier RH</h3>
+                                    <p style={{ margin: 0, fontSize: '12.5px', color: '#64748b' }}>
+                                        Recherchez une candidature par nom, e-mail ou intitulé de poste pour l'ajouter au vivier.
+                                    </p>
+                                </div>
+                            </div>
                             <button className="ghost-button" onClick={() => setShowAddModal(false)} type="button">
                                 <X size={18} />
                             </button>
                         </div>
-                        <form onSubmit={handleAddToVivier} style={{ display: 'grid', gap: '12px', marginTop: '14px' }}>
-                            <label>
-                                <span>Candidat *</span>
-                                <select
-                                    onChange={(e) => setAddForm((curr) => ({ ...curr, id_candidat: e.target.value }))}
-                                    required
-                                    value={addForm.id_candidat}
-                                >
-                                    <option value="">Sélectionner un candidat</option>
-                                    {allCandidats.map((c) => (
-                                        <option key={c.id_candidat} value={c.id_candidat}>
-                                            {c.prenom} {c.nom} ({c.email})
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
 
-                            <label>
-                                <span>Direction suggérée</span>
-                                <select
-                                    onChange={(e) => setAddForm((curr) => ({ ...curr, id_direction: e.target.value }))}
-                                    value={addForm.id_direction}
-                                >
-                                    <option value="">Toutes directions</option>
-                                    {referentiels.directions?.map((d) => (
-                                        <option key={d.id_direction} value={d.id_direction}>
-                                            {d.nom_direction}
-                                        </option>
-                                    ))}
-                                </select>
-                            </label>
-
-                            <label>
-                                <span>Motif d'ajout RH</span>
+                        {/* RECHERCHE DE CANDIDATURE DANS LE POPUP */}
+                        <div style={{ padding: '16px 20px 8px 20px' }}>
+                            <div className="search-field" style={{ width: '100%' }}>
+                                <Search size={18} />
                                 <input
-                                    onChange={(e) => setAddForm((curr) => ({ ...curr, motif_ajout: e.target.value }))}
-                                    placeholder="Ex: Excellent profil technique, à recontacter..."
-                                    type="text"
-                                    value={addForm.motif_ajout}
+                                    autoFocus
+                                    onChange={(e) => setCandSearchQuery(e.target.value)}
+                                    placeholder="Rechercher une candidature (nom, email, offre, poste)..."
+                                    type="search"
+                                    value={candSearchQuery}
                                 />
-                            </label>
-
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '10px' }}>
-                                <button className="ghost-button" onClick={() => setShowAddModal(false)} type="button">
-                                    Annuler
-                                </button>
-                                <button className="primary-button" type="submit">
-                                    Enregistrer dans le vivier
-                                </button>
                             </div>
-                        </form>
+                        </div>
+
+                        {/* LISTE DES CANDIDATURES TROUVÉES */}
+                        <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 20px 20px' }}>
+                            {searchingCands ? (
+                                <LoadingState />
+                            ) : !candSearchResults.length ? (
+                                <div className="empty-state" style={{ padding: '30px 20px' }}>
+                                    Aucune candidature trouvée avec ce critère de recherche.
+                                </div>
+                            ) : (
+                                <div style={{ display: 'grid', gap: '10px', marginTop: '8px' }}>
+                                    {candSearchResults.map((cand) => {
+                                        const isInVivier = cand.dans_vivier === true || cand.dans_vivier === 1;
+                                        const isRetenue = cand.statut?.libelle?.toLowerCase() === 'retenue' || cand.statut?.libelle?.toLowerCase() === 'retenu';
+                                        const isAdding = addingCandId === cand.id_candidature;
+
+                                        return (
+                                            <div
+                                                key={cand.id_candidature}
+                                                style={{
+                                                    background: isInVivier || isRetenue ? '#f8fafc' : '#ffffff',
+                                                    border: isInVivier || isRetenue ? '1px solid #cbd5e1' : '1px solid #e2e8f0',
+                                                    borderRadius: '10px',
+                                                    padding: '14px 16px',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                    gap: '14px',
+                                                    boxShadow: isInVivier || isRetenue ? 'none' : '0 2px 6px rgba(0,0,0,0.03)',
+                                                }}
+                                            >
+                                                <div>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                                        <strong style={{ fontSize: '14.5px', color: '#0f172a' }}>
+                                                            {cand.candidat?.prenom} {cand.candidat?.nom}
+                                                        </strong>
+                                                        <span className="badge" style={{ fontSize: '11px' }}>
+                                                            {cand.statut?.libelle ?? 'Reçue'}
+                                                        </span>
+                                                    </div>
+                                                    <p style={{ margin: 0, fontSize: '13px', color: '#475569' }}>
+                                                        <strong>{cand.offre ? `Offre : ${cand.offre.titre_poste}` : `Poste : ${cand.poste_souhaite ?? 'Spontanée'}`}</strong>
+                                                    </p>
+                                                    <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
+                                                        {cand.candidat?.email} • Déposée le {formatDate(cand.created_at)}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    {isInVivier ? (
+                                                        <span
+                                                            style={{
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px',
+                                                                fontSize: '12.5px',
+                                                                fontWeight: '600',
+                                                                color: '#059669',
+                                                                background: '#ecfdf5',
+                                                                padding: '6px 12px',
+                                                                borderRadius: '8px',
+                                                                border: '1px solid #a7f3d0',
+                                                            }}
+                                                        >
+                                                            <CheckCircle2 size={15} />
+                                                            <span>Déjà en vivier</span>
+                                                        </span>
+                                                    ) : isRetenue ? (
+                                                        <span
+                                                            style={{
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px',
+                                                                fontSize: '12px',
+                                                                fontWeight: '500',
+                                                                color: '#94a3b8',
+                                                                background: '#f1f5f9',
+                                                                padding: '6px 10px',
+                                                                borderRadius: '8px',
+                                                                border: '1px solid #e2e8f0',
+                                                            }}
+                                                            title="Règle de gestion : une candidature retenue ne peut pas être mise en vivier"
+                                                        >
+                                                            <span>Non éligible (Retenue)</span>
+                                                        </span>
+                                                    ) : (
+                                                        <button
+                                                            className="primary-button"
+                                                            disabled={isAdding}
+                                                            onClick={() => handleAddCandidatureToVivier(cand.id_candidature)}
+                                                            style={{
+                                                                fontSize: '13px',
+                                                                padding: '8px 14px',
+                                                                background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                                                                border: 'none',
+                                                            }}
+                                                            type="button"
+                                                        >
+                                                            <Plus size={15} />
+                                                            <span>{isAdding ? 'Ajout...' : 'Ajouter au vivier'}</span>
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="modal-footer" style={{ padding: '14px 20px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
+                            <button className="ghost-button" onClick={() => setShowAddModal(false)} type="button">
+                                Fermer
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

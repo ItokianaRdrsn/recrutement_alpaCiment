@@ -2,12 +2,11 @@ import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import './styles.css';
-import { backendPath, getJson, getPublicJson, sendPublicFormData } from './api/client';
+import { backendPath, getJson, getPublicJson, redirectToLogin, sendPublicFormData } from './api/client';
 import { ErrorState, LoadingState } from './components/common/FeedbackStates';
 import { AppShell } from './components/layout/AppShell';
 
 // Code-splitting lazy loading for all heavy page modules
-const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const DashboardView = lazy(() => import('./pages/DashboardView').then((m) => ({ default: m.DashboardView })));
 const OffersView = lazy(() => import('./pages/OffersView').then((m) => ({ default: m.OffersView })));
 const CandidaturesView = lazy(() => import('./pages/CandidaturesView').then((m) => ({ default: m.CandidaturesView })));
@@ -21,7 +20,10 @@ const PublicOffresPage = lazy(() => import('./frontOffice/PublicOffresPage'));
 function BackOfficeLayout({ bootstrapError, bootstrapLoading, children, user }) {
     if (bootstrapError) return <ErrorState message={bootstrapError} />;
     if (bootstrapLoading) return <LoadingState />;
-    if (!user) return <Navigate replace to="/login" />;
+    if (!user) {
+        redirectToLogin();
+        return <LoadingState />;
+    }
 
     return <AppShell user={user}>{children}</AppShell>;
 }
@@ -56,6 +58,9 @@ function MainApp() {
     const loadBaseData = useCallback(async () => {
         if (isPublicCandidatePath || isLoginPage) {
             setBootstrapLoading(false);
+            if (isLoginPage) {
+                redirectToLogin();
+            }
             return;
         }
         try {
@@ -88,19 +93,20 @@ function MainApp() {
             loadBaseData();
         } else {
             setBootstrapLoading(false);
+            if (isLoginPage) {
+                redirectToLogin();
+            }
         }
     }, [loadBaseData, isPublicCandidatePath, isLoginPage]);
-
-    const handleLoginSuccess = useCallback((userData) => {
-        setUser(userData);
-        loadedRef.current = false;
-        navigate('/dashboard');
-        loadBaseData();
-    }, [navigate, loadBaseData]);
 
     function handleSelectOfferFromDashboard(offre) {
         setEditingOffer(offre);
         navigate('/offres');
+    }
+
+    if (isLoginPage) {
+        redirectToLogin();
+        return <LoadingState />;
     }
 
     return (
@@ -134,9 +140,6 @@ function MainApp() {
                     path="/offre/:slug"
                 />
 
-                {/* AUTH ROUTE */}
-                <Route element={<LoginPage onLoginSuccess={handleLoginSuccess} />} path="/login" />
-
                 {/* PROTECTED BACK-OFFICE ROUTES */}
                 <Route
                     element={
@@ -162,12 +165,24 @@ function MainApp() {
                     path="/offres"
                 />
                 <Route
+                    element={<Navigate replace to="/candidatures/offres" />}
+                    path="/candidatures"
+                />
+                <Route
                     element={
                         <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
-                            <CandidaturesView referentiels={referentiels} />
+                            <CandidaturesView mode="offres" referentiels={referentiels} />
                         </BackOfficeLayout>
                     }
-                    path="/candidatures"
+                    path="/candidatures/offres"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <CandidaturesView mode="spontanees" referentiels={referentiels} />
+                        </BackOfficeLayout>
+                    }
+                    path="/candidatures/spontanees"
                 />
                 <Route
                     element={

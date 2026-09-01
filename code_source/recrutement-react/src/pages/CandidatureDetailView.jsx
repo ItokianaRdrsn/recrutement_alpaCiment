@@ -1,12 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
     ArrowLeft,
+    BookmarkCheck,
     CalendarDays,
+    Check,
     CheckCircle2,
     Cpu,
     Download,
     Edit3,
     FileText,
+    Layers,
+    Lock,
     Printer,
     Save,
     Send,
@@ -22,13 +26,15 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const [details, setDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [activeTab, setActiveTab] = useState('informations'); // 'informations', 'documents', 'statut', 'historique_statuts', 'communications'
-    const [newStatusId, setNewStatusId] = useState('');
+    const [activeTab, setActiveTab] = useState('informations'); // 'informations', 'documents', 'historique_statuts', 'communications'
+    const [targetStatusId, setTargetStatusId] = useState(null);
     const [commentaire, setCommentaire] = useState('');
-    const [updating, setUpdating] = useState(false);
+    const [updatingStatus, setUpdatingStatus] = useState(false);
+    const [updatingVivier, setUpdatingVivier] = useState(false);
     const [ocrExtracting, setOcrExtracting] = useState(false);
     const [ocrData, setOcrData] = useState(null);
     const [ocrSuccessMsg, setOcrSuccessMsg] = useState('');
+    const [statusSuccessMsg, setStatusSuccessMsg] = useState('');
 
     const loadDetails = useCallback(async () => {
         setLoading(true);
@@ -36,9 +42,10 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
         try {
             const res = await getJson(`/api/candidatures/${idCandidature}`);
-            setDetails(res?.data ?? null);
-            if (res?.data?.statut?.id_statut_candidature) {
-                setNewStatusId(String(res.data.statut.id_statut_candidature));
+            const data = res?.data ?? null;
+            setDetails(data);
+            if (data?.statut?.id_statut_candidature) {
+                setTargetStatusId(data.statut.id_statut_candidature);
             }
         } catch (err) {
             setError(err.message);
@@ -82,26 +89,47 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         }
     }
 
-    async function handleStatusUpdate(e) {
+    async function handleStatusSubmit(e) {
         e.preventDefault();
-        if (!newStatusId) return;
+        if (!targetStatusId || targetStatusId === details?.id_statut_candidature) return;
 
-        setUpdating(true);
+        setUpdatingStatus(true);
+        setStatusSuccessMsg('');
+        setError('');
+
         try {
             await sendJson(`/api/candidatures/${idCandidature}/statut`, {
                 method: 'PATCH',
                 body: {
-                    id_statut_candidature: Number(newStatusId),
+                    id_statut_candidature: Number(targetStatusId),
                     commentaire: commentaire.trim() || null,
                 },
             });
             setCommentaire('');
+            setStatusSuccessMsg('Statut de la candidature mis à jour avec succès !');
             await loadDetails();
             if (onRefreshList) onRefreshList();
         } catch (err) {
             setError(err.message);
         } finally {
-            setUpdating(false);
+            setUpdatingStatus(false);
+        }
+    }
+
+    async function handleToggleVivier(targetVivierState) {
+        setUpdatingVivier(true);
+        setError('');
+        try {
+            await sendJson(`/api/candidatures/${idCandidature}/vivier`, {
+                method: 'PATCH',
+                body: { dans_vivier: targetVivierState },
+            });
+            await loadDetails();
+            if (onRefreshList) onRefreshList();
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setUpdatingVivier(false);
         }
     }
 
@@ -117,13 +145,17 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         return <div className="empty-state">Dossier introuvable.</div>;
     }
 
+    const currentStatus = details.statut;
+    const currentWorkflowOrder = Number(currentStatus?.ordre_workflow ?? 10);
+    const sortedStatuts = [...statutsList].sort((a, b) => Number(a.ordre_workflow) - Number(b.ordre_workflow));
+
     const photoDoc = (details.documents ?? []).find(
         (d) => d.type_document === 'Photo' || (d.mime_type && d.mime_type.startsWith('image/'))
     );
 
     return (
         <div className="view-stack">
-            {/* EN-TÊTE FICHE CANDIDAT & BOUTON IMPRESSIONS / RETOUR */}
+            {/* EN-TÊTE FICHE CANDIDATURE */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <button className="ghost-button" onClick={onBack} type="button">
                     <ArrowLeft size={18} />
@@ -135,12 +167,12 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                         <span>Exporter en PDF / Imprimer</span>
                     </button>
                     <span className="status-pill success" style={{ fontSize: '14px', padding: '6px 14px' }}>
-                        Statut actuel : {details.statut?.libelle ?? 'Reçue'}
+                        Statut actuel : {currentStatus?.libelle ?? 'Reçue'} ({currentWorkflowOrder})
                     </span>
                 </div>
             </div>
 
-            {/* DEUXIÈME BARRE DE NAVIGATION PAR SECTIONS FICHE CANDIDAT (Informations, Documents, Statut, Historique statuts, Communications) */}
+            {/* SECTIONS TABS */}
             <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid var(--border)', paddingBottom: '8px', marginBottom: '16px', background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
                 <button
                     className={`ghost-button ${activeTab === 'informations' ? 'primary' : ''}`}
@@ -153,7 +185,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     type="button"
                 >
                     <User size={16} />
-                    <span>Informations</span>
+                    <span>Informations & Workflow</span>
                 </button>
 
                 <button
@@ -199,23 +231,23 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                 </button>
             </div>
 
-            {/* CONTENU PRINCIPAL DE LA SECTION SÉLECTIONNÉE */}
+            {/* TAB INFORMATIONS */}
             {activeTab === 'informations' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '20px', alignItems: 'start' }}>
-                    {/* CARTE CANDIDAT GAUCHE */}
+                <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: '20px', alignItems: 'start' }}>
+                    {/* CARTE CANDIDAT & WORKFLOW SIDEBAR GAUCHE */}
                     <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                             {photoDoc ? (
                                 <img
                                     alt="Photo candidat"
                                     src={backendPath(`/storage/${photoDoc.chemin_fichier}`)}
-                                    style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', margin: '0 auto' }}
+                                    style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', margin: '0 auto' }}
                                 />
                             ) : (
                                 <div
                                     style={{
-                                        width: '100px',
-                                        height: '100px',
+                                        width: '90px',
+                                        height: '90px',
                                         borderRadius: '50%',
                                         background: 'var(--soft-blue)',
                                         color: 'var(--primary)',
@@ -225,10 +257,10 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                         margin: '0 auto',
                                     }}
                                 >
-                                    <User size={48} />
+                                    <User size={44} />
                                 </div>
                             )}
-                            <h2 style={{ fontSize: '20px', margin: '12px 0 4px 0', color: 'var(--text)' }}>
+                            <h2 style={{ fontSize: '19px', margin: '12px 0 4px 0', color: 'var(--text)' }}>
                                 {details.candidat?.prenom} {details.candidat?.nom}
                             </h2>
                             <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '6px' }}>
@@ -241,39 +273,189 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             </div>
                         </div>
 
-                        <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', gap: '10px' }}>
+                        <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '14px', gap: '8px' }}>
                             <strong>Coordonnées du candidat</strong>
-                            <p style={{ margin: 0 }}><strong>Email:</strong> {details.candidat?.email}</p>
-                            <p style={{ margin: 0 }}><strong>Téléphone:</strong> {details.candidat?.telephone ?? '-'}</p>
+                            <p style={{ margin: 0, fontSize: '13.5px' }}><strong>Email:</strong> {details.candidat?.email}</p>
+                            <p style={{ margin: 0, fontSize: '13.5px' }}><strong>Téléphone:</strong> {details.candidat?.telephone ?? '-'}</p>
                         </div>
 
-                        {/* FORMULAIRE DE MISE À JOUR DU STATUT RH INCLUS DANS INFORMATIONS */}
-                        <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
-                            <strong style={{ color: 'var(--primary)' }}>Mise à jour du statut RH</strong>
-                            <form onSubmit={handleStatusUpdate} style={{ display: 'grid', gap: '10px', marginTop: '8px' }}>
-                                <select
-                                    onChange={(e) => setNewStatusId(e.target.value)}
-                                    style={{ padding: '8px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
-                                    value={newStatusId}
-                                >
-                                    {statutsList.map((s) => (
-                                        <option key={s.id_statut_candidature} value={s.id_statut_candidature}>
-                                            {s.libelle}
-                                        </option>
-                                    ))}
-                                </select>
-                                <textarea
-                                    onChange={(e) => setCommentaire(e.target.value)}
-                                    placeholder="Commentaire de changement de statut (optionnel)..."
-                                    rows={2}
-                                    style={{ padding: '8px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
-                                    value={commentaire}
-                                />
-                                <button className="filter-button" disabled={updating} style={{ width: '100%', padding: '10px', fontSize: '13px' }} type="submit">
-                                    <Save size={15} />
-                                    <span>{updating ? 'Enregistrement...' : 'Valider le statut'}</span>
-                                </button>
+                        {/* SECTION 1: WORKFLOW RH DES STATUTS (STEPPER EN LIGNE HORS MENU DÉROULANT) */}
+                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
+                            <strong style={{ color: 'var(--primary)', fontSize: '14px', display: 'block', marginBottom: '8px' }}>
+                                Progression du Statut RH
+                            </strong>
+                            
+                            {details.dans_vivier ? (
+                                <div style={{ background: '#fef3c7', border: '1px solid #fde047', color: '#92400e', padding: '8px 10px', borderRadius: '8px', fontSize: '12px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <Lock size={14} />
+                                    <span>Règle de gestion : statut verrouillé car la candidature est en vivier RH. Retirez-la du vivier pour modifier son statut.</span>
+                                </div>
+                            ) : (
+                                <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: '#64748b' }}>
+                                    Règle de gestion : impossible de revenir à un statut d'ordre workflow inférieur ou égal ({currentWorkflowOrder}).
+                                </p>
+                            )}
+
+                            <form onSubmit={handleStatusSubmit} style={{ display: 'grid', gap: '12px' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {sortedStatuts.map((s) => {
+                                        const isCurrent = Number(s.id_statut_candidature) === Number(details.id_statut_candidature);
+                                        const isSelected = Number(s.id_statut_candidature) === Number(targetStatusId);
+                                        const isDisabled = details.dans_vivier || Number(s.ordre_workflow) <= currentWorkflowOrder;
+
+                                        let bg = '#ffffff';
+                                        let border = '1px solid #cbd5e1';
+                                        let textColor = '#334155';
+
+                                        if (isCurrent) {
+                                            bg = '#dbeafe';
+                                            border = '2px solid #2563eb';
+                                            textColor = '#1e40af';
+                                        } else if (isSelected) {
+                                            bg = '#e0e7ff';
+                                            border = '2px solid #4f46e5';
+                                            textColor = '#3730a3';
+                                        } else if (isDisabled) {
+                                            bg = '#f1f5f9';
+                                            border = '1px solid #e2e8f0';
+                                            textColor = '#94a3b8';
+                                        }
+
+                                        return (
+                                            <button
+                                                disabled={isDisabled}
+                                                key={s.id_statut_candidature}
+                                                onClick={() => setTargetStatusId(s.id_statut_candidature)}
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                    padding: '10px 12px',
+                                                    borderRadius: '8px',
+                                                    background: bg,
+                                                    border: border,
+                                                    color: textColor,
+                                                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                                    opacity: isDisabled && !isCurrent ? 0.7 : 1,
+                                                    transition: 'all 0.15s ease',
+                                                    fontSize: '13px',
+                                                    fontWeight: isCurrent || isSelected ? '700' : '500',
+                                                    textAlign: 'left',
+                                                }}
+                                                title={details.dans_vivier ? "Statut verrouillé car la candidature est en vivier" : isDisabled ? `Ordre workflow (${s.ordre_workflow}) <= Actuel (${currentWorkflowOrder}). Règle de non-retour appliquée.` : `Passer au statut ${s.libelle}`}
+                                                type="button"
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <span
+                                                        style={{
+                                                            width: '24px',
+                                                            height: '24px',
+                                                            borderRadius: '50%',
+                                                            background: isCurrent ? '#2563eb' : isSelected ? '#4f46e5' : isDisabled ? '#cbd5e1' : '#f1f5f9',
+                                                            color: isCurrent || isSelected ? '#ffffff' : '#475569',
+                                                            fontSize: '11px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center',
+                                                            fontWeight: 'bold',
+                                                        }}
+                                                    >
+                                                        {s.ordre_workflow}
+                                                    </span>
+                                                    <span>{s.libelle}</span>
+                                                </div>
+
+                                                {isCurrent ? (
+                                                    <span className="badge blue" style={{ fontSize: '11px' }}>Actuel</span>
+                                                ) : isDisabled ? (
+                                                    <Lock size={14} style={{ color: '#94a3b8' }} />
+                                                ) : isSelected ? (
+                                                    <Check size={16} style={{ color: '#4f46e5' }} />
+                                                ) : null}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                {!details.dans_vivier && targetStatusId && Number(targetStatusId) !== Number(details.id_statut_candidature) ? (
+                                    <div style={{ marginTop: '4px', display: 'grid', gap: '8px' }}>
+                                        <textarea
+                                            onChange={(e) => setCommentaire(e.target.value)}
+                                            placeholder="Commentaire sur ce changement de statut (optionnel)..."
+                                            rows={2}
+                                            style={{ padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                            value={commentaire}
+                                        />
+                                        <button className="primary-button" disabled={updatingStatus} style={{ width: '100%', padding: '10px', fontSize: '13px', justifyContent: 'center' }} type="submit">
+                                            <Save size={15} />
+                                            <span>{updatingStatus ? 'Enregistrement...' : 'Valider la transition'}</span>
+                                        </button>
+                                    </div>
+                                ) : null}
+
+                                {statusSuccessMsg ? (
+                                    <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: '#166534', fontWeight: '500' }}>
+                                        {statusSuccessMsg}
+                                    </p>
+                                ) : null}
                             </form>
+                        </div>
+
+                        {/* SECTION 2: BOUTON & GESTION EN VIVIER DE LA CANDIDATURE */}
+                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
+                            <strong style={{ color: '#334155', fontSize: '13.5px', display: 'block', marginBottom: '8px' }}>
+                                Conservation en Vivier RH
+                            </strong>
+
+                            {details.dans_vivier ? (
+                                <div
+                                    style={{
+                                        background: '#ecfdf5',
+                                        border: '1px solid #a7f3d0',
+                                        borderRadius: '10px',
+                                        padding: '12px',
+                                        display: 'grid',
+                                        gap: '8px',
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#065f46', fontSize: '13px', fontWeight: '600' }}>
+                                        <BookmarkCheck size={18} />
+                                        <span>Cette candidature est en vivier RH</span>
+                                    </div>
+                                    <button
+                                        className="ghost-button danger"
+                                        disabled={updatingVivier}
+                                        onClick={() => handleToggleVivier(false)}
+                                        style={{ fontSize: '12px', padding: '6px 10px', width: '100%', justifyContent: 'center' }}
+                                        type="button"
+                                    >
+                                        <span>{updatingVivier ? 'Mise à jour...' : 'Retirer cette candidature du vivier'}</span>
+                                    </button>
+                                </div>
+                            ) : (currentStatus?.libelle?.toLowerCase() === 'retenue' || currentStatus?.libelle?.toLowerCase() === 'retenu') ? (
+                                <div style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '10px 12px', borderRadius: '8px', fontSize: '12.5px', color: '#475569', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <Lock size={15} style={{ color: '#94a3b8' }} />
+                                    <span>Règle de gestion : une candidature retenue ne peut pas être mise en vivier.</span>
+                                </div>
+                            ) : (
+                                <button
+                                    className="primary-button"
+                                    disabled={updatingVivier}
+                                    onClick={() => handleToggleVivier(true)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '11px',
+                                        fontSize: '13.5px',
+                                        justifyContent: 'center',
+                                        background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+                                        boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                                    }}
+                                    type="button"
+                                >
+                                    <Layers size={17} />
+                                    <span>{updatingVivier ? 'Enregistrement...' : 'Mettre cette candidature en vivier'}</span>
+                                </button>
+                            )}
                         </div>
                     </div>
 
@@ -287,6 +469,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                     <span className="badge amber">Candidature Spontanée</span>
                                 ) : (
                                     <span className="badge blue">Candidature sur offre</span>
+                                )}
+                            </p>
+                            <p style={{ margin: '6px 0' }}>
+                                <strong>Statut Vivier :</strong>{' '}
+                                {details.dans_vivier ? (
+                                    <span className="badge green">En Vivier RH</span>
+                                ) : (
+                                    <span className="badge gray">Hors Vivier</span>
                                 )}
                             </p>
                             <p style={{ margin: '6px 0' }}>
@@ -314,7 +504,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             <div style={{ marginTop: '16px' }}>
                                 <strong style={{ display: 'block', marginBottom: '6px' }}>Message de présentation / Lettre de motivation :</strong>
                                 <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '14px', lineHeight: '1.6' }}>
-                                    {details.message_motivation ?? 'Aucun message spécifique fourni.'}
+                                    {details.message_motivation ?? details.message ?? 'Aucun message spécifique fourni.'}
                                 </div>
                             </div>
                         </div>
@@ -429,7 +619,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                 </div>
             )}
 
-            {/* SECTION DOCUMENTS */}
+            {/* TAB DOCUMENTS */}
             {activeTab === 'documents' && (
                 <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                     <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>
@@ -466,7 +656,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                 </div>
             )}
 
-            {/* SECTION HISTORIQUE STATUTS */}
+            {/* TAB HISTORIQUE STATUTS */}
             {activeTab === 'historique_statuts' && (
                 <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                     <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Historique Chronologique des Statuts RH</h3>
@@ -492,7 +682,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                 </div>
             )}
 
-            {/* SECTION COMMUNICATIONS */}
+            {/* TAB COMMUNICATIONS */}
             {activeTab === 'communications' && (
                 <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                     <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Historique des Communications avec le Candidat</h3>

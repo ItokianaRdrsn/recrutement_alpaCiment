@@ -567,11 +567,27 @@ class CandidatureController extends Controller
         ]);
 
         $candidature = Candidature::findOrFail($id);
+
+        if ($candidature->dans_vivier) {
+            return response()->json([
+                'message' => 'Impossible de modifier le statut d\'une candidature enregistrée dans le vivier RH. Retirez-la du vivier pour changer son statut.',
+            ], 422);
+        }
+
         $oldStatusId = $candidature->id_statut_candidature;
         $newStatusId = (int) $validated['id_statut_candidature'];
 
         if ($oldStatusId === $newStatusId) {
             return response()->json(['message' => 'La candidature est déjà dans ce statut.'], 422);
+        }
+
+        $currentStatut = StatutCandidature::find($oldStatusId);
+        $newStatut = StatutCandidature::find($newStatusId);
+
+        if ($currentStatut && $newStatut && (int) $newStatut->ordre_workflow <= (int) $currentStatut->ordre_workflow) {
+            return response()->json([
+                'message' => 'Impossible de basculer vers un statut ayant un ordre de workflow inférieur ou égal à l\'actuel.',
+            ], 422);
         }
 
         DB::transaction(function () use ($candidature, $oldStatusId, $newStatusId, $validated) {
@@ -610,7 +626,17 @@ class CandidatureController extends Controller
             'dans_vivier' => ['required', 'boolean'],
         ]);
 
-        $candidature = Candidature::findOrFail($id);
+        $candidature = Candidature::with('statut')->findOrFail($id);
+
+        if ($validated['dans_vivier']) {
+            $statusLibelle = strtolower(trim($candidature->statut?->libelle ?? ''));
+            if ($statusLibelle === 'retenue' || $statusLibelle === 'retenu') {
+                return response()->json([
+                    'message' => 'Une candidature ayant le statut "Retenue" ne peut pas être placée dans le vivier RH.',
+                ], 422);
+            }
+        }
+
         $candidature->update(['dans_vivier' => $validated['dans_vivier']]);
 
         return response()->json([

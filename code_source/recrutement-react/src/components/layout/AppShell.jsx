@@ -9,6 +9,7 @@ import {
     Layers,
     LayoutDashboard,
     LogOut,
+    Sparkles,
     UserCheck,
 } from 'lucide-react';
 import { submitLogout } from '../../api/client';
@@ -36,14 +37,6 @@ export function AppShell({ children, user }) {
         }
     }, [activeView]);
 
-    const navItems = [
-        { id: 'dashboard', label: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
-        { id: 'offres', label: 'Offres', href: '/offres', icon: BriefcaseBusiness },
-        { id: 'candidatures', label: 'Candidatures', href: '/candidatures', icon: UserCheck },
-        { id: 'vivier', label: 'Vivier & OCR', href: '/vivier', icon: Layers },
-        { id: 'referentiels', label: 'Référentiels', href: '/referentiels', icon: Building2, hasSub: true },
-    ];
-
     const referentielSubLinks = [
         { id: 'all', label: 'Tous les referentiels', href: '/referentiels' },
         { id: 'directions', label: 'Directions', href: '/referentiels/directions' },
@@ -63,71 +56,110 @@ export function AppShell({ children, user }) {
                 </div>
 
                 <nav className="main-nav" aria-label="Navigation principale">
-                    {navItems.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = activeView === item.id;
+                    {/* TABLEAU DE BORD */}
+                    <a
+                        aria-current={activePath === '/dashboard' ? 'page' : undefined}
+                        className={activePath === '/dashboard' ? 'nav-link active' : 'nav-link'}
+                        href="/dashboard"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/dashboard');
+                        }}
+                    >
+                        <LayoutDashboard aria-hidden="true" size={18} />
+                        <span>Tableau de bord</span>
+                    </a>
 
-                        if (item.hasSub) {
-                            return (
-                                <React.Fragment key={item.id}>
-                                    <div
-                                        className={isActive ? 'nav-link active' : 'nav-link'}
-                                        onClick={() => {
-                                            if (!isActive) {
-                                                navigate(item.href);
-                                            }
-                                            setReferentielsOpen((curr) => !curr);
+                    {/* OFFRES */}
+                    <a
+                        aria-current={activePath.startsWith('/offres') && !activePath.startsWith('/candidatures') ? 'page' : undefined}
+                        className={activePath.startsWith('/offres') && !activePath.startsWith('/candidatures') ? 'nav-link active' : 'nav-link'}
+                        href="/offres"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/offres');
+                        }}
+                    >
+                        <BriefcaseBusiness aria-hidden="true" size={18} />
+                        <span>Offres d'emploi</span>
+                    </a>
+
+                    {/* CANDIDATURES SUR OFFRE */}
+                    <a
+                        aria-current={activePath === '/candidatures/offres' ? 'page' : undefined}
+                        className={activePath === '/candidatures/offres' ? 'nav-link active' : 'nav-link'}
+                        href="/candidatures/offres"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/candidatures/offres');
+                        }}
+                    >
+                        <UserCheck aria-hidden="true" size={18} />
+                        <span>Candidatures sur offre</span>
+                    </a>
+
+                    {/* CANDIDATURES SPONTANÉES */}
+                    <a
+                        aria-current={activePath === '/candidatures/spontanees' ? 'page' : undefined}
+                        className={activePath === '/candidatures/spontanees' ? 'nav-link active' : 'nav-link'}
+                        href="/candidatures/spontanees"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/candidatures/spontanees');
+                        }}
+                    >
+                        <Sparkles aria-hidden="true" size={18} />
+                        <span>Candidatures spontanées</span>
+                    </a>
+
+                    {/* VIVIER & OCR */}
+                    <a
+                        aria-current={activePath === '/vivier' ? 'page' : undefined}
+                        className={activePath === '/vivier' ? 'nav-link active' : 'nav-link'}
+                        href="/vivier"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/vivier');
+                        }}
+                    >
+                        <Layers aria-hidden="true" size={18} />
+                        <span>Vivier & OCR</span>
+                    </a>
+
+                    {/* RÉFÉRENTIELS (CLIC SUR LE HEADER AFFICHE / MASQUE UNIQUEMENT LE MENU DÉROULANT SANS REDIRECTION AUTOMATIQUE) */}
+                    <div
+                        className={activeView === 'referentiels' ? 'nav-link active' : 'nav-link'}
+                        onClick={() => setReferentielsOpen((curr) => !curr)}
+                        style={{ cursor: 'pointer', justifyContent: 'space-between' }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <Building2 aria-hidden="true" size={18} />
+                            <span>Référentiels</span>
+                        </div>
+                        {referentielsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </div>
+
+                    {referentielsOpen ? (
+                        <div className="sidebar-sub-menu">
+                            {referentielSubLinks.map((sub) => {
+                                const isSubActive = activePath === sub.href;
+
+                                return (
+                                    <a
+                                        className={isSubActive ? 'sub-nav-link active' : 'sub-nav-link'}
+                                        href={sub.href}
+                                        key={sub.id}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            navigate(sub.href);
                                         }}
-                                        style={{ cursor: 'pointer', justifyContent: 'space-between' }}
                                     >
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <Icon aria-hidden="true" size={18} />
-                                            <span>{item.label}</span>
-                                        </div>
-                                        {referentielsOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                                    </div>
-
-                                    {referentielsOpen ? (
-                                        <div className="sidebar-sub-menu">
-                                            {referentielSubLinks.map((sub) => {
-                                                const isSubActive = activePath === sub.href;
-
-                                                return (
-                                                    <a
-                                                        className={isSubActive ? 'sub-nav-link active' : 'sub-nav-link'}
-                                                        href={sub.href}
-                                                        key={sub.id}
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            navigate(sub.href);
-                                                        }}
-                                                    >
-                                                        <span>• {sub.label}</span>
-                                                    </a>
-                                                );
-                                            })}
-                                        </div>
-                                    ) : null}
-                                </React.Fragment>
-                            );
-                        }
-
-                        return (
-                            <a
-                                aria-current={isActive ? 'page' : undefined}
-                                className={isActive ? 'nav-link active' : 'nav-link'}
-                                href={item.href}
-                                key={item.id}
-                                onClick={(event) => {
-                                    event.preventDefault();
-                                    navigate(item.href);
-                                }}
-                            >
-                                <Icon aria-hidden="true" size={18} />
-                                <span>{item.label}</span>
-                            </a>
-                        );
-                    })}
+                                        <span>• {sub.label}</span>
+                                    </a>
+                                );
+                            })}
+                        </div>
+                    ) : null}
                 </nav>
 
                 <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #243746' }}>
@@ -148,10 +180,12 @@ export function AppShell({ children, user }) {
                     <div>
                         <p className="eyebrow">Back-office RH</p>
                         <h1>
-                            {activeView === 'offres'
+                            {activePath === '/candidatures/offres'
+                                ? 'Candidatures sur offre'
+                                : activePath === '/candidatures/spontanees'
+                                ? 'Candidatures spontanées'
+                                : activeView === 'offres'
                                 ? "Offres d'emploi"
-                                : activeView === 'candidatures'
-                                ? 'Candidatures'
                                 : activeView === 'vivier'
                                 ? 'Vivier & OCR'
                                 : activeView === 'referentiels'
