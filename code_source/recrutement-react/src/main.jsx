@@ -1,11 +1,13 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import './styles.css';
 import { backendPath, getJson, getPublicJson, sendPublicFormData } from './api/client';
 import { ErrorState, LoadingState } from './components/common/FeedbackStates';
 import { AppShell } from './components/layout/AppShell';
 
 // Code-splitting lazy loading for all heavy page modules
+const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 const DashboardView = lazy(() => import('./pages/DashboardView').then((m) => ({ default: m.DashboardView })));
 const OffersView = lazy(() => import('./pages/OffersView').then((m) => ({ default: m.OffersView })));
 const CandidaturesView = lazy(() => import('./pages/CandidaturesView').then((m) => ({ default: m.CandidaturesView })));
@@ -16,8 +18,19 @@ const CandidatureSpontaneePage = lazy(() => import('./frontOffice/CandidatureSpo
 const PostulerOffrePage = lazy(() => import('./frontOffice/PostulerOffrePage'));
 const PublicOffresPage = lazy(() => import('./frontOffice/PublicOffresPage'));
 
-function App() {
-    const [path, setPath] = useState(window.location.pathname);
+function BackOfficeLayout({ bootstrapError, bootstrapLoading, children, user }) {
+    if (bootstrapError) return <ErrorState message={bootstrapError} />;
+    if (bootstrapLoading) return <LoadingState />;
+    if (!user) return <Navigate replace to="/login" />;
+
+    return <AppShell user={user}>{children}</AppShell>;
+}
+
+function MainApp() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const path = location.pathname;
+
     const [user, setUser] = useState(null);
     const [editingOffer, setEditingOffer] = useState(null);
     const [referentiels, setReferentiels] = useState({
@@ -31,26 +44,17 @@ function App() {
 
     const loadedRef = useRef(false);
 
-    const isPublicPath =
+    const isPublicCandidatePath =
         path.startsWith('/candidat/offres') ||
         path.startsWith('/candidature-spontanee') ||
         Boolean(path.match(/\/offres\/(\d+)\/postuler/)) ||
         Boolean(path.match(/\/offre\/([^\/]+)/));
 
-    useEffect(() => {
-        const handlePopState = () => setPath(window.location.pathname);
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, []);
+    const isLoginPage = path === '/login' || path === '/logout';
 
-    const navigate = useCallback((target) => {
-        window.history.pushState({}, '', target);
-        setPath(target);
-    }, []);
-
-    // Back-Office Load Base Data (Guarded against duplicate calls)
+    // Back-Office Load Base Data
     const loadBaseData = useCallback(async () => {
-        if (isPublicPath) {
+        if (isPublicCandidatePath || isLoginPage) {
             setBootstrapLoading(false);
             return;
         }
@@ -75,70 +79,24 @@ function App() {
         } finally {
             setBootstrapLoading(false);
         }
-    }, [isPublicPath]);
+    }, [isPublicCandidatePath, isLoginPage]);
 
     useEffect(() => {
-        if (loadedRef.current) return;
-        loadedRef.current = true;
-        if (!isPublicPath) {
+        if (loadedRef.current && !isLoginPage) return;
+        if (!isPublicCandidatePath && !isLoginPage) {
+            loadedRef.current = true;
             loadBaseData();
         } else {
             setBootstrapLoading(false);
         }
-    }, [loadBaseData, isPublicPath]);
+    }, [loadBaseData, isPublicCandidatePath, isLoginPage]);
 
-    // Front-Office Routing (Public Candidates)
-    if (path.startsWith('/candidat/offres')) {
-        return (
-            <Suspense fallback={<LoadingState />}>
-                <PublicOffresPage getJson={getPublicJson} onNavigate={navigate} />
-            </Suspense>
-        );
-    }
-
-    if (path.startsWith('/candidature-spontanee')) {
-        return (
-            <Suspense fallback={<LoadingState />}>
-                <CandidatureSpontaneePage getJson={getPublicJson} onNavigate={navigate} sendFormData={sendPublicFormData} />
-            </Suspense>
-        );
-    }
-
-    const offreSlugMatch = path.match(/\/offre\/([^\/]+)/);
-    const postulerMatch = path.match(/\/offres\/(\d+)\/postuler/);
-    const targetSlugOrId = offreSlugMatch ? offreSlugMatch[1] : (postulerMatch ? postulerMatch[1] : null);
-
-    if (targetSlugOrId) {
-        return (
-            <Suspense fallback={<LoadingState />}>
-                <PostulerOffrePage
-                    backendPath={backendPath}
-                    getJson={getPublicJson}
-                    idOffre={targetSlugOrId}
-                    onNavigate={navigate}
-                    sendFormData={sendPublicFormData}
-                />
-            </Suspense>
-        );
-    }
-
-    const activeView = path.startsWith('/offres')
-        ? 'offres'
-        : path.startsWith('/candidatures')
-        ? 'candidatures'
-        : path.startsWith('/vivier')
-        ? 'vivier'
-        : path.startsWith('/referentiels')
-        ? 'referentiels'
-        : 'dashboard';
-
-    const referentielSubTab = path === '/referentiels/directions'
-        ? 'directions'
-        : path === '/referentiels/domaines'
-        ? 'domaines'
-        : path === '/referentiels/competences'
-        ? 'competences'
-        : 'all';
+    const handleLoginSuccess = useCallback((userData) => {
+        setUser(userData);
+        loadedRef.current = false;
+        navigate('/dashboard');
+        loadBaseData();
+    }, [navigate, loadBaseData]);
 
     function handleSelectOfferFromDashboard(offre) {
         setEditingOffer(offre);
@@ -146,39 +104,145 @@ function App() {
     }
 
     return (
-        <AppShell activePath={path} activeView={activeView} onNavigate={navigate} user={user}>
-            {bootstrapError ? (
-                <ErrorState message={bootstrapError} />
-            ) : bootstrapLoading ? (
-                <LoadingState />
-            ) : (
-                <Suspense fallback={<LoadingState />}>
-                    {activeView === 'offres' ? (
-                        <OffersView
-                            canManage={user?.permissions?.includes('manage_offres') ?? false}
-                            competencesData={competencesData}
-                            initialEditingOffer={editingOffer}
-                            onClearEditingOffer={() => setEditingOffer(null)}
+        <Suspense fallback={<LoadingState />}>
+            <Routes>
+                {/* PUBLIC FRONT-OFFICE ROUTES */}
+                <Route element={<PublicOffresPage getJson={getPublicJson} onNavigate={navigate} />} path="/candidat/offres" />
+                <Route element={<CandidatureSpontaneePage getJson={getPublicJson} onNavigate={navigate} sendFormData={sendPublicFormData} />} path="/candidature-spontanee" />
+                <Route
+                    element={
+                        <PostulerOffrePage
+                            backendPath={backendPath}
+                            getJson={getPublicJson}
+                            idOffre={path.match(/\/offres\/(\d+)\/postuler/)?.[1]}
                             onNavigate={navigate}
-                            referentiels={referentiels}
+                            sendFormData={sendPublicFormData}
                         />
-                    ) : activeView === 'candidatures' ? (
-                        <CandidaturesView referentiels={referentiels} />
-                    ) : activeView === 'vivier' ? (
-                        <VivierView competencesData={competencesData} referentiels={referentiels} />
-                    ) : activeView === 'referentiels' ? (
-                        <ReferentialsView
-                            canManage={user?.permissions?.includes('manage_referentiels') ?? false}
-                            competencesData={competencesData}
-                            initialSubTab={referentielSubTab}
-                            onRefreshBase={loadBaseData}
+                    }
+                    path="/offres/:id/postuler"
+                />
+                <Route
+                    element={
+                        <PostulerOffrePage
+                            backendPath={backendPath}
+                            getJson={getPublicJson}
+                            idOffre={path.match(/\/offre\/([^\/]+)/)?.[1]}
+                            onNavigate={navigate}
+                            sendFormData={sendPublicFormData}
                         />
-                    ) : (
-                        <DashboardView onSelectOffer={handleSelectOfferFromDashboard} />
-                    )}
-                </Suspense>
-            )}
-        </AppShell>
+                    }
+                    path="/offre/:slug"
+                />
+
+                {/* AUTH ROUTE */}
+                <Route element={<LoginPage onLoginSuccess={handleLoginSuccess} />} path="/login" />
+
+                {/* PROTECTED BACK-OFFICE ROUTES */}
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <DashboardView onSelectOffer={handleSelectOfferFromDashboard} />
+                        </BackOfficeLayout>
+                    }
+                    path="/dashboard"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <OffersView
+                                canManage={user?.permissions?.includes('manage_offres') ?? false}
+                                competencesData={competencesData}
+                                initialEditingOffer={editingOffer}
+                                onClearEditingOffer={() => setEditingOffer(null)}
+                                onNavigate={navigate}
+                                referentiels={referentiels}
+                            />
+                        </BackOfficeLayout>
+                    }
+                    path="/offres"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <CandidaturesView referentiels={referentiels} />
+                        </BackOfficeLayout>
+                    }
+                    path="/candidatures"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <VivierView competencesData={competencesData} referentiels={referentiels} />
+                        </BackOfficeLayout>
+                    }
+                    path="/vivier"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <ReferentialsView
+                                canManage={user?.permissions?.includes('manage_referentiels') ?? false}
+                                competencesData={competencesData}
+                                initialSubTab="all"
+                                onRefreshBase={loadBaseData}
+                            />
+                        </BackOfficeLayout>
+                    }
+                    path="/referentiels"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <ReferentialsView
+                                canManage={user?.permissions?.includes('manage_referentiels') ?? false}
+                                competencesData={competencesData}
+                                initialSubTab="directions"
+                                onRefreshBase={loadBaseData}
+                            />
+                        </BackOfficeLayout>
+                    }
+                    path="/referentiels/directions"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <ReferentialsView
+                                canManage={user?.permissions?.includes('manage_referentiels') ?? false}
+                                competencesData={competencesData}
+                                initialSubTab="domaines"
+                                onRefreshBase={loadBaseData}
+                            />
+                        </BackOfficeLayout>
+                    }
+                    path="/referentiels/domaines"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <ReferentialsView
+                                canManage={user?.permissions?.includes('manage_referentiels') ?? false}
+                                competencesData={competencesData}
+                                initialSubTab="competences"
+                                onRefreshBase={loadBaseData}
+                            />
+                        </BackOfficeLayout>
+                    }
+                    path="/referentiels/competences"
+                />
+
+                {/* DEFAULT FALLBACK REDIRECT */}
+                <Route element={<Navigate replace to="/dashboard" />} path="/" />
+                <Route element={<Navigate replace to="/dashboard" />} path="*" />
+            </Routes>
+        </Suspense>
+    );
+}
+
+export function App() {
+    return (
+        <BrowserRouter>
+            <MainApp />
+        </BrowserRouter>
     );
 }
 

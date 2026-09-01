@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,7 @@ class SessionController extends Controller
         return view('auth.login');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
@@ -29,6 +30,14 @@ class SessionController extends Controller
         $remember = $request->boolean('remember');
 
         if (! Auth::attempt($credentials, $remember)) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'Les identifiants sont incorrects.',
+                    'errors' => [
+                        'email' => ['Les identifiants sont incorrects.'],
+                    ],
+                ], 422);
+            }
             return back()
                 ->withErrors(['email' => 'Les identifiants sont incorrects.'])
                 ->onlyInput('email');
@@ -38,17 +47,28 @@ class SessionController extends Controller
 
         $request->session()->forget('url.intended');
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Connexion réussie',
+                'data' => Auth::user(),
+            ]);
+        }
+
         $frontendUrl = rtrim((string) config('app.frontend_url'), '/');
 
         return redirect()->to($frontendUrl ? $frontendUrl.'/dashboard' : route('dashboard'));
     }
 
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request): JsonResponse|RedirectResponse
     {
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if ($request->wantsJson()) {
+            return response()->json(['message' => 'Déconnexion réussie']);
+        }
 
         return redirect()->route('login');
     }

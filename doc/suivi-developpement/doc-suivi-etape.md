@@ -1,20 +1,19 @@
 # Document Central de Suivi par Étape et d'Avancement Global (65,5 j)
 
-Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 4** et l'optimisation extrême des performances réseau et frontend (Code-Splitting, Lazy Loading & Deduplication).
+Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 4** et la mise à jour du design de la page Connexion (style blanc classique et raccourcis d'identifiants).
 
 ---
 
-## ⚡ Optimisations Majeures des Performances (Sprint 4)
+## 🎨 Design Blanc Classique & Raccourcis d'Identifiants de Test (Sprint 4)
 
-1. **Splitting de Code & Dynamic Imports (`React.lazy()`)** :
-   - Mise en place du chargement différé (*lazy loading*) via `React.lazy()` et `<Suspense>` pour toutes les vues et pages (`DashboardView`, `OffersView`, `CandidaturesView`, `ReferentialsView`, `VivierView`, etc.).
-   - Empaquetage séparé des icônes (`vendor-icons.js`) et du framework (`vendor-react.js`).
-   - **Taille du bundle initial réduite de 8,4 Mo à ~200 Ko (-97,5%)** !
-2. **Elimination de la cascade de requêtes et déduplication API** :
-   - Déduplication des requêtes d'initialisation `/api/me`, `/api/referentiels/recrutement`, `/api/competences` à l'aide d'un garde d'exécution unique `useRef`.
-   - Suppression du blocage en cascade pour le chargement du tableau de bord.
-3. **Calcul direct des KPIs Candidatures** :
-   - Ajout des requêtes directes optimisées pour les KPIs candidatures sur offre et candidatures spontanées.
+Conformément à la direction artistique globale du projet :
+
+1. **Design Blanc Classique (`src/pages/LoginPage.jsx`)** :
+   - Fond épuré gris/bleu clair (`#f8fafc`), carte blanche brillante (`#ffffff`) avec bordure fine (`#e2e8f0`) et ombre douce.
+   - Accentuation bleu indigo (`linear-gradient(135deg, #6366f1, #4f46e5)`).
+2. **Encadré d'Identifiants de Test Pré-remplis** :
+   - Intégration d'un bloc d'aide avec les comptes de démonstration (`admin@alphaciment.local`, `sophie.martin@entreprise.com`, `pierre.bernard@entreprise.com`).
+   - Clic direct sur un compte de test pour auto-remplir les champs e-mail et mot de passe (`password`).
 
 ---
 
@@ -29,7 +28,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 | **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | **100.0%** | **[FAIT]** |
 | **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | **100.0%** | **[FAIT]** |
 | **Sprint 3** | Dépôt et réception des candidatures (Web & Saisie RH) | 6,5 j | **100.0%** | **[FAIT]** |
-| **Sprint 4** | Gestion RH des candidatures, fiche candidat, découpage React et optimisations performance | 7,0 j | **100.0%** | **[FAIT]** |
+| **Sprint 4** | Gestion RH des candidatures, fiche candidat, découpage React, routage SPA et design Login blanc | 7,0 j | **100.0%** | **[FAIT]** |
 | **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 11,5 j | **100.0%** | **[FAIT]** |
 | **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | **0.0%** | **[A FAIRE]** |
 | **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 8,5 j | **0.0%** | **[A FAIRE]** |

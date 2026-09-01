@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
     BriefcaseBusiness,
     Building2,
@@ -12,7 +13,21 @@ import {
 } from 'lucide-react';
 import { submitLogout } from '../../api/client';
 
-export function AppShell({ activePath, activeView, children, onNavigate, user }) {
+export function AppShell({ children, user }) {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const activePath = location.pathname;
+
+    const activeView = activePath.startsWith('/offres')
+        ? 'offres'
+        : activePath.startsWith('/candidatures')
+        ? 'candidatures'
+        : activePath.startsWith('/vivier')
+        ? 'vivier'
+        : activePath.startsWith('/referentiels')
+        ? 'referentiels'
+        : 'dashboard';
+
     const [referentielsOpen, setReferentielsOpen] = useState(activeView === 'referentiels');
 
     useEffect(() => {
@@ -59,7 +74,7 @@ export function AppShell({ activePath, activeView, children, onNavigate, user })
                                         className={isActive ? 'nav-link active' : 'nav-link'}
                                         onClick={() => {
                                             if (!isActive) {
-                                                onNavigate(item.href);
+                                                navigate(item.href);
                                             }
                                             setReferentielsOpen((curr) => !curr);
                                         }}
@@ -84,7 +99,7 @@ export function AppShell({ activePath, activeView, children, onNavigate, user })
                                                         key={sub.id}
                                                         onClick={(e) => {
                                                             e.preventDefault();
-                                                            onNavigate(sub.href);
+                                                            navigate(sub.href);
                                                         }}
                                                     >
                                                         <span>• {sub.label}</span>
@@ -105,7 +120,7 @@ export function AppShell({ activePath, activeView, children, onNavigate, user })
                                 key={item.id}
                                 onClick={(event) => {
                                     event.preventDefault();
-                                    onNavigate(item.href);
+                                    navigate(item.href);
                                 }}
                             >
                                 <Icon aria-hidden="true" size={18} />
@@ -118,7 +133,7 @@ export function AppShell({ activePath, activeView, children, onNavigate, user })
                 <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #243746' }}>
                     <button
                         className="ghost-button"
-                        onClick={() => onNavigate('/candidat/offres')}
+                        onClick={() => navigate('/candidat/offres')}
                         style={{ width: '100%', justifyContent: 'center', color: '#f2b84b' }}
                         type="button"
                     >
@@ -137,8 +152,10 @@ export function AppShell({ activePath, activeView, children, onNavigate, user })
                                 ? "Offres d'emploi"
                                 : activeView === 'candidatures'
                                 ? 'Candidatures'
+                                : activeView === 'vivier'
+                                ? 'Vivier & OCR'
                                 : activeView === 'referentiels'
-                                ? 'Referentiels'
+                                ? 'Référentiels'
                                 : 'Tableau de bord'}
                         </h1>
                     </div>
@@ -148,7 +165,7 @@ export function AppShell({ activePath, activeView, children, onNavigate, user })
                             <span>{user?.name ?? 'Utilisateur'}</span>
                             <small>{user?.role ?? '-'}</small>
                         </div>
-                        <button className="icon-button danger" onClick={submitLogout} title="Se deconnecter" type="button">
+                        <button className="icon-button danger" onClick={submitLogout} title="Se déconnecter" type="button">
                             <LogOut aria-hidden="true" size={18} />
                             <span>Sortir</span>
                         </button>

@@ -23,15 +23,26 @@ export default defineConfig(({ mode }) => {
                 },
             },
         },
+        optimizeDeps: {
+            include: ['react', 'react-dom', 'lucide-react'],
+            holdUntilCrawlEnd: false,
+        },
         server: {
             port: 5173,
             strictPort: true,
+            warmup: {
+                clientFiles: ['./src/main.jsx', './src/api/client.js', './src/styles.css'],
+            },
             proxy: {
                 '/api': {
                     target: backendUrl,
                     changeOrigin: true,
                 },
                 '/logout': {
+                    target: backendUrl,
+                    changeOrigin: true,
+                },
+                '/login': {
                     target: backendUrl,
                     changeOrigin: true,
                 },

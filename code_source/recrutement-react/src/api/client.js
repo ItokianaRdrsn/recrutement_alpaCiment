@@ -7,18 +7,18 @@ export function backendPath(path) {
 }
 
 export function redirectToLogin() {
-    const loginUrl = backendPath('/login');
-
-    if (redirectingToLogin || window.location.href === loginUrl) {
+    if (redirectingToLogin || window.location.pathname === '/login') {
         return;
     }
 
     redirectingToLogin = true;
-    window.location.replace(loginUrl);
+    window.history.pushState({}, '', '/login');
+    window.dispatchEvent(new PopStateEvent('popstate'));
 }
 
 export async function getPublicJson(url) {
-    const response = await fetch(url, {
+    const fullUrl = url.startsWith('http') ? url : backendPath(url);
+    const response = await fetch(fullUrl, {
         headers: {
             Accept: 'application/json',
         },
@@ -32,7 +32,8 @@ export async function getPublicJson(url) {
 }
 
 export async function sendPublicFormData(url, formData, method = 'POST') {
-    const response = await fetch(url, {
+    const fullUrl = url.startsWith('http') ? url : backendPath(url);
+    const response = await fetch(fullUrl, {
         method,
         headers: {
             Accept: 'application/json',
@@ -55,7 +56,8 @@ export async function sendPublicFormData(url, formData, method = 'POST') {
 }
 
 export async function getJson(url) {
-    const response = await fetch(url, {
+    const fullUrl = url.startsWith('http') ? url : backendPath(url);
+    const response = await fetch(fullUrl, {
         credentials: 'include',
         headers: {
             Accept: 'application/json',
@@ -88,8 +90,9 @@ export async function getCsrfToken() {
 }
 
 export async function sendJson(url, { body, method = 'POST' } = {}) {
+    const fullUrl = url.startsWith('http') ? url : backendPath(url);
     const token = await getCsrfToken();
-    const response = await fetch(url, {
+    const response = await fetch(fullUrl, {
         method,
         credentials: 'include',
         headers: {
@@ -119,8 +122,9 @@ export async function sendJson(url, { body, method = 'POST' } = {}) {
 }
 
 export async function sendFormData(url, formData, method = 'POST') {
+    const fullUrl = url.startsWith('http') ? url : backendPath(url);
     const token = await getCsrfToken();
-    const response = await fetch(url, {
+    const response = await fetch(fullUrl, {
         method,
         credentials: 'include',
         headers: {
@@ -153,6 +157,7 @@ export async function submitLogout() {
     try {
         await sendJson('/logout', { method: 'POST' });
     } finally {
-        window.location.replace(backendPath('/login'));
+        redirectingToLogin = false;
+        redirectToLogin();
     }
 }
