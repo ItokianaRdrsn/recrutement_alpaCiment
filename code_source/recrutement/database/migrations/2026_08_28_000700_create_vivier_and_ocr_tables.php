@@ -26,8 +26,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('experience_professionnelle')) {
-            Schema::create('experience_professionnelle', function (Blueprint $table) {
+        if (! Schema::hasTable('candidat_experience_professionnelle') && ! Schema::hasTable('experience_professionnelle')) {
+            Schema::create('candidat_experience_professionnelle', function (Blueprint $table) {
                 $table->id('id_experience');
                 $table->foreignId('id_candidat')->constrained('candidat', 'id_candidat')->cascadeOnDelete();
                 $table->string('poste', 200);
@@ -48,8 +48,8 @@ return new class extends Migration
             });
         }
 
-        if (! Schema::hasTable('formation')) {
-            Schema::create('formation', function (Blueprint $table) {
+        if (! Schema::hasTable('candidat_formation') && ! Schema::hasTable('formation')) {
+            Schema::create('candidat_formation', function (Blueprint $table) {
                 $table->id('id_formation');
                 $table->foreignId('id_candidat')->constrained('candidat', 'id_candidat')->cascadeOnDelete();
                 $table->string('diplome', 200);

@@ -146,9 +146,47 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 17 (Rectification) : 2 Boutons sous chaque Direction ("Toutes les candidatures" & "Offres & candidatures"), Arrivée par Défaut sur "Toutes les candidatures"
 > **User Prompt :** *"non je te parle de chaque direction on aura 2 bouton comme :toutes les candidatures et Offre&candidature mais de base on arrive dans toutes les candidature"*
-- **Résolution (Suivant strict protocole Rectification de `methodologie.md`) :**
-  1. **Les 2 Boutons sous Chaque Direction ([CandidaturesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesView.jsx))** : Sous l'intitulé de chaque direction dans la colonne de gauche, intégration de deux boutons distincts :
-     - **Bouton 1 : `👥 Toutes les candidatures (X)`**
-     - **Bouton 2 : `💼 Offres & candidatures (Y offres)`**
-  2. **Affichage par Défaut (`de base`)** : À l'ouverture de la page ou lors de la sélection d'une direction, le sous-mode actif est **"Toutes les candidatures"**, affichant directement dans la colonne de droite le tableau récapitulatif de tous les candidats de cette direction (avec l'indicateur barre bleue non-vue).
-  3. **Bascule vers "Offres & candidatures"** : Le clic sur le Bouton 2 bascule la colonne de droite vers le composant de recherche et de cartes d'offres avec boutons déroulants de candidats.
+- **Résolution :**
+  1. **Les 2 Boutons sous Chaque Direction ([CandidaturesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesView.jsx))** : Bouton 1 (`Toutes les candidatures`) et Bouton 2 (`Offres & candidatures`).
+  2. **Affichage par Défaut (`de base`)** : Arrivée systématique sur "Toutes les candidatures" pour la direction sélectionnée.
+
+---
+
+### Demande 18 (Sprint 5) : Gestion Manuelle des Compétences, Expériences et Formations Candidat (1,5 j - 100%)
+> **User Prompt :** *"pour me sprint 5 peux tu faire ceci #### **[À FAIRE]** Gestion manuelle des compétences, expériences et formations candidat (1,5 j) - **100%** - **Notes :** Drawe/Modal Profil Candidat RH permettant d'ajouter et consulter les compétences avec leur niveau (Débutant, Intermédiaire, Avancé, Expert), expériences pro et diplômes."*
+- **Résolution :** Création du document de tâche du jour [gestion-manuelle-competences-experiences-formations.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-09-01/gestion-manuelle-competences-experiences-formations.md) et intégration de la gestion du profil.
+
+---
+
+### Demande 19 (Rectification) : Intégration Directe des Compétences/Expériences/Formations dans l'Onglet Informations de la Fiche Candidat & Bouton Unique "Consulter dossier" dans le Vivier
+> **User Prompt :** *"non ca ne s'affiche pas et dans vivier ne met pas le bouton profil et competence ,met juste voir dossier et la gestion des comptetence ,formation et expericience sera dans le dossier dans informations"*
+- **Résolution :**
+  1. **Dans le Vivier RH ([VivierView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/VivierView.jsx))** : Bouton unique `Consulter dossier`.
+  2. **Dans la Fiche Candidature ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx))** : Emplacement direct des blocs Compétences, Expériences et Formations au cœur du premier onglet principal `Informations & Profil RH`.
+
+---
+
+### Demande 20 (Fix SQL / Schema) : Correction du Nom de Colonne « poste » dans la Relation PostgreSQL « experience_professionnelle » et « date_obtention » dans « formation »
+> **User Prompt :** *"Impossible de charger les donnees. SQLSTATE[42703]: Undefined column: 7 ERREUR: la colonne « intitule_poste » de la relation « experience_professionnelle » n'existe pas ... regarfe bien la table et le script sql"*
+- **Résolution :** Alignement du modèle `CandidatExperience` et de `VivierController` sur la colonne PostgreSQL réelle `poste` et `date_obtention`.
+
+---
+
+### Demande 21 (Fix Frontend) : Resolution de l'erreur `allCompetences.map is not a function` dans `CandidatureDetailView`
+> **User Prompt :** *"erreur ,regarde aussi pour competence candidat et formation candidat les table sql Uncaught TypeError: allCompetences.map is not a function at CandidatureDetailView (CandidatureDetailView.jsx:646:53)"*
+- **Résolution :** Extraction sécurisée du tableau `competences` à partir du wrapper d'API `/api/competences` et ajouts de gardes de sécurité `Array.isArray(...)`.
+
+---
+
+### Demande 22 (Rectification / Prefixe `candidat_`) : Uniformisation avec le Préfixe `candidat_` sur les Tables SQL (`candidat_experience_professionnelle` et `candidat_formation`)
+> **User Prompt :** *"change aussi le script et dans notre code ,pour expererince et formation rajoute le prefixe candidat"*
+- **Résolution :** Renommage des tables `experience_professionnelle` -> `candidat_experience_professionnelle` et `formation` -> `candidat_formation` dans `sql/gestion_recrutement.sql`, la migration et les modèles.
+
+---
+
+### Demande 23 (Méthodologie) : Ajout de la 5e Règle dans `methodologie.md` pour la Mise à Jour des Tâches du Sprint (`taches.md`)
+> **User Prompt :** *"aussi ici dans le fichier merhodologie: Lorsqu'une demande concerne le développement d'une nouvelle tâche ou fonctionnalité rattachée à un Sprint : rajoute le 5e point mettre a jour les taches si on a terminer"*
+- **Résolution (Suivant le guide `methodologie.md`) :**
+  1. **Fichier [methodologie.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md)** : Ajout du 5ème point dans la section *🟢 Cas A : Tâche / Fonctionnalité d'un Sprint* :
+     `5. **Mise à jour des tâches du sprint (taches.md)** : Si la tâche est terminée, passer son statut à **[FAIT]** - **100%** dans le fichier taches.md du sprint concerné, et recalculer le pourcentage d'avancement global du sprint.`
+  2. **Fichier [sprint-5/taches.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/taches.md)** : Mise à jour de toutes les tâches achevées du Sprint 5 à **[FAIT] - 100%** et actualisation du statut global à **100.0% Terminé**.

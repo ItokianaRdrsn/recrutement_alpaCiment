@@ -5,29 +5,47 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Schema;
 
 class CandidatExperience extends Model
 {
     use HasFactory;
 
-    protected $table = 'experience_professionnelle';
     protected $primaryKey = 'id_experience';
+
+    public function getTable()
+    {
+        if (Schema::hasTable('candidat_experience_professionnelle')) {
+            return 'candidat_experience_professionnelle';
+        }
+        return 'experience_professionnelle';
+    }
 
     protected $fillable = [
         'id_candidat',
-        'intitule_poste',
+        'poste',
         'entreprise',
         'date_debut',
         'date_fin',
+        'poste_actuel',
         'description',
+        'source',
         'valide',
     ];
 
     protected $casts = [
         'valide' => 'boolean',
+        'poste_actuel' => 'boolean',
         'date_debut' => 'date',
         'date_fin' => 'date',
     ];
+
+    protected $appends = ['intitule_poste'];
+
+    public function getIntitulePosteAttribute(): string
+    {
+        return $this->attributes['poste'] ?? '';
+    }
 
     public function candidat(): BelongsTo
     {

@@ -4,6 +4,7 @@ import {
     BriefcaseBusiness,
     Check,
     CheckCircle2,
+    Eye,
     Filter,
     GraduationCap,
     Layers,
@@ -19,13 +20,14 @@ import {
 import { getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
 import { formatDate } from '../utils/formatters';
+import { CandidatureDetailView } from './CandidatureDetailView';
 
-export function VivierView({ competencesData, referentiels }) {
+export function VivierView({ referentiels }) {
     const [vivierList, setVivierList] = useState([]);
+    const [statutsList, setStatutsList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [selectedCandidat, setSelectedCandidat] = useState(null);
-    const [profileData, setProfileData] = useState(null);
+    const [selectedCandidatureId, setSelectedCandidatureId] = useState(null);
 
     // Modal state for searching & adding candidature to Vivier
     const [showAddModal, setShowAddModal] = useState(false);
@@ -35,10 +37,6 @@ export function VivierView({ competencesData, referentiels }) {
     const [addingCandId, setAddingCandId] = useState(null);
 
     const [filters, setFilters] = useState({ q: '', direction: '', domaine: '', statut: '' });
-
-    const [newComp, setNewComp] = useState({ id_competence: '', niveau: 'Intermédiaire' });
-    const [newExp, setNewExp] = useState({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
-    const [newForm, setNewForm] = useState({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '' });
 
     const loadVivier = useCallback(async () => {
         setLoading(true);
@@ -50,8 +48,12 @@ export function VivierView({ competencesData, referentiels }) {
             if (filters.domaine) params.set('domaine', filters.domaine);
             if (filters.statut) params.set('statut', filters.statut);
 
-            const vivRes = await getJson(`/api/vivier?${params.toString()}`);
+            const [vivRes, statutsResponse] = await Promise.all([
+                getJson(`/api/vivier?${params.toString()}`),
+                getJson('/api/referentiels/statuts-candidature'),
+            ]);
             setVivierList(vivRes?.data ?? []);
+            setStatutsList(statutsResponse?.data ?? []);
         } catch (err) {
             setError(err.message);
         } finally {
@@ -84,15 +86,6 @@ export function VivierView({ competencesData, referentiels }) {
         }
     }, [showAddModal, candSearchQuery, searchCandidaturesModal]);
 
-    const loadCandidateProfile = useCallback(async (idCandidat) => {
-        try {
-            const res = await getJson(`/api/vivier/candidat/${idCandidat}/profile`);
-            setProfileData(res?.data ?? null);
-        } catch (err) {
-            setError(err.message);
-        }
-    }, []);
-
     async function handleAddCandidatureToVivier(idCandidature) {
         setAddingCandId(idCandidature);
         try {
@@ -110,7 +103,7 @@ export function VivierView({ competencesData, referentiels }) {
     }
 
     async function handleRemoveFromVivier(item) {
-        if (!window.confirm('Retirer cette candidature/candidat du vivier ?')) return;
+        if (!window.confirm('Retirer cette candidature du vivier ?')) return;
         try {
             if (item.id_candidature) {
                 await sendJson(`/api/candidatures/${item.id_candidature}/vivier`, {
@@ -126,65 +119,20 @@ export function VivierView({ competencesData, referentiels }) {
         }
     }
 
-    async function handleAddCompetence(e) {
-        e.preventDefault();
-        if (!selectedCandidat || !newComp.id_competence) return;
-        try {
-            await sendJson(`/api/vivier/candidat/${selectedCandidat.id_candidat}/competences`, {
-                body: {
-                    id_competence: Number(newComp.id_competence),
-                    niveau: newComp.niveau,
-                },
-            });
-            setNewComp({ id_competence: '', niveau: 'Intermédiaire' });
-            await loadCandidateProfile(selectedCandidat.id_candidat);
-        } catch (err) {
-            setError(err.message);
-        }
-    }
-
-    async function handleAddExperience(e) {
-        e.preventDefault();
-        if (!selectedCandidat || !newExp.intitule_poste) return;
-        try {
-            await sendJson(`/api/vivier/candidat/${selectedCandidat.id_candidat}/experiences`, {
-                body: {
-                    intitule_poste: newExp.intitule_poste.trim(),
-                    entreprise: newExp.entreprise.trim() || null,
-                    date_debut: newExp.date_debut || null,
-                    date_fin: newExp.date_fin || null,
-                    description: newExp.description.trim() || null,
-                },
-            });
-            setNewExp({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
-            await loadCandidateProfile(selectedCandidat.id_candidat);
-        } catch (err) {
-            setError(err.message);
-        }
-    }
-
-    async function handleAddFormation(e) {
-        e.preventDefault();
-        if (!selectedCandidat || !newForm.diplome) return;
-        try {
-            await sendJson(`/api/vivier/candidat/${selectedCandidat.id_candidat}/formations`, {
-                body: {
-                    diplome: newForm.diplome.trim(),
-                    etablissement: newForm.etablissement.trim() || null,
-                    annee_obtention: newForm.annee_obtention ? Number(newForm.annee_obtention) : null,
-                    domaine_etude: newForm.domaine_etude.trim() || null,
-                },
-            });
-            setNewForm({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '' });
-            await loadCandidateProfile(selectedCandidat.id_candidat);
-        } catch (err) {
-            setError(err.message);
-        }
-    }
-
     const resetVivierFilters = () => {
         setFilters({ q: '', direction: '', domaine: '', statut: '' });
     };
+
+    if (selectedCandidatureId) {
+        return (
+            <CandidatureDetailView
+                idCandidature={selectedCandidatureId}
+                onBack={() => setSelectedCandidatureId(null)}
+                onRefreshList={loadVivier}
+                statutsList={statutsList}
+            />
+        );
+    }
 
     return (
         <div className="view-stack">
@@ -243,7 +191,7 @@ export function VivierView({ competencesData, referentiels }) {
                     </div>
                 </div>
 
-                {/* BOUTON AJOUTER AU VIVIER HAUTEMENT STYLISÉ (VIBRANT GRADIENT & OMBERE GLOUIANTE) */}
+                {/* BOUTON AJOUTER AU VIVIER STYLISÉ */}
                 <button
                     className="primary-button"
                     onClick={() => setShowAddModal(true)}
@@ -318,18 +266,15 @@ export function VivierView({ competencesData, referentiels }) {
                                         <td><span className="status-pill success">{item.statut ?? 'Actif'}</span></td>
                                         <td>
                                             <div style={{ display: 'flex', gap: '6px' }}>
-                                                {item.candidat?.id_candidat ? (
+                                                {item.id_candidature ? (
                                                     <button
                                                         className="filter-button"
-                                                        onClick={() => {
-                                                            setSelectedCandidat(item.candidat);
-                                                            loadCandidateProfile(item.candidat.id_candidat);
-                                                        }}
-                                                        style={{ padding: '6px 12px', fontSize: '13px' }}
+                                                        onClick={() => setSelectedCandidatureId(item.id_candidature)}
+                                                        style={{ padding: '6px 12px', fontSize: '13px', gap: '6px' }}
                                                         type="button"
                                                     >
-                                                        <User size={15} />
-                                                        <span>Profil & Compétences</span>
+                                                        <Eye size={15} />
+                                                        <span>Consulter dossier</span>
                                                     </button>
                                                 ) : null}
                                                 <button
@@ -499,136 +444,6 @@ export function VivierView({ competencesData, referentiels }) {
                                 Fermer
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {/* DRAWER PROFIL COMPÉTENCES & PARCOURS CANDIDAT */}
-            {selectedCandidat && (
-                <div className="modal-backdrop" onClick={() => setSelectedCandidat(null)}>
-                    <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="modal-header">
-                            <h3>Profil & Fiche Compétences : {selectedCandidat.prenom} {selectedCandidat.nom}</h3>
-                            <button className="ghost-button" onClick={() => setSelectedCandidat(null)} type="button">
-                                <X size={18} />
-                            </button>
-                        </div>
-
-                        {!profileData ? (
-                            <LoadingState />
-                        ) : (
-                            <div style={{ display: 'grid', gap: '20px', marginTop: '14px' }}>
-                                {/* COMPÉTENCES */}
-                                <div className="data-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                    <h4 style={{ margin: '0 0 10px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <Sparkles size={16} />
-                                        <span>Compétences Validées ({profileData.competences?.length ?? 0})</span>
-                                    </h4>
-
-                                    <div className="tags-list" style={{ marginBottom: '12px' }}>
-                                        {(profileData.competences ?? []).map((c) => (
-                                            <span key={c.id_competence} className="badge green" style={{ fontSize: '13px', padding: '6px 10px' }}>
-                                                {c.nom_competence} - {c.niveau} ({c.source_extraction})
-                                            </span>
-                                        ))}
-                                    </div>
-
-                                    <form onSubmit={handleAddCompetence} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                        <select
-                                            onChange={(e) => setNewComp((curr) => ({ ...curr, id_competence: e.target.value }))}
-                                            style={{ padding: '6px 10px', fontSize: '13px' }}
-                                            value={newComp.id_competence}
-                                        >
-                                            <option value="">Sélectionner une compétence</option>
-                                            {(competencesData.competences ?? []).map((c) => (
-                                                <option key={c.id} value={c.id}>
-                                                    {c.nom} ({c.type})
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <select
-                                            onChange={(e) => setNewComp((curr) => ({ ...curr, niveau: e.target.value }))}
-                                            style={{ padding: '6px 10px', fontSize: '13px' }}
-                                            value={newComp.niveau}
-                                        >
-                                            <option value="Débutant">Débutant</option>
-                                            <option value="Intermédiaire">Intermédiaire</option>
-                                            <option value="Avancé">Avancé</option>
-                                            <option value="Expert">Expert</option>
-                                        </select>
-                                        <button className="filter-button" type="submit">
-                                            <Plus size={14} />
-                                            <span>Ajouter</span>
-                                        </button>
-                                    </form>
-                                </div>
-
-                                {/* EXPÉRIENCES */}
-                                <div className="data-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                    <h4 style={{ margin: '0 0 10px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <BriefcaseBusiness size={16} />
-                                        <span>Expériences Professionnelles ({profileData.experiences?.length ?? 0})</span>
-                                    </h4>
-                                    {(profileData.experiences ?? []).map((exp) => (
-                                        <div key={exp.id_experience} style={{ background: '#fff', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', marginBottom: '8px' }}>
-                                            <strong>{exp.intitule_poste}</strong> - <span>{exp.entreprise}</span>
-                                            {exp.description ? <p style={{ margin: '4px 0 0 0', fontSize: '13px' }}>{exp.description}</p> : null}
-                                        </div>
-                                    ))}
-                                    <form onSubmit={handleAddExperience} style={{ display: 'grid', gap: '8px', marginTop: '10px' }}>
-                                        <input
-                                            onChange={(e) => setNewExp((curr) => ({ ...curr, intitule_poste: e.target.value }))}
-                                            placeholder="Intitulé du poste (ex: Chef de Projet)..."
-                                            required
-                                            type="text"
-                                            value={newExp.intitule_poste}
-                                        />
-                                        <input
-                                            onChange={(e) => setNewExp((curr) => ({ ...curr, entreprise: e.target.value }))}
-                                            placeholder="Entreprise..."
-                                            type="text"
-                                            value={newExp.entreprise}
-                                        />
-                                        <button className="filter-button" type="submit">
-                                            <Plus size={14} />
-                                            <span>Ajouter l'expérience</span>
-                                        </button>
-                                    </form>
-                                </div>
-
-                                {/* FORMATIONS */}
-                                <div className="data-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                    <h4 style={{ margin: '0 0 10px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <GraduationCap size={16} />
-                                        <span>Formations & Diplômes ({profileData.formations?.length ?? 0})</span>
-                                    </h4>
-                                    {(profileData.formations ?? []).map((f) => (
-                                        <div key={f.id_formation} style={{ background: '#fff', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border)', marginBottom: '8px' }}>
-                                            <strong>{f.diplome}</strong> - <span>{f.etablissement}</span> ({f.annee_obtention ?? '-'})
-                                        </div>
-                                    ))}
-                                    <form onSubmit={handleAddFormation} style={{ display: 'grid', gap: '8px', marginTop: '10px' }}>
-                                        <input
-                                            onChange={(e) => setNewForm((curr) => ({ ...curr, diplome: e.target.value }))}
-                                            placeholder="Diplôme (ex: Master 2 Informatique)..."
-                                            required
-                                            type="text"
-                                            value={newForm.diplome}
-                                        />
-                                        <input
-                                            onChange={(e) => setNewForm((curr) => ({ ...curr, etablissement: e.target.value }))}
-                                            placeholder="Établissement / Université..."
-                                            type="text"
-                                            value={newForm.etablissement}
-                                        />
-                                        <button className="filter-button" type="submit">
-                                            <Plus size={14} />
-                                            <span>Ajouter la formation</span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             )}

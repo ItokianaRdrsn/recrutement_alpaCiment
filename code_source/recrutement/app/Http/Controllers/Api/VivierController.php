@@ -17,61 +17,64 @@ use Illuminate\Support\Facades\DB;
 class VivierController extends Controller
 {
     /**
-     * List all candidates in the Vivier with search & filters
+     * Display Vivier listing with search, filtering by Direction, Domaine & Statut
      */
     public function index(Request $request): JsonResponse
     {
-        $q = trim($request->input('q', ''));
-        $directionId = $request->input('direction');
-        $domaineId = $request->input('domaine');
+        $query = VivierCandidat::with(['candidat', 'direction', 'domaine']);
 
-        // 1. Vivier Candidats records
-        $vivierQuery = VivierCandidat::query()->with(['candidat', 'direction', 'domaine']);
-
-        if (!empty($q)) {
-            $vivierQuery->whereHas('candidat', function ($sub) use ($q) {
-                $sub->where('nom', 'like', "%{$q}%")
-                    ->orWhere('prenom', 'like', "%{$q}%")
-                    ->orWhere('email', 'like', "%{$q}%");
+        if ($request->filled('q')) {
+            $q = trim($request->input('q'));
+            $query->whereHas('candidat', function ($sub) use ($q) {
+                $sub->where('nom', 'ILIKE', "%{$q}%")
+                    ->orWhere('prenom', 'ILIKE', "%{$q}%")
+                    ->orWhere('email', 'ILIKE', "%{$q}%");
             });
         }
-        if ($directionId) {
-            $vivierQuery->where('id_direction', $directionId);
-        }
-        if ($domaineId) {
-            $vivierQuery->where('id_domaine', $domaineId);
+
+        if ($request->filled('direction')) {
+            $query->where('id_direction', $request->input('direction'));
         }
 
-        $vivierItems = $vivierQuery->orderByDesc('created_at')->get();
+        if ($request->filled('domaine')) {
+            $query->where('id_domaine', $request->input('domaine'));
+        }
 
-        // 2. Candidatures marked dans_vivier = true
-        $candQuery = Candidature::query()
-            ->with(['candidat', 'direction', 'domaine', 'statut', 'offre'])
+        if ($request->filled('statut')) {
+            $query->where('statut', $request->input('statut'));
+        }
+
+        $vivierItems = $query->orderByDesc('created_at')->get();
+
+        // Include candidatures flagged with dans_vivier = true
+        $candQuery = Candidature::with(['candidat', 'offre.direction', 'domaine.direction'])
             ->where('dans_vivier', true);
 
-        if (!empty($q)) {
+        if ($request->filled('q')) {
+            $q = trim($request->input('q'));
             $candQuery->whereHas('candidat', function ($sub) use ($q) {
-                $sub->where('nom', 'like', "%{$q}%")
-                    ->orWhere('prenom', 'like', "%{$q}%")
-                    ->orWhere('email', 'like', "%{$q}%");
+                $sub->where('nom', 'ILIKE', "%{$q}%")
+                    ->orWhere('prenom', 'ILIKE', "%{$q}%")
+                    ->orWhere('email', 'ILIKE', "%{$q}%");
             });
         }
-        if ($directionId) {
-            $candQuery->where(function ($sub) use ($directionId) {
-                $sub->whereHas('offre', fn($o) => $o->where('id_direction', $directionId))
-                    ->orWhereHas('domaine', fn($d) => $d->where('id_direction', $directionId)->where('valide', true));
+
+        if ($request->filled('direction')) {
+            $dirId = (int) $request->input('direction');
+            $candQuery->where(function ($qDir) use ($dirId) {
+                $qDir->whereHas('offre', function ($s) use ($dirId) {
+                    $s->where('id_direction', $dirId);
+                })->orWhereHas('domaine', function ($s) use ($dirId) {
+                    $s->where('id_direction', $dirId);
+                });
             });
         }
-        if ($domaineId) {
-            $candQuery->where('id_domaine', $domaineId);
-        }
 
-        $candItems = $candQuery->orderByDesc('created_at')->get();
+        $candidaturesEnVivier = $candQuery->orderByDesc('date_maj')->get();
 
-        // Format unified list
         $combined = collect();
 
-        foreach ($candItems as $cand) {
+        foreach ($candidaturesEnVivier as $cand) {
             $combined->push([
                 'id_vivier_candidat' => 'cand_' . $cand->id_candidature,
                 'id_candidature' => $cand->id_candidature,
@@ -86,7 +89,6 @@ class VivierController extends Controller
         }
 
         foreach ($vivierItems as $viv) {
-            // Avoid duplicate candidates if already included from candidatures
             if (!$combined->firstWhere('id_candidat', $viv->id_candidat)) {
                 $combined->push([
                     'id_vivier_candidat' => $viv->id_vivier_candidat,
@@ -112,7 +114,7 @@ class VivierController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'id_candidat' => ['required', 'integer', 'exists:candidats,id_candidat'],
+            'id_candidat' => ['required', 'integer', 'exists:candidat,id_candidat'],
             'id_direction' => ['nullable', 'integer', 'exists:direction,id_direction'],
             'id_domaine' => ['nullable', 'integer', 'exists:domaine,id_domaine'],
             'motif_ajout' => ['nullable', 'string', 'max:255'],
@@ -155,7 +157,7 @@ class VivierController extends Controller
         $candidat = Candidat::findOrFail($idCandidat);
 
         $experiences = CandidatExperience::where('id_candidat', $idCandidat)->orderByDesc('date_debut')->get();
-        $formations = CandidatFormation::where('id_candidat', $idCandidat)->orderByDesc('annee_obtention')->get();
+        $formations = CandidatFormation::where('id_candidat', $idCandidat)->orderByDesc('id_formation')->get();
 
         $competences = DB::table('candidat_competence')
             ->join('competence', 'candidat_competence.id_competence', '=', 'competence.id_competence')
@@ -167,7 +169,7 @@ class VivierController extends Controller
                 'type_competence.libelle as type_competence',
                 'candidat_competence.niveau',
                 'candidat_competence.valide',
-                'candidat_competence.source_extraction'
+                'candidat_competence.source'
             )
             ->get();
 
@@ -199,7 +201,7 @@ class VivierController extends Controller
             [
                 'niveau' => $validated['niveau'] ?? 'Intermédiaire',
                 'valide' => true,
-                'source_extraction' => 'Manuelle',
+                'source' => 'manuel',
             ]
         );
 
@@ -212,21 +214,25 @@ class VivierController extends Controller
     public function addExperience(Request $request, int $idCandidat): JsonResponse
     {
         $validated = $request->validate([
-            'intitule_poste' => ['required', 'string', 'max:150'],
-            'entreprise' => ['nullable', 'string', 'max:150'],
+            'poste' => ['nullable', 'string', 'max:200'],
+            'intitule_poste' => ['nullable', 'string', 'max:200'],
+            'entreprise' => ['nullable', 'string', 'max:200'],
             'date_debut' => ['nullable', 'date'],
             'date_fin' => ['nullable', 'date'],
             'description' => ['nullable', 'string'],
         ]);
 
+        $posteTitle = trim($validated['poste'] ?? $validated['intitule_poste'] ?? 'Poste non spécifié');
+
         $exp = CandidatExperience::create([
             'id_candidat' => $idCandidat,
-            'intitule_poste' => $validated['intitule_poste'],
+            'poste' => $posteTitle,
             'entreprise' => $validated['entreprise'] ?? null,
             'date_debut' => $validated['date_debut'] ?? null,
             'date_fin' => $validated['date_fin'] ?? null,
             'description' => $validated['description'] ?? null,
             'valide' => true,
+            'source' => 'manuel',
         ]);
 
         return response()->json(['message' => 'Expérience ajoutée.', 'data' => $exp], 201);
@@ -238,19 +244,28 @@ class VivierController extends Controller
     public function addFormation(Request $request, int $idCandidat): JsonResponse
     {
         $validated = $request->validate([
-            'diplome' => ['required', 'string', 'max:150'],
-            'etablissement' => ['nullable', 'string', 'max:150'],
-            'annee_obtention' => ['nullable', 'integer'],
+            'diplome' => ['required', 'string', 'max:200'],
+            'etablissement' => ['nullable', 'string', 'max:200'],
+            'annee_obtention' => ['nullable'],
+            'date_obtention' => ['nullable', 'date'],
             'domaine_etude' => ['nullable', 'string', 'max:150'],
         ]);
+
+        $dateObt = null;
+        if (!empty($validated['date_obtention'])) {
+            $dateObt = $validated['date_obtention'];
+        } elseif (!empty($validated['annee_obtention']) && is_numeric($validated['annee_obtention'])) {
+            $dateObt = $validated['annee_obtention'] . '-01-01';
+        }
 
         $form = CandidatFormation::create([
             'id_candidat' => $idCandidat,
             'diplome' => $validated['diplome'],
             'etablissement' => $validated['etablissement'] ?? null,
-            'annee_obtention' => $validated['annee_obtention'] ?? null,
+            'date_obtention' => $dateObt,
             'domaine_etude' => $validated['domaine_etude'] ?? null,
             'valide' => true,
+            'source' => 'manuel',
         ]);
 
         return response()->json(['message' => 'Formation ajoutée.', 'data' => $form], 201);
@@ -263,7 +278,6 @@ class VivierController extends Controller
     {
         $candidature = Candidature::with(['candidat', 'documents'])->findOrFail($idCandidature);
 
-        // Simulated PaddleOCR & FastAPI LLM extraction payload
         $extractedData = [
             'competences' => [
                 ['nom' => 'PHP / Laravel', 'niveau' => 'Avancé'],
@@ -273,7 +287,7 @@ class VivierController extends Controller
             ],
             'experiences' => [
                 [
-                    'intitule_poste' => 'Développeur Fullstack Web',
+                    'poste' => 'Développeur Fullstack Web',
                     'entreprise' => 'Alpha Ciment Services',
                     'date_debut' => '2023-01-01',
                     'date_fin' => '2025-12-31',
@@ -333,7 +347,7 @@ class VivierController extends Controller
                 foreach ($validated['competences'] as $comp) {
                     $compModel = Competence::firstOrCreate(
                         ['nom_competence' => trim($comp['nom'])],
-                        ['id_type_competence' => 1] // Technique
+                        ['id_type_competence' => 1]
                     );
 
                     DB::table('candidat_competence')->updateOrInsert(
@@ -344,7 +358,7 @@ class VivierController extends Controller
                         [
                             'niveau' => $comp['niveau'] ?? 'Intermédiaire',
                             'valide' => true,
-                            'source_extraction' => 'OCR_IA',
+                            'source' => 'cv_ocr',
                         ]
                     );
                 }
@@ -353,14 +367,16 @@ class VivierController extends Controller
             // Import experiences
             if (!empty($validated['experiences'])) {
                 foreach ($validated['experiences'] as $exp) {
+                    $posteTitle = trim($exp['poste'] ?? $exp['intitule_poste'] ?? 'Poste non spécifié');
                     CandidatExperience::create([
                         'id_candidat' => $idCandidat,
-                        'intitule_poste' => $exp['intitule_poste'],
+                        'poste' => $posteTitle,
                         'entreprise' => $exp['entreprise'] ?? null,
                         'date_debut' => $exp['date_debut'] ?? null,
                         'date_fin' => $exp['date_fin'] ?? null,
                         'description' => $exp['description'] ?? null,
                         'valide' => true,
+                        'source' => 'cv_ocr',
                     ]);
                 }
             }
@@ -368,13 +384,21 @@ class VivierController extends Controller
             // Import formations
             if (!empty($validated['formations'])) {
                 foreach ($validated['formations'] as $form) {
+                    $dateObt = null;
+                    if (!empty($form['date_obtention'])) {
+                        $dateObt = $form['date_obtention'];
+                    } elseif (!empty($form['annee_obtention']) && is_numeric($form['annee_obtention'])) {
+                        $dateObt = $form['annee_obtention'] . '-01-01';
+                    }
+
                     CandidatFormation::create([
                         'id_candidat' => $idCandidat,
                         'diplome' => $form['diplome'],
                         'etablissement' => $form['etablissement'] ?? null,
-                        'annee_obtention' => $form['annee_obtention'] ?? null,
+                        'date_obtention' => $dateObt,
                         'domaine_etude' => $form['domaine_etude'] ?? null,
                         'valide' => true,
+                        'source' => 'cv_ocr',
                     ]);
                 }
             }

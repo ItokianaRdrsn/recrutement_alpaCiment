@@ -24,6 +24,8 @@ Lorsqu'une demande concerne le développement d'une nouvelle tâche ou fonctionn
    - Ajouter la nouvelle entrée avec le prompt exact de l'utilisateur et sa résolution.
 4. **Mise à jour du fichier des règles de gestion (`regles-de-gestion.md`)** :
    - Si la tâche introduit ou modifie une règle métier, l'ajouter immédiatement dans [regles-de-gestion.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/regles-de-gestion.md).
+5. **Mise à jour des tâches du sprint (`taches.md`)** :
+   - Si la tâche est terminée, passer son statut à **[FAIT]** - **100%** dans le fichier `taches.md` du sprint concerné, et recalculer le pourcentage d'avancement global du sprint.
 
 ---
 

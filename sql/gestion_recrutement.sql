@@ -365,9 +365,9 @@ CREATE TABLE candidat_competence (
         )
 );
 -- ============================================================
--- 13ter. EXPERIENCE_PROFESSIONNELLE
+-- 13ter. CANDIDAT_EXPERIENCE_PROFESSIONNELLE
 -- ============================================================
-CREATE TABLE experience_professionnelle (
+CREATE TABLE candidat_experience_professionnelle (
     id_experience BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_candidat BIGINT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
     poste VARCHAR(200) NOT NULL,
@@ -400,11 +400,11 @@ CREATE TABLE experience_professionnelle (
             )
         )
 );
-CREATE INDEX idx_experience_candidat ON experience_professionnelle(id_candidat);
+CREATE INDEX idx_experience_candidat ON candidat_experience_professionnelle(id_candidat);
 -- ============================================================
--- 13quater. FORMATION
+-- 13quater. CANDIDAT_FORMATION
 -- ============================================================
-CREATE TABLE formation (
+CREATE TABLE candidat_formation (
     id_formation BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_candidat BIGINT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
     diplome VARCHAR(200) NOT NULL,
@@ -431,7 +431,7 @@ CREATE TABLE formation (
             )
         )
 );
-CREATE INDEX idx_formation_candidat ON formation(id_candidat);
+CREATE INDEX idx_formation_candidat ON candidat_formation(id_candidat);
 -- ============================================================
 -- 14. RENDEZ-VOUS (test / entretien)
 -- ============================================================
