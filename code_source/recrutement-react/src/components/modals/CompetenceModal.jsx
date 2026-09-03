@@ -17,13 +17,13 @@ export function CompetenceModal({ competence = null, onClose, onSuccess, typesLi
         setError('');
 
         try {
-            await sendJson('/api/competences', {
+            const res = await sendJson('/api/competences', {
                 body: {
                     nom_competence: name,
                     id_type_competence: Number(idTypeCompetence),
                 },
             });
-            if (onSuccess) await onSuccess();
+            if (onSuccess) await onSuccess(res?.data ?? res);
             onClose();
         } catch (err) {
             setError(err.message);

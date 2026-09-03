@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { Pagination } from '../components/common/Pagination';
 import { SaisirRhCandidatureModal } from '../components/modals/SaisirRhCandidatureModal';
 import { formatDate } from '../utils/formatters';
 import { CandidatureDetailView } from './CandidatureDetailView';
@@ -253,6 +254,8 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                         </table>
                     </div>
                 )}
+
+                <Pagination meta={paginationMeta} onChangePage={(p) => setPage(p)} perPage={perPage} />
             </div>
 
             {/* MODAL SAISIR MANUELLE RH */}

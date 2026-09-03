@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { Pagination } from '../components/common/Pagination';
 import { formatDate } from '../utils/formatters';
 import { CandidatureDetailView } from './CandidatureDetailView';
 
@@ -28,6 +29,8 @@ export function VivierView({ referentiels }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedCandidatureId, setSelectedCandidatureId] = useState(null);
+    const [page, setPage] = useState(1);
+    const perPage = 10;
 
     // Modal state for searching & adding candidature to Vivier
     const [showAddModal, setShowAddModal] = useState(false);
@@ -249,7 +252,7 @@ export function VivierView({ referentiels }) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {vivierList.map((item) => (
+                                {vivierList.slice((page - 1) * perPage, page * perPage).map((item) => (
                                     <tr key={item.id_vivier_candidat ?? `cand_${item.id_candidature}`}>
                                         <td>
                                             <strong>{item.candidat?.prenom} {item.candidat?.nom}</strong>
@@ -293,6 +296,16 @@ export function VivierView({ referentiels }) {
                         </table>
                     </div>
                 )}
+
+                <Pagination
+                    meta={{
+                        current_page: page,
+                        last_page: Math.ceil(vivierList.length / perPage) || 1,
+                        total: vivierList.length,
+                    }}
+                    onChangePage={(p) => setPage(p)}
+                    perPage={perPage}
+                />
             </section>
 
             {/* POPUP MODAL : RECHERCHE ET SELECTION DE CANDIDATURE A METTRE EN VIVIER */}

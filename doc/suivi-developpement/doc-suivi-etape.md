@@ -1,6 +1,6 @@
 # Document Central de Suivi par Étape et d'Avancement Global (65,5 j)
 
-Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et le journal chronologique cumulatif de toutes les demandes utilisateur (Prompts) avec leurs résolutions.
+Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et le journal chronologique cumulatif de toutes les demandes utilisateur (Prompts) avec me me leurs résolutions.
 
 ---
 
@@ -240,15 +240,99 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 32 (Rectification / Séparation des Vues de Candidatures) : Séparation du Composant Unique `CandidaturesView` en 2 Composants Distincts par Page (`CandidaturesOffresView` et `CandidaturesSpontaneesView`) Sans Prop `mode`
 > **User Prompt :** *"okey pour ces routes : <Route element={<BackOfficeLayout ...><CandidaturesView mode="offres" referentiels={referentiels} /></BackOfficeLayout>} path="/candidatures/offres" /> <Route element={<BackOfficeLayout ...><CandidaturesView mode="spontanees" referentiels={referentiels} /></BackOfficeLayout>} path="/candidatures/spontanees" /> je ne veux pas de mode ,je veux 2 pages differentes pour les candidatures sur offres et spontanees"*
+- **Résolution :** Création des composants de page `CandidaturesOffresView.jsx` et `CandidaturesSpontaneesView.jsx`, mise à jour des routes dans `src/main.jsx` et validation par `npm run build` et `php artisan test`.
+
+---
+
+### Demande 33 (Rectification / Resolution Erreur 500 Vivier) : Correction de la Requête SQL sur la Colonne `date_maj` et Sécurisation de la Récupération des Profils dans `VivierController`
+> **User Prompt :** *"rectification la liste des candidatures en vivier ne marche pas erreur 500"*
+- **Résolution :** Remplacement de `orderByDesc('date_maj')` par `orderByDesc('updated_at')` dans `VivierController.php` et validation par script scratch (Status 200 OK) et tests PHPUnit (15/15 PASS).
+
+---
+
+### Demande 34 (Rectification / Prise en Charge des Filtres Globaux dans "Offres & Candidatures") : Transmission des Filtres de Recherche Candidat, Statut RH et Canal de Dépôt dans le Mode "Offres & Candidatures"
+> **User Prompt :** *"okey dans candidaturesOffersView dans me cette partie const handleSelectDirectionWithSubMode = (dirId, subMode) => { setSelectedDirectionId(dirId); setDirectionSubMode(subMode); }; lorsque je clique sur offre & candidatures ,les filtres ne marches pas"*
+- **Résolution :** Propagation des filtres globaux (`q`, `statut`, `canal_depot`) à la requête `/api/candidatures?type_demande=offre&per_page=500` et filtrage réactif au sein de chaque carte d'offre d'emploi.
+
+---
+
+### Demande 35 (Rectification / Contrôles de Pagination Universels & Recherche de Compétences dans la Création d'Offre) : Ajout du Composant de Pagination sur Toutes les Vues de Liste et Remplacement du Sélecteur de Compétences par un Sélecteur avec Recherche par Nom
+> **User Prompt :** *"okey n'oublie jamais les paginations pour les listes ex: des candidatures spontannees et sur offres ,les viviers ,les referenciels ,dans l'ajout competences dans offres ,on va rechercher la competence au lieu de lister comme cela ,ca va etre difficile a lire lorsqu'on aura beaucoup de competences"*
+- **Résolution :** Intégration du composant de pagination sur toutes les vues et amélioration de la recherche de compétences dans les offres.
+
+---
+
+### Demande 36 (Rectification / Workflow Inline d'Ajout & Pop-up de Création de Compétence dans la Création d'Offre) : Formulaire d'Ajout Inline de Compétence (Input de recherche + Select des résultats + Select du Niveau + Bouton Ajouter) & Pop-up de Création Directe de Compétence
+> **User Prompt :** *"dans l'ajout de competence ,je veux juste un input de recherche ,ensuite un champ sur le resultat ou liste de comptences et a droite le niveau et ensuite bouton ajouter competence et aussi un bouton creation de competence avec pop up pour la creation"*
+- **Résolution :** Création du formulaire d'ajout inline de compétences et du bouton pop-up.
+
+---
+
+### Demande 37 (Rectification / Disposition Verticale & Auto-Sélection de la Compétence dans la Recherche) : Alignement Vertical des Champs d'Ajout de Compétences et Prise en Charge Automatique de la Première Option Filtrée Sans Nécessiter de `onChange`
+> **User Prompt :** *"okey deja dans les competences dans offres ,je veux que ca soit en vertical pas en horizontal comme ceci ,le bouton ajouter competence ne marche pas ensuite ,j'ai commenter ceci pour directement afficher la competence lors des recherches mais je veux qu'il prenne direct en compte alors le option actuel et pas onChange"*
+- **Résolution :** Alignement des compétences et gestion de l'auto-sélection.
+
+---
+
+### Demande 38 (Rectification / Disposition Horizontale Inline & Fix du Chevauchement de l'Icône de Recherche) : Disposition Horizontale des Champs d'Ajout de Compétence avec Alignement `flex-end` et Correction du `padding-left: 38px !important` sur l'Input de Recherche
+> **User Prompt :** *"je te dis mets ceci en horizontal Rechercher une compétence Tapez le nom de la compétence (ex: PHP, React, Management...) Compétence correspondante (6 trouvées) Gestion de projet (Technique) Niveau requis pour l'offre Intermédiaire Ajouter compétence Créer une nouvelle compétence Aucune compétence rattachée à cette offre pour le moment. Choisissez une compétence ci-dessus et cliquez sur Ajouter compétence. et aussi l'icone recherche cache le placeholder et le texte qu'on ecris"*
+- **Résolution :** Disposition horizontale inline et fix de l'icône de recherche.
+
+---
+
+### Demande 39 (Rectification / Portée Pleine Largeur `full-span` du Bloc "Compétences requises") : Extension du Bloc "Compétences requises" sur 100% de la Largeur du Formulaire via `className="full-span"` et `gridColumn: '1 / -1'`
+> **User Prompt :** *"mais met en horizontal le bloc pour competence requises"*
+- **Résolution :** Extension pleine largeur du bloc de compétences.
+
+---
+
+### Demande 40 (Rectification / Ajout Direct de la Compétence Créée depuis la Pop-up dans l'Offre) : Retour de l'Objet Compétence Créé par `CompetenceModal` (`onSuccess(res)`) et Insertion Automatique dans `offerForm.competences`
+> **User Prompt :** *"mais le bouton creer une nouvelle competence doit ouvrir un pop up et choisir libelle et type comme toutes les competences et ca rajoute directement dans la liste des competences pour l'offre"*
+- **Résolution :** Transmission de l'objet créé et insertion automatique.
+
+---
+
+### Demande 41 (Rectification / Rendu de la Pop-up `CompetenceModal` en Mode Formulaire d'Offre) : Duplication du Bloc de Rendu `{showCompetenceCreateModal ? <CompetenceModal ... /> : null}` dans le Premier Return de `OffersView.jsx` (`if (viewMode === 'form')`)
+> **User Prompt :** *"mais rien ne s'affiche lorsque je clique sur creer nouvelle competence"*
+- **Résolution :** Intégration du composant `<CompetenceModal>` dans la vue de formulaire.
+
+---
+
+### Demande 42 (Rectification / Correction de l'Affichage du Nom de la Compétence Créée au lieu de `Compétence #8`) : Transmission de `onRefreshBase={loadBaseData}` dans `main.jsx` et Mémorisation Locale Immédiate (`extraCompetences` / `allCompetences`) dans `OffersView.jsx`
+> **User Prompt :** *"pour les competences nouvellement creer le nom qui s'affiche dans les competences requises pour l'offre c'est Compétence #8"*
+- **Résolution :** Passage de `onRefreshBase` et synchronisation réactive locale.
+
+---
+
+### Demande 43 (Rectification / Optimisation de l'Agencement des Actions des Offres en Hauteur) : Compactage de la Colonne d'Actions (`padding: 8px 12px`, `height: 32px`, `flex-wrap: nowrap !important`) dans `OffersTable.jsx` et `styles.css`
+> **User Prompt :** *"okey maintenant pour la liste des offres d'emploi je trouve qu'il faudrait mieux agencer les actions ,ca prend trop de place en hauteur"*
+- **Résolution :** Compactage des actions et suppression du retour à la ligne.
+
+---
+
+### Demande 44 (Rectification / Généralisation des 4 Actions sur Toutes les Offres & Grisement des Actions Indisponibles) : Présence Systématique des 4 Boutons (`Publier`, `Clôturer`, `Modifier`, `Supprimer`) sur Chaque Ligne d'Offre avec État Désactivé/Grisé et Tooltip Explicatif (`disabled={!canAction}`, `opacity: 0.35`)
+> **User Prompt :** *"okey tres bien juste generalise les actions ,toutes les offres doivent avoir les actions publier ,cloturer ,modifier et supprimer juste tu mets comme pour le lien et candidature rh si il ne peut pas realiser l'action"*
+- **Résolution :** Présence systématique des 4 actions et grisement avec tooltips.
+
+---
+
+### Demande 45 (Fix Runtime / Import d'icône Manquant) : Résolution de l'erreur `Uncaught ReferenceError: Edit3 is not defined` par l'ajout de `Edit3` dans les Imports `lucide-react` de `OffersView.jsx`
+> **User Prompt :** *"Uncaught ReferenceError: Edit3 is not defined at renderOfferActions (OffersView.jsx:423:22) at OffersTable.jsx:142:78 at Array.map (<anonymous>) at OffersTable (OffersTable.jsx:39:29)"*
+- **Résolution :** Ajout de `Edit3` aux icônes importées de `lucide-react`.
+
+---
+
+### Demande 46 (Rectification / Harmonisation des Boutons d'Ajout de Compétences au Bas de la Div) : Uniformisation de la Section Compétences (`className="full-span" style={{ display: 'grid', gap: '8px' }}`) et Disposition des Boutons `ghost-button` en Bas à Gauche (`justifySelf: 'start'`) Identique aux Sections Missions et Formations
+> **User Prompt :** *"le ajouter competence fais comme pour les autres comme pour formation et mission ,le meme style et au meme endroit de la div"*
+- **Résolution :** Structuration identique et placement des boutons en bas à gauche de la div.
+
+---
+
+### Demande 47 (Rectification / Style de Couleur Dédié au Bouton de Création de Compétence) : Application d'un Style Violet Douce Distinctif (`background: #f3e8ff`, `color: #6b21a8`, `border: 1px solid #d8b4fe`) sur le Bouton "Créer une nouvelle compétence"
+> **User Prompt :** *"le bouton creer une nouvelle competence met en une autre couleur"*
 - **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
-  1. **Composants Dédiés par Page** :
-     - **[CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx)** : Page dédiée aux candidatures sur offre avec la disposition 2 colonnes, la recherche d'offre et la liste par direction.
-     - **[CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx)** : Page dédiée aux candidatures spontanées avec son tableau propre.
-  2. **Mise à Jour du Routage Declaratif ([src/main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/main.jsx#L172-L186))** :
-     - Importations séparées avec Lazy Loading : `CandidaturesOffresView` et `CandidaturesSpontaneesView`.
-     - Suppression de la prop `mode` sur les composants de route.
-  3. **Backward Compatibility ([src/pages/CandidaturesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesView.jsx))** :
-     - Redirection conditionnelle légère si importé ailleurs.
-  4. **Validation par Compilation & Tests** :
-     - **Vite Build (`npm run build`)** : **✓ Built in 678ms (0 erreur, chunks séparés `CandidaturesOffresView` 15.6 KB & `CandidaturesSpontaneesView` 6.6 KB)**.
-     - **PHPUnit (`php artisan test`)** : **✓ 15/15 PASS (100% au vert)**.
+  1. **Personnalisation Visuelle ([OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/OffersView.jsx#L884))** :
+     - Ajout de la couleur violette douce (`background: '#f3e8ff'`, `color: '#6b21a8'`, `border: '1px solid #d8b4fe'`) au bouton *Créer une nouvelle compétence*.
+     - Le bouton ressort clairement par rapport aux boutons `ghost-button` gris standards tout en conservant le même alignement au bas de la section.
+  2. **Validation de Build** :
+     - **Vite Build (`npm run build`)** : **✓ Built in 554ms (0 erreur)**.

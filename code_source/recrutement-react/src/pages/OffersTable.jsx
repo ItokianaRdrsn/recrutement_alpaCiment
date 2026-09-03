@@ -79,8 +79,8 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                         <span className="status-pill">{offre.statut?.libelle ?? '-'}</span>
                                     </td>
                                     {renderActions || compact || onNavigate ? (
-                                        <td style={{ whiteSpace: 'nowrap', width: '1%' }}>
-                                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+                                        <td style={{ padding: '8px 12px', whiteSpace: 'nowrap', width: '1%' }}>
+                                            <div style={{ display: 'inline-flex', gap: '4px', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
                                                 {compact && onSelectOffer ? (
                                                     <button
                                                         className="row-button"
@@ -91,7 +91,7 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                         title="Voir / Modifier l'offre"
                                                         type="button"
                                                     >
-                                                        <Edit3 size={16} />
+                                                        <Edit3 size={15} />
                                                     </button>
                                                 ) : null}
                                                 {!compact ? (
@@ -102,10 +102,10 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                             if (isPublished) copyCandidateLink(offre);
                                                         }}
                                                         style={!isPublished ? { opacity: 0.4, cursor: 'not-allowed' } : {}}
-                                                        title={isPublished ? "Copier le lien de candidature" : "Lien indisponible (Offre non publiée)"}
+                                                        title={isPublished ? "Copier le lien public" : "Offre non publiée"}
                                                         type="button"
                                                     >
-                                                        <Share2 size={16} />
+                                                        <Share2 size={15} />
                                                     </button>
                                                 ) : null}
                                                 {!compact ? (
@@ -120,7 +120,8 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                             color: isPublished ? '#6d28d9' : '#94a3b8',
                                                             border: isPublished ? '1px solid #ddd6fe' : '1px solid #e2e8f0',
                                                             borderRadius: '6px',
-                                                            padding: '4px 8px',
+                                                            height: '32px',
+                                                            padding: '0 9px',
                                                             fontWeight: '600',
                                                             fontSize: '12px',
                                                             display: 'inline-flex',
@@ -131,7 +132,7 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                             boxShadow: isPublished ? '0 1px 2px rgba(109, 40, 217, 0.08)' : 'none',
                                                             opacity: isPublished ? 1 : 0.65,
                                                         }}
-                                                        title={isPublished ? "Saisir manuellement une candidature RH pour cette offre" : "Saisie RH impossible (Offre non publiée)"}
+                                                        title={isPublished ? "Saisir manuellement une candidature RH" : "Offre non publiée"}
                                                         type="button"
                                                     >
                                                         <UserPlus size={14} />

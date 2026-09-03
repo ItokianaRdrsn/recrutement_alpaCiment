@@ -159,6 +159,7 @@ function MainApp() {
                                 initialEditingOffer={editingOffer}
                                 onClearEditingOffer={() => setEditingOffer(null)}
                                 onNavigate={navigate}
+                                onRefreshBase={loadBaseData}
                                 referentiels={referentiels}
                             />
                         </BackOfficeLayout>

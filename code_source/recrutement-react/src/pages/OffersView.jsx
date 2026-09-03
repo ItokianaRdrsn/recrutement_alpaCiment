@@ -4,6 +4,7 @@ import {
     Award,
     BriefcaseBusiness,
     CheckCircle2,
+    Edit3,
     Filter,
     GraduationCap,
     ListChecks,
@@ -20,11 +21,12 @@ import { getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { RowActions } from '../components/common/RowActions';
+import { CompetenceModal } from '../components/modals/CompetenceModal';
 import { SaisirRhCandidatureModal } from '../components/modals/SaisirRhCandidatureModal';
 import { emptyOfferForm, offerPayload } from '../utils/formatters';
 import { OffersTable } from './OffersTable';
 
-export function OffersView({ canManage, competencesData, initialEditingOffer = null, onClearEditingOffer = null, onNavigate = null, referentiels }) {
+export function OffersView({ canManage, competencesData, initialEditingOffer = null, onClearEditingOffer = null, onNavigate = null, onRefreshBase = null, referentiels }) {
     const [viewMode, setViewMode] = useState(initialEditingOffer ? 'form' : 'list');
     const [filters, setFilters] = useState({
         q: '',
@@ -40,6 +42,40 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
     const [formError, setFormError] = useState('');
+    const [competenceSearchQuery, setCompetenceSearchQuery] = useState('');
+    const [selectedAddCompId, setSelectedAddCompId] = useState('');
+    const [selectedAddCompNiveau, setSelectedAddCompNiveau] = useState('Intermediaire');
+    const [showCompetenceCreateModal, setShowCompetenceCreateModal] = useState(false);
+    const [extraCompetences, setExtraCompetences] = useState([]);
+
+    const getCompId = useCallback((c) => Number(c?.id_competence ?? c?.id ?? 0), []);
+    const getCompName = useCallback((c) => c?.nom_competence ?? c?.nom ?? `Compétence #${getCompId(c)}`, [getCompId]);
+
+    const allCompetences = useMemo(() => {
+        const base = competencesData.competences ?? [];
+        const baseIds = new Set(base.map((c) => getCompId(c)));
+        const extraToAdd = extraCompetences.filter((c) => !baseIds.has(getCompId(c)));
+        return [...base, ...extraToAdd];
+    }, [competencesData.competences, extraCompetences, getCompId]);
+
+    const filteredComps = useMemo(() => {
+        const list = allCompetences;
+        if (!competenceSearchQuery.trim()) return list;
+        const q = competenceSearchQuery.toLowerCase().trim();
+        return list.filter((c) => getCompName(c).toLowerCase().includes(q));
+    }, [allCompetences, competenceSearchQuery, getCompName]);
+
+    useEffect(() => {
+        if (filteredComps.length > 0) {
+            const firstId = String(getCompId(filteredComps[0]));
+            const exists = filteredComps.some((c) => String(getCompId(c)) === String(selectedAddCompId));
+            if (!exists) {
+                setSelectedAddCompId(firstId);
+            }
+        } else {
+            setSelectedAddCompId('');
+        }
+    }, [filteredComps, selectedAddCompId, getCompId]);
 
     const defaultStatusId = useMemo(
         () => referentiels.statuts_offre?.find((statut) => statut.libelle === 'Brouillon')?.id_statut_offre ?? '',
@@ -185,25 +221,48 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
     }
 
     function toggleCompetence(id_competence) {
+        const numId = Number(id_competence);
         setOfferForm((curr) => {
-            const exists = curr.competences.find((c) => c.id_competence === id_competence);
+            const exists = curr.competences.find((c) => Number(c.id_competence) === numId);
             if (exists) {
                 return {
                     ...curr,
-                    competences: curr.competences.filter((c) => c.id_competence !== id_competence),
+                    competences: curr.competences.filter((c) => Number(c.id_competence) !== numId),
                 };
             }
             return {
                 ...curr,
-                competences: [...curr.competences, { id_competence, niveau_requis: 'Intermediaire' }],
+                competences: [...curr.competences, { id_competence: numId, niveau_requis: 'Intermediaire' }],
             };
         });
     }
 
+    function handleAddCompetenceFromSelect() {
+        const targetIdStr = selectedAddCompId || (filteredComps.length > 0 ? String(getCompId(filteredComps[0])) : '');
+        if (!targetIdStr) return;
+
+        const id_comp = Number(targetIdStr);
+        setOfferForm((curr) => {
+            const exists = curr.competences.find((c) => Number(c.id_competence) === id_comp);
+            if (exists) {
+                return {
+                    ...curr,
+                    competences: curr.competences.map((c) => (Number(c.id_competence) === id_comp ? { ...c, niveau_requis: selectedAddCompNiveau } : c)),
+                };
+            }
+            return {
+                ...curr,
+                competences: [...curr.competences, { id_competence: id_comp, niveau_requis: selectedAddCompNiveau }],
+            };
+        });
+        setCompetenceSearchQuery('');
+    }
+
     function updateCompetenceNiveau(id_competence, niveau_requis) {
+        const numId = Number(id_competence);
         setOfferForm((curr) => ({
             ...curr,
-            competences: curr.competences.map((c) => (c.id_competence === id_competence ? { ...c, niveau_requis } : c)),
+            competences: curr.competences.map((c) => (Number(c.id_competence) === numId ? { ...c, niveau_requis } : c)),
         }));
     }
 
@@ -321,48 +380,62 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         }
     }
 
-    const renderOfferActions = canManage
-        ? (offre) => {
-              const currentStatusObj = referentiels.statuts_offre?.find((s) => s.id_statut_offre === offre.statut?.id);
-              const currentOrder = currentStatusObj?.ordre_workflow ?? 0;
-              const publieeOrder = referentiels.statuts_offre?.find((s) => s.libelle === 'Publiee' || s.libelle === 'Publiée')?.ordre_workflow ?? 2;
-              const clotureeOrder = referentiels.statuts_offre?.find((s) => s.libelle === 'Cloturee' || s.libelle === 'Clôturée')?.ordre_workflow ?? 3;
+    const renderOfferActions = (offre) => {
+        const currentStatusObj = referentiels.statuts_offre?.find((s) => s.id_statut_offre === offre.statut?.id);
+        const currentOrder = currentStatusObj?.ordre_workflow ?? 0;
+        const publieeOrder = referentiels.statuts_offre?.find((s) => s.libelle === 'Publiee' || s.libelle === 'Publiée')?.ordre_workflow ?? 2;
+        const clotureeOrder = referentiels.statuts_offre?.find((s) => s.libelle === 'Cloturee' || s.libelle === 'Clôturée')?.ordre_workflow ?? 3;
 
-              const canPublish = currentOrder < publieeOrder;
-              const canClose = currentOrder < clotureeOrder;
+        const canPublish = canManage && currentOrder < publieeOrder;
+        const canClose = canManage && currentOrder < clotureeOrder;
+        const canEdit = canManage;
+        const canDelete = canManage;
 
-              return (
-                  <RowActions
-                      extra={
-                          <>
-                              {canPublish ? (
-                                  <button
-                                      className="row-button success"
-                                      onClick={() => changeOfferStatus(offre, 'publier')}
-                                      title="Publier l'offre"
-                                      type="button"
-                                  >
-                                      <CheckCircle2 aria-hidden="true" size={16} />
-                                  </button>
-                              ) : null}
-                              {canClose ? (
-                                  <button
-                                      className="row-button"
-                                      onClick={() => changeOfferStatus(offre, 'cloturer')}
-                                      title="Cloturer l'offre"
-                                      type="button"
-                                  >
-                                      <X aria-hidden="true" size={16} />
-                                  </button>
-                              ) : null}
-                          </>
-                      }
-                      onDelete={() => deleteOffer(offre)}
-                      onEdit={() => editOffer(offre)}
-                  />
-              );
-          }
-        : null;
+        return (
+            <div className="row-actions">
+                <button
+                    className={`row-button ${canPublish ? 'success' : ''}`}
+                    disabled={!canPublish}
+                    onClick={() => { if (canPublish) changeOfferStatus(offre, 'publier'); }}
+                    style={!canPublish ? { opacity: 0.35, cursor: 'not-allowed' } : {}}
+                    title={canPublish ? "Publier l'offre" : "Publication impossible (Offre déjà publiée ou clôturée)"}
+                    type="button"
+                >
+                    <CheckCircle2 aria-hidden="true" size={15} />
+                </button>
+                <button
+                    className="row-button"
+                    disabled={!canClose}
+                    onClick={() => { if (canClose) changeOfferStatus(offre, 'cloturer'); }}
+                    style={!canClose ? { opacity: 0.35, cursor: 'not-allowed' } : {}}
+                    title={canClose ? "Clôturer l'offre" : "Clôture impossible (Offre déjà clôturée)"}
+                    type="button"
+                >
+                    <X aria-hidden="true" size={15} />
+                </button>
+                <button
+                    className="row-button"
+                    disabled={!canEdit}
+                    onClick={() => { if (canEdit) editOffer(offre); }}
+                    style={!canEdit ? { opacity: 0.35, cursor: 'not-allowed' } : {}}
+                    title={canEdit ? "Modifier l'offre" : "Modification non autorisée"}
+                    type="button"
+                >
+                    <Edit3 aria-hidden="true" size={15} />
+                </button>
+                <button
+                    className="row-button danger"
+                    disabled={!canDelete}
+                    onClick={() => { if (canDelete) deleteOffer(offre); }}
+                    style={!canDelete ? { opacity: 0.35, cursor: 'not-allowed' } : {}}
+                    title={canDelete ? "Supprimer l'offre" : "Suppression non autorisée"}
+                    type="button"
+                >
+                    <Trash2 aria-hidden="true" size={15} />
+                </button>
+            </div>
+        );
+    };
 
     const meta = offersResponse.meta;
 
@@ -677,41 +750,144 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                             </button>
                         </div>
 
-                        <div className="form-sub-header">
+                        <div className="form-sub-header full-span">
                             <Award size={18} />
                             <span>Competences requises</span>
                         </div>
 
-                        <div className="competence-selector">
-                            {(competencesData.competences ?? []).map((comp) => {
-                                const selectedObj = offerForm.competences.find((c) => c.id_competence === comp.id);
-                                const isSelected = Boolean(selectedObj);
-
-                                return (
-                                    <div className={`competence-item ${isSelected ? 'selected' : ''}`} key={comp.id}>
-                                        <div className="competence-item-header">
-                                            <span>{comp.nom}</span>
-                                            <input
-                                                checked={isSelected}
-                                                onChange={() => toggleCompetence(comp.id)}
-                                                type="checkbox"
-                                            />
-                                        </div>
-                                        {isSelected ? (
-                                            <select
-                                                onChange={(e) => updateCompetenceNiveau(comp.id, e.target.value)}
-                                                style={{ height: '32px', fontSize: '12px' }}
-                                                value={selectedObj.niveau_requis ?? 'Intermediaire'}
-                                            >
-                                                <option value="Debutant">Debutant</option>
-                                                <option value="Intermediaire">Intermediaire</option>
-                                                <option value="Avance">Avance</option>
-                                                <option value="Expert">Expert</option>
-                                            </select>
-                                        ) : null}
+                        <div className="full-span" style={{ display: 'grid', gap: '8px' }}>
+                            {/* RANGÉE HORIZONTALE DES CONTROLES DE RECHERCHE ET SELECTION */}
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '12px', flexWrap: 'wrap' }}>
+                                {/* 1. Input de recherche */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: '1 1 220px', minWidth: '200px' }}>
+                                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}>
+                                        Rechercher une compétence
+                                    </label>
+                                    <div className="search-field" style={{ width: '100%' }}>
+                                        <Search size={16} />
+                                        <input
+                                            onChange={(e) => setCompetenceSearchQuery(e.target.value)}
+                                            placeholder="Tapez le nom de la compétence (ex: PHP, React...)"
+                                            type="search"
+                                            value={competenceSearchQuery}
+                                        />
                                     </div>
-                                );
-                            })}
+                                </div>
+
+                                {/* 2. Select des résultats */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: '1.2 1 240px', minWidth: '220px' }}>
+                                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}>
+                                        Compétence correspondante ({filteredComps.length} trouvée{filteredComps.length > 1 ? 's' : ''})
+                                    </label>
+                                    <select
+                                        onChange={(e) => setSelectedAddCompId(e.target.value)}
+                                        style={{ width: '100%', height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        value={selectedAddCompId}
+                                    >
+                                        {filteredComps.length ? (
+                                            filteredComps.map((c) => (
+                                                <option key={getCompId(c)} value={getCompId(c)}>
+                                                    {getCompName(c)} {c.type ? `(${c.type})` : ''}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            <option value="">Aucune compétence trouvée</option>
+                                        )}
+                                    </select>
+                                </div>
+
+                                {/* 3. Select Niveau */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '160px' }}>
+                                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}>
+                                        Niveau requis pour l'offre
+                                    </label>
+                                    <select
+                                        onChange={(e) => setSelectedAddCompNiveau(e.target.value)}
+                                        style={{ width: '100%', height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        value={selectedAddCompNiveau}
+                                    >
+                                        <option value="Debutant">Débutant</option>
+                                        <option value="Intermediaire">Intermédiaire</option>
+                                        <option value="Avance">Avancé</option>
+                                        <option value="Expert">Expert</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* TABLEAU DES COMPÉTENCES RATTACHÉES À L'OFFRE */}
+                            {offerForm.competences.length > 0 ? (
+                                <div className="table-wrap" style={{ background: '#ffffff', borderRadius: '8px', border: '1px solid var(--border)', marginTop: '4px' }}>
+                                    <table style={{ margin: 0, fontSize: '13.5px' }}>
+                                        <thead>
+                                            <tr>
+                                                <th style={{ padding: '10px 14px' }}>Compétence Sélectionnée</th>
+                                                <th style={{ padding: '10px 14px' }}>Niveau Requis</th>
+                                                <th style={{ padding: '10px 14px', width: '90px', textAlign: 'center' }}>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {offerForm.competences.map((selectedObj) => {
+                                                const compRef = allCompetences.find((c) => getCompId(c) === Number(selectedObj.id_competence));
+                                                const compName = compRef ? getCompName(compRef) : `Compétence #${selectedObj.id_competence}`;
+
+                                                return (
+                                                    <tr key={selectedObj.id_competence}>
+                                                        <td style={{ padding: '10px 14px' }}>
+                                                            <strong style={{ color: '#0f172a' }}>{compName}</strong>
+                                                        </td>
+                                                        <td style={{ padding: '10px 14px' }}>
+                                                            <select
+                                                                onChange={(e) => updateCompetenceNiveau(selectedObj.id_competence, e.target.value)}
+                                                                style={{ height: '34px', fontSize: '13px', padding: '0 8px', borderRadius: '6px', border: '1px solid var(--border)' }}
+                                                                value={selectedObj.niveau_requis ?? 'Intermediaire'}
+                                                            >
+                                                                <option value="Debutant">Débutant</option>
+                                                                <option value="Intermediaire">Intermédiaire</option>
+                                                                <option value="Avance">Avancé</option>
+                                                                <option value="Expert">Expert</option>
+                                                            </select>
+                                                        </td>
+                                                        <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                                                            <button
+                                                                className="row-button danger"
+                                                                onClick={() => toggleCompetence(selectedObj.id_competence)}
+                                                                title="Retirer de l'offre"
+                                                                type="button"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : null}
+
+                            {/* BOUTONS AU BAS DE LA DIV, MÊME STYLE ET EMPLACEMENT QUE MISSIONS ET FORMATIONS */}
+                            <div style={{ display: 'flex', gap: '8px', justifySelf: 'start', flexWrap: 'wrap' }}>
+                                <button
+                                    className="ghost-button"
+                                    disabled={!selectedAddCompId && !filteredComps.length}
+                                    onClick={handleAddCompetenceFromSelect}
+                                    style={{ justifySelf: 'start' }}
+                                    type="button"
+                                >
+                                    <Plus size={16} />
+                                    <span>Ajouter la compétence</span>
+                                </button>
+
+                                <button
+                                    className="ghost-button"
+                                    onClick={() => setShowCompetenceCreateModal(true)}
+                                    style={{ justifySelf: 'start', background: '#f3e8ff', color: '#6b21a8', border: '1px solid #d8b4fe' }}
+                                    type="button"
+                                >
+                                    <Plus size={16} />
+                                    <span>Créer une nouvelle compétence</span>
+                                </button>
+                            </div>
                         </div>
 
                         <div className="form-actions full-span" style={{ marginTop: '16px' }}>
@@ -735,6 +911,32 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         {formError ? <p className="form-error full-span">{formError}</p> : null}
                     </form>
                 </section>
+
+                {showCompetenceCreateModal ? (
+                    <CompetenceModal
+                        onClose={() => setShowCompetenceCreateModal(false)}
+                        onSuccess={async (createdItem) => {
+                            if (createdItem) {
+                                setExtraCompetences((prev) => [...prev, createdItem]);
+                                const newId = Number(createdItem?.id_competence ?? createdItem?.id ?? 0);
+                                if (newId) {
+                                    setOfferForm((curr) => {
+                                        const exists = curr.competences.find((c) => Number(c.id_competence) === newId);
+                                        if (!exists) {
+                                            return {
+                                                ...curr,
+                                                competences: [...curr.competences, { id_competence: newId, niveau_requis: selectedAddCompNiveau }],
+                                            };
+                                        }
+                                        return curr;
+                                    });
+                                }
+                            }
+                            if (onRefreshBase) await onRefreshBase();
+                        }}
+                        typesList={competencesData?.types ?? []}
+                    />
+                ) : null}
             </div>
         );
     }
@@ -849,6 +1051,29 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                     onClose={() => setSaisirRhOffreId(null)}
                     onSuccess={loadOffers}
                     referentiels={referentiels}
+                />
+            ) : null}
+
+            {showCompetenceCreateModal ? (
+                <CompetenceModal
+                    onClose={() => setShowCompetenceCreateModal(false)}
+                    onSuccess={async (createdItem) => {
+                        if (onRefreshBase) await onRefreshBase();
+                        const newId = Number(createdItem?.id_competence ?? createdItem?.id ?? 0);
+                        if (newId) {
+                            setOfferForm((curr) => {
+                                const exists = curr.competences.find((c) => Number(c.id_competence) === newId);
+                                if (!exists) {
+                                    return {
+                                        ...curr,
+                                        competences: [...curr.competences, { id_competence: newId, niveau_requis: selectedAddCompNiveau }],
+                                    };
+                                }
+                                return curr;
+                            });
+                        }
+                    }}
+                    typesList={competencesData.types ?? []}
                 />
             ) : null}
         </div>

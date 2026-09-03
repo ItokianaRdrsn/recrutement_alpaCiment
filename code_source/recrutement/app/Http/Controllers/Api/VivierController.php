@@ -70,7 +70,7 @@ class VivierController extends Controller
             });
         }
 
-        $candidaturesEnVivier = $candQuery->orderByDesc('date_maj')->get();
+        $candidaturesEnVivier = $candQuery->orderByDesc('updated_at')->get();
 
         $combined = collect();
 
@@ -155,6 +155,10 @@ class VivierController extends Controller
     public function getCandidatProfile(int $id): JsonResponse
     {
         $candidature = Candidature::with('candidat')->find($id);
+        if (!$candidature) {
+            $candidature = Candidature::with('candidat')->where('id_candidat', $id)->latest()->first();
+        }
+
         $candidat = $candidature ? $candidature->candidat : Candidat::find($id);
 
         if (!$candidat && !$candidature) {
@@ -162,42 +166,32 @@ class VivierController extends Controller
         }
 
         $idCandidature = $candidature ? $candidature->id_candidature : null;
-        $idCandidat = $candidat ? $candidat->id_candidat : null;
 
-        $expQuery = CandidatExperience::query();
-        if ($idCandidature) {
-            $expQuery->where('id_candidature', $idCandidature);
-        } else {
-            $expQuery->where('id_candidat', $idCandidat);
-        }
-        $experiences = $expQuery->orderByDesc('date_debut')->get();
-
-        $formQuery = CandidatFormation::query();
-        if ($idCandidature) {
-            $formQuery->where('id_candidature', $idCandidature);
-        } else {
-            $formQuery->where('id_candidat', $idCandidat);
-        }
-        $formations = $formQuery->orderByDesc('id_formation')->get();
-
-        $compQuery = DB::table('candidat_competence')
-            ->join('competence', 'candidat_competence.id_competence', '=', 'competence.id_competence')
-            ->join('type_competence', 'competence.id_type_competence', '=', 'type_competence.id_type_competence');
-
-        if ($idCandidature) {
-            $compQuery->where('candidat_competence.id_candidature', $idCandidature);
-        } else {
-            $compQuery->where('candidat_competence.id_candidat', $idCandidat);
+        $experiences = collect();
+        if ($idCandidature && \Illuminate\Support\Facades\Schema::hasColumn('candidat_experience_professionnelle', 'id_candidature')) {
+            $experiences = CandidatExperience::where('id_candidature', $idCandidature)->orderByDesc('date_debut')->get();
         }
 
-        $competences = $compQuery->select(
-            'competence.id_competence',
-            'competence.nom_competence',
-            'type_competence.libelle as type_competence',
-            'candidat_competence.niveau',
-            'candidat_competence.valide',
-            'candidat_competence.source'
-        )->get();
+        $formations = collect();
+        if ($idCandidature && \Illuminate\Support\Facades\Schema::hasColumn('candidat_formation', 'id_candidature')) {
+            $formations = CandidatFormation::where('id_candidature', $idCandidature)->orderByDesc('id_formation')->get();
+        }
+
+        $competences = collect();
+        if ($idCandidature && \Illuminate\Support\Facades\Schema::hasColumn('candidat_competence', 'id_candidature')) {
+            $competences = DB::table('candidat_competence')
+                ->join('competence', 'candidat_competence.id_competence', '=', 'competence.id_competence')
+                ->join('type_competence', 'competence.id_type_competence', '=', 'type_competence.id_type_competence')
+                ->where('candidat_competence.id_candidature', $idCandidature)
+                ->select(
+                    'competence.id_competence',
+                    'competence.nom_competence',
+                    'type_competence.libelle as type_competence',
+                    'candidat_competence.niveau',
+                    'candidat_competence.valide',
+                    'candidat_competence.source'
+                )->get();
+        }
 
         return response()->json([
             'data' => [

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { Pagination } from '../components/common/Pagination';
 import { SaisirRhCandidatureModal } from '../components/modals/SaisirRhCandidatureModal';
 import { formatDate } from '../utils/formatters';
 import { CandidatureDetailView } from './CandidatureDetailView';
@@ -90,11 +91,18 @@ export function CandidaturesOffresView({ referentiels }) {
                 params.set('direction', filters.direction);
             }
 
+            const allCandsParams = new URLSearchParams();
+            allCandsParams.set('type_demande', 'offre');
+            allCandsParams.set('per_page', '500');
+            if (filters.q) allCandsParams.set('q', filters.q);
+            if (filters.statut) allCandsParams.set('statut', filters.statut);
+            if (filters.canal_depot) allCandsParams.set('canal_depot', filters.canal_depot);
+
             const [candResponse, statutsResponse, offresResponse, allCandsResponse] = await Promise.all([
                 getJson(`/api/candidatures?${params.toString()}`),
                 getJson('/api/referentiels/statuts-candidature'),
                 getJson('/api/offres?per_page=150'),
-                getJson('/api/candidatures?type_demande=offre&per_page=500'),
+                getJson(`/api/candidatures?${allCandsParams.toString()}`),
             ]);
 
             setCandidatures(candResponse?.data ?? []);
@@ -414,9 +422,32 @@ export function CandidaturesOffresView({ referentiels }) {
                                         const currentOffreId = getOffreId(o);
                                         const isExpanded = expandedOffresInRightCol[currentOffreId] ?? false;
 
-                                        const offreCands = allCandidaturesSurOffre.filter(
-                                            (c) => getCandOffreId(c) === currentOffreId
-                                        );
+                                        const offreCands = allCandidaturesSurOffre.filter((c) => {
+                                            if (getCandOffreId(c) !== currentOffreId) return false;
+
+                                            if (filters.q) {
+                                                const query = filters.q.toLowerCase().trim();
+                                                const prenom = (c.candidat?.prenom ?? '').toLowerCase();
+                                                const nom = (c.candidat?.nom ?? '').toLowerCase();
+                                                const email = (c.candidat?.email ?? '').toLowerCase();
+                                                const full = `${prenom} ${nom}`;
+                                                if (!prenom.includes(query) && !nom.includes(query) && !email.includes(query) && !full.includes(query)) {
+                                                    return false;
+                                                }
+                                            }
+                                            if (filters.statut) {
+                                                const candStatutId = String(c.id_statut_candidature ?? c.statut?.id_statut_candidature ?? c.statut?.id ?? '');
+                                                if (candStatutId !== String(filters.statut)) {
+                                                    return false;
+                                                }
+                                            }
+                                            if (filters.canal_depot) {
+                                                if (c.canal_depot !== filters.canal_depot) {
+                                                    return false;
+                                                }
+                                            }
+                                            return true;
+                                        });
                                         const offreCandCount = offreCands.length;
 
                                         return (
@@ -635,6 +666,8 @@ export function CandidaturesOffresView({ referentiels }) {
                                     </table>
                                 </div>
                             )}
+
+                            <Pagination meta={paginationMeta} onChangePage={(p) => setPage(p)} perPage={perPage} />
                         </div>
                     )}
                 </div>

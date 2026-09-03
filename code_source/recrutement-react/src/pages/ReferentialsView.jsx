@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { CheckCircle2, Plus, RefreshCw } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { Pagination } from '../components/common/Pagination';
 import { RowActions } from '../components/common/RowActions';
 import { SimpleTable } from '../components/common/SimpleTable';
 import { CompetenceModal } from '../components/modals/CompetenceModal';
@@ -17,6 +18,11 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
     const [showDirectionModal, setShowDirectionModal] = useState(false);
     const [showDomaineModal, setShowDomaineModal] = useState(false);
     const [showCompetenceModal, setShowCompetenceModal] = useState(false);
+
+    const [dirPage, setDirPage] = useState(1);
+    const [domPage, setDomPage] = useState(1);
+    const [compPage, setCompPage] = useState(1);
+    const perPage = 10;
 
     useEffect(() => {
         setSubTab(initialSubTab);
@@ -164,7 +170,7 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
                             <SimpleTable
                                 columns={['Direction', 'Domaines', 'Offres', 'Actions']}
                                 emptyLabel="Aucune direction."
-                                rows={directions.map((direction) => [
+                                rows={directions.slice((dirPage - 1) * perPage, dirPage * perPage).map((direction) => [
                                     <strong>{direction.nom_direction}</strong>,
                                     direction.domaines_count ?? 0,
                                     direction.offres_count ?? 0,
@@ -177,6 +183,11 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
                                         '-'
                                     ),
                                 ])}
+                            />
+                            <Pagination
+                                meta={{ current_page: dirPage, last_page: Math.ceil(directions.length / perPage) || 1, total: directions.length }}
+                                onChangePage={(p) => setDirPage(p)}
+                                perPage={perPage}
                             />
                         </div>
                     ) : null}
@@ -216,7 +227,7 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
                             <SimpleTable
                                 columns={['Domaine', 'Direction', 'Statut', 'Actions']}
                                 emptyLabel="Aucun domaine."
-                                rows={domaines.map((domaine) => [
+                                rows={domaines.slice((domPage - 1) * perPage, domPage * perPage).map((domaine) => [
                                     <strong>{domaine.nom_domaine}</strong>,
                                     domaine.direction?.nom ?? '-',
                                     <span className={domaine.valide ? 'status-pill success' : 'status-pill warning'}>
@@ -238,6 +249,11 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
                                         '-'
                                     ),
                                 ])}
+                            />
+                            <Pagination
+                                meta={{ current_page: domPage, last_page: Math.ceil(domaines.length / perPage) || 1, total: domaines.length }}
+                                onChangePage={(p) => setDomPage(p)}
+                                perPage={perPage}
                             />
                         </div>
                     ) : null}
@@ -279,11 +295,20 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
                     <SimpleTable
                         columns={['Competence', 'Type', 'Statut']}
                         emptyLabel="Aucune competence enregistree."
-                        rows={(competencesData.competences ?? []).map((c) => [
+                        rows={(competencesData.competences ?? []).slice((compPage - 1) * perPage, compPage * perPage).map((c) => [
                             <strong>{c.nom}</strong>,
                             <span className="badge">{c.type ?? 'Technique'}</span>,
                             <span className="badge green">Actif</span>,
                         ])}
+                    />
+                    <Pagination
+                        meta={{
+                            current_page: compPage,
+                            last_page: Math.ceil((competencesData.competences?.length ?? 0) / perPage) || 1,
+                            total: competencesData.competences?.length ?? 0,
+                        }}
+                        onChangePage={(p) => setCompPage(p)}
+                        perPage={perPage}
                     />
                 </section>
             ) : null}

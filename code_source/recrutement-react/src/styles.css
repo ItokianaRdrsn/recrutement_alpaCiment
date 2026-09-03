@@ -407,7 +407,7 @@ button,
 }
 
 .search-field input {
-    padding-left: 36px;
+    padding-left: 38px !important;
     width: 100%;
 }
 
@@ -569,24 +569,33 @@ td span {
     width: 16px;
 }
 
-.form-actions,
-.row-actions {
+.form-actions {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
 
+.row-actions {
+    align-items: center;
+    display: inline-flex;
+    flex-wrap: nowrap !important;
+    gap: 4px;
+    white-space: nowrap;
+}
+
 .row-button {
     align-items: center;
     background: #eef3f6;
     border: 0;
-    border-radius: 8px;
+    border-radius: 6px;
     color: var(--primary-dark);
     display: inline-flex;
-    height: 34px;
+    height: 32px;
     justify-content: center;
-    width: 34px;
+    width: 32px;
+    padding: 0;
+    flex-shrink: 0;
 }
 
 .row-button:hover {
