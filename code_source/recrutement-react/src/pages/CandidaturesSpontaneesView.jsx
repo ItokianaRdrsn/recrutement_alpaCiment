@@ -46,6 +46,7 @@ export function CandidaturesSpontaneesView({ referentiels }) {
 
     const resetFilters = () => {
         setFilters({ q: '', statut: '', canal_depot: '' });
+        setPage(1);
     };
 
     const loadData = useCallback(async () => {
@@ -198,7 +199,6 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                                     <th>Domaine / Direction Suggérée</th>
                                     <th>Date de Dépôt</th>
                                     <th>Statut RH</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -208,11 +208,14 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                                     return (
                                         <tr
                                             key={c.id_candidature}
+                                            onClick={() => handleOpenDossier(c.id_candidature)}
                                             style={{
                                                 background: isUnread ? '#eff6ff' : '#ffffff',
                                                 borderLeft: isUnread ? '4px solid #2563eb' : 'none',
                                                 fontWeight: isUnread ? '600' : 'normal',
+                                                cursor: 'pointer',
                                             }}
+                                            title="Cliquer pour consulter le dossier de cette candidature spontanée"
                                         >
                                             <td>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -235,17 +238,6 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                                             <td>{formatDate(c.created_at)}</td>
                                             <td>
                                                 <span className="status-pill success">{c.statut?.libelle ?? 'Reçue'}</span>
-                                            </td>
-                                            <td>
-                                                <button
-                                                    className="filter-button"
-                                                    onClick={() => handleOpenDossier(c.id_candidature)}
-                                                    style={{ padding: '6px 12px', fontSize: '12.5px', gap: '6px' }}
-                                                    type="button"
-                                                >
-                                                    <Eye size={14} />
-                                                    <span>Consulter dossier</span>
-                                                </button>
                                             </td>
                                         </tr>
                                     );

@@ -1,6 +1,6 @@
 # Document Central de Suivi par Étape et d'Avancement Global (65,5 j)
 
-Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et le journal chronologique cumulatif de toutes les demandes utilisateur (Prompts) avec me me leurs résolutions.
+Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et le journal chronologique cumulatif de toutes les demandes utilisateur (Prompts) avec leurs résolutions.
 
 ---
 
@@ -275,7 +275,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 38 (Rectification / Disposition Horizontale Inline & Fix du Chevauchement de l'Icône de Recherche) : Disposition Horizontale des Champs d'Ajout de Compétence avec Alignement `flex-end` et Correction du `padding-left: 38px !important` sur l'Input de Recherche
-> **User Prompt :** *"je te dis mets ceci en horizontal Rechercher une compétence Tapez le nom de la compétence (ex: PHP, React, Management...) Compétence correspondante (6 trouvées) Gestion de projet (Technique) Niveau requis pour l'offre Intermédiaire Ajouter compétence Créer une nouvelle compétence Aucune compétence rattachée à cette offre pour le moment. Choisissez une compétence ci-dessus et cliquez sur Ajouter compétence. et aussi l'icone recherche cache le placeholder et le texte qu'on ecris"*
+> **User Prompt :** *"je te dis mets ceci en horizontal Rechercher une compétence Tapez le nom de la compétence (ex: PHP, React, Management...) Compétence correspondante (6 trouvées) Gestion de projet (Technique) Niveau requis pour l'offre Intermédiaire Ajouter competence Créer une nouvelle compétence Aucune compétence rattachée à cette offre pour le moment. Choisissez une compétence ci-dessus me et cliquez sur Ajouter competence. et aussi l'icone recherche cache le placeholder et le texte qu'on ecris"*
 - **Résolution :** Disposition horizontale inline et fix de l'icône de recherche.
 
 ---
@@ -311,7 +311,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 44 (Rectification / Généralisation des 4 Actions sur Toutes les Offres & Grisement des Actions Indisponibles) : Présence Systématique des 4 Boutons (`Publier`, `Clôturer`, `Modifier`, `Supprimer`) sur Chaque Ligne d'Offre avec État Désactivé/Grisé et Tooltip Explicatif (`disabled={!canAction}`, `opacity: 0.35`)
-> **User Prompt :** *"okey tres bien juste generalise les actions ,toutes les offres doivent avoir les actions publier ,cloturer ,modifier et supprimer juste tu mets comme pour le lien et candidature rh si il ne peut pas realiser l'action"*
+> **User Prompt :** *"okey tres bien juste generalise les actions ,toutes les offres me doivent avoir les actions publier ,cloturer ,modifier et supprimer juste tu mets comme pour le lien et candidature rh si il ne peut pas realiser l'action"*
 - **Résolution :** Présence systématique des 4 actions et grisement avec tooltips.
 
 ---
@@ -330,9 +330,77 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 47 (Rectification / Style de Couleur Dédié au Bouton de Création de Compétence) : Application d'un Style Violet Douce Distinctif (`background: #f3e8ff`, `color: #6b21a8`, `border: 1px solid #d8b4fe`) sur le Bouton "Créer une nouvelle compétence"
 > **User Prompt :** *"le bouton creer une nouvelle competence met en une autre couleur"*
+- **Résolution :** Personnalisation visuelle du bouton avec un thème violet doux.
+
+---
+
+### Demande 48 (Rectification / Alignment Visuel de la Modal du Vivier RH sur CompetenceModal) : Refonte de la Pop-up de Recherche et d'Ajout au Vivier (`VivierView.jsx`) pour Adopter Exactement la Même Structure de Backdrop, Badge d'En-tête Sparkles, Carte Arrondie (24px padding, 12px radius, blur) et Footer que `CompetenceModal`
+> **User Prompt :** *"dans /vivier aussi lorsque je me veux que ca soit un pop up comme pour la creation d'une nouvelle competence dans creation d'offre"*
+- **Résolution :** Harmonisation UX/UI de la modale du vivier RH sur `CompetenceModal`.
+
+---
+
+### Demande 49 (Rectification / Menu Déroulant Accordéon par Flèche sur les Directions, Scrolls Indépendants & 98 Candidatures Réelles en Base) : 
+1. **Menu Déroulant par Flèche sur les Directions ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx#L310-L380))** : Ajout des icônes `<ChevronDown />` et `<ChevronRight />` et gestion de l'état `expandedDirs` pour afficher les sous-boutons (*Toutes les candidatures* / *Offres & candidatures*) uniquement lors du clic sur la flèche déroulante ou la carte direction.
+2. **Scrolls Indépendants Fixes (Panneau Gauche vs Panneau Droit)** : Application du style `position: 'sticky', top: '16px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto'` sur la colonne de gauche. Le défilement de la liste des candidats à droite ne masque plus le panneau des directions.
+3. **Alimentation de la Base PostgreSQL** : Exécution du script de seeding `seed_candidatures.php` insérant **98 candidatures réelles** réparties avec profils candidats, formations et expériences sur toutes les offres et directions.
+> **User Prompt :** *"okey aussi dans candidature sur offre ,je veux que dans la sections directions et poles ,on affiche toutes les directions mais c'est lorsqu'on clique sur la fleche du menu deroulante qu'on voit toutes les candidatures et offres /candidature ,et egalement le que le scrolle soit independant pour le tableau et pour la section direction et pole ,je veux scroller le tableau sans que je ne vois plus la direction et pole et finalement tu peux rajouter vraiment beaucoup de candidature pour voir avec des donnees reelles"*
 - **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
-  1. **Personnalisation Visuelle ([OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/OffersView.jsx#L884))** :
-     - Ajout de la couleur violette douce (`background: '#f3e8ff'`, `color: '#6b21a8'`, `border: '1px solid #d8b4fe'`) au bouton *Créer une nouvelle compétence*.
-     - Le bouton ressort clairement par rapport aux boutons `ghost-button` gris standards tout en conservant le même alignement au bas de la section.
-  2. **Validation de Build** :
-     - **Vite Build (`npm run build`)** : **✓ Built in 554ms (0 erreur)**.
+  - Accordéon déroulant avec icônes de chevrons sur les directions.
+  - Fixation sticky du panneau des directions pour un défilement indépendant du tableau.
+  - Ajout de 98 candidatures avec données réelles en base de données.
+  - **Vite Build (`npm run build`)** : **✓ Built in 958ms (0 erreur)**.
+
+---
+
+### Demande 50 (Rectification / Reset Systématique de la Pagination à la Page 1 & Lignes 100% Cliquables Sans Bouton "Consulter Dossier") :
+1. **Réinitialisation Systématique de la Pagination à la Page 1 ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx))** : Ajout de `setPage(1)` lors du changement de direction sélectionnée (`handleSelectDirectionWithSubMode`), du clic sur "Toutes les directions" et lors du réinitialiseur de filtres (`resetFilters`). Ceci empêche d'être bloqué sur une page 2+ vide lors d'un changement de filtre/direction.
+2. **Lignes de Tableau 100% Cliquables et Suppression de la Colonne "Consulter dossier" ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx) & [CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx))** : Suppression de la colonne `<th>Actions</th>` et du bouton `Consulter dossier`. Toute la ligne `<tr>` est désormais cliquable (`cursor: 'pointer'`, `onClick={() => handleOpenDossier(c.id_candidature)}`) pour éliminer tout besoin de défilement horizontal et harmoniser l'expérience utilisateur.
+> **User Prompt :** *"ahhh okey erreur j'ai mis toutes les direction et ensuite j'ai changer de page en suivant ducoup page 2 et j'ai mais toutes les candidatures pour une direction et il y a ecrit aucune candidature car j'etais bloquer sur la page 2 ,remet toujours les page a 1 et ensuite ne met plus l'action consulter dossier dans les pages candidatures sur offre et spontannee car ca prend trop de place surtout avec candidature sur offre ,fais juste que ca soit cliquable son div car actuellement on doit slider a droite pour voir le bouton et pour unifier le style je veux le changer aussi dans candidature spontanee"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Réinitialisation systématique `setPage(1)` sur toute sélection de direction/filtre.
+  - Lignes `<tr>` rendues cliquables avec `cursor: 'pointer'` et suppression de la colonne "Actions".
+  - **Vite Build (`npm run build`)** : **✓ Built in 553ms (0 erreur)**.
+
+---
+
+### Demande 51 (Rectification / Réintégration du Bouton "Créer une nouvelle compétence" dans la Fiche Candidat) :
+1. **Bouton & Pop-up Modal de Création Directe ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L670-L695))** : Ajout du bouton violet doux `Créer une nouvelle compétence` à côté de `Ajouter compétence` dans la section Gestion des Compétences de la fiche candidat.
+2. **Auto-Sélection & Synchronisation Instantanée** : La soumission du formulaire dans `<CompetenceModal>` ferme la fenêtre modale, rafraîchit la liste des compétences globales et sélectionne automatiquement la compétence fraîchement créée dans le menu déroulant du profil candidat.
+> **User Prompt :** *"tu as enlever dans la fiche de candidature pour le competence ,la creation de competence avec pop up remet la"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Import et intégration du composant `<CompetenceModal>` dans `CandidatureDetailView.jsx`.
+  - Ajout du bouton violet doux et mémorisation automatique de la nouvelle compétence.
+  - **Vite Build (`npm run build`)** : **✓ Built in 484ms (0 erreur)**.
+
+---
+
+### Demande 52 (Rectification / Disposition des Boutons d'Action au Bas de la Div dans la Fiche Candidat) :
+1. **Alignement au Bas du Bloc ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L675-L698))** : Restructuration du formulaire d'ajout de compétences pour placer les deux boutons d'action (`Ajouter compétence` et `Créer une nouvelle compétence`) sur une ligne dédiée tout en bas de la sous-div grisifiée, en parfaite harmonie visuelle avec les sections Expériences, Formations et Formulaire d'Offres.
+> **User Prompt :** *"et encore une fois pour la fiche candidat pour competence mes en bas comme pour tous les autres l'ajout de competence"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Alignement des sélecteurs en haut du sous-bloc et boutons d'action au bas du sous-bloc.
+  - **Vite Build (`npm run build`)** : **✓ Built in 480ms (0 erreur)**.
+
+---
+
+### Demande 53 (Fix / Correction de la conservation de Page 2 lors du Changement de Direction) :
+1. **Réinitialisation de la Pagination dans `handleSelectDirectionWithSubMode` ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx#L154-L158))** : Ajout explicite de `setPage(1)` au sein de la fonction `handleSelectDirectionWithSubMode`, qui est appelée lors des clics sur n'importe quel bouton de direction ou sous-boutons.
+2. **Réinitialisation dans `resetFilters` ([CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx#L47-L50))** : Ajout de `setPage(1)` dans le composant des candidatures spontanées.
+> **User Prompt :** *"okey maintenant l'erreur que je t'ai dit a cause de la pagination ,lorsque je suis dans candidature offre ,et que je suis d'abord dans la section toutes les direction et que je change de page pour la page 2 et que je choisis direction commerciale ,il n'y rien qui s'affiche car je suis directement a la pagination 2"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Inscription de `setPage(1)` au sein du gestionnaire `handleSelectDirectionWithSubMode`.
+  - **Vite Build (`npm run build`)** : **✓ Built in 468ms (0 erreur)**.
+
+---
+
+### Demande 54 (Rectification / Recherche de Compétences & Harmonisation des Inputs dans la Fiche Candidat) :
+1. **Intégration de la Recherche de Compétences dans la Fiche Candidat ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L671-L752))** :
+   - Ajout de l'input de recherche avec icône loupe (`Search`), affichage du nombre de résultats trouvés (`(X trouvées)`), auto-sélection de la première option correspondante et sélecteur de niveau de maîtrise alignés en rangée horizontale (`alignItems: flex-end`, `gap: 12px`), identique à la vue de création d'offre (`OffersView.jsx`).
+2. **Harmonisation du Style Visuel des Champs & Forms** :
+   - Application d'une hauteur standard de `42px`, `border-radius: 8px`, `border: 1px solid var(--border)`, `font-size: 13.5px` et `background: #ffffff` sur l'ensemble des champs `<input>`, `<select>` et `<textarea>` des formulaires d'Expériences et de Formations de la fiche candidat.
+> **User Prompt :** *"okey je vais te demander ceci ,le style uniquement ,pour les input ,champ et tout fais comment dans la creation d'offre aussi dans la fiche candidature ,et aussi ,rajoute aussi la recherche de competence dans la fiche de candidat ,je veux la meme"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Ajout du bloc de recherche de compétences avec auto-sélection dans `CandidatureDetailView.jsx`.
+  - Harmonisation complète du design et de la hauteur des champs sur toute la fiche candidat.
+  - **Vite Build (`npm run build`)** : **✓ Built in 499ms (0 erreur)**.

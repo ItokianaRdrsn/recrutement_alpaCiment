@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     ArrowLeft,
     BookmarkCheck,
@@ -16,6 +16,7 @@ import {
     Plus,
     Printer,
     Save,
+    Search,
     Send,
     Sparkles,
     User,
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 import { backendPath, getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { CompetenceModal } from '../components/modals/CompetenceModal';
 import { formatDate } from '../utils/formatters';
 
 export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsList }) {
@@ -45,10 +47,34 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const [profileData, setProfileData] = useState(null);
     const [loadingProfile, setLoadingProfile] = useState(false);
     const [allCompetences, setAllCompetences] = useState([]);
+    const [compSearchQuery, setCompSearchQuery] = useState('');
+    const [showCompetenceCreateModal, setShowCompetenceCreateModal] = useState(false);
     const [newComp, setNewComp] = useState({ id_competence: '', niveau: 'Intermédiaire' });
     const [newExp, setNewExp] = useState({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
     const [newForm, setNewForm] = useState({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '' });
     const [profileMsg, setProfileMsg] = useState('');
+
+    const filteredCompsInDetail = useMemo(() => {
+        const list = allCompetences;
+        if (!compSearchQuery.trim()) return list;
+        const q = compSearchQuery.toLowerCase().trim();
+        return list.filter((c) => {
+            const name = (c.nom_competence ?? c.nom ?? '').toLowerCase();
+            const type = (c.type?.libelle ?? c.type ?? '').toLowerCase();
+            return name.includes(q) || type.includes(q);
+        });
+    }, [allCompetences, compSearchQuery]);
+
+    const effectiveSelectedCompId = useMemo(() => {
+        if (newComp.id_competence) {
+            const exists = filteredCompsInDetail.some((c) => String(c.id_competence ?? c.id) === String(newComp.id_competence));
+            if (exists) return newComp.id_competence;
+        }
+        if (filteredCompsInDetail.length > 0) {
+            return String(filteredCompsInDetail[0].id_competence ?? filteredCompsInDetail[0].id);
+        }
+        return '';
+    }, [filteredCompsInDetail, newComp.id_competence]);
 
     const loadDetails = useCallback(async () => {
         setLoading(true);
@@ -101,22 +127,36 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     async function handleAddCompetence(e) {
         e.preventDefault();
         const targetId = idCandidature || details?.id_candidat;
-        if (!targetId || !newComp.id_competence) return;
+        const targetCompId = newComp.id_competence || effectiveSelectedCompId;
+        if (!targetId || !targetCompId) return;
         setProfileMsg('');
         try {
             await sendJson(`/api/candidature/${targetId}/competences`, {
                 body: {
-                    id_competence: Number(newComp.id_competence),
+                    id_competence: Number(targetCompId),
                     niveau: newComp.niveau,
                 },
             });
             setNewComp({ id_competence: '', niveau: 'Intermédiaire' });
+            setCompSearchQuery('');
             setProfileMsg('Compétence ajoutée à la candidature !');
             await loadCandidateProfile(targetId);
         } catch (err) {
             setError(err.message);
         }
     }
+
+    const handleCompetenceCreated = (createdComp) => {
+        setShowCompetenceCreateModal(false);
+        if (createdComp) {
+            setAllCompetences((prev) => [...prev, createdComp]);
+            setNewComp((curr) => ({ ...curr, id_competence: String(createdComp.id_competence ?? createdComp.id) }));
+        }
+        const targetId = idCandidature || details?.id_candidat;
+        if (targetId) {
+            loadCandidateProfile(targetId);
+        }
+    };
 
     async function handleAddExperience(e) {
         e.preventDefault();
@@ -628,37 +668,88 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 ))}
                             </div>
 
-                            <form onSubmit={handleAddCompetence} style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', background: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                <strong style={{ fontSize: '13.5px' }}>Ajouter une compétence :</strong>
-                                <select
-                                    onChange={(e) => setNewComp((curr) => ({ ...curr, id_competence: e.target.value }))}
-                                    required
-                                    style={{ padding: '8px 12px', fontSize: '13px', borderRadius: '6px' }}
-                                    value={newComp.id_competence}
-                                >
-                                    <option value="">Sélectionner une compétence...</option>
-                                    {(Array.isArray(allCompetences) ? allCompetences : []).map((c) => (
-                                        <option key={c.id_competence ?? c.id} value={c.id_competence ?? c.id}>
-                                            {c.nom_competence ?? c.nom} ({c.type?.libelle ?? c.type ?? 'Technique'})
-                                        </option>
-                                    ))}
-                                </select>
+                            <form onSubmit={handleAddCompetence} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                <strong style={{ fontSize: '14px', color: '#0f172a' }}>Ajouter une compétence au profil candidat :</strong>
 
-                                <select
-                                    onChange={(e) => setNewComp((curr) => ({ ...curr, niveau: e.target.value }))}
-                                    style={{ padding: '8px 12px', fontSize: '13px', borderRadius: '6px' }}
-                                    value={newComp.niveau}
-                                >
-                                    <option value="Débutant">Débutant</option>
-                                    <option value="Intermédiaire">Intermédiaire</option>
-                                    <option value="Avancé">Avancé</option>
-                                    <option value="Expert">Expert</option>
-                                </select>
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '12px', flexWrap: 'wrap' }}>
+                                    {/* 1. Input de recherche */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: '1 1 220px', minWidth: '200px' }}>
+                                        <label style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}>
+                                            Rechercher une compétence
+                                        </label>
+                                        <div className="search-field" style={{ width: '100%' }}>
+                                            <Search size={16} />
+                                            <input
+                                                onChange={(e) => setCompSearchQuery(e.target.value)}
+                                                placeholder="Tapez le nom de la compétence (ex: PHP, React...)"
+                                                type="search"
+                                                value={compSearchQuery}
+                                            />
+                                        </div>
+                                    </div>
 
-                                <button className="primary-button" style={{ padding: '8px 14px', fontSize: '13px' }} type="submit">
-                                    <Plus size={15} />
-                                    <span>Ajouter compétence</span>
-                                </button>
+                                    {/* 2. Select des résultats */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: '1.2 1 240px', minWidth: '220px' }}>
+                                        <label style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}>
+                                            Compétence correspondante ({filteredCompsInDetail.length} trouvée{filteredCompsInDetail.length > 1 ? 's' : ''})
+                                        </label>
+                                        <select
+                                            onChange={(e) => setNewComp((curr) => ({ ...curr, id_competence: e.target.value }))}
+                                            style={{ width: '100%', height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                            value={effectiveSelectedCompId}
+                                        >
+                                            {filteredCompsInDetail.length ? (
+                                                filteredCompsInDetail.map((c) => (
+                                                    <option key={c.id_competence ?? c.id} value={c.id_competence ?? c.id}>
+                                                        {c.nom_competence ?? c.nom} ({c.type?.libelle ?? c.type ?? 'Technique'})
+                                                    </option>
+                                                ))
+                                            ) : (
+                                                <option value="">Aucune compétence trouvée</option>
+                                            )}
+                                        </select>
+                                    </div>
+
+                                    {/* 3. Select Niveau */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '160px' }}>
+                                        <label style={{ fontSize: '13px', fontWeight: '600', color: '#334155' }}>
+                                            Niveau de maîtrise
+                                        </label>
+                                        <select
+                                            onChange={(e) => setNewComp((curr) => ({ ...curr, niveau: e.target.value }))}
+                                            style={{ width: '100%', height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                            value={newComp.niveau}
+                                        >
+                                            <option value="Débutant">Débutant</option>
+                                            <option value="Intermédiaire">Intermédiaire</option>
+                                            <option value="Avancé">Avancé</option>
+                                            <option value="Expert">Expert</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {/* BOUTONS D'ACTION AU BAS DE LA DIV DE SÉLECTION */}
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
+                                    <button
+                                        className="ghost-button"
+                                        disabled={!effectiveSelectedCompId}
+                                        style={{ justifySelf: 'start' }}
+                                        type="submit"
+                                    >
+                                        <Plus size={16} />
+                                        <span>Ajouter la compétence</span>
+                                    </button>
+
+                                    <button
+                                        className="ghost-button"
+                                        onClick={() => setShowCompetenceCreateModal(true)}
+                                        style={{ justifySelf: 'start', background: '#f3e8ff', color: '#6b21a8', border: '1px solid #d8b4fe' }}
+                                        type="button"
+                                    >
+                                        <Plus size={16} />
+                                        <span>Créer une nouvelle compétence</span>
+                                    </button>
+                                </div>
                             </form>
                         </div>
 
@@ -684,35 +775,35 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 ))}
                             </div>
 
-                            <form onSubmit={handleAddExperience} style={{ display: 'grid', gap: '10px', background: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                <strong style={{ fontSize: '13.5px' }}>Saisir une nouvelle expérience :</strong>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                            <form onSubmit={handleAddExperience} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                <strong style={{ fontSize: '14px', color: '#0f172a' }}>Saisir une nouvelle expérience :</strong>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <input
                                         onChange={(e) => setNewExp((curr) => ({ ...curr, intitule_poste: e.target.value }))}
                                         placeholder="Intitulé du poste (ex: Chef de Projet)..."
                                         required
-                                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="text"
                                         value={newExp.intitule_poste}
                                     />
                                     <input
                                         onChange={(e) => setNewExp((curr) => ({ ...curr, entreprise: e.target.value }))}
                                         placeholder="Entreprise / Organisation..."
-                                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="text"
                                         value={newExp.entreprise}
                                     />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <input
                                         onChange={(e) => setNewExp((curr) => ({ ...curr, date_debut: e.target.value }))}
-                                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="date"
                                         value={newExp.date_debut}
                                     />
                                     <input
                                         onChange={(e) => setNewExp((curr) => ({ ...curr, date_fin: e.target.value }))}
-                                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="date"
                                         value={newExp.date_fin}
                                     />
@@ -721,13 +812,15 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                     onChange={(e) => setNewExp((curr) => ({ ...curr, description: e.target.value }))}
                                     placeholder="Description des missions réalisées..."
                                     rows={2}
-                                    style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                    style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                     value={newExp.description}
                                 />
-                                <button className="primary-button" style={{ justifySelf: 'start', padding: '8px 16px', fontSize: '13px' }} type="submit">
-                                    <Plus size={15} />
-                                    <span>Ajouter l'expérience</span>
-                                </button>
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                    <button className="ghost-button" style={{ justifySelf: 'start' }} type="submit">
+                                        <Plus size={16} />
+                                        <span>Ajouter l'expérience</span>
+                                    </button>
+                                </div>
                             </form>
                         </div>
 
@@ -750,45 +843,47 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 ))}
                             </div>
 
-                            <form onSubmit={handleAddFormation} style={{ display: 'grid', gap: '10px', background: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                <strong style={{ fontSize: '13.5px' }}>Saisir une nouvelle formation :</strong>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                            <form onSubmit={handleAddFormation} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                <strong style={{ fontSize: '14px', color: '#0f172a' }}>Saisir une nouvelle formation :</strong>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <input
                                         onChange={(e) => setNewForm((curr) => ({ ...curr, diplome: e.target.value }))}
                                         placeholder="Diplôme obtenu (ex: Master 2 Génie Software)..."
                                         required
-                                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="text"
                                         value={newForm.diplome}
                                     />
                                     <input
                                         onChange={(e) => setNewForm((curr) => ({ ...curr, etablissement: e.target.value }))}
                                         placeholder="Établissement / Université..."
-                                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="text"
                                         value={newForm.etablissement}
                                     />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <input
                                         onChange={(e) => setNewForm((curr) => ({ ...curr, annee_obtention: e.target.value }))}
                                         placeholder="Année d'obtention (ex: 2023)..."
-                                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="number"
                                         value={newForm.annee_obtention}
                                     />
                                     <input
                                         onChange={(e) => setNewForm((curr) => ({ ...curr, domaine_etude: e.target.value }))}
                                         placeholder="Domaine d'étude (ex: Informatique)..."
-                                        style={{ padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border)', fontSize: '13px' }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="text"
                                         value={newForm.domaine_etude}
                                     />
                                 </div>
-                                <button className="primary-button" style={{ justifySelf: 'start', padding: '8px 16px', fontSize: '13px' }} type="submit">
-                                    <Plus size={15} />
-                                    <span>Ajouter la formation</span>
-                                </button>
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                    <button className="ghost-button" style={{ justifySelf: 'start' }} type="submit">
+                                        <Plus size={16} />
+                                        <span>Ajouter la formation</span>
+                                    </button>
+                                </div>
                             </form>
                         </div>
 
@@ -944,6 +1039,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                         </p>
                     </div>
                 </div>
+            )}
+
+            {/* MODAL CRÉATION DE COMPÉTENCE */}
+            {showCompetenceCreateModal && (
+                <CompetenceModal
+                    onClose={() => setShowCompetenceCreateModal(false)}
+                    onSuccess={handleCompetenceCreated}
+                />
             )}
         </div>
     );

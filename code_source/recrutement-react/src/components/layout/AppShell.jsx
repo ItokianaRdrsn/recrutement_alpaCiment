@@ -123,7 +123,7 @@ export function AppShell({ children, user }) {
                         }}
                     >
                         <Layers aria-hidden="true" size={18} />
-                        <span>Vivier & OCR</span>
+                        <span>Vivier</span>
                     </a>
 
                     {/* RÉFÉRENTIELS (CLIC SUR LE HEADER AFFICHE / MASQUE UNIQUEMENT LE MENU DÉROULANT SANS REDIRECTION AUTOMATIQUE) */}
@@ -187,7 +187,7 @@ export function AppShell({ children, user }) {
                                 : activeView === 'offres'
                                 ? "Offres d'emploi"
                                 : activeView === 'vivier'
-                                ? 'Vivier & OCR'
+                                ? 'Vivier'
                                 : activeView === 'referentiels'
                                 ? 'Référentiels'
                                 : 'Tableau de bord'}

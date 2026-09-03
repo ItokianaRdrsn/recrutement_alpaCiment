@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
     BriefcaseBusiness,
     Building2,
+    ChevronDown,
+    ChevronRight,
     Eye,
     Filter,
     ListChecks,
@@ -38,6 +40,7 @@ export function CandidaturesOffresView({ referentiels }) {
     // Sélection de direction & sous-mode de vue : 'toutes_candidatures' (par défaut) vs 'offres_candidatures'
     const [selectedDirectionId, setSelectedDirectionId] = useState(null);
     const [directionSubMode, setDirectionSubMode] = useState('toutes_candidatures'); // 'toutes_candidatures' | 'offres_candidatures'
+    const [expandedDirs, setExpandedDirs] = useState({});
     const [searchOffreQuery, setSearchOffreQuery] = useState('');
     const [expandedOffresInRightCol, setExpandedOffresInRightCol] = useState({});
 
@@ -69,6 +72,7 @@ export function CandidaturesOffresView({ referentiels }) {
         setSelectedDirectionId(null);
         setDirectionSubMode('toutes_candidatures');
         setSearchOffreQuery('');
+        setPage(1);
     };
 
     const loadData = useCallback(async () => {
@@ -150,6 +154,7 @@ export function CandidaturesOffresView({ referentiels }) {
     const handleSelectDirectionWithSubMode = (dirId, subMode) => {
         setSelectedDirectionId(dirId);
         setDirectionSubMode(subMode);
+        setPage(1);
     };
 
     const filteredOffresForRightCol = offresList.filter((o) => {
@@ -242,10 +247,22 @@ export function CandidaturesOffresView({ referentiels }) {
                 </div>
             </section>
 
-            {/* CONTENU PRINCIPAL : DISPOSITION 2 COLONNES */}
-            <div style={{ display: 'grid', gridTemplateColumns: '330px 1fr', gap: '20px', alignItems: 'start' }}>
-                {/* COLONNE 1 (GAUCHE) : DIRECTIONS AVEC LES 2 BOUTONS */}
-                <div className="data-section" style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+            {/* CONTENU PRINCIPAL : DISPOSITION 2 COLONNES AVEC SCROLLS INDÉPENDANTS */}
+            <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: '20px', alignItems: 'start' }}>
+                {/* COLONNE 1 (GAUCHE) : DIRECTIONS AVEC ACCORDÉON / DÉROULANT FLÈCHE ET SCROLL INDÉPENDANT STICKY */}
+                <div
+                    className="data-section"
+                    style={{
+                        background: '#ffffff',
+                        padding: '16px',
+                        borderRadius: '12px',
+                        border: '1px solid var(--border)',
+                        position: 'sticky',
+                        top: '16px',
+                        maxHeight: 'calc(100vh - 120px)',
+                        overflowY: 'auto',
+                    }}
+                >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                         <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <Building2 size={18} />
@@ -257,6 +274,7 @@ export function CandidaturesOffresView({ referentiels }) {
                         onClick={() => {
                             setSelectedDirectionId(null);
                             setDirectionSubMode('toutes_candidatures');
+                            setPage(1);
                         }}
                         style={{
                             width: '100%',
@@ -298,8 +316,25 @@ export function CandidaturesOffresView({ referentiels }) {
                             const dirOffreCount = dirOffres.length;
 
                             const isDirSelected = selectedDirectionId === currentDirId;
+                            const isExpanded = expandedDirs[currentDirId] ?? isDirSelected;
                             const isToutesActive = isDirSelected && directionSubMode === 'toutes_candidatures';
                             const isOffresActive = isDirSelected && directionSubMode === 'offres_candidatures';
+
+                            const toggleDirCollapse = (e) => {
+                                e.stopPropagation();
+                                setExpandedDirs((prev) => ({
+                                    ...prev,
+                                    [currentDirId]: !isExpanded,
+                                }));
+                            };
+
+                            const handleSelectDirHeader = () => {
+                                handleSelectDirectionWithSubMode(currentDirId, 'toutes_candidatures');
+                                setExpandedDirs((prev) => ({
+                                    ...prev,
+                                    [currentDirId]: true,
+                                }));
+                            };
 
                             return (
                                 <div
@@ -308,75 +343,106 @@ export function CandidaturesOffresView({ referentiels }) {
                                         border: isDirSelected ? '1.5px solid #3b82f6' : '1px solid #cbd5e1',
                                         borderRadius: '9px',
                                         background: isDirSelected ? '#eff6ff' : '#ffffff',
-                                        padding: '12px',
+                                        padding: '10px 12px',
+                                        transition: 'all 0.15s ease',
                                     }}
                                 >
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                        <strong style={{ fontSize: '14px', color: isDirSelected ? '#1d4ed8' : '#0f172a' }}>
-                                            {dir.nom_direction ?? dir.nom}
-                                        </strong>
+                                    <div
+                                        onClick={handleSelectDirHeader}
+                                        style={{
+                                            display: 'flex',
+                                            justify: 'space-between',
+                                            alignItems: 'center',
+                                            cursor: 'pointer',
+                                            padding: '4px 0',
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <button
+                                                onClick={toggleDirCollapse}
+                                                style={{
+                                                    background: 'none',
+                                                    border: 'none',
+                                                    padding: '2px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    color: isDirSelected ? '#1d4ed8' : '#64748b',
+                                                }}
+                                                title={isExpanded ? 'Réduire' : 'Déplier'}
+                                                type="button"
+                                            >
+                                                {isExpanded ? <ChevronDown size={17} /> : <ChevronRight size={17} />}
+                                            </button>
+                                            <strong style={{ fontSize: '13.5px', color: isDirSelected ? '#1d4ed8' : '#0f172a' }}>
+                                                {dir.nom_direction ?? dir.nom}
+                                            </strong>
+                                        </div>
                                         <span className="badge blue" style={{ fontSize: '11px', fontWeight: 'bold' }}>
                                             {dirCandCount} cand.
                                         </span>
                                     </div>
 
-                                    <div style={{ display: 'grid', gap: '6px' }}>
-                                        <button
-                                            onClick={() => handleSelectDirectionWithSubMode(currentDirId, 'toutes_candidatures')}
-                                            style={{
-                                                width: '100%',
-                                                textAlign: 'left',
-                                                padding: '7px 10px',
-                                                borderRadius: '6px',
-                                                background: isToutesActive ? '#2563eb' : '#ffffff',
-                                                border: isToutesActive ? 'none' : '1px solid #cbd5e1',
-                                                color: isToutesActive ? '#ffffff' : '#334155',
-                                                fontWeight: isToutesActive ? '700' : '500',
-                                                fontSize: '12px',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                            }}
-                                            type="button"
-                                        >
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <Users size={13} />
-                                                <span>Toutes les candidatures</span>
-                                            </div>
-                                            <span className={`badge ${isToutesActive ? 'white' : 'gray'}`} style={{ fontSize: '10px', color: isToutesActive ? '#1e40af' : '#475569' }}>
-                                                {dirCandCount}
-                                            </span>
-                                        </button>
+                                    {/* SOUS-BOUTONS ACCESSIBLES UNIVERSELLEMENT LORSQUE DÉPLIÉ VIA LA FLÈCHE OU LE CLIC */}
+                                    {isExpanded && (
+                                        <div style={{ display: 'grid', gap: '6px', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #e2e8f0' }}>
+                                            <button
+                                                onClick={() => handleSelectDirectionWithSubMode(currentDirId, 'toutes_candidatures')}
+                                                style={{
+                                                    width: '100%',
+                                                    textAlign: 'left',
+                                                    padding: '7px 10px',
+                                                    borderRadius: '6px',
+                                                    background: isToutesActive ? '#2563eb' : '#ffffff',
+                                                    border: isToutesActive ? 'none' : '1px solid #cbd5e1',
+                                                    color: isToutesActive ? '#ffffff' : '#334155',
+                                                    fontWeight: isToutesActive ? '700' : '500',
+                                                    fontSize: '12px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                }}
+                                                type="button"
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <Users size={13} />
+                                                    <span>Toutes les candidatures</span>
+                                                </div>
+                                                <span className={`badge ${isToutesActive ? 'white' : 'gray'}`} style={{ fontSize: '10px', color: isToutesActive ? '#1e40af' : '#475569' }}>
+                                                    {dirCandCount}
+                                                </span>
+                                            </button>
 
-                                        <button
-                                            onClick={() => handleSelectDirectionWithSubMode(currentDirId, 'offres_candidatures')}
-                                            style={{
-                                                width: '100%',
-                                                textAlign: 'left',
-                                                padding: '7px 10px',
-                                                borderRadius: '6px',
-                                                background: isOffresActive ? '#4f46e5' : '#ffffff',
-                                                border: isOffresActive ? 'none' : '1px solid #cbd5e1',
-                                                color: isOffresActive ? '#ffffff' : '#334155',
-                                                fontWeight: isOffresActive ? '700' : '500',
-                                                fontSize: '12px',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                            }}
-                                            type="button"
-                                        >
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <BriefcaseBusiness size={13} />
-                                                <span>Offres & candidatures</span>
-                                            </div>
-                                            <span className={`badge ${isOffresActive ? 'white' : 'gray'}`} style={{ fontSize: '10px', color: isOffresActive ? '#3730a3' : '#475569' }}>
-                                                {dirOffreCount} offre{dirOffreCount > 1 ? 's' : ''}
-                                            </span>
-                                        </button>
-                                    </div>
+                                            <button
+                                                onClick={() => handleSelectDirectionWithSubMode(currentDirId, 'offres_candidatures')}
+                                                style={{
+                                                    width: '100%',
+                                                    textAlign: 'left',
+                                                    padding: '7px 10px',
+                                                    borderRadius: '6px',
+                                                    background: isOffresActive ? '#4f46e5' : '#ffffff',
+                                                    border: isOffresActive ? 'none' : '1px solid #cbd5e1',
+                                                    color: isOffresActive ? '#ffffff' : '#334155',
+                                                    fontWeight: isOffresActive ? '700' : '500',
+                                                    fontSize: '12px',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between',
+                                                }}
+                                                type="button"
+                                            >
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <BriefcaseBusiness size={13} />
+                                                    <span>Offres & candidatures</span>
+                                                </div>
+                                                <span className={`badge ${isOffresActive ? 'white' : 'gray'}`} style={{ fontSize: '10px', color: isOffresActive ? '#3730a3' : '#475569' }}>
+                                                    {dirOffreCount} offre{dirOffreCount > 1 ? 's' : ''}
+                                                </span>
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -525,7 +591,6 @@ export function CandidaturesOffresView({ referentiels }) {
                                                                             <th>Email & Téléphone</th>
                                                                             <th>Date de Dépôt</th>
                                                                             <th>Statut RH</th>
-                                                                            <th>Actions</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
@@ -535,11 +600,14 @@ export function CandidaturesOffresView({ referentiels }) {
                                                                             return (
                                                                                 <tr
                                                                                     key={c.id_candidature}
+                                                                                    onClick={() => handleOpenDossier(c.id_candidature)}
                                                                                     style={{
                                                                                         background: isUnread ? '#eff6ff' : '#ffffff',
                                                                                         borderLeft: isUnread ? '4px solid #2563eb' : 'none',
                                                                                         fontWeight: isUnread ? '600' : 'normal',
+                                                                                        cursor: 'pointer',
                                                                                     }}
+                                                                                    title="Cliquer pour consulter le dossier de ce candidat"
                                                                                 >
                                                                                     <td>
                                                                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -556,17 +624,6 @@ export function CandidaturesOffresView({ referentiels }) {
                                                                                     <td>{formatDate(c.created_at)}</td>
                                                                                     <td>
                                                                                         <span className="status-pill success">{c.statut?.libelle ?? 'Reçue'}</span>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <button
-                                                                                            className="filter-button"
-                                                                                            onClick={() => handleOpenDossier(c.id_candidature)}
-                                                                                            style={{ padding: '6px 12px', fontSize: '12px', gap: '6px' }}
-                                                                                            type="button"
-                                                                                        >
-                                                                                            <Eye size={14} />
-                                                                                            <span>Consulter dossier</span>
-                                                                                        </button>
                                                                                     </td>
                                                                                 </tr>
                                                                             );
@@ -610,7 +667,6 @@ export function CandidaturesOffresView({ referentiels }) {
                                                 <th>Direction</th>
                                                 <th>Date de Dépôt</th>
                                                 <th>Statut RH</th>
-                                                <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -620,11 +676,14 @@ export function CandidaturesOffresView({ referentiels }) {
                                                 return (
                                                     <tr
                                                         key={c.id_candidature}
+                                                        onClick={() => handleOpenDossier(c.id_candidature)}
                                                         style={{
                                                             background: isUnread ? '#eff6ff' : '#ffffff',
                                                             borderLeft: isUnread ? '4px solid #2563eb' : 'none',
                                                             fontWeight: isUnread ? '600' : 'normal',
+                                                            cursor: 'pointer',
                                                         }}
+                                                        title="Cliquer pour consulter le dossier de ce candidat"
                                                     >
                                                         <td>
                                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -648,22 +707,11 @@ export function CandidaturesOffresView({ referentiels }) {
                                                         <td>
                                                             <span className="status-pill success">{c.statut?.libelle ?? 'Reçue'}</span>
                                                         </td>
-                                                        <td>
-                                                            <button
-                                                                className="filter-button"
-                                                                onClick={() => handleOpenDossier(c.id_candidature)}
-                                                                style={{ padding: '6px 12px', fontSize: '12.5px', gap: '6px' }}
-                                                                type="button"
-                                                            >
-                                                                <Eye size={15} />
-                                                                <span>Consulter dossier</span>
-                                                            </button>
-                                                        </td>
                                                     </tr>
                                                 );
                                             })}
                                         </tbody>
-                                    </table>
+                                     </table>
                                 </div>
                             )}
 

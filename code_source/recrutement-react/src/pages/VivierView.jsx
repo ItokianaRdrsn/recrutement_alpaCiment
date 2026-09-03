@@ -310,27 +310,76 @@ export function VivierView({ referentiels }) {
 
             {/* POPUP MODAL : RECHERCHE ET SELECTION DE CANDIDATURE A METTRE EN VIVIER */}
             {showAddModal && (
-                <div className="modal-backdrop" onClick={() => setShowAddModal(false)}>
-                    <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '680px', width: '100%', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-                        <div className="modal-header">
+                <div
+                    className="modal-backdrop"
+                    onClick={() => setShowAddModal(false)}
+                    style={{
+                        zIndex: 1100,
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(15, 23, 42, 0.6)',
+                        backdropFilter: 'blur(4px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                >
+                    <div
+                        className="modal-card"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            maxWidth: '680px',
+                            width: '90%',
+                            maxHeight: '85vh',
+                            background: '#ffffff',
+                            borderRadius: '12px',
+                            padding: '24px',
+                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                        }}
+                    >
+                        {/* HEADER DU POPUP MODAL EN HARMONIE AVEC COMPETENCEMODAL */}
+                        <div
+                            className="modal-header"
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: '16px',
+                                paddingBottom: '12px',
+                                borderBottom: '1px solid var(--border)',
+                            }}
+                        >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5' }}>
-                                    <Layers size={20} />
+                                <div
+                                    style={{
+                                        background: '#ede9fe',
+                                        padding: '8px',
+                                        borderRadius: '8px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                    }}
+                                >
+                                    <Sparkles color="#6d28d9" size={22} />
                                 </div>
                                 <div>
-                                    <h3 style={{ margin: 0, fontSize: '18px' }}>Ajouter une candidature au vivier RH</h3>
-                                    <p style={{ margin: 0, fontSize: '12.5px', color: '#64748b' }}>
+                                    <h3 style={{ margin: 0, color: '#1e1b4b', fontSize: '18px', fontWeight: '700' }}>
+                                        Ajouter une candidature au vivier RH
+                                    </h3>
+                                    <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: '#64748b' }}>
                                         Recherchez une candidature par nom, e-mail ou intitulé de poste pour l'ajouter au vivier.
                                     </p>
                                 </div>
                             </div>
-                            <button className="ghost-button" onClick={() => setShowAddModal(false)} type="button">
+                            <button className="icon-button" onClick={() => setShowAddModal(false)} type="button">
                                 <X size={18} />
                             </button>
                         </div>
 
                         {/* RECHERCHE DE CANDIDATURE DANS LE POPUP */}
-                        <div style={{ padding: '16px 20px 8px 20px' }}>
+                        <div style={{ marginBottom: '14px' }}>
                             <div className="search-field" style={{ width: '100%' }}>
                                 <Search size={18} />
                                 <input
@@ -344,7 +393,7 @@ export function VivierView({ referentiels }) {
                         </div>
 
                         {/* LISTE DES CANDIDATURES TROUVÉES */}
-                        <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 20px 20px' }}>
+                        <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
                             {searchingCands ? (
                                 <LoadingState />
                             ) : !candSearchResults.length ? (
@@ -352,7 +401,7 @@ export function VivierView({ referentiels }) {
                                     Aucune candidature trouvée avec ce critère de recherche.
                                 </div>
                             ) : (
-                                <div style={{ display: 'grid', gap: '10px', marginTop: '8px' }}>
+                                <div style={{ display: 'grid', gap: '10px' }}>
                                     {candSearchResults.map((cand) => {
                                         const isInVivier = cand.dans_vivier === true || cand.dans_vivier === 1;
                                         const isRetenue = cand.statut?.libelle?.toLowerCase() === 'retenue' || cand.statut?.libelle?.toLowerCase() === 'retenu';
@@ -365,7 +414,7 @@ export function VivierView({ referentiels }) {
                                                     background: isInVivier || isRetenue ? '#f8fafc' : '#ffffff',
                                                     border: isInVivier || isRetenue ? '1px solid #cbd5e1' : '1px solid #e2e8f0',
                                                     borderRadius: '10px',
-                                                    padding: '14px 16px',
+                                                    padding: '12px 14px',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'space-between',
@@ -434,9 +483,16 @@ export function VivierView({ referentiels }) {
                                                             onClick={() => handleAddCandidatureToVivier(cand.id_candidature)}
                                                             style={{
                                                                 fontSize: '13px',
-                                                                padding: '8px 14px',
+                                                                padding: '7px 14px',
                                                                 background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
                                                                 border: 'none',
+                                                                borderRadius: '8px',
+                                                                color: '#ffffff',
+                                                                cursor: 'pointer',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px',
+                                                                fontWeight: '600',
                                                             }}
                                                             type="button"
                                                         >
@@ -452,9 +508,19 @@ export function VivierView({ referentiels }) {
                             )}
                         </div>
 
-                        <div className="modal-footer" style={{ padding: '14px 20px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
+                        {/* FOOTER DU POPUP EN HARMONIE AVEC COMPETENCEMODAL */}
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                gap: '10px',
+                                marginTop: '14px',
+                                paddingTop: '14px',
+                                borderTop: '1px solid var(--border)',
+                            }}
+                        >
                             <button className="ghost-button" onClick={() => setShowAddModal(false)} type="button">
-                                Fermer
+                                <span>Fermer</span>
                             </button>
                         </div>
                     </div>
