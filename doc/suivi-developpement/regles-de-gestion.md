@@ -8,6 +8,9 @@ Ce document répertorie l'ensemble des règles de gestion métier appliquées su
 - **RG-OFF-01 : Validation des Offres par Statut** : Seules les offres ayant le statut `Publiée` (statut 2) sont visibles sur le portail public candidat et ouvertes au dépôt de candidatures.
 - **RG-OFF-02 : Saisie Manuelle RH sur Offres** : Une candidature saisie manuellement par un agent RH pour une offre exige également que l'offre soit au statut `Publiée`.
 - **RG-OFF-03 : Unicité des Statuts d'Offre** : Les statuts d'offre suivent l'ordre de workflow : `Brouillon` (1), `Publiée` (2), `Clôturée` (3).
+- **RG-OFF-04 : Référentiel des Lieux d'Affectation** : Toute offre d'emploi est obligatoirement rattachée à un lieu d'affectation officiel (`id_lieu NOT NULL`) issu de la table `lieu`.
+- **RG-OFF-05 : Référentiel des Niveaux d'Étude** : Les exigences de formation du profil d'une offre reposent sur les clés étrangères `id_niveau_min` et `id_niveau_max` référençant la table `niveau`.
+- **RG-UI-01 : Astérisques Rouges sur Formulaires** : Tout champ obligatoire dans les formulaires d'édition (ex: création d'offre) comporte un astérisque rouge `*` à côté de son libelle.
 
 ---
 

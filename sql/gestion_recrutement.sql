@@ -79,6 +79,37 @@ VALUES ('CDI'),
     ('Stage'),
     ('Interim'),
     ('Consultance');
+
+-- ============================================================
+-- 6bis. LIEU ET NIVEAU DIPLOME
+-- ============================================================
+CREATE TABLE lieu (
+    id_lieu BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    libelle VARCHAR(150) NOT NULL UNIQUE
+);
+INSERT INTO lieu (libelle) VALUES
+('Antananarivo'),
+('Toamasina'),
+('Antsirabe'),
+('Mahajanga'),
+('Fianarantsoa'),
+('Toliara'),
+('Antsiranana'),
+('Usine AlpA Ciment');
+
+CREATE TABLE niveau (
+    id_niveau BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    libelle VARCHAR(100) NOT NULL UNIQUE
+);
+INSERT INTO niveau (libelle) VALUES
+('CAP / BEP'),
+('Baccalauréat'),
+('Bac+2 (BTS / DUT)'),
+('Bac+3 (Licence)'),
+('Bac+4 (Master 1)'),
+('Bac+5 (Master 2 / Ingénieur)'),
+('Bac+8 (Doctorat)');
+
 -- ============================================================
 -- 7. OFFRE
 -- ============================================================
@@ -87,7 +118,7 @@ CREATE TABLE offre (
     titre_poste VARCHAR(200) NOT NULL,
     id_direction BIGINT NOT NULL REFERENCES direction(id_direction) ON DELETE RESTRICT,
     description TEXT,
-    lieu VARCHAR(200),
+    id_lieu BIGINT NOT NULL REFERENCES lieu(id_lieu) ON DELETE RESTRICT,
     id_type_contrat BIGINT REFERENCES type_contrat(id_type_contrat) ON DELETE RESTRICT,
     date_publication DATE,
     date_limite DATE,
@@ -101,6 +132,7 @@ CREATE TABLE offre (
     )
 );
 CREATE INDEX idx_offre_direction ON offre(id_direction);
+CREATE INDEX idx_offre_lieu ON offre(id_lieu);
 CREATE INDEX idx_offre_type_contrat ON offre(id_type_contrat);
 CREATE INDEX idx_offre_statut ON offre(id_statut_offre);
 -- ============================================================
@@ -138,14 +170,14 @@ CREATE INDEX idx_mission_offre ON mission(id_offre);
 CREATE TABLE profil_formation (
     id_profil_formation BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_offre BIGINT NOT NULL REFERENCES offre(id_offre) ON DELETE CASCADE,
-    niveau_min VARCHAR(50),
-    niveau_max VARCHAR(50),
+    id_niveau_min BIGINT REFERENCES niveau(id_niveau) ON DELETE RESTRICT,
+    id_niveau_max BIGINT REFERENCES niveau(id_niveau) ON DELETE RESTRICT,
     domaine VARCHAR(150),
     obligatoire BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT chk_profil_formation_niveau CHECK (
-        niveau_min IS NOT NULL
-        OR niveau_max IS NOT NULL
+        id_niveau_min IS NOT NULL
+        OR id_niveau_max IS NOT NULL
         OR domaine IS NOT NULL
     )
 );
@@ -642,6 +674,7 @@ VALUES ('Developpement Web', 1, TRUE),
 INSERT INTO offre (
         titre_poste,
         id_direction,
+        id_lieu,
         id_type_contrat,
         date_publication,
         date_limite,
@@ -649,6 +682,7 @@ INSERT INTO offre (
     )
 VALUES (
         'Developpeur Full Stack',
+        1,
         1,
         1,
         '2026-01-15',
@@ -659,12 +693,14 @@ VALUES (
         'Developpeur React Native',
         1,
         1,
+        1,
         '2026-02-01',
         '2026-04-01',
         2
     ),
     (
         'Data Engineer',
+        1,
         1,
         1,
         '2026-01-20',
@@ -675,14 +711,16 @@ VALUES (
         'Responsable Recrutement',
         2,
         1,
+        1,
         '2026-01-10',
         '2026-02-10',
         3
     ),
-    ('Comptable', 3, 1, '2026-02-01', '2026-04-01', 1),
+    ('Comptable', 3, 1, 1, '2026-02-01', '2026-04-01', 1),
     (
         'Chargé de Marketing Digital',
         4,
+        1,
         2,
         '2026-01-25',
         '2026-03-25',
@@ -691,6 +729,7 @@ VALUES (
     (
         'Commercial Senior',
         5,
+        1,
         1,
         '2026-01-15',
         '2026-03-15',

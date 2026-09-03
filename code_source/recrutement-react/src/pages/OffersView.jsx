@@ -398,7 +398,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         </div>
 
                         <label>
-                            <span>Poste</span>
+                            <span>Poste <span style={{ color: '#ef4444' }}>*</span></span>
                             <input
                                 name="titre_poste"
                                 onChange={(event) => updateOfferForm('titre_poste', event.target.value)}
@@ -409,7 +409,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         </label>
 
                         <label>
-                            <span>Direction</span>
+                            <span>Direction <span style={{ color: '#ef4444' }}>*</span></span>
                             <select
                                 name="id_direction"
                                 onChange={(event) => updateOfferForm('id_direction', event.target.value)}
@@ -442,10 +442,11 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         </label>
 
                         <label>
-                            <span>Statut</span>
+                            <span>Statut <span style={{ color: '#ef4444' }}>*</span></span>
                             <select
                                 name="id_statut_offre"
                                 onChange={(event) => updateOfferForm('id_statut_offre', event.target.value)}
+                                required
                                 value={offerForm.id_statut_offre}
                             >
                                 <option value="">Brouillon par defaut</option>
@@ -472,13 +473,20 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         </label>
 
                         <label>
-                            <span>Lieu</span>
-                            <input
-                                name="lieu"
-                                onChange={(event) => updateOfferForm('lieu', event.target.value)}
-                                type="text"
-                                value={offerForm.lieu}
-                            />
+                            <span>Lieu <span style={{ color: '#ef4444' }}>*</span></span>
+                            <select
+                                name="id_lieu"
+                                onChange={(event) => updateOfferForm('id_lieu', event.target.value)}
+                                required
+                                value={offerForm.id_lieu}
+                            >
+                                <option value="">Choisir un lieu</option>
+                                {(referentiels.lieux ?? []).map((lieu) => (
+                                    <option key={lieu.id_lieu} value={lieu.id_lieu}>
+                                        {lieu.libelle}
+                                    </option>
+                                ))}
+                            </select>
                         </label>
 
                         <label>
@@ -621,11 +629,28 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         <div className="full-span" style={{ display: 'grid', gap: '8px' }}>
                             {offerForm.formations.map((formation, index) => (
                                 <div className="dynamic-row" key={index}>
-                                    <input
-                                        onChange={(e) => updateFormation(index, 'niveau_min', e.target.value)}
-                                        placeholder="Niveau (ex: Bac+5, Master)"
-                                        value={formation.niveau_min}
-                                    />
+                                    <select
+                                        onChange={(e) => updateFormation(index, 'id_niveau_min', e.target.value)}
+                                        value={formation.id_niveau_min}
+                                    >
+                                        <option value="">Niveau Min (Optionnel)</option>
+                                        {(referentiels.niveaux ?? []).map((n) => (
+                                            <option key={n.id_niveau} value={n.id_niveau}>
+                                                {n.libelle}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <select
+                                        onChange={(e) => updateFormation(index, 'id_niveau_max', e.target.value)}
+                                        value={formation.id_niveau_max}
+                                    >
+                                        <option value="">Niveau Max (Optionnel)</option>
+                                        {(referentiels.niveaux ?? []).map((n) => (
+                                            <option key={n.id_niveau} value={n.id_niveau}>
+                                                {n.libelle}
+                                            </option>
+                                        ))}
+                                    </select>
                                     <input
                                         onChange={(e) => updateFormation(index, 'domaine', e.target.value)}
                                         placeholder="Domaine (ex: Informatique, Finance)"

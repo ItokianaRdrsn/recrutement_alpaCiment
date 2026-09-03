@@ -222,18 +222,33 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 29 (Sprint 5) : Intégration du Module NLP de Parsing de CV (`cv_nlp_parser.py`) & Validation par Script de Test (2,0 j - 100%)
 > **User Prompt :** *"okey voici le code qu'on m'a donne pour le OCR ,NLP cv_nlp_parser.py ... et voici un fichier pour le tester ,testons le aussi : test_cv_nlp_parser.py"*
-- **Résolution (Suivant le strict protocole Sprint 5 de `methodologie.md`) :**
-  1. **Création du Module NLP ([code_source/ocr/cv_nlp_parser.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_nlp_parser.py))** :
-     - Segmentation en sections (contact, profil, compétences, expériences, formations, langues).
-     - Détection d'entités de personnes (`PER`) et d'entreprises (`ORG`) via spaCy (`fr_core_news_md`).
-     - Rapprochement flou du référentiel de compétences avec calcul de score de confiance (`rapidfuzz`).
-     - Normalisation ISO des dates (`dateparser`).
-  2. **Interconnexion FastAPI ([code_source/ocr/main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py#L185-L210))** :
-     - Appel du module `cv_nlp_parser.py` dans l'endpoint `POST /extract-cv` avec transmission optionnelle du référentiel dynamique.
-  3. **Création & Exécution du Test ([code_source/ocr/test_cv_nlp_parser.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/test_cv_nlp_parser.py))** :
-     - Exécution réussie (`python test_cv_nlp_parser.py`) : extraction complète et déterministe des contacts, compétences (avec niveau et score 0.95), expériences pro et formations.
-  4. **Mise à Jour de la Documentation & ADR ([justification-technologique.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/justification-technologique.md#L93-L115))** :
-     - Enrichissement du comparatif NLP (spaCy + rapidfuzz + dateparser vs Regex pur vs LLMs Cloud).
-  5. **Mise à Jour de `sprint-5/taches.md`** :
-     - Passage de la tâche *Extraction des compétences, expériences et formations depuis le CV (2,0 j)* à **`[FAIT] - 100%`**.
-     - Progression du Sprint 5 portée à **73.9%** (8,5 / 11,5 j) et progression globale à **67.2%** (44,0 / 65,5 j).
+- **Résolution :** Intégration du parser NLP, téléchargement du modèle spaCy `fr_core_news_sm`, activation de rapidfuzz/dateparser et passage du sprint 5 à 73.9%.
+
+---
+
+### Demande 30 (Rectification / Harmonisation RESTful Nomenclaturée) : Harmonisation Globale de Tous les Endpoints de la Plateforme (Singulier `/ressource/{id}` vs Pluriel `/ressources`)
+> **User Prompt :** *"RECTIFICATION: okey est ce que tu peux generaliser les endpoints comme ceci ,exemples ,on va dans offre ,l endpoint c'est /offres ,ensuite pour voir une offre en particulier /offre/1 pareils pour les candidatures ... okey je trouve ca pas mal juste petite rectifications on met plus de "S" lorsque c'est exemple /offre/{id} uniquemennt pour /offres pour lister les offres ... okey parfait mets en place cela et n'oublie pas le methodologie.md que tu dois suivre"*
+- **Résolution :** Application du standard RESTful Nomenclaturé sur `routes/api.php` et l'ensemble des vues React.
+
+---
+
+### Demande 31 (Rectification / Table `lieu`, Table `niveau` & Marquage des Champs Obligatoires) : Création des Tables `lieu` et `niveau`, Remplacement de `lieu` par `id_lieu NOT NULL` et `niveau` par `id_niveau_min`/`id_niveau_max`, et Ajout d'Astérisques Rouges sur la Création d'Offre
+> **User Prompt :** *"RECTIFICATION : on va creer une table lieu id et libelle juste pour l'instant ,et alors dans la table offre il y a aura id lieu au lieu de lieu juste ,et il sera not null egalement ,et dans la creation des offres ,on va mettre un "*" en rouge pour les champ obligatoire a fournir pour la creation des offres ,et egalement ,pour le niveau dans profil formation on va creer une table niveau et dans profil formation ca sera id niveaumin et id niveaumax ,pour l'instant id et libelle juste et change le script sql aussi"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  1. **Base de Données & Script SQL ([sql/gestion_recrutement.sql](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql#L83-L153))** :
+     - Création de la table `lieu` (`id_lieu BIGINT PRIMARY KEY`, `libelle VARCHAR(150) NOT NULL UNIQUE`) et données initiales (Antananarivo, Toamasina, Antsirabe, Mahajanga, Fianarantsoa, Toliara, Antsiranana, Usine AlpA Ciment).
+     - Création de la table `niveau` (`id_niveau BIGINT PRIMARY KEY`, `libelle VARCHAR(100) NOT NULL UNIQUE`) et données initiales (CAP/BEP, Bac, Bac+2, Bac+3, Bac+4, Bac+5, Bac+8).
+     - Table `offre` : Remplacement de `lieu` par `id_lieu BIGINT NOT NULL REFERENCES lieu(id_lieu) ON DELETE RESTRICT`.
+     - Table `profil_formation` : Remplacement de `niveau_min`/`niveau_max` par `id_niveau_min BIGINT REFERENCES niveau(id_niveau)` et `id_niveau_max BIGINT REFERENCES niveau(id_niveau)`.
+  2. **Modèles & Controllers Backend Laravel** :
+     - Création des modèles **[Lieu.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Models/Lieu.php)** et **[Niveau.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Models/Niveau.php)** et controllers associés.
+     - Mise à jour des modèles [Offre.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Models/Offre.php), [ProfilFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Models/ProfilFormation.php), [OffreController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Http/Controllers/Api/OffreController.php), [OffreResource.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Http/Resources/OffreResource.php), [ReferentielController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Http/Controllers/Api/ReferentielController.php), et [DatabaseSeeder.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/database/seeders/DatabaseSeeder.php).
+  3. **Interface Frontend React ([OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/OffersView.jsx#L400-L655)) & Utils ([formatters.js](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/utils/formatters.js))** :
+     - **Astérisques Rouges `<span className="text-red-500">*</span>`** ajoutés à côté des libellés de tous les champs obligatoires (Poste `*`, Direction `*`, Lieu `*`, Statut `*`).
+     - Menu déroulant `<select>` alimenté par la table `lieu` (`id_lieu` obligatoire).
+     - Menus déroulants `<select>` pour `id_niveau_min` et `id_niveau_max` alimentés par la table `niveau`.
+  4. **Mise à Jour du Registre des Règles de Gestion ([regles-de-gestion.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/regles-de-gestion.md#L11-L14))** :
+     - Ajout des règles **`RG-OFF-04`**, **`RG-OFF-05`**, et **`RG-UI-01`**.
+  5. **Validation par Compilations & Tests** :
+     - **Vite Build (`npm run build`)** : **✓ Built in 1.01s (0 erreur)**.
+     - **PHPUnit (`php artisan test`)** : **✓ 15/15 PASS (100% au vert)**.

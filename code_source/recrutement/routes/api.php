@@ -46,6 +46,9 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::get('/dashboard', DashboardController::class)->name('api.dashboard');
     Route::get('/referentiels/recrutement', ReferentielController::class)->name('api.referentiels.recrutement');
     Route::get('/referentiels/statuts-candidature', [CandidatureController::class, 'statuts'])->name('api.referentiels.statuts-candidature');
+    
+    Route::get('/lieux', [\App\Http\Controllers\Api\LieuController::class, 'index'])->name('api.lieux.index');
+    Route::get('/niveaux', [\App\Http\Controllers\Api\NiveauController::class, 'index'])->name('api.niveaux.index');
 
     // --- DIRECTIONS ---
     Route::get('/directions', [DirectionController::class, 'index'])->name('api.directions.index');

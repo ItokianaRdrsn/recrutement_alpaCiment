@@ -21,6 +21,7 @@ class Offre extends Model
         'titre_poste',
         'id_direction',
         'description',
+        'id_lieu',
         'lieu',
         'id_type_contrat',
         'date_publication',
@@ -39,6 +40,11 @@ class Offre extends Model
     public function direction(): BelongsTo
     {
         return $this->belongsTo(Direction::class, 'id_direction', 'id_direction');
+    }
+
+    public function lieuRef(): BelongsTo
+    {
+        return $this->belongsTo(Lieu::class, 'id_lieu', 'id_lieu');
     }
 
     public function statut(): BelongsTo

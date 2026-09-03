@@ -21,10 +21,15 @@ Pour chaque choix, il présente les **motifs de sélection**, les **alternatives
 | **Spring Boot (Java 17+)** | • Excellentes performances de pointe<br>• Robustesse de l'écosystème Java entreprise | • Verbosité extrême du code (boilerplate)<br>• Démarrage/compilation lourds (JVM)<br>• Ralentissement de la vélocité sur les sprints courts | **Écarté ❌** |
 | **NestJS / Express (Node.js)** | • Unification du langage JS/TS avec le Frontend<br>• Modèle d'I/O non bloquant | • Moins de conventions strictes de structure<br>• TypeORM/Prisma moins intégrés qu'Eloquent pour les pivots et relations complexes | **Écarté ❌** |
 
+### 🌐 Standard de Routage API RESTful (Singulier vs Pluriel)
+- **Règle de Collection (Pluriel)** : `/offres`, `/candidatures`, `/directions`, `/domaines`, `/competences` désignent les ensembles et collections de ressources.
+- **Règle d'Entité Unique (Singulier)** : `/offre/{id}`, `/candidature/{id}`, `/direction/{id}`, `/domaine/{id}`, `/competence/{id}` désignent une ressource spécifique et unique accédée par son identifiant `{id}`.
+
 ### 📚 Sources & Documentations
 - [Documentation Officielle Laravel 11.x](https://laravel.com/docs)
 - [Benchmark & Comparison Laravel vs Spring Boot (Medium / JetBrains)](https://blog.jetbrains.com/idea/)
 - [Laravel Eloquent ORM Guide](https://laravel.com/docs/eloquent)
+- [RESTful API Design Best Practices (Mozilla / Microsoft Azure API Guidelines)](https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design)
 
 ---
 

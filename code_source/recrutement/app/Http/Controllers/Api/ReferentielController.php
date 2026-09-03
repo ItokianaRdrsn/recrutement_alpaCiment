@@ -6,6 +6,8 @@ use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\Direction;
 use App\Models\Domaine;
+use App\Models\Lieu;
+use App\Models\Niveau;
 use App\Models\StatutOffre;
 use App\Models\TypeContrat;
 use Illuminate\Http\JsonResponse;
@@ -29,6 +31,12 @@ class ReferentielController extends Controller
                 'types_contrat' => TypeContrat::query()
                     ->orderBy('libelle')
                     ->get(['id_type_contrat', 'libelle']),
+                'lieux' => Lieu::query()
+                    ->orderBy('libelle')
+                    ->get(['id_lieu', 'libelle']),
+                'niveaux' => Niveau::query()
+                    ->orderBy('id_niveau')
+                    ->get(['id_niveau', 'libelle']),
                 'roles' => UserRole::toReferentiel(),
             ],
         ]);

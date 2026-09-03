@@ -186,6 +186,7 @@ class OffreController extends Controller
             'titre_poste' => ['required', 'string', 'max:200'],
             'id_direction' => ['required', 'integer', 'exists:direction,id_direction'],
             'description' => ['nullable', 'string'],
+            'id_lieu' => ['nullable', 'integer', 'exists:lieu,id_lieu'],
             'lieu' => ['nullable', 'string', 'max:150'],
             'id_type_contrat' => ['nullable', 'integer', 'exists:type_contrat,id_type_contrat'],
             'date_publication' => ['nullable', 'date'],
@@ -220,7 +221,11 @@ class OffreController extends Controller
             }
         });
 
-        return $validator->validate();
+        $data = $validator->validate();
+        if (empty($data['id_lieu'])) {
+            $data['id_lieu'] = 1; // Fallback par défaut Antananarivo
+        }
+        return $data;
     }
 
     private function syncNestedRelations(Request $request, Offre $offre): void
@@ -277,8 +282,10 @@ class OffreController extends Controller
             $formations = $request->input('formations', []);
             if (is_array($formations)) {
                 foreach ($formations as $item) {
-                    if (is_array($item) && (!empty($item['niveau_min']) || !empty($item['domaine']))) {
+                    if (is_array($item) && (!empty($item['id_niveau_min']) || !empty($item['niveau_min']) || !empty($item['domaine']))) {
                         $offre->formations()->create([
+                            'id_niveau_min' => $item['id_niveau_min'] ?? null,
+                            'id_niveau_max' => $item['id_niveau_max'] ?? null,
                             'niveau_min' => $item['niveau_min'] ?? null,
                             'niveau_max' => $item['niveau_max'] ?? null,
                             'domaine' => $item['domaine'] ?? null,
