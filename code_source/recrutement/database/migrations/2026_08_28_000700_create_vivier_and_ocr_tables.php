@@ -13,7 +13,7 @@ return new class extends Migration
     {
         if (! Schema::hasTable('candidat_competence')) {
             Schema::create('candidat_competence', function (Blueprint $table) {
-                $table->foreignId('id_candidat')->constrained('candidat', 'id_candidat')->cascadeOnDelete();
+                $table->foreignId('id_candidature')->constrained('candidature', 'id_candidature')->cascadeOnDelete();
                 $table->foreignId('id_competence')->constrained('competence', 'id_competence')->cascadeOnDelete();
                 $table->string('niveau', 30)->nullable();
                 $table->string('source', 20)->default('manuel');
@@ -22,14 +22,14 @@ return new class extends Migration
                 $table->boolean('valide')->default(false);
                 $table->timestampTz('date_validation')->nullable();
                 $table->foreignId('valide_par')->nullable()->constrained('utilisateur', 'id_utilisateur')->nullOnDelete();
-                $table->primary(['id_candidat', 'id_competence']);
+                $table->primary(['id_candidature', 'id_competence']);
             });
         }
 
         if (! Schema::hasTable('candidat_experience_professionnelle') && ! Schema::hasTable('experience_professionnelle')) {
             Schema::create('candidat_experience_professionnelle', function (Blueprint $table) {
                 $table->id('id_experience');
-                $table->foreignId('id_candidat')->constrained('candidat', 'id_candidat')->cascadeOnDelete();
+                $table->foreignId('id_candidature')->constrained('candidature', 'id_candidature')->cascadeOnDelete();
                 $table->string('poste', 200);
                 $table->string('entreprise', 200)->nullable();
                 $table->date('date_debut')->nullable();
@@ -44,14 +44,14 @@ return new class extends Migration
                 $table->foreignId('valide_par')->nullable()->constrained('utilisateur', 'id_utilisateur')->nullOnDelete();
                 $table->timestampsTz();
 
-                $table->index('id_candidat', 'idx_experience_candidat');
+                $table->index('id_candidature', 'idx_experience_candidature');
             });
         }
 
         if (! Schema::hasTable('candidat_formation') && ! Schema::hasTable('formation')) {
             Schema::create('candidat_formation', function (Blueprint $table) {
                 $table->id('id_formation');
-                $table->foreignId('id_candidat')->constrained('candidat', 'id_candidat')->cascadeOnDelete();
+                $table->foreignId('id_candidature')->constrained('candidature', 'id_candidature')->cascadeOnDelete();
                 $table->string('diplome', 200);
                 $table->string('etablissement', 200)->nullable();
                 $table->string('domaine_etude', 150)->nullable();
@@ -65,7 +65,7 @@ return new class extends Migration
                 $table->foreignId('valide_par')->nullable()->constrained('utilisateur', 'id_utilisateur')->nullOnDelete();
                 $table->timestampsTz();
 
-                $table->index('id_candidat', 'idx_formation_candidat');
+                $table->index('id_candidature', 'idx_formation_candidature');
             });
         }
 

@@ -22,6 +22,7 @@ class CandidatFormation extends Model
     }
 
     protected $fillable = [
+        'id_candidature',
         'id_candidat',
         'diplome',
         'etablissement',
@@ -45,6 +46,11 @@ class CandidatFormation extends Model
             return null;
         }
         return (int) date('Y', strtotime($this->attributes['date_obtention']));
+    }
+
+    public function candidature(): BelongsTo
+    {
+        return $this->belongsTo(Candidature::class, 'id_candidature', 'id_candidature');
     }
 
     public function candidat(): BelongsTo

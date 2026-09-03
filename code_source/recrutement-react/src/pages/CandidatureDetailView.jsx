@@ -55,7 +55,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         setError('');
 
         try {
-            const res = await getJson(`/api/candidatures/${idCandidature}`);
+            const res = await getJson(`/api/candidature/${idCandidature}`);
             const data = res?.data ?? null;
             setDetails(data);
             if (data?.statut?.id_statut_candidature) {
@@ -72,44 +72,47 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         loadDetails();
     }, [loadDetails]);
 
-    const loadCandidateProfile = useCallback(async (idCandidat) => {
-        if (!idCandidat) return;
+    const loadCandidateProfile = useCallback(async (targetId) => {
+        if (!targetId) return;
         setLoadingProfile(true);
         try {
             const [profileRes, compRes] = await Promise.all([
-                getJson(`/api/vivier/candidat/${idCandidat}/profile`),
+                getJson(`/api/candidature/${targetId}/profile`),
                 getJson('/api/competences'),
             ]);
             setProfileData(profileRes?.data ?? null);
             const compList = compRes?.data?.competences ?? (Array.isArray(compRes?.data) ? compRes.data : (Array.isArray(compRes) ? compRes : []));
             setAllCompetences(Array.isArray(compList) ? compList : []);
         } catch (err) {
-            console.error('Erreur chargement profil candidat:', err);
+            console.error('Erreur chargement profil candidature:', err);
         } finally {
             setLoadingProfile(false);
         }
     }, []);
 
     useEffect(() => {
-        if (details?.id_candidat) {
+        if (idCandidature) {
+            loadCandidateProfile(idCandidature);
+        } else if (details?.id_candidat) {
             loadCandidateProfile(details.id_candidat);
         }
-    }, [details?.id_candidat, loadCandidateProfile]);
+    }, [idCandidature, details?.id_candidat, loadCandidateProfile]);
 
     async function handleAddCompetence(e) {
         e.preventDefault();
-        if (!details?.id_candidat || !newComp.id_competence) return;
+        const targetId = idCandidature || details?.id_candidat;
+        if (!targetId || !newComp.id_competence) return;
         setProfileMsg('');
         try {
-            await sendJson(`/api/vivier/candidat/${details.id_candidat}/competences`, {
+            await sendJson(`/api/candidature/${targetId}/competences`, {
                 body: {
                     id_competence: Number(newComp.id_competence),
                     niveau: newComp.niveau,
                 },
             });
             setNewComp({ id_competence: '', niveau: 'Intermédiaire' });
-            setProfileMsg('Compétence ajoutée au profil candidat !');
-            await loadCandidateProfile(details.id_candidat);
+            setProfileMsg('Compétence ajoutée à la candidature !');
+            await loadCandidateProfile(targetId);
         } catch (err) {
             setError(err.message);
         }
@@ -117,22 +120,16 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
     async function handleAddExperience(e) {
         e.preventDefault();
-        if (!details?.id_candidat || !newExp.intitule_poste) return;
+        const targetId = idCandidature || details?.id_candidat;
+        if (!targetId || !newExp.intitule_poste) return;
         setProfileMsg('');
         try {
-            await sendJson(`/api/vivier/candidat/${details.id_candidat}/experiences`, {
-                body: {
-                    poste: newExp.intitule_poste.trim(),
-                    intitule_poste: newExp.intitule_poste.trim(),
-                    entreprise: newExp.entreprise.trim() || null,
-                    date_debut: newExp.date_debut || null,
-                    date_fin: newExp.date_fin || null,
-                    description: newExp.description.trim() || null,
-                },
+            await sendJson(`/api/candidature/${targetId}/experiences`, {
+                body: newExp,
             });
             setNewExp({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
-            setProfileMsg('Expérience professionnelle ajoutée !');
-            await loadCandidateProfile(details.id_candidat);
+            setProfileMsg('Expérience ajoutée à la candidature !');
+            await loadCandidateProfile(targetId);
         } catch (err) {
             setError(err.message);
         }
@@ -140,20 +137,16 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
     async function handleAddFormation(e) {
         e.preventDefault();
-        if (!details?.id_candidat || !newForm.diplome) return;
+        const targetId = idCandidature || details?.id_candidat;
+        if (!targetId || !newForm.diplome) return;
         setProfileMsg('');
         try {
-            await sendJson(`/api/vivier/candidat/${details.id_candidat}/formations`, {
-                body: {
-                    diplome: newForm.diplome.trim(),
-                    etablissement: newForm.etablissement.trim() || null,
-                    annee_obtention: newForm.annee_obtention ? Number(newForm.annee_obtention) : null,
-                    domaine_etude: newForm.domaine_etude.trim() || null,
-                },
+            await sendJson(`/api/candidature/${targetId}/formations`, {
+                body: newForm,
             });
             setNewForm({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '' });
-            setProfileMsg('Diplôme / Formation ajoutée !');
-            await loadCandidateProfile(details.id_candidat);
+            setProfileMsg('Diplôme/Formation ajouté(e) à la candidature !');
+            await loadCandidateProfile(targetId);
         } catch (err) {
             setError(err.message);
         }
@@ -163,7 +156,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         setOcrExtracting(true);
         setOcrSuccessMsg('');
         try {
-            const res = await sendJson(`/api/candidatures/${idCandidature}/extract-ocr`, { method: 'POST' });
+            const res = await sendJson(`/api/candidature/${idCandidature}/ocr/extract`, { method: 'POST' });
             setOcrData(res?.data?.donnees_json ?? null);
             setOcrSuccessMsg('Extraction PaddleOCR & IA effectuée avec succès !');
         } catch (err) {
@@ -176,7 +169,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     async function handleValidateOcr(statusVal) {
         if (!ocrData) return;
         try {
-            await sendJson(`/api/candidatures/${idCandidature}/validate-ocr`, {
+            await sendJson(`/api/candidature/${idCandidature}/ocr/validate`, {
                 body: {
                     statut_validation: statusVal,
                     competences: ocrData.competences ?? [],
@@ -202,7 +195,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         setError('');
 
         try {
-            await sendJson(`/api/candidatures/${idCandidature}/statut`, {
+            await sendJson(`/api/candidature/${idCandidature}/statut`, {
                 method: 'PATCH',
                 body: {
                     id_statut_candidature: Number(targetStatusId),
@@ -224,7 +217,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         setUpdatingVivier(true);
         setError('');
         try {
-            await sendJson(`/api/candidatures/${idCandidature}/vivier`, {
+            await sendJson(`/api/candidature/${idCandidature}/vivier`, {
                 method: 'PATCH',
                 body: { dans_vivier: targetVivierState },
             });
@@ -824,51 +817,48 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             ) : null}
 
                             {ocrData ? (
-                                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                                    <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--primary)' }}>Données Extraites (À valider par le RH)</h4>
+                                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gap: '12px' }}>
+                                    <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--primary)' }}>Résultats de l'Extraction OCR (Données brutes reçues du Microservice)</h4>
                                     
-                                    <div style={{ display: 'grid', gap: '10px', fontSize: '13px' }}>
+                                    {ocrData.texte_brut ? (
                                         <div>
-                                            <strong>Compétences identifiées :</strong>
-                                            <div className="tags-list" style={{ marginTop: '4px' }}>
-                                                {ocrData.competences?.map((c, i) => (
-                                                    <span key={i} className="badge green">{c.nom} ({c.niveau})</span>
-                                                ))}
+                                            <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Texte Brut OCR Extrait :</strong>
+                                            <pre style={{ background: '#0f172a', color: '#38bdf8', padding: '12px', borderRadius: '6px', fontSize: '12px', whiteSpace: 'pre-wrap', maxHeight: '180px', overflowY: 'auto' }}>
+                                                {ocrData.texte_brut}
+                                            </pre>
+                                        </div>
+                                    ) : null}
+
+                                    <div>
+                                        <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Données Structurées Extraites (JSON) :</strong>
+                                        <div style={{ display: 'grid', gap: '10px', fontSize: '13px', background: '#ffffff', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                            <div>
+                                                <strong>Compétences identifiées :</strong>
+                                                <div className="tags-list" style={{ marginTop: '4px' }}>
+                                                    {(ocrData.donnees_json?.competences ?? ocrData.competences ?? []).map((c, i) => (
+                                                        <span key={i} className="badge green">{c.nom ?? c.nom_competence} ({c.niveau})</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <strong>Expériences identifiées :</strong>
+                                                <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                                                    {(ocrData.donnees_json?.experiences ?? ocrData.experiences ?? []).map((exp, i) => (
+                                                        <li key={i}><strong>{exp.poste ?? exp.intitule_poste}</strong> chez {exp.entreprise} ({exp.date_debut} à {exp.date_fin})</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            <div>
+                                                <strong>Formations identifiées :</strong>
+                                                <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                                                    {(ocrData.donnees_json?.formations ?? ocrData.formations ?? []).map((f, i) => (
+                                                        <li key={i}><strong>{f.diplome}</strong> - {f.etablissement} ({f.annee_obtention ?? f.date_obtention})</li>
+                                                    ))}
+                                                </ul>
                                             </div>
                                         </div>
-
-                                        <div>
-                                            <strong>Expériences identifiées :</strong>
-                                            <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                                {ocrData.experiences?.map((exp, i) => (
-                                                    <li key={i}><strong>{exp.intitule_poste}</strong> chez {exp.entreprise} ({exp.date_debut} à {exp.date_fin})</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-
-                                        <div>
-                                            <strong>Formations identifiées :</strong>
-                                            <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                                {ocrData.formations?.map((f, i) => (
-                                                    <li key={i}><strong>{f.diplome}</strong> - {f.etablissement} ({f.annee_obtention})</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
-
-                                    <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
-                                        <button className="primary-button" onClick={() => handleValidateOcr('valide')} style={{ padding: '6px 14px', fontSize: '13px' }} type="button">
-                                            <CheckCircle2 size={15} />
-                                            <span>Valider & Importer au profil</span>
-                                        </button>
-                                        <button className="ghost-button" onClick={() => handleValidateOcr('corrige')} style={{ padding: '6px 14px', fontSize: '13px' }} type="button">
-                                            <Edit3 size={15} />
-                                            <span>Corriger</span>
-                                        </button>
-                                        <button className="ghost-button danger" onClick={() => handleValidateOcr('rejete')} style={{ padding: '6px 14px', fontSize: '13px' }} type="button">
-                                            <X size={15} />
-                                            <span>Rejeter</span>
-                                        </button>
                                     </div>
                                 </div>
                             ) : null}

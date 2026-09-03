@@ -1,0 +1,11 @@
+fastapi>=0.100.0
+uvicorn>=0.22.0
+python-multipart>=0.0.6
+pypdf>=3.10.0
+requests>=2.31.0
+pillow>=9.5.0
+rapidfuzz>=3.0.0
+dateparser>=1.1.8
+spacy>=3.5.0
+# Pour télécharger le modèle français spaCy :
+# python -m spacy download fr_core_news_md

@@ -22,6 +22,7 @@ class CandidatExperience extends Model
     }
 
     protected $fillable = [
+        'id_candidature',
         'id_candidat',
         'poste',
         'entreprise',
@@ -45,6 +46,11 @@ class CandidatExperience extends Model
     public function getIntitulePosteAttribute(): string
     {
         return $this->attributes['poste'] ?? '';
+    }
+
+    public function candidature(): BelongsTo
+    {
+        return $this->belongsTo(Candidature::class, 'id_candidature', 'id_candidature');
     }
 
     public function candidat(): BelongsTo

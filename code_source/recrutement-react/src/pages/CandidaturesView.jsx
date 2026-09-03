@@ -59,7 +59,7 @@ export function CandidaturesView({ mode = 'offres', referentiels }) {
             prev.map((item) => (item.id_candidature === id ? { ...item, vue: true } : item))
         );
         try {
-            await sendJson(`/api/candidatures/${id}/marquer-vue`, { method: 'PATCH' });
+            await sendJson(`/api/candidature/${id}/marquer-vue`, { method: 'PATCH' });
         } catch (err) {
             // silent
         }

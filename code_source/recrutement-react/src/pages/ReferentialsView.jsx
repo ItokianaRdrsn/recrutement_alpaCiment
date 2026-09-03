@@ -53,7 +53,7 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
         if (!confirmed) return;
 
         try {
-            await sendJson(`/api/directions/${direction.id}`, { method: 'DELETE' });
+            await sendJson(`/api/direction/${direction.id}`, { method: 'DELETE' });
             await loadReferentials();
         } catch (caughtError) {
             setError(caughtError.message);
@@ -62,7 +62,7 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
 
     async function validateDomaine(domaine) {
         try {
-            await sendJson(`/api/domaines/${domaine.id}/valider`, { method: 'PATCH' });
+            await sendJson(`/api/domaine/${domaine.id}/valider`, { method: 'PATCH' });
             await loadReferentials();
         } catch (caughtError) {
             setError(caughtError.message);

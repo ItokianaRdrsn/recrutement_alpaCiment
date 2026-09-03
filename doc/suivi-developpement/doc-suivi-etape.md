@@ -6,8 +6,8 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ## 📈 Tableau Général d'Avancement par Sprint (% terminé)
 
-- **Avancement Global du Projet :** **71.8% terminé** (47.0 / 65.5 j)
-- **Barre de Progression Globale :** `[██████████████░░░░░░] 71.8%`
+- **Avancement Global du Projet :** **67.2% terminé** (44.0 / 65.5 j)
+- **Barre de Progression Globale :** `[██████████████░░░░░░] 67.2%`
 
 | Sprint | Intitulé | Estimation | Progression (%) | Statut |
 | --- | --- | ---: | ---: | --- |
@@ -16,10 +16,10 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 | **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | **100.0%** | **[FAIT]** |
 | **Sprint 3** | Dépôt et réception des candidatures (Web & Saisie RH) | 6,5 j | **100.0%** | **[FAIT]** |
 | **Sprint 4** | Gestion RH des candidatures, fiche candidat, découpage React, routage SPA & Blade Login | 7,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 5** | Vivier, compétences, règles de workflow RH & recherche de candidature en pop-up | 11,5 j | **100.0%** | **[FAIT]** |
+| **Sprint 5** | Vivier, compétences, règles de workflow RH & recherche de candidature en pop-up | 11,5 j | **73.9%** (8,5 / 11,5 j) | **[EN COURS]** |
 | **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | **0.0%** | **[A FAIRE]** |
 | **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 8,5 j | **0.0%** | **[A FAIRE]** |
-| **Total** | **Total Scope Général** | **65,5 j** | **71.8%** | |
+| **Total** | **Total Scope Général** | **65,5 j** | **67.2%** | |
 
 ---
 
@@ -186,7 +186,54 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 23 (Méthodologie) : Ajout de la 5e Règle dans `methodologie.md` pour la Mise à Jour des Tâches du Sprint (`taches.md`)
 > **User Prompt :** *"aussi ici dans le fichier merhodologie: Lorsqu'une demande concerne le développement d'une nouvelle tâche ou fonctionnalité rattachée à un Sprint : rajoute le 5e point mettre a jour les taches si on a terminer"*
-- **Résolution (Suivant le guide `methodologie.md`) :**
-  1. **Fichier [methodologie.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md)** : Ajout du 5ème point dans la section *🟢 Cas A : Tâche / Fonctionnalité d'un Sprint* :
-     `5. **Mise à jour des tâches du sprint (taches.md)** : Si la tâche est terminée, passer son statut à **[FAIT]** - **100%** dans le fichier taches.md du sprint concerné, et recalculer le pourcentage d'avancement global du sprint.`
-  2. **Fichier [sprint-5/taches.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/taches.md)** : Mise à jour de toutes les tâches achevées du Sprint 5 à **[FAIT] - 100%** et actualisation du statut global à **100.0% Terminé**.
+- **Résolution :** Ajout du 5ème point dans `methodologie.md` pour mettre à jour le statut des tâches terminées dans `taches.md`.
+
+---
+
+### Demande 24 (Rectification Statut Sprint 5) : Correction du Statut des Tâches OCR & Recalcul
+> **User Prompt :** *"c'est faux il n'y a pas du tout ca encore #### **[FAIT]** Intégration FastAPI et extraction OCR avec PaddleOCR (2,0 j)..."*
+- **Résolution :** Correction du statut des tâches OCR et réajustement du calcul de progression.
+
+---
+
+### Demande 25 (Sprint 5) : Création du Microservice FastAPI (PaddleOCR) dans `code_source/ocr/` (2,0 j - 100%)
+> **User Prompt :** *"faisons cette tache alors creer un dossier a coter de recrutement ,ecris ocr ,et mets dedans le microservice fast api"*
+- **Résolution :** Création du microservice FastAPI dans `code_source/ocr/` et méthode HTTP d'extraction dans `VivierController.php`.
+
+---
+
+### Demande 26 (Rectification / Affichage direct OCR) : Remise à `[À FAIRE]` des 2 Tâches de Parsing/Validation et Affichage Direct du Résultat OCR sans Boutons de Validation
+> **User Prompt :** *"deja ces 2 taches c'est pas encore fait ... mais ne les fait pas encore ,donne moi le resultat de l'ocr apres avoir cliquer sur lancer l'extraction CV affiche le direct simplement pour l'instant"*
+- **Résolution :** Suppression des boutons de validation/correction/rejet et affichage direct du texte brut OCR et du JSON structuré.
+
+---
+
+### Demande 27 (Règles & Architecture / Clef Étrangère `id_candidature`) : Rattachement des Compétences, Expériences et Formations à la Candidature (`id_candidature`) au lieu du Candidat
+> **User Prompt :** *"okey un changement aussi ,candidat competence,candidat experience professionnelle ,candidat formation doivent etre relier a une candidature pas avec un candidat"*
+- **Résolution :** Migration des contraintes d'intégrité relationnelle et des modèles Eloquent sur `id_candidature`.
+
+---
+
+### Demande 28 (Méthodologie & ADR) : Obligation d'Explicitation et de Comparatif des Technologies / Librairies + Création de `justification-technologique.md`
+> **User Prompt :** *"okey met aussi dans methodologie peu importe ,sprint ou non ,lorsqu'on utilise une librairie ou techno ,etc on doit dire pourquoi on utilise ,on donne d'autre exemple qui aurait pu marcher mais qui sont moins bien et on donne les sources de ces recherches ,documentation ,site ,etc..."*
+- **Résolution :** Rédaction des règles méthodologiques de justification et création du registre `justification-technologique.md`.
+
+---
+
+### Demande 29 (Sprint 5) : Intégration du Module NLP de Parsing de CV (`cv_nlp_parser.py`) & Validation par Script de Test (2,0 j - 100%)
+> **User Prompt :** *"okey voici le code qu'on m'a donne pour le OCR ,NLP cv_nlp_parser.py ... et voici un fichier pour le tester ,testons le aussi : test_cv_nlp_parser.py"*
+- **Résolution (Suivant le strict protocole Sprint 5 de `methodologie.md`) :**
+  1. **Création du Module NLP ([code_source/ocr/cv_nlp_parser.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_nlp_parser.py))** :
+     - Segmentation en sections (contact, profil, compétences, expériences, formations, langues).
+     - Détection d'entités de personnes (`PER`) et d'entreprises (`ORG`) via spaCy (`fr_core_news_md`).
+     - Rapprochement flou du référentiel de compétences avec calcul de score de confiance (`rapidfuzz`).
+     - Normalisation ISO des dates (`dateparser`).
+  2. **Interconnexion FastAPI ([code_source/ocr/main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py#L185-L210))** :
+     - Appel du module `cv_nlp_parser.py` dans l'endpoint `POST /extract-cv` avec transmission optionnelle du référentiel dynamique.
+  3. **Création & Exécution du Test ([code_source/ocr/test_cv_nlp_parser.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/test_cv_nlp_parser.py))** :
+     - Exécution réussie (`python test_cv_nlp_parser.py`) : extraction complète et déterministe des contacts, compétences (avec niveau et score 0.95), expériences pro et formations.
+  4. **Mise à Jour de la Documentation & ADR ([justification-technologique.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/justification-technologique.md#L93-L115))** :
+     - Enrichissement du comparatif NLP (spaCy + rapidfuzz + dateparser vs Regex pur vs LLMs Cloud).
+  5. **Mise à Jour de `sprint-5/taches.md`** :
+     - Passage de la tâche *Extraction des compétences, expériences et formations depuis le CV (2,0 j)* à **`[FAIT] - 100%`**.
+     - Progression du Sprint 5 portée à **73.9%** (8,5 / 11,5 j) et progression globale à **67.2%** (44,0 / 65,5 j).

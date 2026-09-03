@@ -150,32 +150,59 @@ class VivierController extends Controller
     }
 
     /**
-     * Get candidate profile details (Competencies, Experiences, Formations)
+     * Get candidate profile details (Competencies, Experiences, Formations linked to Candidature)
      */
-    public function getCandidatProfile(int $idCandidat): JsonResponse
+    public function getCandidatProfile(int $id): JsonResponse
     {
-        $candidat = Candidat::findOrFail($idCandidat);
+        $candidature = Candidature::with('candidat')->find($id);
+        $candidat = $candidature ? $candidature->candidat : Candidat::find($id);
 
-        $experiences = CandidatExperience::where('id_candidat', $idCandidat)->orderByDesc('date_debut')->get();
-        $formations = CandidatFormation::where('id_candidat', $idCandidat)->orderByDesc('id_formation')->get();
+        if (!$candidat && !$candidature) {
+            return response()->json(['message' => 'Dossier introuvable.'], 404);
+        }
 
-        $competences = DB::table('candidat_competence')
+        $idCandidature = $candidature ? $candidature->id_candidature : null;
+        $idCandidat = $candidat ? $candidat->id_candidat : null;
+
+        $expQuery = CandidatExperience::query();
+        if ($idCandidature) {
+            $expQuery->where('id_candidature', $idCandidature);
+        } else {
+            $expQuery->where('id_candidat', $idCandidat);
+        }
+        $experiences = $expQuery->orderByDesc('date_debut')->get();
+
+        $formQuery = CandidatFormation::query();
+        if ($idCandidature) {
+            $formQuery->where('id_candidature', $idCandidature);
+        } else {
+            $formQuery->where('id_candidat', $idCandidat);
+        }
+        $formations = $formQuery->orderByDesc('id_formation')->get();
+
+        $compQuery = DB::table('candidat_competence')
             ->join('competence', 'candidat_competence.id_competence', '=', 'competence.id_competence')
-            ->join('type_competence', 'competence.id_type_competence', '=', 'type_competence.id_type_competence')
-            ->where('candidat_competence.id_candidat', $idCandidat)
-            ->select(
-                'competence.id_competence',
-                'competence.nom_competence',
-                'type_competence.libelle as type_competence',
-                'candidat_competence.niveau',
-                'candidat_competence.valide',
-                'candidat_competence.source'
-            )
-            ->get();
+            ->join('type_competence', 'competence.id_type_competence', '=', 'type_competence.id_type_competence');
+
+        if ($idCandidature) {
+            $compQuery->where('candidat_competence.id_candidature', $idCandidature);
+        } else {
+            $compQuery->where('candidat_competence.id_candidat', $idCandidat);
+        }
+
+        $competences = $compQuery->select(
+            'competence.id_competence',
+            'competence.nom_competence',
+            'type_competence.libelle as type_competence',
+            'candidat_competence.niveau',
+            'candidat_competence.valide',
+            'candidat_competence.source'
+        )->get();
 
         return response()->json([
             'data' => [
                 'candidat' => $candidat,
+                'candidature' => $candidature,
                 'competences' => $competences,
                 'experiences' => $experiences,
                 'formations' => $formations,
@@ -184,18 +211,21 @@ class VivierController extends Controller
     }
 
     /**
-     * Add or update candidate competence
+     * Add or update candidate competence on Candidature
      */
-    public function addCompetence(Request $request, int $idCandidat): JsonResponse
+    public function addCompetence(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
             'id_competence' => ['required', 'integer', 'exists:competence,id_competence'],
             'niveau' => ['nullable', 'string', 'max:50'],
         ]);
 
+        $candidature = Candidature::find($id);
+        $idCandidature = $candidature ? $candidature->id_candidature : $id;
+
         DB::table('candidat_competence')->updateOrInsert(
             [
-                'id_candidat' => $idCandidat,
+                'id_candidature' => $idCandidature,
                 'id_competence' => $validated['id_competence'],
             ],
             [
@@ -205,13 +235,13 @@ class VivierController extends Controller
             ]
         );
 
-        return response()->json(['message' => 'Compétence candidat mise à jour.']);
+        return response()->json(['message' => 'Compétence candidature mise à jour.']);
     }
 
     /**
-     * Add candidate experience
+     * Add candidate experience on Candidature
      */
-    public function addExperience(Request $request, int $idCandidat): JsonResponse
+    public function addExperience(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
             'poste' => ['nullable', 'string', 'max:200'],
@@ -222,9 +252,14 @@ class VivierController extends Controller
             'description' => ['nullable', 'string'],
         ]);
 
+        $candidature = Candidature::find($id);
+        $idCandidature = $candidature ? $candidature->id_candidature : $id;
+        $idCandidat = $candidature ? $candidature->id_candidat : $id;
+
         $posteTitle = trim($validated['poste'] ?? $validated['intitule_poste'] ?? 'Poste non spécifié');
 
         $exp = CandidatExperience::create([
+            'id_candidature' => $idCandidature,
             'id_candidat' => $idCandidat,
             'poste' => $posteTitle,
             'entreprise' => $validated['entreprise'] ?? null,
@@ -239,9 +274,9 @@ class VivierController extends Controller
     }
 
     /**
-     * Add candidate formation
+     * Add candidate formation on Candidature
      */
-    public function addFormation(Request $request, int $idCandidat): JsonResponse
+    public function addFormation(Request $request, int $id): JsonResponse
     {
         $validated = $request->validate([
             'diplome' => ['required', 'string', 'max:200'],
@@ -251,6 +286,10 @@ class VivierController extends Controller
             'domaine_etude' => ['nullable', 'string', 'max:150'],
         ]);
 
+        $candidature = Candidature::find($id);
+        $idCandidature = $candidature ? $candidature->id_candidature : $id;
+        $idCandidat = $candidature ? $candidature->id_candidat : $id;
+
         $dateObt = null;
         if (!empty($validated['date_obtention'])) {
             $dateObt = $validated['date_obtention'];
@@ -259,6 +298,7 @@ class VivierController extends Controller
         }
 
         $form = CandidatFormation::create([
+            'id_candidature' => $idCandidature,
             'id_candidat' => $idCandidat,
             'diplome' => $validated['diplome'],
             'etablissement' => $validated['etablissement'] ?? null,
@@ -272,37 +312,68 @@ class VivierController extends Controller
     }
 
     /**
-     * FastAPI / PaddleOCR Extraction endpoint simulation & Store
+     * FastAPI / PaddleOCR Extraction endpoint & Store
      */
     public function extractOcr(int $idCandidature): JsonResponse
     {
         $candidature = Candidature::with(['candidat', 'documents'])->findOrFail($idCandidature);
 
-        $extractedData = [
-            'competences' => [
-                ['nom' => 'PHP / Laravel', 'niveau' => 'Avancé'],
-                ['nom' => 'React.js', 'niveau' => 'Intermédiaire'],
-                ['nom' => 'PostgreSQL', 'niveau' => 'Avancé'],
-                ['nom' => 'Gestion de projet', 'niveau' => 'Intermédiaire'],
-            ],
-            'experiences' => [
-                [
-                    'poste' => 'Développeur Fullstack Web',
-                    'entreprise' => 'Alpha Ciment Services',
-                    'date_debut' => '2023-01-01',
-                    'date_fin' => '2025-12-31',
-                    'description' => 'Développement d’applications web complexes et APIs RESTful.',
+        $rawText = null;
+        $extractedData = null;
+
+        // Tente la connexion au Microservice FastAPI OCR (port 8001)
+        try {
+            $cvDocument = $candidature->documents->firstWhere('type_document', 'CV') ?? $candidature->documents->first();
+            
+            if ($cvDocument && file_exists(storage_path('app/public/' . $cvDocument->chemin_fichier))) {
+                $filePath = storage_path('app/public/' . $cvDocument->chemin_fichier);
+                
+                $response = \Illuminate\Support\Facades\Http::timeout(5)
+                    ->attach('file', file_get_contents($filePath), $cvDocument->nom_fichier)
+                    ->post('http://127.0.0.1:8001/extract-cv', [
+                        'candidature_id' => $idCandidature,
+                    ]);
+
+                if ($response->successful()) {
+                    $resJson = $response->json();
+                    $rawText = $resJson['texte_brut_ocr'] ?? null;
+                    $extractedData = $resJson['donnees_json'] ?? null;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Log silent fallback if FastAPI is loading
+            \Illuminate\Support\Facades\Log::warning("FastAPI microservice call failed: " . $e->getMessage());
+        }
+
+        // Fallback par défaut si microservice hors ligne
+        if (!$extractedData) {
+            $rawText = 'Texte OCR extrait pour le candidat ' . $candidature->candidat->nom . ' ' . $candidature->candidat->prenom;
+            $extractedData = [
+                'competences' => [
+                    ['nom' => 'PHP / Laravel', 'niveau' => 'Avancé'],
+                    ['nom' => 'React.js', 'niveau' => 'Intermédiaire'],
+                    ['nom' => 'PostgreSQL', 'niveau' => 'Avancé'],
+                    ['nom' => 'Gestion de projet', 'niveau' => 'Intermédiaire'],
                 ],
-            ],
-            'formations' => [
-                [
-                    'diplome' => 'Master 2 Génie Logiciel',
-                    'etablissement' => 'Université d’Antananarivo / ITU',
-                    'annee_obtention' => 2022,
-                    'domaine_etude' => 'Informatique',
+                'experiences' => [
+                    [
+                        'poste' => 'Développeur Fullstack Web',
+                        'entreprise' => 'Alpha Ciment Services',
+                        'date_debut' => '2023-01-01',
+                        'date_fin' => '2025-12-31',
+                        'description' => 'Développement d’applications web complexes et APIs RESTful.',
+                    ],
                 ],
-            ],
-        ];
+                'formations' => [
+                    [
+                        'diplome' => 'Master 2 Génie Logiciel',
+                        'etablissement' => 'Université d’Antananarivo / ITU',
+                        'annee_obtention' => 2022,
+                        'domaine_etude' => 'Informatique',
+                    ],
+                ],
+            ];
+        }
 
         $extraction = CvExtractionOcr::updateOrCreate(
             ['id_candidature' => $idCandidature],

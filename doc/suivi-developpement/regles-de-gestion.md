@@ -35,3 +35,15 @@ Ce document répertorie l'ensemble des règles de gestion métier appliquées su
 ## 📌 4. Règles de Gestion sur les Référentiels & Domaines
 - **RG-REF-01 : Validation des Domaines d'Expertise** : Les candidats peuvent saisir un poste souhaité libre lors d'une candidature spontanée. Cela crée un domaine au statut `valide = false`. Les administrateurs RH doivent valider ou rattacher ce domaine à une direction officielle avant exploitation complète.
 - **RG-REF-02 : Droits d'Accès Référentiels** : La création, modification et suppression des directions, domaines et compétences sont réservées aux utilisateurs possédant la permission `manage_referentiels`.
+
+---
+
+## 📌 5. Règles de Gestion sur le Profil Candidat & Pièces Jointes
+- **RG-CMP-01 : Rattachement des Données de Profil à la Candidature** : Les compétences (`candidat_competence`), expériences professionnelles (`candidat_experience_professionnelle`) et formations diplômantes (`candidat_formation`) sont directement rattachées à la **candidature** (`id_candidature`) pour préserver l'intégrité et la spécificité des pièces de chaque dossier.
+
+---
+
+## 📌 6. Règles de Nomenclatures d'Endpoints API & Routage RESTful
+- **RG-END-01 : Harmonisation des Endpoints (Singulier vs Pluriel)** :
+  - **Pluriel avec `s`** (`/offres`, `/candidatures`, `/directions`, `/domaines`, `/competences`) pour toutes les routes d'API renvoyant une collection ou liste de ressources.
+  - **Singulier sans `s`** (`/offre/{id}`, `/candidature/{id}`, `/direction/{id}`, `/domaine/{id}`, `/competence/{id}`) pour toutes les routes ciblant une ressource spécifique identifiée par son `{id}`.

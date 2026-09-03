@@ -17,7 +17,7 @@ export function DirectionModal({ direction = null, onClose, onSuccess }) {
 
         try {
             if (direction?.id) {
-                await sendJson(`/api/directions/${direction.id}`, {
+                await sendJson(`/api/direction/${direction.id}`, {
                     method: 'PUT',
                     body: { nom_direction: name },
                 });

@@ -281,7 +281,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         setFormError('');
 
         try {
-            await sendJson(offerForm.id ? `/api/offres/${offerForm.id}` : '/api/offres', {
+            await sendJson(offerForm.id ? `/api/offre/${offerForm.id}` : '/api/offres', {
                 body: offerPayload(offerForm),
                 method: offerForm.id ? 'PUT' : 'POST',
             });
@@ -303,7 +303,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         setFormError('');
 
         try {
-            await sendJson(`/api/offres/${offre.id}`, { method: 'DELETE' });
+            await sendJson(`/api/offre/${offre.id}`, { method: 'DELETE' });
             await loadOffers();
         } catch (caughtError) {
             setFormError(caughtError.message);
@@ -314,7 +314,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         setFormError('');
 
         try {
-            await sendJson(`/api/offres/${offre.id}/${action}`, { method: 'PATCH' });
+            await sendJson(`/api/offre/${offre.id}/${action}`, { method: 'PATCH' });
             await loadOffers();
         } catch (caughtError) {
             setFormError(caughtError.message);

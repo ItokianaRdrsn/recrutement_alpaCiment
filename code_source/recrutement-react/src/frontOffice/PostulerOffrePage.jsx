@@ -20,7 +20,7 @@ export default function PostulerOffrePage({ backendPath, getJson, idOffre, onNav
     useEffect(() => {
         if (!idOffre) return;
         setLoading(true);
-        getJson(`/api/public/offres/${idOffre}`)
+        getJson(`/api/public/offre/${idOffre}`)
             .then((res) => {
                 setOffre(res?.data ?? null);
             })
@@ -53,7 +53,7 @@ export default function PostulerOffrePage({ backendPath, getJson, idOffre, onNav
                 data.append('photo', photoFile);
             }
 
-            const res = await sendFormData(`/api/public/offres/${idOffre}/postuler`, data);
+            const res = await sendFormData(`/api/public/offre/${idOffre}/postuler`, data);
             setSuccessMessage(res?.message ?? 'Votre candidature a été soumise avec succès !');
         } catch (err) {
             setErrorMessage(err.message || 'Une erreur est survenue lors de l\'envoi.');

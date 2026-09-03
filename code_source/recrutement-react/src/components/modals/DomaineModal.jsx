@@ -25,7 +25,7 @@ export function DomaineModal({ directionsList = [], domaine = null, onClose, onS
 
         try {
             if (domaine?.id) {
-                await sendJson(`/api/domaines/${domaine.id}`, {
+                await sendJson(`/api/domaine/${domaine.id}`, {
                     method: 'PUT',
                     body: payload,
                 });

@@ -342,7 +342,7 @@ CREATE INDEX idx_document_recherche_texte ON document USING GIN (recherche_texte
 -- pour le matching qu'apres validation RH. Placee ici (apres DOCUMENT) car elle
 -- reference document(id_document) pour tracer le CV source d'une extraction.
 CREATE TABLE candidat_competence (
-    id_candidat BIGINT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
     id_competence BIGINT NOT NULL REFERENCES competence(id_competence) ON DELETE CASCADE,
     niveau VARCHAR(30),
     source VARCHAR(20) NOT NULL DEFAULT 'manuel' CHECK (source IN ('manuel', 'cv_ocr')),
@@ -355,7 +355,7 @@ CREATE TABLE candidat_competence (
         date_validation TIMESTAMPTZ,
         valide_par BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE
     SET NULL,
-        PRIMARY KEY (id_candidat, id_competence),
+        PRIMARY KEY (id_candidature, id_competence),
         CONSTRAINT chk_candidat_competence_validation CHECK (
             valide = FALSE
             OR (
@@ -369,7 +369,7 @@ CREATE TABLE candidat_competence (
 -- ============================================================
 CREATE TABLE candidat_experience_professionnelle (
     id_experience BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_candidat BIGINT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
     poste VARCHAR(200) NOT NULL,
     entreprise VARCHAR(200),
     date_debut DATE,
@@ -400,13 +400,13 @@ CREATE TABLE candidat_experience_professionnelle (
             )
         )
 );
-CREATE INDEX idx_experience_candidat ON candidat_experience_professionnelle(id_candidat);
+CREATE INDEX idx_experience_candidature ON candidat_experience_professionnelle(id_candidature);
 -- ============================================================
 -- 13quater. CANDIDAT_FORMATION
 -- ============================================================
 CREATE TABLE candidat_formation (
     id_formation BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_candidat BIGINT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
     diplome VARCHAR(200) NOT NULL,
     etablissement VARCHAR(200),
     domaine_etude VARCHAR(150),
@@ -431,7 +431,7 @@ CREATE TABLE candidat_formation (
             )
         )
 );
-CREATE INDEX idx_formation_candidat ON candidat_formation(id_candidat);
+CREATE INDEX idx_formation_candidature ON candidat_formation(id_candidature);
 -- ============================================================
 -- 14. RENDEZ-VOUS (test / entretien)
 -- ============================================================
