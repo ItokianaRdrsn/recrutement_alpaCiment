@@ -94,7 +94,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
   1. **Ordre Workflow des Statuts (10, 20, 30, 40, 50, 50)** : `Reçue`: 10, `Présélectionnée`: 20, `Test`: 30, `Entretien`: 40, `Retenue`: 50, `Non retenue`: 50.
   2. **Stepper Horizontal de Statut RH** avec surbrillance du statut actuel.
   3. **Règle de Gestion de Non-Retour** : Interdiction côté Frontend et Backend (`CandidatureController.php`) de basculer vers un statut ayant un `ordre_workflow <= ordre_workflow_actuel`.
-  4. **Bouton Mettre en Vivier la Candidature** : Intégration d'un bouton dédié `PATCH /api/candidatures/{id}/vivier` (`dans_vivier = true`).
+  4. **Bouton Mettre en Vivier la Candidature** : Intégration d'un bouton dédié `PATCH /api/candidature/{id}/vivier` (`dans_vivier = true`).
   5. **Pop-up de Recherche dans VivierView** : Bouton stylisé et modal avec recherche dynamique pour ajouter une candidature au vivier.
 
 ---
@@ -234,21 +234,21 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 31 (Rectification / Table `lieu`, Table `niveau` & Marquage des Champs Obligatoires) : Création des Tables `lieu` et `niveau`, Remplacement de `lieu` par `id_lieu NOT NULL` et `niveau` par `id_niveau_min`/`id_niveau_max`, et Ajout d'Astérisques Rouges sur la Création d'Offre
 > **User Prompt :** *"RECTIFICATION : on va creer une table lieu id et libelle juste pour l'instant ,et alors dans la table offre il y a aura id lieu au lieu de lieu juste ,et il sera not null egalement ,et dans la creation des offres ,on va mettre un "*" en rouge pour les champ obligatoire a fournir pour la creation des offres ,et egalement ,pour le niveau dans profil formation on va creer une table niveau et dans profil formation ca sera id niveaumin et id niveaumax ,pour l'instant id et libelle juste et change le script sql aussi"*
+- **Résolution :** Création des tables `lieu` et `niveau`, mise à jour du script SQL `sql/gestion_recrutement.sql`, de la migration Laravel, des modèles Eloquent, et ajouts des astérisques rouges `*` et des sélecteurs `<select>` dans le formulaire `OffersView.jsx`.
+
+---
+
+### Demande 32 (Rectification / Séparation des Vues de Candidatures) : Séparation du Composant Unique `CandidaturesView` en 2 Composants Distincts par Page (`CandidaturesOffresView` et `CandidaturesSpontaneesView`) Sans Prop `mode`
+> **User Prompt :** *"okey pour ces routes : <Route element={<BackOfficeLayout ...><CandidaturesView mode="offres" referentiels={referentiels} /></BackOfficeLayout>} path="/candidatures/offres" /> <Route element={<BackOfficeLayout ...><CandidaturesView mode="spontanees" referentiels={referentiels} /></BackOfficeLayout>} path="/candidatures/spontanees" /> je ne veux pas de mode ,je veux 2 pages differentes pour les candidatures sur offres et spontanees"*
 - **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
-  1. **Base de Données & Script SQL ([sql/gestion_recrutement.sql](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql#L83-L153))** :
-     - Création de la table `lieu` (`id_lieu BIGINT PRIMARY KEY`, `libelle VARCHAR(150) NOT NULL UNIQUE`) et données initiales (Antananarivo, Toamasina, Antsirabe, Mahajanga, Fianarantsoa, Toliara, Antsiranana, Usine AlpA Ciment).
-     - Création de la table `niveau` (`id_niveau BIGINT PRIMARY KEY`, `libelle VARCHAR(100) NOT NULL UNIQUE`) et données initiales (CAP/BEP, Bac, Bac+2, Bac+3, Bac+4, Bac+5, Bac+8).
-     - Table `offre` : Remplacement de `lieu` par `id_lieu BIGINT NOT NULL REFERENCES lieu(id_lieu) ON DELETE RESTRICT`.
-     - Table `profil_formation` : Remplacement de `niveau_min`/`niveau_max` par `id_niveau_min BIGINT REFERENCES niveau(id_niveau)` et `id_niveau_max BIGINT REFERENCES niveau(id_niveau)`.
-  2. **Modèles & Controllers Backend Laravel** :
-     - Création des modèles **[Lieu.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Models/Lieu.php)** et **[Niveau.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Models/Niveau.php)** et controllers associés.
-     - Mise à jour des modèles [Offre.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Models/Offre.php), [ProfilFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Models/ProfilFormation.php), [OffreController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Http/Controllers/Api/OffreController.php), [OffreResource.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Http/Resources/OffreResource.php), [ReferentielController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Http/Controllers/Api/ReferentielController.php), et [DatabaseSeeder.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/database/seeders/DatabaseSeeder.php).
-  3. **Interface Frontend React ([OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/OffersView.jsx#L400-L655)) & Utils ([formatters.js](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/utils/formatters.js))** :
-     - **Astérisques Rouges `<span className="text-red-500">*</span>`** ajoutés à côté des libellés de tous les champs obligatoires (Poste `*`, Direction `*`, Lieu `*`, Statut `*`).
-     - Menu déroulant `<select>` alimenté par la table `lieu` (`id_lieu` obligatoire).
-     - Menus déroulants `<select>` pour `id_niveau_min` et `id_niveau_max` alimentés par la table `niveau`.
-  4. **Mise à Jour du Registre des Règles de Gestion ([regles-de-gestion.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/regles-de-gestion.md#L11-L14))** :
-     - Ajout des règles **`RG-OFF-04`**, **`RG-OFF-05`**, et **`RG-UI-01`**.
-  5. **Validation par Compilations & Tests** :
-     - **Vite Build (`npm run build`)** : **✓ Built in 1.01s (0 erreur)**.
+  1. **Composants Dédiés par Page** :
+     - **[CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx)** : Page dédiée aux candidatures sur offre avec la disposition 2 colonnes, la recherche d'offre et la liste par direction.
+     - **[CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx)** : Page dédiée aux candidatures spontanées avec son tableau propre.
+  2. **Mise à Jour du Routage Declaratif ([src/main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/main.jsx#L172-L186))** :
+     - Importations séparées avec Lazy Loading : `CandidaturesOffresView` et `CandidaturesSpontaneesView`.
+     - Suppression de la prop `mode` sur les composants de route.
+  3. **Backward Compatibility ([src/pages/CandidaturesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesView.jsx))** :
+     - Redirection conditionnelle légère si importé ailleurs.
+  4. **Validation par Compilation & Tests** :
+     - **Vite Build (`npm run build`)** : **✓ Built in 678ms (0 erreur, chunks séparés `CandidaturesOffresView` 15.6 KB & `CandidaturesSpontaneesView` 6.6 KB)**.
      - **PHPUnit (`php artisan test`)** : **✓ 15/15 PASS (100% au vert)**.

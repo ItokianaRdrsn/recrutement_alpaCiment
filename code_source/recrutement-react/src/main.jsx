@@ -9,7 +9,8 @@ import { AppShell } from './components/layout/AppShell';
 // Code-splitting lazy loading for all heavy page modules
 const DashboardView = lazy(() => import('./pages/DashboardView').then((m) => ({ default: m.DashboardView })));
 const OffersView = lazy(() => import('./pages/OffersView').then((m) => ({ default: m.OffersView })));
-const CandidaturesView = lazy(() => import('./pages/CandidaturesView').then((m) => ({ default: m.CandidaturesView })));
+const CandidaturesOffresView = lazy(() => import('./pages/CandidaturesOffresView').then((m) => ({ default: m.CandidaturesOffresView })));
+const CandidaturesSpontaneesView = lazy(() => import('./pages/CandidaturesSpontaneesView').then((m) => ({ default: m.CandidaturesSpontaneesView })));
 const ReferentialsView = lazy(() => import('./pages/ReferentialsView').then((m) => ({ default: m.ReferentialsView })));
 const VivierView = lazy(() => import('./pages/VivierView').then((m) => ({ default: m.VivierView })));
 
@@ -171,7 +172,7 @@ function MainApp() {
                 <Route
                     element={
                         <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
-                            <CandidaturesView mode="offres" referentiels={referentiels} />
+                            <CandidaturesOffresView referentiels={referentiels} />
                         </BackOfficeLayout>
                     }
                     path="/candidatures/offres"
@@ -179,7 +180,7 @@ function MainApp() {
                 <Route
                     element={
                         <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
-                            <CandidaturesView mode="spontanees" referentiels={referentiels} />
+                            <CandidaturesSpontaneesView referentiels={referentiels} />
                         </BackOfficeLayout>
                     }
                     path="/candidatures/spontanees"
