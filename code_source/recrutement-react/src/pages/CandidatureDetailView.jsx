@@ -119,14 +119,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     useEffect(() => {
         if (idCandidature) {
             loadCandidateProfile(idCandidature);
-        } else if (details?.id_candidat) {
-            loadCandidateProfile(details.id_candidat);
+        } else if (details?.id_candidature) {
+            loadCandidateProfile(details.id_candidature);
         }
-    }, [idCandidature, details?.id_candidat, loadCandidateProfile]);
+    }, [idCandidature, details?.id_candidature, loadCandidateProfile]);
 
     async function handleAddCompetence(e) {
         e.preventDefault();
-        const targetId = idCandidature || details?.id_candidat;
+        const targetId = idCandidature || details?.id_candidature;
         const targetCompId = newComp.id_competence || effectiveSelectedCompId;
         if (!targetId || !targetCompId) return;
         setProfileMsg('');
@@ -152,7 +152,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
             setAllCompetences((prev) => [...prev, createdComp]);
             setNewComp((curr) => ({ ...curr, id_competence: String(createdComp.id_competence ?? createdComp.id) }));
         }
-        const targetId = idCandidature || details?.id_candidat;
+        const targetId = idCandidature || details?.id_candidature;
         if (targetId) {
             loadCandidateProfile(targetId);
         }
@@ -160,7 +160,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
     async function handleAddExperience(e) {
         e.preventDefault();
-        const targetId = idCandidature || details?.id_candidat;
+        const targetId = idCandidature || details?.id_candidature;
         if (!targetId || !newExp.intitule_poste) return;
         setProfileMsg('');
         try {
@@ -177,7 +177,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
     async function handleAddFormation(e) {
         e.preventDefault();
-        const targetId = idCandidature || details?.id_candidat;
+        const targetId = idCandidature || details?.id_candidature;
         if (!targetId || !newForm.diplome) return;
         setProfileMsg('');
         try {

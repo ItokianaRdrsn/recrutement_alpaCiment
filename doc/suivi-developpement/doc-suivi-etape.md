@@ -404,3 +404,19 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
   - Ajout du bloc de recherche de compétences avec auto-sélection dans `CandidatureDetailView.jsx`.
   - Harmonisation complète du design et de la hauteur des champs sur toute la fiche candidat.
   - **Vite Build (`npm run build`)** : **✓ Built in 499ms (0 erreur)**.
+
+---
+
+### Demande 55 (Rectification / Migration Globale des Tables Candidat sur `id_candidature`) :
+1. **Migration PostgreSQL & Schéma Database ([2026_09_04_001000_alter_candidat_tables_to_id_candidature.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_09_04_001000_alter_candidat_tables_to_id_candidature.php))** :
+   - Exécution de la migration PostgreSQL altérant `candidat_competence`, `candidat_experience_professionnelle` et `candidat_formation` pour remplacer la clé étrangère `id_candidat` par `id_candidature` (referencing `candidature(id_candidature) ON DELETE CASCADE`).
+2. **Alignement Backend Eloquent & Controller ([VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php#L418-L465))** :
+   - Mise à jour des insertions/mises à jour dans `VivierController.php` pour cibler strictement `id_candidature`.
+3. **Alignement Frontend React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L119-L193))** :
+   - Remplacement de tout reliquat `details?.id_candidat` par `details?.id_candidature` dans les fonctions `handleAddCompetence`, `handleAddExperience`, `handleAddFormation` et `loadCandidateProfile`.
+> **User Prompt :** *"mais tu as changer la table candidat_competence ,je t'ai dit c'etait id_candidature pas id_candidat"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Migration exécutée avec succès en base de données.
+  - Modèles et contrôleurs Eloquent mis à jour.
+  - Raccordement pur sur `id_candidature` dans React.
+  - **Vite Build (`npm run build`)** : **✓ Built in 1.01s (0 erreur)**.

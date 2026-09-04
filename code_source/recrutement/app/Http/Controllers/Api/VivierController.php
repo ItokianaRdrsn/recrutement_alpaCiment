@@ -417,7 +417,7 @@ class VivierController extends Controller
 
                     DB::table('candidat_competence')->updateOrInsert(
                         [
-                            'id_candidat' => $idCandidat,
+                            'id_candidature' => $idCandidature,
                             'id_competence' => $compModel->id_competence,
                         ],
                         [
@@ -434,7 +434,7 @@ class VivierController extends Controller
                 foreach ($validated['experiences'] as $exp) {
                     $posteTitle = trim($exp['poste'] ?? $exp['intitule_poste'] ?? 'Poste non spécifié');
                     CandidatExperience::create([
-                        'id_candidat' => $idCandidat,
+                        'id_candidature' => $idCandidature,
                         'poste' => $posteTitle,
                         'entreprise' => $exp['entreprise'] ?? null,
                         'date_debut' => $exp['date_debut'] ?? null,
@@ -457,7 +457,7 @@ class VivierController extends Controller
                     }
 
                     CandidatFormation::create([
-                        'id_candidat' => $idCandidat,
+                        'id_candidature' => $idCandidature,
                         'diplome' => $form['diplome'],
                         'etablissement' => $form['etablissement'] ?? null,
                         'date_obtention' => $dateObt,
