@@ -45,6 +45,9 @@ return new class extends Migration
                 DB::statement('ALTER TABLE candidat_formation ALTER COLUMN id_candidature SET NOT NULL');
                 DB::statement('ALTER TABLE candidat_formation DROP COLUMN id_candidat');
             }
+            if (! Schema::hasColumn('candidat_formation', 'id_niveau')) {
+                DB::statement('ALTER TABLE candidat_formation ADD COLUMN id_niveau BIGINT REFERENCES niveau(id_niveau) ON DELETE SET NULL');
+            }
         }
     }
 

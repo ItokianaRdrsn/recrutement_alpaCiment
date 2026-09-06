@@ -132,6 +132,7 @@ export function VivierView({ referentiels }) {
                 idCandidature={selectedCandidatureId}
                 onBack={() => setSelectedCandidatureId(null)}
                 onRefreshList={loadVivier}
+                referentiels={referentiels}
                 statutsList={statutsList}
             />
         );

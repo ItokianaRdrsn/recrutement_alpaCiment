@@ -174,7 +174,7 @@ class VivierController extends Controller
 
         $formations = collect();
         if ($idCandidature && \Illuminate\Support\Facades\Schema::hasColumn('candidat_formation', 'id_candidature')) {
-            $formations = CandidatFormation::where('id_candidature', $idCandidature)->orderByDesc('id_formation')->get();
+            $formations = CandidatFormation::with('niveauRel')->where('id_candidature', $idCandidature)->orderByDesc('id_formation')->get();
         }
 
         $competences = collect();
@@ -278,6 +278,8 @@ class VivierController extends Controller
             'annee_obtention' => ['nullable'],
             'date_obtention' => ['nullable', 'date'],
             'domaine_etude' => ['nullable', 'string', 'max:150'],
+            'id_niveau' => ['nullable', 'integer', 'exists:niveau,id_niveau'],
+            'niveau' => ['nullable', 'string', 'max:100'],
         ]);
 
         $candidature = Candidature::find($id);
@@ -291,6 +293,21 @@ class VivierController extends Controller
             $dateObt = $validated['annee_obtention'] . '-01-01';
         }
 
+        $idNiveau = $validated['id_niveau'] ?? null;
+        $niveauText = $validated['niveau'] ?? null;
+
+        if ($idNiveau && empty($niveauText)) {
+            $niveauObj = \App\Models\Niveau::find($idNiveau);
+            if ($niveauObj) {
+                $niveauText = $niveauObj->libelle;
+            }
+        } elseif (!empty($niveauText) && empty($idNiveau)) {
+            $niveauObj = \App\Models\Niveau::where('libelle', $niveauText)->first();
+            if ($niveauObj) {
+                $idNiveau = $niveauObj->id_niveau;
+            }
+        }
+
         $form = CandidatFormation::create([
             'id_candidature' => $idCandidature,
             'id_candidat' => $idCandidat,
@@ -298,11 +315,13 @@ class VivierController extends Controller
             'etablissement' => $validated['etablissement'] ?? null,
             'date_obtention' => $dateObt,
             'domaine_etude' => $validated['domaine_etude'] ?? null,
+            'id_niveau' => $idNiveau,
+            'niveau' => $niveauText,
             'valide' => true,
             'source' => 'manuel',
         ]);
 
-        return response()->json(['message' => 'Formation ajoutée.', 'data' => $form], 201);
+        return response()->json(['message' => 'Formation ajoutée.', 'data' => $form->load('niveauRel')], 201);
     }
 
     /**

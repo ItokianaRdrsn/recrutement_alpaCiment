@@ -27,7 +27,7 @@ import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
 import { CompetenceModal } from '../components/modals/CompetenceModal';
 import { formatDate } from '../utils/formatters';
 
-export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsList }) {
+export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsList, referentiels }) {
     const [details, setDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -51,8 +51,22 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const [showCompetenceCreateModal, setShowCompetenceCreateModal] = useState(false);
     const [newComp, setNewComp] = useState({ id_competence: '', niveau: 'Intermédiaire' });
     const [newExp, setNewExp] = useState({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
-    const [newForm, setNewForm] = useState({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '' });
+    const [newForm, setNewForm] = useState({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '', id_niveau: '', niveau: '' });
     const [profileMsg, setProfileMsg] = useState('');
+
+    const fallbackNiveaux = useMemo(() => [
+        { id_niveau: 1, libelle: 'CAP / BEP' },
+        { id_niveau: 2, libelle: 'Baccalauréat' },
+        { id_niveau: 3, libelle: 'Bac+2' },
+        { id_niveau: 4, libelle: 'Bac+3' },
+        { id_niveau: 5, libelle: 'Bac+4' },
+        { id_niveau: 6, libelle: 'Bac+5' },
+        { id_niveau: 7, libelle: 'Bac+8' },
+    ], []);
+
+    const niveauxList = useMemo(() => (
+        referentiels?.niveaux?.length ? referentiels.niveaux : fallbackNiveaux
+    ), [referentiels?.niveaux, fallbackNiveaux]);
 
     const filteredCompsInDetail = useMemo(() => {
         const list = allCompetences;
@@ -184,7 +198,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
             await sendJson(`/api/candidature/${targetId}/formations`, {
                 body: newForm,
             });
-            setNewForm({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '' });
+            setNewForm({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '', id_niveau: '', niveau: '' });
             setProfileMsg('Diplôme/Formation ajouté(e) à la candidature !');
             await loadCandidateProfile(targetId);
         } catch (err) {
@@ -835,7 +849,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 {(profileData?.formations ?? []).map((f) => (
                                     <div key={f.id_formation} style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <strong style={{ fontSize: '14.5px', color: '#0f172a' }}>{f.diplome}</strong>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <strong style={{ fontSize: '14.5px', color: '#0f172a' }}>{f.diplome}</strong>
+                                                {(f.niveauRel?.libelle || f.niveau) && (
+                                                    <span className="badge green" style={{ fontSize: '11px' }}>
+                                                        {f.niveauRel?.libelle ?? f.niveau}
+                                                    </span>
+                                                )}
+                                            </div>
                                             <span className="badge blue">{f.annee_obtention ?? 'Année non précisée'}</span>
                                         </div>
                                         <span style={{ fontSize: '13px', color: '#64748b' }}>{f.etablissement} {f.domaine_etude ? `(${f.domaine_etude})` : ''}</span>
@@ -854,6 +875,28 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                         type="text"
                                         value={newForm.diplome}
                                     />
+                                    <select
+                                        onChange={(e) => {
+                                            const selectedId = e.target.value;
+                                            const sel = niveauxList.find((n) => String(n.id_niveau ?? n.id) === String(selectedId));
+                                            setNewForm((curr) => ({
+                                                ...curr,
+                                                id_niveau: selectedId,
+                                                niveau: sel ? sel.libelle : '',
+                                            }));
+                                        }}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        value={newForm.id_niveau}
+                                    >
+                                        <option value="">-- Niveau d'études (Référentiel) --</option>
+                                        {niveauxList.map((n) => (
+                                            <option key={n.id_niveau ?? n.id} value={n.id_niveau ?? n.id}>
+                                                {n.libelle}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
                                     <input
                                         onChange={(e) => setNewForm((curr) => ({ ...curr, etablissement: e.target.value }))}
                                         placeholder="Établissement / Université..."
@@ -861,8 +904,6 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                         type="text"
                                         value={newForm.etablissement}
                                     />
-                                </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <input
                                         onChange={(e) => setNewForm((curr) => ({ ...curr, annee_obtention: e.target.value }))}
                                         placeholder="Année d'obtention (ex: 2023)..."

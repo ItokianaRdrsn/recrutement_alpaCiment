@@ -139,6 +139,7 @@ export function CandidaturesOffresView({ referentiels }) {
                 idCandidature={selectedCandidatureId}
                 onBack={() => setSelectedCandidatureId(null)}
                 onRefreshList={loadData}
+                referentiels={referentiels}
                 statutsList={statutsList}
             />
         );

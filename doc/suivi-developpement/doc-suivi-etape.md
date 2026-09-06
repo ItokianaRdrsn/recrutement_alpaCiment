@@ -311,7 +311,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 44 (Rectification / Généralisation des 4 Actions sur Toutes les Offres & Grisement des Actions Indisponibles) : Présence Systématique des 4 Boutons (`Publier`, `Clôturer`, `Modifier`, `Supprimer`) sur Chaque Ligne d'Offre avec État Désactivé/Grisé et Tooltip Explicatif (`disabled={!canAction}`, `opacity: 0.35`)
-> **User Prompt :** *"okey tres bien juste generalise les actions ,toutes les offres me doivent avoir les actions publier ,cloturer ,modifier et supprimer juste tu mets comme pour le lien et candidature rh si il ne peut pas realiser l'action"*
+> **User Prompt :** *"okey tres bien juste generalise les actions ,toutes les offres me me doivent avoir les actions publier ,cloturer ,modifier et supprimer juste tu mets comme pour le lien et candidature rh si il ne peut pas realiser l'action"*
 - **Résolution :** Présence systématique des 4 actions et grisement avec tooltips.
 
 ---
@@ -420,3 +420,35 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
   - Modèles et contrôleurs Eloquent mis à jour.
   - Raccordement pur sur `id_candidature` dans React.
   - **Vite Build (`npm run build`)** : **✓ Built in 1.01s (0 erreur)**.
+
+---
+
+### Demande 56 (Explication / Architecture d'Intégration du Microservice FastAPI & NLP) :
+1. **Composant Microservice Python/FastAPI ([code_source/ocr/](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/))** :
+   - Le microservice est hébergé dans le dossier `code_source/ocr/`. Il contient `main.py` (FastAPI sur le port **8001** avec les endpoints `POST /extract-cv` et `POST /extract`), `cv_nlp_parser.py` (module NLP pour le sectionnement heuristique, extraction de coordonnées, recherche floue avec RapidFuzz et spaCy) et `test_cv_nlp_parser.py`.
+2. **Point de Branchement Backend Laravel ([VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php#L318-L336))** :
+   - Lorsque le bouton d'extraction est cliqué dans l'interface RH, React appelle `POST /api/candidature/{id}/ocr/extract`.
+   - La méthode `VivierController::extractOcr()` récupère le fichier CV stocké (PDF ou image) et le transmet via une requête HTTP multipart au microservice FastAPI : `Http::post('http://127.0.0.1:8001/extract-cv')`.
+3. **Point de Trigger dans l'Interface React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L890-L925))** :
+   - Présence du bloc **"Extraction Automatique CV (PaddleOCR & IA)"** dans la fiche candidat avec le bouton `Lancer l'extraction CV (PaddleOCR)`.
+> **User Prompt :** *"ou est l'utilisation du ocr et nlp ,je ne vois pas ou il utilise le microservice fastApi"*
+- **Explication & Cartographie d'architecture fournies à l'utilisateur.**
+
+---
+
+### Demande 57 (Rectification / Intégration du Référentiel Niveau dans la Formation Candidat) :
+1. **Évolution Schéma Database & Backend Eloquent ([CandidatFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatFormation.php) & [VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php))** :
+   - Ajout de la colonne `id_niveau` (`BIGINT REFERENCES niveau(id_niveau) ON DELETE SET NULL`) sur la table PostgreSQL `candidat_formation`.
+   - Ajout de la relation Eloquent `niveauRel()` `BelongsTo` dans `CandidatFormation` et chargement eager-load `with('niveauRel')` dans `getCandidateProfile()`.
+   - Prise en charge explicite de `id_niveau` et `niveau` dans `VivierController::addFormation()`.
+2. **Interface Frontend React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+   - Intégration du sélecteur `<select>` pour le *Niveau d'études (Référentiel)* dans le formulaire de saisie de formation.
+   - Affichage automatique du badge vert (`<span className="badge green">{f.niveauRel?.libelle ?? f.niveau}</span>`) à côté du diplôme dans la liste des formations du candidat.
+   - Transmission de la prop `referentiels={referentiels}` depuis les composantes parents (`CandidaturesOffresView`, `CandidaturesSpontaneesView`, `VivierView`).
+> **User Prompt :** *"dans les candidatures ,pour l'ajout de formation ,le niveau utilise la table qu'on a fait"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Ajout de la colonne FK `id_niveau` sur `candidat_formation` et relation Eloquent `niveauRel`.
+  - Sélecteur de référentiel Niveau et affichage du badge vert dans React.
+  - **Vite Build (`npm run build`)** : **✓ Built in 2.13s (0 erreur)**.
+  - **PHPUnit Tests (`php artisan test`)** : **✓ 15/15 tests PASS (36 assertions, 0 erreur)**.
+

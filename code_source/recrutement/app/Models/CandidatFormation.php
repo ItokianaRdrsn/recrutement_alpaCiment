@@ -27,6 +27,7 @@ class CandidatFormation extends Model
         'diplome',
         'etablissement',
         'domaine_etude',
+        'id_niveau',
         'niveau',
         'date_obtention',
         'source',
@@ -56,5 +57,10 @@ class CandidatFormation extends Model
     public function candidat(): BelongsTo
     {
         return $this->belongsTo(Candidat::class, 'id_candidat', 'id_candidat');
+    }
+
+    public function niveauRel(): BelongsTo
+    {
+        return $this->belongsTo(Niveau::class, 'id_niveau', 'id_niveau');
     }
 }
