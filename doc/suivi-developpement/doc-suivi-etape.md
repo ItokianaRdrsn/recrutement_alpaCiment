@@ -452,3 +452,68 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
   - **Vite Build (`npm run build`)** : **✓ Built in 2.13s (0 erreur)**.
   - **PHPUnit Tests (`php artisan test`)** : **✓ 15/15 tests PASS (36 assertions, 0 erreur)**.
 
+---
+
+### Demande 58 (Rectification / Réinitialisation Complète des Données, Création d'Offres Diversifiées & Candidatures Tout au Statut "Reçue") :
+1. **Réinitialisation des Données en Base PostgreSQL** :
+   - Exécution du script de réinitialisation `reseed_database.php` vidant les anciennes candidatures et offres (`TRUNCATE TABLE candidat_competence, candidat_experience_professionnelle, candidat_formation, historique_statut, document, candidature, candidat, profil_competence, profil_formation, mission, offre RESTART IDENTITY CASCADE;`).
+2. **Génération des Offres de Postes Réelles (14 Offres Diversifiées)** :
+   - Insertion de 14 offres de recrutement réelles et diversifiées couvrant toutes les directions (`Informatique`, `Ressources Humaines`, `Finance`, `Marketing`, `Commercial`) et tous les lieux (`Antananarivo`, `Usine AlpA Ciment`, `Toamasina`, `Mahajanga`).
+3. **Génération des Candidatures au Statut "Reçue" (98 Candidatures)** :
+   - Génération de **98 candidatures** avec profils candidats complets (formations rattachées aux niveaux du référentiel, expériences professionnelles, compétences).
+   - **Toutes les candidatures (100%)** ont été créées au statut **"Reçue"** (`id_statut_candidature = 1`, `ordre_workflow = 10`), avec `dans_vivier = false`.
+> **User Prompt :** *"okey reinitialisons les donnees et faisons des offres de postes d un peu pres tout ,et des candidatures tous en recu pour l'instant"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Vidage et régénération complète des données applicatives en base.
+  - 14 offres de postes publiées créées sur l'ensemble des directions.
+  - 98 candidatures créées **toutes strictly au statut "Reçue" (ordre 10)**.
+  - **Vite Build (`npm run build`)** : **✓ Built in 3.54s (0 erreur)**.
+
+---
+
+### Demande 59 (Rectification / Alimentation des Exigences de Profil, Formation, Expérience, Compétences et Missions sur Toutes les Offres) :
+1. **Enrichissement du Référentiel des Compétences** :
+   - Ajout de 22 compétences techniques, linguistiques, logiciels, méthodologiques et métier (`PHP / Laravel`, `React.js`, `PostgreSQL`, `DevOps & Docker`, `Python / Data Analytics`, `Comptabilité OHADA / IFRS`, `Fiscalité Malgache`, `Sage Comptabilité`, `SAP / ERP Industriel`, `Techniques de Vente B2B`, `Droit du Travail & Paie`, `GPEC & Recrutement`, `Power BI`, `Automatisme Industriel`, `Normes QHSE ISO 9001`).
+2. **Alimentation des Tables d'Exigences des Offres d'Emploi** :
+   - **Profil / Expérience Requise (`profil_offre`)** : 15 entrées décrivant l'expérience minimale requise (ex: 3 à 5 ans en développement web, 4 à 8 ans en gestion RH / audit).
+   - **Formations Requises (`profil_formation`)** : 14 exigences de diplômes rattachées au référentiel des niveaux (`Bac+2` à `Bac+5`) avec domaines spécialisés.
+   - **Compétences Requises (`profil_competence`)** : 42 liaisons de compétences par offre avec indication du niveau exigé (`Débutant`, `Intermédiaire`, `Avancé`, `Expert`).
+   - **Missions Principales (`mission`)** : 31 missions et responsabilités détaillées par fiche de poste.
+> **User Prompt :** *"okey deja ,les offres met des donnees dedans pour profil ,formation ,experience et competence"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Alimentation exhaustive des 14 offres avec profils, formations, expériences, compétences et missions.
+  - **Vite Build (`npm run build`)** : **✓ Built in 939ms (0 erreur)**.
+
+---
+
+### Demande 60 (Rectification / Panneau Gauche Sticky Fiche Candidat, Style d'Input Recherche Compétence & Bouton "+ Candidature RH") :
+1. **Panneau de Gauche Sticky dans la Fiche Candidat ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L389))** :
+   - Application du style `position: 'sticky', top: '16px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto'` sur le composant `.data-section` du panneau gauche (Carte candidat, Coordonnées, Stepper de progression RH, Formulaire de transition de statut et Bouton Vivier RH).
+   - Le panneau gauche reste fixe au défilement tandis que la colonne de droite (Compétences, Expériences, Formations, Extraction OCR, Documents) défile indépendamment.
+2. **Harmonisation de l'Input Recherche de Compétence ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L696) & [OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/OffersView.jsx#L768))** :
+   - Ajout d'un style explicite (`height: '42px'`, `padding: '0 12px 0 38px'`, `borderRadius: '8px'`, `border: '1px solid var(--border)'`, `fontSize: '13.5px'`, `background: '#ffffff'`) identique à tous les autres champs de formulaire.
+3. **Harmonisation du Bouton "+ Candidature RH" ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx#L194) & [CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx#L121))** :
+   - Remplacement des anciens boutons `Saisir une candidature RH` par le bouton stylisé violet `+ Candidature RH` (`<UserPlus size={16} />`, fond `#ede9fe`, texte `#6d28d9`, bordure `#ddd6fe`), identique à la liste des offres d'emploi.
+> **User Prompt :** *"okey ,deja dans la fiche candidature ,fait en sorte comme pour les directions dans la liste des canidatures ,pour les information et profil candidat a gauche avec ces informations ... je veux que ca bouge jusqu a un certain point et que ca soit sticky et c'est la partie droite qui va slider ensuite pour l'input recherche de competence ,il n'a pas le meme style que les autres input ,met le pareil ,ensuite dans les candidatures ,je veux que le bouton ajouter candidature rh sois comme dans la liste des offres dans offre d'emploi avec le bouton +Candidature RH"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Sticky sidebar sur la fiche candidat avec scroll indépendant du panneau droit.
+  - Style unifié sur l'input de recherche de compétence.
+  - Boutons `+ Candidature RH` harmonisés en style violet.
+  - **Vite Build (`npm run build`)** : **✓ Built in 982ms (0 erreur)**.
+
+---
+
+### Demande 61 (Rectification / Suppression de la Barre de Défilement Interne de la Carte Candidat Gauche) :
+1. **Suppression du Rognage et de la Scrollbar Interne ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L389))** :
+   - Suppression des propriétés `maxHeight: 'calc(100vh - 120px)'` et `overflowY: 'auto'` sur la carte d'information candidat de gauche.
+   - La carte de gauche conserve la propriété `position: 'sticky'`, `top: '16px'`, et affiche désormais l'intégralité du profil (Photo, Nom, Canal, Coordonnées, Stepper de statut RH complet et Vivier RH) directement sans coupure ni barre de défilement interne.
+> **User Prompt :** *"okey pas mal ,juste maintenant dans la fiche candidature ,je dois slider pour voir les informations sur le profil ,c'est couper au niveau de la liste des status ,pas de slider ici ,affiche directement tout"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Suppression de la barre de défilement interne sur la carte de gauche.
+  - Affichage direct et intégral de tous les sous-blocs sans tronquage.
+  - **Vite Build (`npm run build`)** : **✓ Built in 928ms (0 erreur)**.
+
+
+
+
+

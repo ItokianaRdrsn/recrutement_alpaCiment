@@ -11,6 +11,7 @@ import {
     RefreshCw,
     RotateCcw,
     Search,
+    UserPlus,
     Users,
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
@@ -190,9 +191,29 @@ export function CandidaturesOffresView({ referentiels }) {
                         <RefreshCw size={16} />
                         <span>Actualiser</span>
                     </button>
-                    <button className="primary-button" onClick={() => setShowSaisirModal(true)} type="button">
-                        <Plus size={17} />
-                        <span>Saisir une candidature RH</span>
+                    <button
+                        onClick={() => setShowSaisirModal(true)}
+                        style={{
+                            background: '#ede9fe',
+                            color: '#6d28d9',
+                            border: '1px solid #ddd6fe',
+                            borderRadius: '8px',
+                            height: '40px',
+                            padding: '0 14px',
+                            fontWeight: '600',
+                            fontSize: '13.5px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            boxShadow: '0 1px 2px rgba(109, 40, 217, 0.08)',
+                            transition: 'all 0.15s ease',
+                        }}
+                        type="button"
+                    >
+                        <UserPlus size={16} />
+                        <span>+ Candidature RH</span>
                     </button>
                 </div>
             </div>

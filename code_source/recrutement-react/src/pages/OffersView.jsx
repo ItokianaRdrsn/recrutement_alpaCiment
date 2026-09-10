@@ -768,6 +768,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                                         <input
                                             onChange={(e) => setCompetenceSearchQuery(e.target.value)}
                                             placeholder="Tapez le nom de la compétence (ex: PHP, React...)"
+                                            style={{ width: '100%', height: '42px', padding: '0 12px 0 38px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                             type="search"
                                             value={competenceSearchQuery}
                                         />

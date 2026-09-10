@@ -380,13 +380,27 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     <Send size={16} />
                     <span>Communications</span>
                 </button>
+
+                <button
+                    className={`ghost-button ${activeTab === 'extraction_cv' ? 'primary' : ''}`}
+                    onClick={() => setActiveTab('extraction_cv')}
+                    style={{
+                        fontWeight: activeTab === 'extraction_cv' ? 'bold' : 'normal',
+                        borderBottom: activeTab === 'extraction_cv' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <Cpu size={16} />
+                    <span>Extraction CV</span>
+                </button>
             </div>
 
             {/* TAB INFORMATIONS (INCLUANT TOUTE LA GESTION DES COMPÉTENCES, EXPÉRIENCES ET FORMATIONS) */}
             {activeTab === 'informations' && (
                 <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: '20px', alignItems: 'start' }}>
                     {/* CARTE CANDIDAT & WORKFLOW SIDEBAR GAUCHE */}
-                    <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', position: 'sticky', top: '16px' }}>
                         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
                             {photoDoc ? (
                                 <img
@@ -696,6 +710,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                             <input
                                                 onChange={(e) => setCompSearchQuery(e.target.value)}
                                                 placeholder="Tapez le nom de la compétence (ex: PHP, React...)"
+                                                style={{ width: '100%', height: '42px', padding: '0 12px 0 38px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                                 type="search"
                                                 value={compSearchQuery}
                                             />
@@ -927,78 +942,6 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 </div>
                             </form>
                         </div>
-
-                        {/* SECTION EXTRACTION OCR & IA PADDLEOCR */}
-                        <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                                <div>
-                                    <h3 style={{ margin: 0, color: 'var(--primary)', fontSize: '17px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <Cpu size={18} />
-                                        <span>Extraction Automatique CV (PaddleOCR & IA)</span>
-                                    </h3>
-                                    <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--muted)' }}>
-                                        Extraire les compétences, diplômes et expériences directement du fichier CV.
-                                    </p>
-                                </div>
-                                <button className="primary-button" disabled={ocrExtracting} onClick={handleExtractOcr} style={{ gap: '6px' }} type="button">
-                                    <Sparkles size={16} />
-                                    <span>{ocrExtracting ? 'Analyse OCR...' : 'Lancer Extraction CV'}</span>
-                                </button>
-                            </div>
-
-                            {ocrSuccessMsg ? (
-                                <div className="status-pill success" style={{ padding: '8px 14px', marginBottom: '12px', display: 'inline-block' }}>
-                                    {ocrSuccessMsg}
-                                </div>
-                            ) : null}
-
-                            {ocrData ? (
-                                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gap: '12px' }}>
-                                    <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--primary)' }}>Résultats de l'Extraction OCR (Données brutes reçues du Microservice)</h4>
-                                    
-                                    {ocrData.texte_brut ? (
-                                        <div>
-                                            <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Texte Brut OCR Extrait :</strong>
-                                            <pre style={{ background: '#0f172a', color: '#38bdf8', padding: '12px', borderRadius: '6px', fontSize: '12px', whiteSpace: 'pre-wrap', maxHeight: '180px', overflowY: 'auto' }}>
-                                                {ocrData.texte_brut}
-                                            </pre>
-                                        </div>
-                                    ) : null}
-
-                                    <div>
-                                        <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Données Structurées Extraites (JSON) :</strong>
-                                        <div style={{ display: 'grid', gap: '10px', fontSize: '13px', background: '#ffffff', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-                                            <div>
-                                                <strong>Compétences identifiées :</strong>
-                                                <div className="tags-list" style={{ marginTop: '4px' }}>
-                                                    {(ocrData.donnees_json?.competences ?? ocrData.competences ?? []).map((c, i) => (
-                                                        <span key={i} className="badge green">{c.nom ?? c.nom_competence} ({c.niveau})</span>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <strong>Expériences identifiées :</strong>
-                                                <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                                    {(ocrData.donnees_json?.experiences ?? ocrData.experiences ?? []).map((exp, i) => (
-                                                        <li key={i}><strong>{exp.poste ?? exp.intitule_poste}</strong> chez {exp.entreprise} ({exp.date_debut} à {exp.date_fin})</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-
-                                            <div>
-                                                <strong>Formations identifiées :</strong>
-                                                <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                                    {(ocrData.donnees_json?.formations ?? ocrData.formations ?? []).map((f, i) => (
-                                                        <li key={i}><strong>{f.diplome}</strong> - {f.etablissement} ({f.annee_obtention ?? f.date_obtention})</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : null}
-                        </div>
                     </div>
                 </div>
             )}
@@ -1079,6 +1022,80 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             Date d'envoi : {formatDate(details.created_at)} | Destinataire : {details.candidat?.email}
                         </p>
                     </div>
+                </div>
+            )}
+
+            {/* TAB EXTRACTION CV */}
+            {activeTab === 'extraction_cv' && (
+                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <div>
+                            <h3 style={{ margin: 0, color: 'var(--primary)', fontSize: '17px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Cpu size={18} />
+                                <span>Extraction Automatique CV (PaddleOCR & IA)</span>
+                            </h3>
+                            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--muted)' }}>
+                                Extraire les compétences, diplômes et expériences directement du fichier CV.
+                            </p>
+                        </div>
+                        <button className="primary-button" disabled={ocrExtracting} onClick={handleExtractOcr} style={{ gap: '6px' }} type="button">
+                            <Sparkles size={16} />
+                            <span>{ocrExtracting ? 'Analyse OCR...' : 'Lancer Extraction CV'}</span>
+                        </button>
+                    </div>
+
+                    {ocrSuccessMsg ? (
+                        <div className="status-pill success" style={{ padding: '8px 14px', marginBottom: '12px', display: 'inline-block' }}>
+                            {ocrSuccessMsg}
+                        </div>
+                    ) : null}
+
+                    {ocrData ? (
+                        <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gap: '12px' }}>
+                            <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--primary)' }}>Résultats de l'Extraction OCR (Données brutes reçues du Microservice)</h4>
+                            
+                            {ocrData.texte_brut ? (
+                                <div>
+                                    <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Texte Brut OCR Extrait :</strong>
+                                    <pre style={{ background: '#0f172a', color: '#38bdf8', padding: '12px', borderRadius: '6px', fontSize: '12px', whiteSpace: 'pre-wrap', maxHeight: '180px', overflowY: 'auto' }}>
+                                        {ocrData.texte_brut}
+                                    </pre>
+                                </div>
+                            ) : null}
+
+                            <div>
+                                <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Données Structurées Extraites (JSON) :</strong>
+                                <div style={{ display: 'grid', gap: '10px', fontSize: '13px', background: '#ffffff', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                    <div>
+                                        <strong>Compétences identifiées :</strong>
+                                        <div className="tags-list" style={{ marginTop: '4px' }}>
+                                            {(ocrData.donnees_json?.competences ?? ocrData.competences ?? []).map((c, i) => (
+                                                <span key={i} className="badge green">{c.nom ?? c.nom_competence} ({c.niveau})</span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <strong>Expériences identifiées :</strong>
+                                        <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                                            {(ocrData.donnees_json?.experiences ?? ocrData.experiences ?? []).map((exp, i) => (
+                                                <li key={i}><strong>{exp.poste ?? exp.intitule_poste}</strong> chez {exp.entreprise} ({exp.date_debut} à {exp.date_fin})</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div>
+                                        <strong>Formations identifiées :</strong>
+                                        <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                                            {(ocrData.donnees_json?.formations ?? ocrData.formations ?? []).map((f, i) => (
+                                                <li key={i}><strong>{f.diplome}</strong> - {f.etablissement} ({f.annee_obtention ?? f.date_obtention})</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
                 </div>
             )}
 
