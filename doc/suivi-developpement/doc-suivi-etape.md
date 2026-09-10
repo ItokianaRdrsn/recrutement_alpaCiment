@@ -88,6 +88,20 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ---
 
+### Demande 62 (Rectification / Déplacement de la section Extraction CV OCR dans un Onglet Dédié "Extraction CV") :
+1. **Création d'un Onglet Dédié "Extraction CV" ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L383-L396))** :
+   - Ajout d'un bouton d'onglet `<Cpu size={16} /> <span>Extraction CV</span>` dans la barre de navigation des sections de la fiche candidat, placé à côté de l'onglet `Communications`.
+2. **Isolation du Module PaddleOCR & IA ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L1028-L1099))** :
+   - Extraction de la section `Extraction Automatique CV (PaddleOCR & IA)` hors de l'onglet `Informations & Profil RH`.
+   - Affichage exclusif du bloc OCR lorsque `activeTab === 'extraction_cv'`.
+> **User Prompt :** *"okey maintenant dans la fiche candidat ,je veux que ca ne soit plus dans information et profil mais que tu crees une nouvelle section a coter de communication qui sera ,Excration CV"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Nouvel onglet `Extraction CV` fonctionnel et isolé à côté de `Communications`.
+  - Nettoyage du panneau `Informations & Profil RH`.
+  - **Vite Build (`npm run build`)** : **✓ Built in 1.02s (0 erreur)**.
+
+---
+
 ### Demande 11 : Sprint 5 - Stepper de Statut RH, Règle de non-retour, Bouton Mettre en Vivier & Recherche Pop-up Vivier
 > **User Prompt :** *"revenons au sprint 5 maintenant ,deja tu n'as rien terminer a part la gestion de crud competences faisons etape par etape ,la gestion de vivier ,deja dans la fiche du candidature ,on va faire comme ceci ,dans la colonne ou il y a mise a jour du status RH ,deja on ne va pas mettre un menu deroulant ,on va afficher directement tous les status en ligne par ordre et mettre une surbrillance au status actuel de la personne et mettre une regle de gestion ,on ne peut pas revenir a un status qui a un ordre workflow inferieur ou egal ,deja l'ordre va etre 10 ,20 ,30 ,40 ,50 et 50 pour retenue et non retenue et le reste suis l'ordre ,ensuite un peu en bas de ca on a un bouton mettre en vivier qui va mettre true a la colonne dans vivier ,sachant qu'on ne met pas un candidat en vivier mais une candidature en vivier ,et dans la section en vivier maintenant ,deja le bouton ajouter vivier ,tu vas le styliser ,ensuite ,un pop un s'affiche avec recherche de candidature"*
 - **Résolution :**
@@ -512,6 +526,21 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
   - Suppression de la barre de défilement interne sur la carte de gauche.
   - Affichage direct et intégral de tous les sous-blocs sans tronquage.
   - **Vite Build (`npm run build`)** : **✓ Built in 928ms (0 erreur)**.
+
+---
+
+### Demande 62 (Rectification / Déplacement de la section Extraction CV OCR dans un Onglet Dédié "Extraction CV") :
+1. **Création d'un Onglet Dédié "Extraction CV" ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L383-L396))** :
+   - Ajout d'un bouton d'onglet `<Cpu size={16} /> <span>Extraction CV</span>` dans la barre de navigation des sections de la fiche candidat, placé à côté de l'onglet `Communications`.
+2. **Isolation du Module PaddleOCR & IA ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L1028-L1099))** :
+   - Extraction de la section `Extraction Automatique CV (PaddleOCR & IA)` hors de l'onglet `Informations & Profil RH`.
+   - Affichage exclusif du bloc OCR lorsque `activeTab === 'extraction_cv'`.
+> **User Prompt :** *"okey maintenant dans la fiche candidat ,je veux que ca ne soit plus dans information et profil mais que tu crees une nouvelle section a coter de communication qui sera ,Excration CV"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Nouvel onglet `Extraction CV` fonctionnel et isolé à côté de `Communications`.
+  - Nettoyage du panneau `Informations & Profil RH`.
+  - **Vite Build (`npm run build`)** : **✓ Built in 1.02s (0 erreur)**.
+
 
 
 
