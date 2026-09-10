@@ -541,6 +541,30 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
   - Nettoyage du panneau `Informations & Profil RH`.
   - **Vite Build (`npm run build`)** : **✓ Built in 1.02s (0 erreur)**.
 
+---
+
+### Demande 63 (Rectification / Réduction Globale de 20% de la Taille d'Affichage CSS) :
+1. **Échelle Globale CSS ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/styles.css#L20-L22))** :
+   - Application de la règle CSS `html { zoom: 0.8; }` dans la feuille de style globale de l'application React (`styles.css`).
+   - Réduction homogène de 20% de l'ensemble de la mise en page (textes, boutons, conteneurs `div`, icônes, marges, padding et modales), équivalent à un zoom navigateur fixé à 80%.
+> **User Prompt :** *"okey je pense on a une rectification a faire ,je trouve l'affichage actuel est un peu trop grand tout est un peu trop grand ,le texte ,les div ,les icones ,mon navigateur je suis passer a 80% de taille qui etait 100% avant et c'est parfait ,alors je te demande 20% de reductions a l'affichage"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Application du zoom 80% global via CSS (`zoom: 0.8;`).
+  - **Vite Build (`npm run build`)** : **✓ Built in 997ms (0 erreur)**.
+
+---
+
+### Demande 64 (Rectification / Ajustement de la Hauteur de la Sidebar sous Échelle 80%) :
+1. **Recalcul de la Hauteur Minimale & Fixe ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/styles.css#L32-L72))** :
+   - Mise à jour de la hauteur de la barre latérale `.sidebar` de `100vh` vers `calc(100vh / 0.8)` (`125vh`).
+   - Mise à jour corrélative des conteneurs `.app-shell`, `body`, `.drawer-content` et `.portal-container` pour s'étendre sur 100% de la hauteur physique de l'écran lors du zoom CSS 80%.
+> **User Prompt :** *"bien juste faut que le sidebar arrive jusqu au bas de la page"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - La sidebar et la coquille applicative recouvrent l'intégralité de la hauteur d'écran jusqu'au bas de page sans espace blanc résiduel.
+  - **Vite Build (`npm run build`)** : **✓ Built in 972ms (0 erreur)**.
+
+
+
 
 
 

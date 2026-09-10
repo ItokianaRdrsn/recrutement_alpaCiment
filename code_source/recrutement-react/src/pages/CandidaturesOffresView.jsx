@@ -281,7 +281,7 @@ export function CandidaturesOffresView({ referentiels }) {
                         border: '1px solid var(--border)',
                         position: 'sticky',
                         top: '16px',
-                        maxHeight: 'calc(100vh - 120px)',
+                        maxHeight: 'calc(100vh / 0.8 - 120px)',
                         overflowY: 'auto',
                     }}
                 >

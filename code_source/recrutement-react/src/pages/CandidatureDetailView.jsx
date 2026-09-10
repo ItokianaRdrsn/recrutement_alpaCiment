@@ -303,6 +303,9 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const photoDoc = (details.documents ?? []).find(
         (d) => d.type_document === 'Photo' || (d.mime_type && d.mime_type.startsWith('image/'))
     );
+    const cvDoc = (details.documents ?? []).find(
+        (d) => d.type_document === 'CV' || (d.nom_fichier && d.nom_fichier.toLowerCase().includes('cv')) || d.mime_type === 'application/pdf'
+    ) || (details.documents ?? []).find((d) => d.id_document !== photoDoc?.id_document);
 
     return (
         <div className="view-stack">
@@ -1027,75 +1030,145 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
             {/* TAB EXTRACTION CV */}
             {activeTab === 'extraction_cv' && (
-                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                        <div>
-                            <h3 style={{ margin: 0, color: 'var(--primary)', fontSize: '17px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Cpu size={18} />
-                                <span>Extraction Automatique CV (PaddleOCR & IA)</span>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '20px', alignItems: 'start' }}>
+                    {/* COLONNE GAUCHE : APERÇU DU FICHIER CV */}
+                    <div className="data-section" style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                            <h3 style={{ margin: 0, color: 'var(--primary)', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FileText size={18} />
+                                <span>CV Original du Candidat</span>
                             </h3>
-                            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'var(--muted)' }}>
-                                Extraire les compétences, diplômes et expériences directement du fichier CV.
-                            </p>
+                            {cvDoc ? (
+                                <a
+                                    className="filter-button"
+                                    href={backendPath(`/storage/${cvDoc.chemin_fichier}`)}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                                    title="Télécharger / Consulter"
+                                >
+                                    <Download size={14} />
+                                    <span>Télécharger</span>
+                                </a>
+                            ) : null}
                         </div>
-                        <button className="primary-button" disabled={ocrExtracting} onClick={handleExtractOcr} style={{ gap: '6px' }} type="button">
-                            <Sparkles size={16} />
-                            <span>{ocrExtracting ? 'Analyse OCR...' : 'Lancer Extraction CV'}</span>
-                        </button>
+
+                        {cvDoc ? (
+                            cvDoc.mime_type === 'application/pdf' || cvDoc.chemin_fichier?.toLowerCase().endsWith('.pdf') ? (
+                                <iframe
+                                    src={backendPath(`/storage/${cvDoc.chemin_fichier}`)}
+                                    style={{ width: '100%', height: '650px', border: '1px solid var(--border)', borderRadius: '8px', background: '#f8fafc' }}
+                                    title="Aperçu CV PDF"
+                                />
+                            ) : cvDoc.mime_type?.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(cvDoc.chemin_fichier) ? (
+                                <div style={{ textAlign: 'center', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid var(--border)', maxHeight: '650px', overflowY: 'auto' }}>
+                                    <img
+                                        src={backendPath(`/storage/${cvDoc.chemin_fichier}`)}
+                                        alt="Document CV"
+                                        style={{ maxWidth: '100%', height: 'auto', borderRadius: '6px' }}
+                                    />
+                                </div>
+                            ) : (
+                                <div style={{ padding: '32px 16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border)', textAlign: 'center' }}>
+                                    <FileText size={48} color="var(--primary)" style={{ margin: '0 auto 12px auto', display: 'block' }} />
+                                    <strong style={{ fontSize: '15px', display: 'block', marginBottom: '4px' }}>{cvDoc.nom_fichier}</strong>
+                                    <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '16px' }}>Format : {cvDoc.mime_type ?? 'Fichier'}</p>
+                                    <a
+                                        className="primary-button"
+                                        href={backendPath(`/storage/${cvDoc.chemin_fichier}`)}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px' }}
+                                    >
+                                        <Download size={16} />
+                                        <span>Consulter le document CV</span>
+                                    </a>
+                                </div>
+                            )
+                        ) : (
+                            <div className="empty-state" style={{ padding: '48px 16px', textAlign: 'center' }}>
+                                <FileText size={40} color="var(--muted)" style={{ margin: '0 auto 12px auto', display: 'block' }} />
+                                <span>Aucun document CV rattaché à cette candidature.</span>
+                            </div>
+                        )}
                     </div>
 
-                    {ocrSuccessMsg ? (
-                        <div className="status-pill success" style={{ padding: '8px 14px', marginBottom: '12px', display: 'inline-block' }}>
-                            {ocrSuccessMsg}
-                        </div>
-                    ) : null}
-
-                    {ocrData ? (
-                        <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gap: '12px' }}>
-                            <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--primary)' }}>Résultats de l'Extraction OCR (Données brutes reçues du Microservice)</h4>
-                            
-                            {ocrData.texte_brut ? (
-                                <div>
-                                    <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Texte Brut OCR Extrait :</strong>
-                                    <pre style={{ background: '#0f172a', color: '#38bdf8', padding: '12px', borderRadius: '6px', fontSize: '12px', whiteSpace: 'pre-wrap', maxHeight: '180px', overflowY: 'auto' }}>
-                                        {ocrData.texte_brut}
-                                    </pre>
-                                </div>
-                            ) : null}
-
+                    {/* COLONNE DROITE : RÉSULTATS DE L'EXTRACTION OCR & IA */}
+                    <div className="data-section" style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                             <div>
-                                <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Données Structurées Extraites (JSON) :</strong>
-                                <div style={{ display: 'grid', gap: '10px', fontSize: '13px', background: '#ffffff', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                <h3 style={{ margin: 0, color: 'var(--primary)', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <Cpu size={18} />
+                                    <span>Résultats Extraction (PaddleOCR & IA)</span>
+                                </h3>
+                                <p style={{ margin: '4px 0 0 0', fontSize: '12.5px', color: 'var(--muted)' }}>
+                                    Données analysées et structurées du CV.
+                                </p>
+                            </div>
+                            <button className="primary-button" disabled={ocrExtracting} onClick={handleExtractOcr} style={{ gap: '6px' }} type="button">
+                                <Sparkles size={16} />
+                                <span>{ocrExtracting ? 'Analyse OCR...' : 'Lancer Extraction CV'}</span>
+                            </button>
+                        </div>
+
+                        {ocrSuccessMsg ? (
+                            <div className="status-pill success" style={{ padding: '8px 14px', marginBottom: '12px', display: 'inline-block' }}>
+                                {ocrSuccessMsg}
+                            </div>
+                        ) : null}
+
+                        {ocrData ? (
+                            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gap: '12px' }}>
+                                <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--primary)' }}>Données reçues du Microservice FastAPI</h4>
+                                
+                                {ocrData.texte_brut ? (
                                     <div>
-                                        <strong>Compétences identifiées :</strong>
-                                        <div className="tags-list" style={{ marginTop: '4px' }}>
-                                            {(ocrData.donnees_json?.competences ?? ocrData.competences ?? []).map((c, i) => (
-                                                <span key={i} className="badge green">{c.nom ?? c.nom_competence} ({c.niveau})</span>
-                                            ))}
+                                        <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Texte Brut OCR Extrait :</strong>
+                                        <pre style={{ background: '#0f172a', color: '#38bdf8', padding: '12px', borderRadius: '6px', fontSize: '12px', whiteSpace: 'pre-wrap', maxHeight: '180px', overflowY: 'auto' }}>
+                                            {ocrData.texte_brut}
+                                        </pre>
+                                    </div>
+                                ) : null}
+
+                                <div>
+                                    <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Données Structurées Extraites (JSON) :</strong>
+                                    <div style={{ display: 'grid', gap: '10px', fontSize: '13px', background: '#ffffff', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                        <div>
+                                            <strong>Compétences identifiées :</strong>
+                                            <div className="tags-list" style={{ marginTop: '4px' }}>
+                                                {(ocrData.donnees_json?.competences ?? ocrData.competences ?? []).map((c, i) => (
+                                                    <span key={i} className="badge green">{c.nom ?? c.nom_competence} ({c.niveau})</span>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div>
-                                        <strong>Expériences identifiées :</strong>
-                                        <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                            {(ocrData.donnees_json?.experiences ?? ocrData.experiences ?? []).map((exp, i) => (
-                                                <li key={i}><strong>{exp.poste ?? exp.intitule_poste}</strong> chez {exp.entreprise} ({exp.date_debut} à {exp.date_fin})</li>
-                                            ))}
-                                        </ul>
-                                    </div>
+                                        <div>
+                                            <strong>Expériences identifiées :</strong>
+                                            <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                                                {(ocrData.donnees_json?.experiences ?? ocrData.experiences ?? []).map((exp, i) => (
+                                                    <li key={i}><strong>{exp.poste ?? exp.intitule_poste}</strong> chez {exp.entreprise} ({exp.date_debut} à {exp.date_fin})</li>
+                                                ))}
+                                            </ul>
+                                        </div>
 
-                                    <div>
-                                        <strong>Formations identifiées :</strong>
-                                        <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                            {(ocrData.donnees_json?.formations ?? ocrData.formations ?? []).map((f, i) => (
-                                                <li key={i}><strong>{f.diplome}</strong> - {f.etablissement} ({f.annee_obtention ?? f.date_obtention})</li>
-                                            ))}
-                                        </ul>
+                                        <div>
+                                            <strong>Formations identifiées :</strong>
+                                            <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
+                                                {(ocrData.donnees_json?.formations ?? ocrData.formations ?? []).map((f, i) => (
+                                                    <li key={i}><strong>{f.diplome}</strong> - {f.etablissement} ({f.annee_obtention ?? f.date_obtention})</li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : null}
+                        ) : (
+                            <div className="empty-state" style={{ padding: '48px 16px', textAlign: 'center', background: '#f8fafc', borderRadius: '8px', border: '1px dashed var(--border)' }}>
+                                <Cpu size={36} color="var(--muted)" style={{ margin: '0 auto 8px auto', display: 'block' }} />
+                                <span style={{ fontSize: '13.5px' }}>Cliquez sur "Lancer Extraction CV" pour analyser le CV du candidat avec PaddleOCR & l'IA.</span>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
