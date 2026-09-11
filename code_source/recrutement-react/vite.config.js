@@ -38,11 +38,7 @@ export default defineConfig(({ mode }) => {
                     target: backendUrl,
                     changeOrigin: true,
                 },
-                '/logout': {
-                    target: backendUrl,
-                    changeOrigin: true,
-                },
-                '/login': {
+                '/storage': {
                     target: backendUrl,
                     changeOrigin: true,
                 },

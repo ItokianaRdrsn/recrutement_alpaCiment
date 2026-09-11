@@ -2,43 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Models\Direction;
-use App\Models\Domaine;
-use App\Models\Lieu;
-use App\Models\Niveau;
-use App\Models\StatutOffre;
-use App\Models\TypeContrat;
+use App\Services\ReferentielService;
 use Illuminate\Http\JsonResponse;
 
 class ReferentielController extends Controller
 {
+    public function __construct(
+        protected ReferentielService $referentielService
+    ) {}
+
     public function __invoke(): JsonResponse
     {
         return response()->json([
-            'data' => [
-                'directions' => Direction::query()
-                    ->orderBy('nom_direction')
-                    ->get(['id_direction', 'nom_direction']),
-                'domaines' => Domaine::query()
-                    ->with('direction:id_direction,nom_direction')
-                    ->orderBy('nom_domaine')
-                    ->get(['id_domaine', 'id_direction', 'nom_domaine', 'valide']),
-                'statuts_offre' => StatutOffre::query()
-                    ->orderBy('ordre_workflow')
-                    ->get(['id_statut_offre', 'libelle', 'ordre_workflow']),
-                'types_contrat' => TypeContrat::query()
-                    ->orderBy('libelle')
-                    ->get(['id_type_contrat', 'libelle']),
-                'lieux' => Lieu::query()
-                    ->orderBy('libelle')
-                    ->get(['id_lieu', 'libelle']),
-                'niveaux' => Niveau::query()
-                    ->orderBy('id_niveau')
-                    ->get(['id_niveau', 'libelle']),
-                'roles' => UserRole::toReferentiel(),
-            ],
+            'data' => $this->referentielService->getAllReferentiels(),
         ]);
     }
 }

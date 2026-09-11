@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\OffreController;
 use App\Http\Controllers\Api\ReferentielController;
 use App\Http\Controllers\Api\CandidatureController;
 use App\Http\Controllers\Api\VivierController;
+use App\Http\Controllers\Auth\SessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +22,18 @@ use Illuminate\Support\Facades\Route;
 |  - Singulier (/offre/{id}, /candidature/{id}, /direction/{id}) pour les ressources uniques.
 |--------------------------------------------------------------------------
 */
+
+// Public Authentication & Session endpoints for React SPA
+Route::middleware(['web'])->group(function (): void {
+    Route::get('/csrf-token', fn () => response()->json([
+        'data' => [
+            'token' => csrf_token(),
+        ],
+    ]))->name('api.csrf-token');
+
+    Route::post('/login', [SessionController::class, 'store'])->name('api.login');
+    Route::post('/logout', [SessionController::class, 'destroy'])->name('api.logout');
+});
 
 // Public routes for candidates
 Route::get('/public/offres', [OffreController::class, 'publicIndex'])->name('api.public.offres.index');
@@ -36,13 +49,8 @@ Route::post('/public/import-candidature', [CandidatureController::class, 'import
 
 // Protected Back-Office routes
 Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
-    Route::get('/csrf-token', fn () => response()->json([
-        'data' => [
-            'token' => csrf_token(),
-        ],
-    ]))->name('api.csrf-token');
-    
     Route::get('/me', MeController::class)->name('api.me');
+
     Route::get('/dashboard', DashboardController::class)->name('api.dashboard');
     Route::get('/referentiels/recrutement', ReferentielController::class)->name('api.referentiels.recrutement');
     Route::get('/referentiels/statuts-candidature', [CandidatureController::class, 'statuts'])->name('api.referentiels.statuts-candidature');

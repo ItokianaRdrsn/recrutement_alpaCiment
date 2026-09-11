@@ -610,6 +610,45 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 - **Résolution (Suivant le strict protocole Documentation de `methodologie.md`) :**
   - Alignement intégral du document central de suivi et du fichier planning sur le scope de 68,0 jours.
 
+---
+
+### Demande 69 (Refactorisation Architecturale / Séparation en Couches Propres : FormRequest, Service, Repository, Resource, Thin Controller) :
+1. **Contexte & Découplage Architectural** :
+   - Déplacement intégral de la logique métier, des transactions de base de données (`DB::transaction`), du traitement de fichiers (`Storage`), et des appels API externes (FastAPI OCR) hors des contrôleurs pour éliminer le pattern anti-ergonomique *Fat Controller*.
+2. **Couche FormRequests (`app/Http/Requests/`)** :
+   - Création de 18 classes `FormRequest` spécialisées pour valider les entrées HTTP :
+     - Candidatures : `PostulerOffreRequest`, `CandidatureSpontaneeRequest`, `ImportExternalCandidatureRequest`, `SaisirRhCandidatureRequest`, `UpdateStatutRequest`, `UpdateVivierStatusRequest`.
+     - Offres : `StoreOffreRequest`, `UpdateOffreRequest`.
+     - Directions & Domaines : `StoreDirectionRequest`, `UpdateDirectionRequest`, `StoreDomaineRequest`, `UpdateDomaineRequest`.
+     - Compétences : `StoreCompetenceRequest`.
+     - Vivier & Profil : `StoreVivierRequest`, `AddCompetenceRequest`, `AddExperienceRequest`, `AddFormationRequest`, `ValidateOcrRequest`.
+3. **Couche Repositories (`app/Repositories/`)** :
+   - Création des interfaces (Contracts) et des implémentations Eloquent encapsulant 100% des requêtes vers PostgreSQL :
+     - `CandidatRepositoryInterface` & `EloquentCandidatRepository`
+     - `CandidatureRepositoryInterface` & `EloquentCandidatureRepository`
+     - `OffreRepositoryInterface` & `EloquentOffreRepository`
+     - `DirectionRepositoryInterface` & `EloquentDirectionRepository`
+     - `DomaineRepositoryInterface` & `EloquentDomaineRepository`
+     - `CompetenceRepositoryInterface` & `EloquentCompetenceRepository`
+     - `VivierRepositoryInterface` & `EloquentVivierRepository`
+     - `ReferentielRepositoryInterface` & `EloquentReferentielRepository`
+     - `DashboardRepositoryInterface` & `EloquentDashboardRepository`
+   - Enregistrement des liaisons d'interfaces dans le fournisseur de services dédié `RepositoryServiceProvider` (`bootstrap/providers.php`).
+4. **Couche Services Métier (`app/Services/`)** :
+   - Implémentation des règles de gestion, workflows, transitions, et transactions dans :
+     - `CandidatureService`, `OffreService`, `VivierService`, `DirectionService`, `DomaineService`, `CompetenceService`, `DashboardService`, `ReferentielService`.
+5. **Couche Eloquent Resources (`app/Http/Resources/`)** :
+   - Formatage standardisé des sorties JSON : `CandidatureResource`, `CandidatResource`, `CompetenceResource`, `VivierResource`, `CvExtractionOcrResource`, `StatutCandidatureResource` (en complément des existants `DirectionResource`, `DomaineResource`, `OffreResource`).
+6. **Contrôleurs Allégés (`app/Http/Controllers/Api/`)** :
+   - Transformation de tous les contrôleurs API en *Thin Controllers* n'effectuant plus aucune requête SQL directe.
+> **User Prompt :** *"gros changement dans le code ,on va faire une grosse refactorisation du code ,j'ai vu ,la majoriter de la logique tu as fais dans le controller ,non je ne veux pas ca ,on aura un repository ,toutes les reuete base seront dedans ,service ,la logique et les appels des methodes dans le repository ,ensuite le controller ,appel des methodes dans le services et juste un peu de logique si il le faut ,on utilisera les ressources et les FormRequest egalement dans le controller et voila fais le ,n'oublie la methodologie vue que tu es un nouveau model je ne sais pas si tu te rappelles de ce qu'on a deja fait"*
+- **Résolution (Suivant le strict protocole Rectification / Refactorisation de `methodologie.md`) :**
+  - Mise en place complète de l'architecture en 5 couches.
+  - Test d'intégration des services et repositories via `test_refactored_backend.php` (5/5 modules validés avec succès).
+  - Validation du routage (`php artisan route:list` : 83 routes résolues).
+  - Compilation frontend React (`npm run build` : 0 erreur, 747ms).
+
+
 
 
 

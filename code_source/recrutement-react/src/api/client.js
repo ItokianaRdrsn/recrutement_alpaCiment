@@ -7,14 +7,12 @@ export function backendPath(path) {
 }
 
 export function redirectToLogin() {
-    const loginUrl = backendPath('/login');
-
-    if (redirectingToLogin || window.location.href === loginUrl) {
+    if (redirectingToLogin || window.location.pathname === '/login') {
         return;
     }
 
     redirectingToLogin = true;
-    window.location.href = loginUrl;
+    window.location.href = '/login';
 }
 
 export async function getPublicJson(url) {
@@ -84,10 +82,53 @@ export async function getCsrfToken() {
         return csrfToken;
     }
 
-    const response = await getJson('/api/csrf-token');
-    csrfToken = response?.data?.token ?? '';
+    try {
+        const fullUrl = backendPath('/api/csrf-token');
+        const response = await fetch(fullUrl, {
+            credentials: 'include',
+            headers: {
+                Accept: 'application/json',
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            csrfToken = data?.data?.token ?? '';
+        }
+    } catch {
+        csrfToken = '';
+    }
 
     return csrfToken;
+}
+
+export async function submitLogin({ email, password, remember = false }) {
+    const fullUrl = backendPath('/api/login');
+    const token = await getCsrfToken();
+    const response = await fetch(fullUrl, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+        },
+        body: JSON.stringify({ email, password, remember }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        let msg = payload.message ?? 'Identifiants incorrects';
+        if (payload.errors?.email) {
+            msg = payload.errors.email[0];
+        } else if (payload.errors?.password) {
+            msg = payload.errors.password[0];
+        }
+        throw new Error(msg);
+    }
+
+    redirectingToLogin = false;
+    return payload.data;
 }
 
 export async function sendJson(url, { body, method = 'POST' } = {}) {
@@ -156,9 +197,12 @@ export async function sendFormData(url, formData, method = 'POST') {
 
 export async function submitLogout() {
     try {
-        await sendJson('/logout', { method: 'POST' });
+        await sendJson('/api/logout', { method: 'POST' });
+    } catch {
+        // Ignore logout errors
     } finally {
+        csrfToken = null;
         redirectingToLogin = false;
-        redirectToLogin();
+        window.location.href = '/login';
     }
 }

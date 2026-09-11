@@ -137,3 +137,30 @@ Pour chaque choix, il présente les **motifs de sélection**, les **alternatives
 ### 📚 Sources & Documentations
 - [Documentation Officielle Vite](https://vite.dev/)
 - [Documentation Officielle React.js](https://react.dev/)
+
+---
+
+## 🏛️ 7. Patron d'Architecture Backend : Architecture en Couches (Controller - FormRequest - Service - Repository - Resource)
+
+### 📌 Pourquoi ce découpage en 5 couches ?
+- **Séparation Stricte des Responsabilités (SoC - Separation of Concerns)** :
+  1. **FormRequest** : Isole 100% de la validation HTTP et de la conformité des types d'entrée avant que la requête n'atteigne le contrôleur.
+  2. **Contrôleur Mince (Thin Controller)** : Élimine le pattern anti-ergonomique *Fat Controller*. Le contrôleur se limite à faire le pont entre le protocole HTTP et le domaine applicatif.
+  3. **Service Métier** : Centralise les règles de gestion (validation de workflow, contrôle d'états, transactions ACID `DB::transaction`, manipulation des fichiers `Storage`, communication microservice).
+  4. **Repository** : Encapsule l'accès aux données et l'abstraction de la base PostgreSQL (requêtes Eloquent / Query Builder). Si la source de données évolue ou si des requêtes SQL complexes sont nécessaires, seule la couche Repository est modifiée sans impacter la logique métier.
+  5. **Eloquent Resource** : Garantit un contrat d'interface JSON immuable et stable pour les clients Frontend (React), masquant les détails internes du schéma de base de données.
+
+### ⚖️ Comparatif & Alternatives Évaluées
+
+| Patron Architectural | Avantages (Pour) | Inconvénients (Contre) | Décision |
+| --- | --- | --- | --- |
+| **Architecture en 5 Couches (FormRequest + Thin Controller + Service + Repository + Resource)** | • Découplage complet entre transport HTTP, règles métier et requêtes SQL<br>• Testabilité unitaire et mocking aisés des repositories et services<br>• Code maintenable, lisible et conforme aux standards Clean Code / DDD<br>• Préservation d'un contrat JSON strict et rétro-compatible | • Nombre de fichiers plus important (boilerplate maîtrisé) | **Retenu ✅** |
+| **Fat Controller (Logique & Requêtes SQL inline dans le Controller)** | • Moins de fichiers créés au démarrage rapide | • Violations flagrantes du principe de responsabilité unique (SRP)<br>• Duplication fréquente des requêtes et règles métier<br>• Tests unitaires impossibles sans simuler l'ensemble du cycle HTTP et DB | **Abandonné ❌** |
+| **Active Record Direct (Appels `$model->save()` directs dans les contrôleurs)** | • Simplicité apparente sur des CRUDs élémentaires | • Logique métier éparpillée et non réutilisable<br>• Dépendance directe du contrôleur au schéma SQL | **Écarté ❌** |
+
+### 📚 Sources & Documentations
+- [Laravel Documentation: Form Request Validation](https://laravel.com/docs/validation#form-request-validation)
+- [Laravel Documentation: Eloquent API Resources](https://laravel.com/docs/eloquent-resources)
+- [Martin Fowler: Repository Pattern & Service Layer](https://martinfowler.com/eaaCatalog/repository.html)
+- [Design Patterns: Elements of Reusable Object-Oriented Software (GoF)](https://en.wikipedia.org/wiki/Design_Patterns)
+

@@ -2,7 +2,7 @@ import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import './styles.css';
-import { backendPath, getJson, getPublicJson, redirectToLogin, sendPublicFormData } from './api/client';
+import { backendPath, getJson, getPublicJson, sendPublicFormData } from './api/client';
 import { ErrorState, LoadingState } from './components/common/FeedbackStates';
 import { AppShell } from './components/layout/AppShell';
 
@@ -13,6 +13,7 @@ const CandidaturesOffresView = lazy(() => import('./pages/CandidaturesOffresView
 const CandidaturesSpontaneesView = lazy(() => import('./pages/CandidaturesSpontaneesView').then((m) => ({ default: m.CandidaturesSpontaneesView })));
 const ReferentialsView = lazy(() => import('./pages/ReferentialsView').then((m) => ({ default: m.ReferentialsView })));
 const VivierView = lazy(() => import('./pages/VivierView').then((m) => ({ default: m.VivierView })));
+const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 
 const CandidatureSpontaneePage = lazy(() => import('./frontOffice/CandidatureSpontaneePage'));
 const PostulerOffrePage = lazy(() => import('./frontOffice/PostulerOffrePage'));
@@ -22,8 +23,7 @@ function BackOfficeLayout({ bootstrapError, bootstrapLoading, children, user }) 
     if (bootstrapError) return <ErrorState message={bootstrapError} />;
     if (bootstrapLoading) return <LoadingState />;
     if (!user) {
-        redirectToLogin();
-        return <LoadingState />;
+        return <Navigate replace to="/login" />;
     }
 
     return <AppShell user={user}>{children}</AppShell>;
@@ -53,15 +53,12 @@ function MainApp() {
         Boolean(path.match(/\/offres\/(\d+)\/postuler/)) ||
         Boolean(path.match(/\/offre\/([^\/]+)/));
 
-    const isLoginPage = path === '/login' || path === '/logout';
+    const isLoginPage = path === '/login';
 
     // Back-Office Load Base Data
     const loadBaseData = useCallback(async () => {
         if (isPublicCandidatePath || isLoginPage) {
             setBootstrapLoading(false);
-            if (isLoginPage) {
-                redirectToLogin();
-            }
             return;
         }
         try {
@@ -81,7 +78,10 @@ function MainApp() {
                 setCompetencesData(competencesResponse.data);
             }
         } catch (error) {
-            setBootstrapError(error.message);
+            // Unauthenticated 401 is normal for guests, only set error for real server failures
+            if (!error.message?.includes('401')) {
+                setBootstrapError(error.message);
+            }
         } finally {
             setBootstrapLoading(false);
         }
@@ -94,25 +94,29 @@ function MainApp() {
             loadBaseData();
         } else {
             setBootstrapLoading(false);
-            if (isLoginPage) {
-                redirectToLogin();
-            }
         }
     }, [loadBaseData, isPublicCandidatePath, isLoginPage]);
+
+    const handleLoginSuccess = async (userData) => {
+        setUser(userData);
+        loadedRef.current = false;
+        await loadBaseData();
+    };
 
     function handleSelectOfferFromDashboard(offre) {
         setEditingOffer(offre);
         navigate('/offres');
     }
 
-    if (isLoginPage) {
-        redirectToLogin();
-        return <LoadingState />;
-    }
-
     return (
         <Suspense fallback={<LoadingState />}>
             <Routes>
+                {/* LOGIN ROUTE */}
+                <Route
+                    element={user ? <Navigate replace to="/dashboard" /> : <LoginPage onLoginSuccess={handleLoginSuccess} />}
+                    path="/login"
+                />
+
                 {/* PUBLIC FRONT-OFFICE ROUTES */}
                 <Route element={<PublicOffresPage getJson={getPublicJson} onNavigate={navigate} />} path="/candidat/offres" />
                 <Route element={<CandidatureSpontaneePage getJson={getPublicJson} onNavigate={navigate} sendFormData={sendPublicFormData} />} path="/candidature-spontanee" />
