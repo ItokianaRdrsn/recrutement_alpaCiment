@@ -5,6 +5,7 @@ import './styles.css';
 import { backendPath, getJson, getPublicJson, sendPublicFormData } from './api/client';
 import { ErrorState, LoadingState } from './components/common/FeedbackStates';
 import { AppShell } from './components/layout/AppShell';
+import { PublicLayout } from './components/layout/PublicLayout';
 
 // Code-splitting lazy loading for all heavy page modules
 const DashboardView = lazy(() => import('./pages/DashboardView').then((m) => ({ default: m.DashboardView })));
@@ -49,6 +50,7 @@ function MainApp() {
 
     const isPublicCandidatePath =
         path.startsWith('/candidat/offres') ||
+        path.startsWith('/nos-offres') ||
         path.startsWith('/candidature-spontanee') ||
         Boolean(path.match(/\/offres\/(\d+)\/postuler/)) ||
         Boolean(path.match(/\/offre\/([^\/]+)/));
@@ -118,29 +120,55 @@ function MainApp() {
                 />
 
                 {/* PUBLIC FRONT-OFFICE ROUTES */}
-                <Route element={<PublicOffresPage getJson={getPublicJson} onNavigate={navigate} />} path="/candidat/offres" />
-                <Route element={<CandidatureSpontaneePage getJson={getPublicJson} onNavigate={navigate} sendFormData={sendPublicFormData} />} path="/candidature-spontanee" />
                 <Route
                     element={
-                        <PostulerOffrePage
-                            backendPath={backendPath}
-                            getJson={getPublicJson}
-                            idOffre={path.match(/\/offres\/(\d+)\/postuler/)?.[1]}
-                            onNavigate={navigate}
-                            sendFormData={sendPublicFormData}
-                        />
+                        <PublicLayout>
+                            <PublicOffresPage getJson={getPublicJson} onNavigate={navigate} />
+                        </PublicLayout>
+                    }
+                    path="/candidat/offres"
+                />
+                <Route
+                    element={
+                        <PublicLayout>
+                            <PublicOffresPage getJson={getPublicJson} onNavigate={navigate} />
+                        </PublicLayout>
+                    }
+                    path="/nos-offres"
+                />
+                <Route
+                    element={
+                        <PublicLayout>
+                            <CandidatureSpontaneePage getJson={getPublicJson} onNavigate={navigate} sendFormData={sendPublicFormData} />
+                        </PublicLayout>
+                    }
+                    path="/candidature-spontanee"
+                />
+                <Route
+                    element={
+                        <PublicLayout>
+                            <PostulerOffrePage
+                                backendPath={backendPath}
+                                getJson={getPublicJson}
+                                idOffre={path.match(/\/offres\/(\d+)\/postuler/)?.[1]}
+                                onNavigate={navigate}
+                                sendFormData={sendPublicFormData}
+                            />
+                        </PublicLayout>
                     }
                     path="/offres/:id/postuler"
                 />
                 <Route
                     element={
-                        <PostulerOffrePage
-                            backendPath={backendPath}
-                            getJson={getPublicJson}
-                            idOffre={path.match(/\/offre\/([^\/]+)/)?.[1]}
-                            onNavigate={navigate}
-                            sendFormData={sendPublicFormData}
-                        />
+                        <PublicLayout>
+                            <PostulerOffrePage
+                                backendPath={backendPath}
+                                getJson={getPublicJson}
+                                idOffre={path.match(/\/offre\/([^\/]+)/)?.[1]}
+                                onNavigate={navigate}
+                                sendFormData={sendPublicFormData}
+                            />
+                        </PublicLayout>
                     }
                     path="/offre/:slug"
                 />

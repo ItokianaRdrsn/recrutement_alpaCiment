@@ -767,9 +767,147 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 3. **Validation & Tests** :
    - Compilation Vite frontend (`npm run build`) : **✓ built in 520ms (0 erreur)**.
    - Rendu visuel propre et réactif sans aucun ralentissement ni asset externe.
-> **User Prompt :** *"okey maintenant ,il faut mettre un loader pour la liste des offres ,candidatures ,dis moi si tu as besoin que je telecherges quelque choses pour le loader ,un gif ou je ne sais quoi"*
+### Demande 75 (Design & Identité Visuelle : Rouge #FF0D00, Logo Découpé & Footer Signature Rouge avec Logo Blanc) :
+1. **Analyse du besoin & Spécifications de la charte** :
+   - Couleur maîtresse de marque définie sur le rouge vif corporate : `#FF0D00`.
+   - Deux déclinaisons du logo fournies dans `logo/` :
+     - `logo-cut.png` : logo officiel détouré pour fonds clairs / blancs.
+     - `logo-white.png` : logo monochrome blanc pour fonds sombres ou colorés en rouge `#FF0D00`.
+   - Exigence : intégration d'un footer signature rouge `#FF0D00` avec le logo blanc affichant les informations institutionnelles de l'entreprise AlpA Ciment.
+2. **Implémentation Réalisée** :
+   - **Déploiement des assets** :
+     - Transfert de `logo-cut.png` et `logo-white.png` vers `code_source/recrutement-react/public/logo/` et `src/assets/logo/`.
+     - Configuration du favicon du site et du titre dans `index.html`.
+   - **Charte CSS globale ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - Harmonisation des variables CSS de thème : `--primary: #FF0D00;`, `--primary-hover: #E60C00;`, `--primary-dark: #D40B00;`, `--soft-red: #FFF0EF;`.
+     - Définition des classes responsives pour le layout candidat et le footer rouge plein (`.public-red-footer`).
+   - **Nouveau Layout Candidat ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx))** :
+     - En-tête (Header) moderne avec `logo-cut.png`, navigation rapide (Offres, Candidature spontanée) et bouton d'accès Espace RH.
+     - Footer institutionnel pleine largeur rouge `#FF0D00` avec `logo-white.png`, description d'entreprise, coordonnées de l'usine d'Ibity (Antsirabe) et du siège d'Antananarivo, liens de carrières et mention légale.
+   - **Harmonisation de l'Espace RH et Authentification** :
+     - [AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) : intégration de `logo-cut.png` dans la barre latérale (sidebar).
+     - [LoginPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/LoginPage.jsx) : intégration du logo dans l'en-tête de la carte de connexion et bouton de connexion rouge `#FF0D00`.
+   - **Composant Public d'Offres ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx))** :
+     - Raccordement du `LoadingState` et `ErrorState` pour les candidats.
+3. **Validation & Tests** :
+   - Compilation Vite frontend (`npm run build`) : **✓ built in 524ms (0 erreur, 22 bundles générés)**.
+   - Intégrité visuelle vérifiée sur les parcours Candidat (Public) et Recruteur (RH).
+### Demande 76 (Intégration du Gabarit HTML/CSS/JS Officiel d'Alpha Ciment pour le Front Office) :
+1. **Analyse du besoin & Spécifications** :
+   - Fourniture par l'utilisateur du code HTML officiel extrait du site de production Alpha Ciment (`not-front path-node page-node-type-landing-page language-fr`).
+   - Règle stricte d'affichage :
+     - **Front Office (Portail Candidat)** : intégration intégrale du header, bannière héroïque, section catalogue des offres avec cartes annonces stylisées, section équipes & galerie photo, grand footer institutionnel complet et barre sociale flottante.
+     - **Back Office (RH & Recruteurs)** : aucun footer grand public n'est affiché, conservation de l'interface d'administration épurée.
+   - Utilisation des feuilles de style et scripts situés dans le dossier `css-js/` adjacent à `logo/`.
+2. **Implémentation Réalisée** :
+   - **Déploiement des Assets & Fichiers Externes** :
+     - Copie de l'intégralité des fichiers CSS et JS de `css-js/` vers `code_source/recrutement-react/public/css/` et `public/sites/default/files/js/`.
+     - Copie de l'ensemble des icônes et logos de `logo/` et `logo/images/` vers `public/themes/custom/apiqa/images/` (`logo-cut.png`, `logo-white.png`, `loader.png`, `icon-phone.svg`, `icon-mail.svg`, `icon-location.svg`).
+     - Téléchargement et intégration locale des photographies réelles d'Alpha Ciment dans `public/sites/default/files/images/` et `public/sites/default/files/styles/optimise/public/images/` (bannière devant le bloc technique, cantine, usine, évènement RH, valeurs).
+   - **Mise à jour du Document Racine ([index.html](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/index.html))** :
+     - Inclusion de Font Awesome 6 (`all.min.css`), de `css_OfchSCC6Ik182tntv9o3E_uWhsm0WYdS9UiJ1D0aQT0.css` et de `css_OyQjWxlUxu--OhsMlYcrEWO-H05fcGFzxYLsU_W2jCk.css`.
+     - Configuration du payload JSON Drupal et inclusion du script `js_ffcD9FB9b55EDTvf0v_CyEaKnYI-lMfzc1E0QUv5q34.js`.
+   - **Refonte Complète du Composant Layout Public ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx))** :
+     - Reproduction exacte de `<header class="main-header">` avec barre de navigation sticky, logo `logo-cut.png`, sous-menus déroulants (A propos, Nos Activités, RSE, Recrutement, Actualités), bouton "Nous contacter" et bouton d'accès dédié "Espace RH".
+     - Menu burger responsive slicknav pour terminaux mobiles.
+     - Reproduction exacte de `<footer class="main-footer">` avec `logo-white.png`, liens utiles, l'entreprise, coordonnées de contact (+261 20 22 293 88, contact@alphaciment.com, siège Tsaralalàna), copyright 2026 et liens réseaux sociaux.
+     - Composant flottant `<div class="social-bar">` Facebook et LinkedIn.
+   - **Refonte de la Page Catalogue ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx))** :
+     - Bannière parallaxe haute : *"Construisons ensemble votre carrière"*.
+     - Section `.our-blog` : titre, paragraphe de présentation institutionnelle, et grille dynamique des offres raccordée à l'API `/api/public/offres` affichée dans le format exact des cartes annonces `.card.shadow--on-hover` avec badge contrat, icône date limite et icône localisation.
+     - Conservation des offres expirées de référence pour préserver l'historique officiel.
+     - Section `.hero-text` : *"Nos équipes, notre plus grande force"* et galerie photo 4 colonnes.
+   - **Routage & Isolation Back Office ([main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+     - Ajout des alias de route `/candidat/offres` et `/nos-offres`.
+     - Maintien du back-office sans footer grand public conformément à la consigne.
+3. **Validation & Tests** :
+   - Compilation Vite frontend (`npm run build`) : **✓ built in 539ms (0 erreur, 22 bundles générés)**.
+   - Assets locaux vérifiés et servis via le serveur web statique.
+> **User Prompt :** *"okey voici le html de la page et je veux que tu fasses que lui ,sauf que pas besoin de footer pour back office mais dans le front oui ,voici le HTML : ... et le css et js ca sera dans le dossier css-js a coter de logo que tu copieras"*
 - **Résolution (Suivant le strict protocole Création / Amélioration de `methodologie.md`) :**
-  - Loader moderne intégré et déployé sur l'ensemble des modules cibles.
+  - Gabarit HTML officiel, feuilles de style CSS et scripts JS intégrés et opérationnels.
+
+---
+
+### Demande 77 (Harmonisation Visuelle : Rétablissement du Rouge Corporate #FF0D00 & Alignement du Style Back Office) :
+1. **Analyse du besoin & Spécifications** :
+   - Rétablissement impératif du rouge vif corporate `#FF0D00` comme couleur dominante sur toute l'application (le chargement du CSS Bootstrap 5 ayant introduit des bleus `#0d6efd` et un fond sombre `#19242e` non souhaités sur certains composants et sur le footer).
+   - Alignement du **Back Office** (Tableau de bord, Offres, Candidatures, Vivier, Référentiels) sur le même style élégant, épuré et moderne que le Front Office, tout en respectant la consigne stricte : **aucun footer dans le Back Office**.
+   - Présence du grand footer rouge `#FF0D00` avec le logo blanc `logo-white.png` exclusivement dans le **Front Office (Portail Candidat)**.
+2. **Implémentation Réalisée** :
+   - **Rétablissement du Rouge Corporate (#FF0D00) ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - Variables globales `:root` verrouillées avec `!important` : `--primary: #FF0D00 !important;`, `--primary-dark: #D40B00 !important;`, `--primary-hover: #E60C00 !important;`, `--soft-red: #FFF0EF !important;`, `--bs-primary: #FF0D00 !important;`, `--bs-link-color: #FF0D00 !important;`.
+     - Boutons primaires (`.filter-button`, `.icon-button`) stylisés en rouge `#FF0D00` avec ombre portée rouge douce.
+     - Boutons secondaires (`.ghost-button`, `.pagination button`) stylisés en fond rouge clair `#FFF0EF` avec bordure et texte `#FF0D00`.
+     - Boutons d'actions de ligne de tableau (`.row-button`) stylisés avec fond `#FFF0EF` et icône `#FF0D00`, survol plein `#FF0D00` et icône blanche.
+     - Champs de saisie : contour au focus surligné en rouge `#FF0D00` avec halo lumineux.
+   - **Harmonisation et Modernisation du Back Office ([AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - **Sidebar** :
+       - Intégration du logo détouré officiel `logo-cut.png` dans un conteneur net à coins arrondis.
+       - Liens de navigation actifs (`.nav-link.active` et `.sub-nav-link.active`) avec fond rouge vif `#FF0D00 !important`, typographie blanche en gras et ombre portée rouge dédiée (`box-shadow: 0 4px 14px rgba(255, 13, 0, 0.35)`).
+     - **Topbar** :
+       - Ajout d'un bouton d'accès rapide élégant `.topbar-candidate-portal-btn` permettant d'ouvrir le portail candidat dans un nouvel onglet, avec style rouge corporate.
+       - Titres de section et badges utilisateurs épurés.
+     - **Tableaux & Cartes** :
+       - Survol des lignes de tableau (`tbody tr:hover`) avec surlignage doux `#FFF9F9`.
+       - Cartes KPI avec ombre portée et accent rouge (`.kpi-card.blue .kpi-icon`).
+     - **Zéro Footer dans le Back Office** : le layout `AppShell.jsx` ne comporte aucun composant footer.
+   - **Footer Signature Rouge du Front Office ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - Application explicite de `background: #FF0D00 !important;` et `color: #ffffff !important;` sur `.main-footer`.
+     - Logo blanc `logo-white.png` mis en valeur sur le fond rouge vif corporate.
+     - Typographie, liens utiles et coordonnées de contact en blanc net (`#ffffff` / `rgba(255, 255, 255, 0.9)`), icônes inversées en blanc pur.
+     - Liens sociaux arrondis avec effet de survol blanc sur texte rouge (`background: #ffffff; color: #FF0D00;`).
+3. **Validation & Tests** :
+   - Compilation Vite frontend (`npm run build`) : **✓ built in 543ms (0 erreur, 22 bundles)**.
+   - Cohérence visuelle parfaite entre le Front Office et le Back Office sous la charte rouge `#FF0D00` d'Alpha Ciment.
+> **User Prompt :** *"non tu as changer les couleurs je veux tu remettes le rouge commen avant ,ensuite je veux que tu mettes le bakoffice le meme style aussi"*
+- **Résolution (Suivant le strict protocole Amélioration / Harmonisation de `methodologie.md`) :**
+  - Rouge corporate `#FF0D00` réappliqué partout.
+  - Back Office harmonisé avec le même style (sidebar, boutons, badges, tableaux) sans aucun footer.
+  - Front Office doté du footer signature rouge et du logo blanc.
+
+---
+
+### Demande 78 (Correction des Dimensions Front Office, Suivi du Curseur et Animations des Offres De Haut En Bas) :
+1. **Analyse du besoin & Spécifications** :
+   - **Nettoyage Back Office** :
+     - Ne pas mettre de lien vers le portail candidat dans la barre supérieure (topbar) du Back Office.
+     - Supprimer totalement le petit point suiveur (`.cb-cursor`) dans le Back Office (inapproprié pour un espace de gestion d'administration RH).
+   - **Résolution des Dimensions Front Office & Diagnostic Curseur** :
+     - Constat : le point curseur ne suivait pas le curseur de la souris et les éléments du Front Office n'avaient pas les mêmes dimensions que le site officiel.
+     - Analyse approfondie : un style global `html { zoom: 0.8; }` réduisait arbitrairement l'intégralité du Front Office de 20% (polices, bannières, conteneurs, hauteurs) et faussait dans le moteur Chromium/WebKit la matrice de calcul des coordonnées de la souris (`e.clientX`, `e.clientY`) utilisée par GSAP dans `Cursor.bind()`, provoquant un décrochage et un décalage exponentiel du point suiveur.
+     - Correction : suppression du `zoom: 0.8` sur `html` pour rétablir les dimensions 100% fidèles du gabarit Drupal, rétablir la précision 1:1 du curseur sur tout l'écran, et adapter la hauteur normale `100vh` aux conteneurs de l'application.
+   - **Curseur Suiveur Front Office** :
+     - Affichage d'un point suiveur rouge corporate Alpha Ciment (`#FF0D00`) fluide, qui suit fidèlement le pointeur sans disparaître brutalement sur les éléments interactifs.
+   - **Animation de Haut en Bas pour l'Affichage et le Survol des Offres** :
+     - Animation d'apparition en cascade de haut en bas (`@keyframes offerCascadeDown`) avec délai progressif (`animationDelay: index * 0.07s`) sur toutes les cartes d'annonces.
+     - Animation dynamique lors du survol ("lorsqu'on passe dessus") avec effet de haut en bas : balayage vertical d'accentuation rouge (`::before` passant de `height: 0` à `100%`), glissement fluide de la carte vers le bas (`transform: translateY(4px)`), surlignage du titre en rouge `#FF0D00` et translation de la flèche de navigation.
+2. **Implémentation Réalisée** :
+   - **Ajustements Back Office ([AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx))** :
+     - Suppression de l'élément `<a className="topbar-candidate-portal-btn">` dans la topbar.
+     - Activation automatique de la classe `body.in-backoffice` et masquage immédiat de `.cb-cursor` via React `useEffect`.
+   - **Correction CSS Globale, Rétablissement des Dimensions et Curseur ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - Retrait du `zoom: 0.8` global sur `html`.
+     - Harmonisation de `min-height: 100vh` sur `body`, `.app-shell`, `.sidebar`, `.drawer-content` et `.portal-container`.
+     - Règle de masquage absolu du curseur dans le backoffice : `body.in-backoffice .cb-cursor, .in-backoffice .cb-cursor, .app-shell ~ .cb-cursor { display: none !important; }`.
+     - Curseur suiveur Front Office stylisé aux couleurs de la marque : `.cb-cursor:before { background: #FF0D00 !important; }`.
+   - **Animations des Offres ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - Définition de `@keyframes offerCascadeDown` de `translateY(-26px)` vers `translateY(0)` avec rebond doux.
+     - Application des délais cadencés `style={{ animationDelay: `${index * 0.07}s` }}` sur les cartes dynamiques et de référence.
+     - Règle de survol `.card.shadow--on-hover:hover` avec transition verticale de haut en bas, gradient de surbrillance et ombre portée rouge.
+3. **Validation & Tests** :
+   - Build Vite réussi (`npm run build`) : **✓ built in 580ms (0 erreur, 22 modules)**.
+   - Vérification de la disparition totale du curseur et du bouton portail en Back Office.
+   - Vérification des dimensions réelles du Front Office et de la réactivité continue du curseur suiveur rouge.
+   - Vérification des animations cascade et survol des annonces.
+> **User Prompt :** *"okey dans le backoffice ne met pas de lien vers le portail front ,ensuite pas besoin du petit point qui nous suis dans le backoffice ,ensuite ,le petit point ne nous suis meme pas ,analyse bien le js ,tout le css car le frontoffice n'a pas les meme dimension des elements aussi ,et il faut l'animation pour l'affichage des offres ,regardes bien le js et le css ou si il y en as pas ,c'est que ,il affiche en animation de haut en bas les offres lorsqu'on passe dessurs"*
+- **Résolution (Suivant le strict protocole Amélioration / Harmonisation de `methodologie.md`) :**
+  - Lien externe retiré du backoffice.
+  - Curseur suiveur totalement supprimé du backoffice.
+  - Dimensions 1:1 et coordonnées curseur frontoffice rétablies (suppression du zoom perturbateur).
+  - Animations d'affichage et de survol de haut en bas implémentées avec fluidité.
+
+
 
 
 

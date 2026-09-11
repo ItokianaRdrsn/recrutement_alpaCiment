@@ -5,7 +5,6 @@ import {
     Building2,
     ChevronDown,
     ChevronUp,
-    ExternalLink,
     Layers,
     LayoutDashboard,
     LogOut,
@@ -18,6 +17,22 @@ export function AppShell({ children, user }) {
     const navigate = useNavigate();
     const location = useLocation();
     const activePath = location.pathname;
+
+    useEffect(() => {
+        // Enforce hiding the custom dot cursor in the back office
+        const cursor = document.querySelector('.cb-cursor');
+        if (cursor) {
+            cursor.style.display = 'none';
+        }
+        document.body.classList.add('in-backoffice');
+
+        return () => {
+            if (cursor) {
+                cursor.style.display = '';
+            }
+            document.body.classList.remove('in-backoffice');
+        };
+    }, []);
 
     const activeView = activePath.startsWith('/offres')
         ? 'offres'
@@ -48,10 +63,14 @@ export function AppShell({ children, user }) {
         <div className="app-shell">
             <aside className="sidebar">
                 <div className="brand-block">
-                    <span className="brand-mark">AC</span>
+                    <img
+                        src="/themes/custom/apiqa/images/logo-cut.png"
+                        alt="AlpA Ciment Logo"
+                        className="sidebar-logo-img"
+                    />
                     <div>
                         <strong>AlpA Ciment</strong>
-                        <span>Recrutement</span>
+                        <span>Portail Recrutement RH</span>
                     </div>
                 </div>
 
@@ -162,17 +181,7 @@ export function AppShell({ children, user }) {
                     ) : null}
                 </nav>
 
-                <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #243746' }}>
-                    <button
-                        className="ghost-button"
-                        onClick={() => navigate('/candidat/offres')}
-                        style={{ width: '100%', justifyContent: 'center', color: '#f2b84b' }}
-                        type="button"
-                    >
-                        <ExternalLink size={16} />
-                        <span>Portail Candidats (Front)</span>
-                    </button>
-                </div>
+                
             </aside>
 
             <div className="content-area">

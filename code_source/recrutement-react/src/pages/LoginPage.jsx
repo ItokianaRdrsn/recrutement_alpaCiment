@@ -63,8 +63,8 @@ export function LoginPage({ onLoginSuccess }) {
             }}>
                 {/* Header branding */}
                 <div style={{
-                    background: 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
-                    padding: '32px 28px 24px',
+                    background: 'linear-gradient(135deg, #D40B00 0%, #FF0D00 100%)',
+                    padding: '30px 28px 22px',
                     color: '#ffffff',
                     textAlign: 'center',
                 }}>
@@ -72,15 +72,17 @@ export function LoginPage({ onLoginSuccess }) {
                         display: 'inline-flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '14px',
-                        background: 'rgba(255, 255, 255, 0.15)',
-                        backdropFilter: 'blur(8px)',
+                        padding: '6px 14px',
+                        borderRadius: '12px',
+                        background: '#ffffff',
                         marginBottom: '14px',
-                        boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
+                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.25)',
                     }}>
-                        <Building2 size={28} color="#ffffff" />
+                        <img
+                            src="/logo/logo-cut.png"
+                            alt="AlpA Ciment Logo"
+                            style={{ height: '42px', width: 'auto', display: 'block' }}
+                        />
                     </div>
                     <h1 style={{
                         fontSize: '22px',
@@ -258,7 +260,7 @@ export function LoginPage({ onLoginSuccess }) {
                                     type="checkbox"
                                     checked={remember}
                                     onChange={(e) => setRemember(e.target.checked)}
-                                    style={{ width: '15px', height: '15px', accentColor: '#2563eb' }}
+                                    style={{ width: '15px', height: '15px', accentColor: '#FF0D00' }}
                                 />
                                 Se souvenir de moi
                             </label>
@@ -270,7 +272,7 @@ export function LoginPage({ onLoginSuccess }) {
                             style={{
                                 width: '100%',
                                 height: '44px',
-                                background: loading ? '#93c5fd' : 'linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)',
+                                background: loading ? '#fca5a5' : 'linear-gradient(135deg, #D40B00 0%, #FF0D00 100%)',
                                 color: '#ffffff',
                                 border: 'none',
                                 borderRadius: '8px',
@@ -281,7 +283,7 @@ export function LoginPage({ onLoginSuccess }) {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '8px',
-                                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                                boxShadow: '0 4px 14px rgba(255, 13, 0, 0.3)',
                                 transition: 'all 0.2s',
                             }}
                         >
