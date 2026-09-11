@@ -1,8 +1,8 @@
-# Sprint 3 - Tâches & Suivi (Dépôt et réception des candidatures - 6,5 j)
+# Sprint 3 - Tâches & Suivi (Dépôt et réception des candidatures - 7,5 j)
 
 ## 📊 Progression du Sprint
 - **Statut :** **[FAIT]**
-- **Progression :** **100.0% terminé** (6.5 / 6.5 j)
+- **Progression :** **100.0% terminé** (7.5 / 7.5 j)
 - **Barre de progression :** `[████████████████████] 100%`
 
 ---
@@ -17,6 +17,12 @@
 
 ---
 
+### BACK-OFFICE
+
+#### **[FAIT]** Saisie manuelle d'une candidature par un RH (1,0 j) - **100%**
+
+---
+
 ### API / SERVICES
 
 #### **[FAIT]** Détection d'un candidat existant et dédoublonnage par email (1,0 j) - **100%**
@@ -26,4 +32,4 @@
 
 ---
 
-## Sous-total Sprint 3 : 6,5 j (100.0% Terminé)
+## Sous-total Sprint 3 : 7,5 j (100.0% Terminé)

@@ -1,25 +1,27 @@
-# Document Central de Suivi par Étape et d'Avancement Global (65,5 j)
+# Document Central de Suivi par Étape et d'Avancement Global (68,0 j)
 
 Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et le journal chronologique cumulatif de toutes les demandes utilisateur (Prompts) avec leurs résolutions.
 
 ---
 
-## 📈 Tableau Général d'Avancement par Sprint (% terminé)
+## 📈 Tableau Général d'Avancement et Planning Calendaire des Sprints (Scope 68,0 j)
 
-- **Avancement Global du Projet :** **67.2% terminé** (44.0 / 65.5 j)
-- **Barre de Progression Globale :** `[██████████████░░░░░░] 67.2%`
+- **Date de Début Globale (Réception du Cahier des Charges) :** **Mercredi 12 Août 2026**
+- **Règle de Calcul Calendaire :** Jours ouvrés uniquement (Lundi au Vendredi - Hors week-ends)
+- **Avancement Global Réalisé :** **64.7% achevé** (44,0 / 68,0 j)
+- **Barre de Progression Globale :** `[█████████████░░░░░░░] 64.7%`
 
-| Sprint | Intitulé | Estimation | Progression (%) | Statut |
-| --- | --- | ---: | ---: | --- |
-| **Sprint 0** | Analyse, cadrage et conception | 9,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 3** | Dépôt et réception des candidatures (Web & Saisie RH) | 6,5 j | **100.0%** | **[FAIT]** |
-| **Sprint 4** | Gestion RH des candidatures, fiche candidat, découpage React, routage SPA & Blade Login | 7,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 5** | Vivier, compétences, règles de workflow RH & recherche de candidature en pop-up | 11,5 j | **73.9%** (8,5 / 11,5 j) | **[EN COURS]** |
-| **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | **0.0%** | **[A FAIRE]** |
-| **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 8,5 j | **0.0%** | **[A FAIRE]** |
-| **Total** | **Total Scope Général** | **65,5 j** | **67.2%** | |
+| Sprint | Intitulé | Estimation | Début Prévu | Fin Prévue | Début Réel | Fin Réelle | Progression (%) | Statut |
+| --- | --- | ---: | --- | --- | --- | --- | ---: | --- |
+| **Sprint 0** | Analyse, cadrage et conception | 9,0 j | 12/08/2026 | 24/08/2026 | 12/08/2026 | 24/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | 25/08/2026 | 01/09/2026 | 25/08/2026 | 26/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | 02/09/2026 | 10/09/2026 | 26/08/2026 | 27/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 3** | Dépôt et réception des candidatures (Web, Saisie RH & Import) | 7,5 j | 11/09/2026 | 21/09/2026 | 28/08/2026 | *En cours* | **86.7%** (6,5/7,5j) | **[EN COURS]** |
+| **Sprint 4** | Gestion RH, fiche candidat, SPA & Login | 7,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 5** | Vivier, compétences, workflow RH & OCR/IA CV | 11,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | *En cours* | **73.9%** (8,5/11,5j) | **[EN COURS]** |
+| **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | 16/10/2026 | 29/10/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
+| **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 10,0 j | 30/10/2026 | 12/11/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
+| **Total** | **Total Scope Général** | **68,0 j** | **12/08/2026** | **12/11/2026** | **12/08/2026** | *En cours* | **64.7%** (44,0/68,0j) | |
 
 ---
 
@@ -562,6 +564,55 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 - **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
   - La sidebar et la coquille applicative recouvrent l'intégralité de la hauteur d'écran jusqu'au bas de page sans espace blanc résiduel.
   - **Vite Build (`npm run build`)** : **✓ Built in 972ms (0 erreur)**.
+
+---
+
+### Demande 65 (Rectification / Présentation Côte à Côte du Fichier CV et des Résultats d'Extraction OCR) :
+1. **Mise en Page 2 Colonnes de l'Onglet Extraction CV ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L1030-L1145))** :
+   - **Colonne de gauche (`1.1fr`)** : Visualiseur de document CV original (intégration d'une preview dynamique via `<iframe>` pour les PDF ou `<img>` pour les images avec bouton de téléchargement rapide).
+   - **Colonne de droite (`0.9fr`)** : Module de déclenchement d'analyse PaddleOCR & IA et affichage des résultats structurés (Texte brut OCR, Compétences, Expériences, Formations).
+> **User Prompt :** *"dans l'extraction de cv ,je veux que tu affiches son CV a gauche et l'exctration sortie a droite"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Organisation côte à côte du CV original à gauche et des résultats d'extraction OCR/IA à droite.
+  - **Vite Build (`npm run build`)** : **✓ Built in 968ms (0 erreur)**.
+
+---
+
+### Demande 66 (Rectification / Ajustement du Ratio A4 du Visualiseur de CV) :
+1. **Dimensions Proportionnelles A4 ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L1033-L1065))** :
+   - Réduction de la largeur relative de la colonne CV à `0.82fr` (`gridTemplateColumns: '0.82fr 1.18fr'`), libérant plus d'espace de lisibilité pour la colonne d'extraction JSON à droite (`1.18fr`).
+   - Augmentation de la hauteur verticale du cadre d'affichage `<iframe>` à `840px` (ratio d'aspect A4 vertical ~1 : 1.414).
+> **User Prompt :** *"okey c'est bon ,je veux que tu reduises un peu la taille en largeur que prend le cv et augmenter la place en longueur ,faire une place pour un A4"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Format d'affichage A4 réaliste et allongé verticalement avec plus de place pour la sortie d'extraction.
+  - **Vite Build (`npm run build`)** : **✓ Built in 925ms (0 erreur)**.
+
+---
+
+### Demande 67 (Documentation / Intégration du Planning Calendaire avec Dates Prévisionnelles et Réelles Hors Week-ends) :
+1. **Périmètre & Calcul Calendaire ([planning-sprints.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/planning-sprints.md) & [doc-suivi-etape.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/doc-suivi-etape.md#L12-L22))** :
+   - Prise en compte de la date de démarrage officielle au **Mercredi 12 Août 2026** (réception du cahier des charges).
+   - Calcul strict des dates en **jours ouvrés uniquement** (Lundi au Vendredi - Hors week-ends Samedi et Dimanche).
+   - Intégration des colonnes **Début Prévu**, **Fin Prévue**, **Début Réel** et **Fin Réelle** dans le tableau de synthèse et les sous-sections de détails.
+> **User Prompt :** *"okey maintenant dans le doc suivi de sprint et dans le fichier planning sprint ,mets les dates ,voici ce que je veux dire ,deja date de debut 12 aout ou j'ai recuperer le cahier des charges ,et je veux que tu mettes la date de realisation normale du sprint sachant que je ne travaille pas les weekends et et mettre aussi la date de debut reelle et date de fin reelle"*
+- **Résolution (Suivant le strict protocole Documentation de `methodologie.md`) :**
+  - Mise à jour exhaustive des documents de suivi et de planning avec l'échéancier complet en jours ouvrés du 12/08/2026 au 09/11/2026.
+
+---
+
+### Demande 68 (Documentation / Harmonisation Complète sur la Découpe Officielle à 68,0 Jours) :
+1. **Nouveau Périmètre Officiel à 68,0 Jours ([planning-sprints.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/planning-sprints.md) & [doc-suivi-etape.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/doc-suivi-etape.md#L1-L25))** :
+   - Mise à jour du Sprint 3 à **7,5 j** avec l'ajout de la tâche *Saisie manuelle d'une candidature par un RH (1,0 j)* sous la sous-catégorie *BACK-OFFICE*.
+   - Ajustement du Sprint 7 à **10,0 j** (Recherche avancée mots-clés CV à 1,5 j et Documentation/Déploiement à 1,5 j).
+   - Intégration de l'ensemble des sous-catégories fonctionnelles (`BACK-OFFICE`, `FRONT-OFFICE`, `API / SERVICES`, `OCR / IA`) dans le détail de chaque sprint.
+   - Recalcul des dates d'échéances en jours ouvrés (du 12/08/2026 au 12/11/2026) avec une réalisation de **48,0 j / 68,0 j** (**70.6% terminé**).
+> **User Prompt :** *"voici les sprints actuellement: Sprint 0 Analyse, cadrage et conception 9,0 ... Sprint 3 Dépôt et réception des candidatures 7,5 ... Total Scope 68,0"*
+- **Résolution (Suivant le strict protocole Documentation de `methodologie.md`) :**
+  - Alignement intégral du document central de suivi et du fichier planning sur le scope de 68,0 jours.
+
+
+
+
 
 
 

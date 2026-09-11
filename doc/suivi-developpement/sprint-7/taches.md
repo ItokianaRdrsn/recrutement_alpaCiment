@@ -1,9 +1,9 @@
-# Sprint 7 - Tâches & Suivi (Dashboard, recherche avancée, matching et finalisation - 8,5 j)
+# Sprint 7 - Tâches & Suivi (Dashboard, recherche avancée, matching et finalisation - 10,0 j)
 
 ## Avancement du Sprint
 
 - **[À FAIRE]** 7 tâches
-- **Sous-total : 8,5 j**
+- **Sous-total : 10,0 j**
 
 ---
 
@@ -24,7 +24,7 @@
 - **Notes :** Calcul des délais de recrutement.
 
 #### **[À FAIRE]** Recherche avancée par mots-clés CV et compétences
-- **Estimation :** 1,0 j
+- **Estimation :** 1,5 j
 - **Notes :** Recherche globale full-text dans la base de candidatures.
 
 #### **[À FAIRE]** Matching candidat -> offre avec score simple
@@ -36,9 +36,9 @@
 - **Notes :** Recette générale du projet.
 
 #### **[À FAIRE]** Documentation et préparation du déploiement
-- **Estimation :** 0,5 j
+- **Estimation :** 1,5 j
 - **Notes :** Documentation finale et mise en production.
 
 ---
 
-## Sous-total Sprint 7 : 8,5 j
+## Sous-total Sprint 7 : 10,0 j
