@@ -14,8 +14,8 @@ class MeController extends Controller
 
         return response()->json([
             'data' => [
-                'id' => $user->id,
-                'name' => $user->name,
+                'id' => $user->id_utilisateur ?? $user->id,
+                'name' => $user->nom ?? $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
                 'role_label' => $user->roleEnum()?->label(),

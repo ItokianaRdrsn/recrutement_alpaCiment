@@ -17,7 +17,8 @@ class OffreResource extends JsonResource
             'slug' => \Illuminate\Support\Str::slug($this->titre_poste),
             'titre_poste' => $this->titre_poste,
             'description' => $this->description,
-            'lieu' => $this->lieu,
+            'id_lieu' => $this->id_lieu,
+            'lieu' => $this->relationLoaded('lieuRef') && $this->lieuRef ? $this->lieuRef->libelle : ($this->lieu ?? 'Antananarivo'),
             'date_publication' => $this->date_publication?->toDateString(),
             'date_limite' => $this->date_limite?->toDateString(),
             'direction' => $this->whenLoaded('direction', fn () => [
@@ -57,8 +58,10 @@ class OffreResource extends JsonResource
             ])->values()),
             'formations' => $this->whenLoaded('formations', fn () => $this->formations->map(fn ($formation) => [
                 'id' => $formation->id_profil_formation,
-                'niveau_min' => $formation->niveau_min,
-                'niveau_max' => $formation->niveau_max,
+                'id_niveau_min' => $formation->id_niveau_min,
+                'id_niveau_max' => $formation->id_niveau_max,
+                'niveau_min' => $formation->niveauMin ? $formation->niveauMin->libelle : $formation->niveau_min,
+                'niveau_max' => $formation->niveauMax ? $formation->niveauMax->libelle : $formation->niveau_max,
                 'domaine' => $formation->domaine,
                 'obligatoire' => $formation->obligatoire,
             ])->values()),

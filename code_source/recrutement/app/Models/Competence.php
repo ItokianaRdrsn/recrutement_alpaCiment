@@ -12,6 +12,8 @@ class Competence extends Model
 
     protected $primaryKey = 'id_competence';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'nom_competence',
         'id_type_competence',

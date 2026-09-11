@@ -10,7 +10,7 @@ class Document extends Model
 {
     use HasFactory;
 
-    protected $table = 'documents';
+    protected $table = 'document';
     protected $primaryKey = 'id_document';
 
     protected $fillable = [
@@ -20,6 +20,8 @@ class Document extends Model
         'chemin_fichier',
         'taille_octets',
         'mime_type',
+        'mode_acquisition',
+        'contenu_texte_extrait',
         'description',
     ];
 

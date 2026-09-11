@@ -11,20 +11,28 @@ class Candidature extends Model
 {
     use HasFactory;
 
-    protected $table = 'candidatures';
+    protected $table = 'candidature';
     protected $primaryKey = 'id_candidature';
 
     protected $fillable = [
         'id_candidat',
         'id_type_demande',
         'id_offre',
-        'id_direction',
         'id_domaine',
         'id_statut_candidature',
-        'date_candidature',
-        'message_motivation',
-        'postule_depuis',
-        'id_recruteur_assigne',
+        'dans_vivier',
+        'vue',
+        'poste_souhaite',
+        'message',
+        'canal_depot',
+        'id_utilisateur_depot',
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $casts = [
+        'dans_vivier' => 'boolean',
+        'vue' => 'boolean',
     ];
 
     public function candidat(): BelongsTo
@@ -37,14 +45,30 @@ class Candidature extends Model
         return $this->belongsTo(Offre::class, 'id_offre', 'id_offre');
     }
 
-    public function direction(): BelongsTo
-    {
-        return $this->belongsTo(Direction::class, 'id_direction', 'id_direction');
-    }
-
     public function domaine(): BelongsTo
     {
         return $this->belongsTo(Domaine::class, 'id_domaine', 'id_domaine');
+    }
+
+    public function typeDemande(): BelongsTo
+    {
+        return $this->belongsTo(TypeDemande::class, 'id_type_demande', 'id_type_demande');
+    }
+
+    public function direction()
+    {
+        if ($this->offre && $this->offre->direction) {
+            return $this->offre->direction();
+        }
+        if ($this->domaine && $this->domaine->valide && $this->domaine->direction) {
+            return $this->domaine->direction();
+        }
+        return $this->belongsTo(Direction::class, 'id_direction', 'id_direction');
+    }
+
+    public function getMessageMotivationAttribute()
+    {
+        return $this->message;
     }
 
     public function statut(): BelongsTo

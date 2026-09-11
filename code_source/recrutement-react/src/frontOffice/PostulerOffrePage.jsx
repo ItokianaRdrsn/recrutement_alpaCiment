@@ -9,8 +9,6 @@ export default function PostulerOffrePage({ backendPath, getJson, idOffre, onNav
         prenom: '',
         email: '',
         telephone: '',
-        ville: '',
-        linkedin_url: '',
         message_motivation: '',
     });
     const [cvFile, setCvFile] = useState(null);
@@ -22,7 +20,7 @@ export default function PostulerOffrePage({ backendPath, getJson, idOffre, onNav
     useEffect(() => {
         if (!idOffre) return;
         setLoading(true);
-        getJson(`/api/public/offres/${idOffre}`)
+        getJson(`/api/public/offre/${idOffre}`)
             .then((res) => {
                 setOffre(res?.data ?? null);
             })
@@ -55,7 +53,7 @@ export default function PostulerOffrePage({ backendPath, getJson, idOffre, onNav
                 data.append('photo', photoFile);
             }
 
-            const res = await sendFormData(`/api/public/offres/${idOffre}/postuler`, data);
+            const res = await sendFormData(`/api/public/offre/${idOffre}/postuler`, data);
             setSuccessMessage(res?.message ?? 'Votre candidature a été soumise avec succès !');
         } catch (err) {
             setErrorMessage(err.message || 'Une erreur est survenue lors de l\'envoi.');
@@ -149,24 +147,6 @@ export default function PostulerOffrePage({ backendPath, getJson, idOffre, onNav
                                 onChange={(e) => setFormData((c) => ({ ...c, telephone: e.target.value }))}
                                 placeholder="+261 34 00 000 00"
                                 value={formData.telephone}
-                            />
-                        </label>
-
-                        <label>
-                            <span>Ville de résidence</span>
-                            <input
-                                onChange={(e) => setFormData((c) => ({ ...c, ville: e.target.value }))}
-                                placeholder="Ex: Antananarivo"
-                                value={formData.ville}
-                            />
-                        </label>
-
-                        <label>
-                            <span>Profil LinkedIn (Optionnel)</span>
-                            <input
-                                onChange={(e) => setFormData((c) => ({ ...c, linkedin_url: e.target.value }))}
-                                placeholder="https://linkedin.com/in/..."
-                                value={formData.linkedin_url}
                             />
                         </label>
 

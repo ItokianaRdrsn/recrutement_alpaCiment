@@ -20,6 +20,8 @@ class ProfilFormation extends Model
      */
     protected $fillable = [
         'id_offre',
+        'id_niveau_min',
+        'id_niveau_max',
         'niveau_min',
         'niveau_max',
         'domaine',
@@ -37,5 +39,15 @@ class ProfilFormation extends Model
     public function offre(): BelongsTo
     {
         return $this->belongsTo(Offre::class, 'id_offre', 'id_offre');
+    }
+
+    public function niveauMin(): BelongsTo
+    {
+        return $this->belongsTo(Niveau::class, 'id_niveau_min', 'id_niveau');
+    }
+
+    public function niveauMax(): BelongsTo
+    {
+        return $this->belongsTo(Niveau::class, 'id_niveau_max', 'id_niveau');
     }
 }

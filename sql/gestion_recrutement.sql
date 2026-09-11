@@ -30,7 +30,7 @@ CREATE TABLE utilisateur (
 CREATE TABLE domaine (
     id_domaine BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nom_domaine VARCHAR(150) NOT NULL UNIQUE,
-    id_direction BIGINT NOT NULL REFERENCES direction(id_direction) ON DELETE RESTRICT,
+    id_direction BIGINT REFERENCES direction(id_direction) ON DELETE RESTRICT,
     valide BOOLEAN NOT NULL DEFAULT FALSE,
     date_validation TIMESTAMPTZ,
     valide_par BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE
@@ -79,6 +79,37 @@ VALUES ('CDI'),
     ('Stage'),
     ('Interim'),
     ('Consultance');
+
+-- ============================================================
+-- 6bis. LIEU ET NIVEAU DIPLOME
+-- ============================================================
+CREATE TABLE lieu (
+    id_lieu BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    libelle VARCHAR(150) NOT NULL UNIQUE
+);
+INSERT INTO lieu (libelle) VALUES
+('Antananarivo'),
+('Toamasina'),
+('Antsirabe'),
+('Mahajanga'),
+('Fianarantsoa'),
+('Toliara'),
+('Antsiranana'),
+('Usine AlpA Ciment');
+
+CREATE TABLE niveau (
+    id_niveau BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    libelle VARCHAR(100) NOT NULL UNIQUE
+);
+INSERT INTO niveau (libelle) VALUES
+('CAP / BEP'),
+('Baccalauréat'),
+('Bac+2 (BTS / DUT)'),
+('Bac+3 (Licence)'),
+('Bac+4 (Master 1)'),
+('Bac+5 (Master 2 / Ingénieur)'),
+('Bac+8 (Doctorat)');
+
 -- ============================================================
 -- 7. OFFRE
 -- ============================================================
@@ -87,7 +118,7 @@ CREATE TABLE offre (
     titre_poste VARCHAR(200) NOT NULL,
     id_direction BIGINT NOT NULL REFERENCES direction(id_direction) ON DELETE RESTRICT,
     description TEXT,
-    lieu VARCHAR(200),
+    id_lieu BIGINT NOT NULL REFERENCES lieu(id_lieu) ON DELETE RESTRICT,
     id_type_contrat BIGINT REFERENCES type_contrat(id_type_contrat) ON DELETE RESTRICT,
     date_publication DATE,
     date_limite DATE,
@@ -101,6 +132,7 @@ CREATE TABLE offre (
     )
 );
 CREATE INDEX idx_offre_direction ON offre(id_direction);
+CREATE INDEX idx_offre_lieu ON offre(id_lieu);
 CREATE INDEX idx_offre_type_contrat ON offre(id_type_contrat);
 CREATE INDEX idx_offre_statut ON offre(id_statut_offre);
 -- ============================================================
@@ -138,14 +170,14 @@ CREATE INDEX idx_mission_offre ON mission(id_offre);
 CREATE TABLE profil_formation (
     id_profil_formation BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_offre BIGINT NOT NULL REFERENCES offre(id_offre) ON DELETE CASCADE,
-    niveau_min VARCHAR(50),
-    niveau_max VARCHAR(50),
+    id_niveau_min BIGINT REFERENCES niveau(id_niveau) ON DELETE RESTRICT,
+    id_niveau_max BIGINT REFERENCES niveau(id_niveau) ON DELETE RESTRICT,
     domaine VARCHAR(150),
     obligatoire BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT chk_profil_formation_niveau CHECK (
-        niveau_min IS NOT NULL
-        OR niveau_max IS NOT NULL
+        id_niveau_min IS NOT NULL
+        OR id_niveau_max IS NOT NULL
         OR domaine IS NOT NULL
     )
 );
@@ -267,6 +299,7 @@ CREATE TABLE candidature (
     id_domaine BIGINT REFERENCES domaine(id_domaine) ON DELETE RESTRICT,
     id_statut_candidature BIGINT NOT NULL REFERENCES statut_candidature(id_statut_candidature) ON DELETE RESTRICT,
     dans_vivier BOOLEAN NOT NULL DEFAULT FALSE,
+    vue BOOLEAN NOT NULL DEFAULT FALSE,
     poste_souhaite VARCHAR(200),
     message TEXT,
     -- D'ou vient ce depot : import du site externe, ou saisie manuelle par un RH
@@ -274,8 +307,9 @@ CREATE TABLE candidature (
     -- Rempli uniquement si canal_depot = 'rh_manuel' : qui a saisi la candidature
     id_utilisateur_depot BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE
     SET NULL,
-        date_candidature TIMESTAMPTZ NOT NULL DEFAULT now(),
-        date_maj TIMESTAMPTZ NOT NULL DEFAULT now(),
+  
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         CONSTRAINT chk_candidature_canal CHECK (
             canal_depot = 'site_externe'
             OR id_utilisateur_depot IS NOT NULL
@@ -299,7 +333,9 @@ CREATE TABLE historique_statut (
     date_changement TIMESTAMPTZ NOT NULL DEFAULT now(),
     commentaire TEXT,
     id_utilisateur BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE
-    SET NULL
+    SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_historique_candidature ON historique_statut(id_candidature);
 -- ============================================================
@@ -338,7 +374,7 @@ CREATE INDEX idx_document_recherche_texte ON document USING GIN (recherche_texte
 -- pour le matching qu'apres validation RH. Placee ici (apres DOCUMENT) car elle
 -- reference document(id_document) pour tracer le CV source d'une extraction.
 CREATE TABLE candidat_competence (
-    id_candidat BIGINT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
     id_competence BIGINT NOT NULL REFERENCES competence(id_competence) ON DELETE CASCADE,
     niveau VARCHAR(30),
     source VARCHAR(20) NOT NULL DEFAULT 'manuel' CHECK (source IN ('manuel', 'cv_ocr')),
@@ -351,7 +387,7 @@ CREATE TABLE candidat_competence (
         date_validation TIMESTAMPTZ,
         valide_par BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE
     SET NULL,
-        PRIMARY KEY (id_candidat, id_competence),
+        PRIMARY KEY (id_candidature, id_competence),
         CONSTRAINT chk_candidat_competence_validation CHECK (
             valide = FALSE
             OR (
@@ -361,11 +397,11 @@ CREATE TABLE candidat_competence (
         )
 );
 -- ============================================================
--- 13ter. EXPERIENCE_PROFESSIONNELLE
+-- 13ter. CANDIDAT_EXPERIENCE_PROFESSIONNELLE
 -- ============================================================
-CREATE TABLE experience_professionnelle (
+CREATE TABLE candidat_experience_professionnelle (
     id_experience BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_candidat BIGINT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
     poste VARCHAR(200) NOT NULL,
     entreprise VARCHAR(200),
     date_debut DATE,
@@ -396,13 +432,13 @@ CREATE TABLE experience_professionnelle (
             )
         )
 );
-CREATE INDEX idx_experience_candidat ON experience_professionnelle(id_candidat);
+CREATE INDEX idx_experience_candidature ON candidat_experience_professionnelle(id_candidature);
 -- ============================================================
--- 13quater. FORMATION
+-- 13quater. CANDIDAT_FORMATION
 -- ============================================================
-CREATE TABLE formation (
+CREATE TABLE candidat_formation (
     id_formation BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_candidat BIGINT NOT NULL REFERENCES candidat(id_candidat) ON DELETE CASCADE,
+    id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
     diplome VARCHAR(200) NOT NULL,
     etablissement VARCHAR(200),
     domaine_etude VARCHAR(150),
@@ -427,7 +463,7 @@ CREATE TABLE formation (
             )
         )
 );
-CREATE INDEX idx_formation_candidat ON formation(id_candidat);
+CREATE INDEX idx_formation_candidature ON candidat_formation(id_candidature);
 -- ============================================================
 -- 14. RENDEZ-VOUS (test / entretien)
 -- ============================================================
@@ -638,6 +674,7 @@ VALUES ('Developpement Web', 1, TRUE),
 INSERT INTO offre (
         titre_poste,
         id_direction,
+        id_lieu,
         id_type_contrat,
         date_publication,
         date_limite,
@@ -645,6 +682,7 @@ INSERT INTO offre (
     )
 VALUES (
         'Developpeur Full Stack',
+        1,
         1,
         1,
         '2026-01-15',
@@ -655,12 +693,14 @@ VALUES (
         'Developpeur React Native',
         1,
         1,
+        1,
         '2026-02-01',
         '2026-04-01',
         2
     ),
     (
         'Data Engineer',
+        1,
         1,
         1,
         '2026-01-20',
@@ -671,14 +711,16 @@ VALUES (
         'Responsable Recrutement',
         2,
         1,
+        1,
         '2026-01-10',
         '2026-02-10',
         3
     ),
-    ('Comptable', 3, 1, '2026-02-01', '2026-04-01', 1),
+    ('Comptable', 3, 1, 1, '2026-02-01', '2026-04-01', 1),
     (
         'Chargé de Marketing Digital',
         4,
+        1,
         2,
         '2026-01-25',
         '2026-03-25',
@@ -687,6 +729,7 @@ VALUES (
     (
         'Commercial Senior',
         5,
+        1,
         1,
         '2026-01-15',
         '2026-03-15',
@@ -1132,7 +1175,7 @@ SELECT (
     ) AS candidatures_spontanees;
 -- Statistiques mensuelles (1/4) : tendance du nombre de candidatures par mois
 CREATE VIEW vue_stats_candidatures_par_mois AS
-SELECT date_trunc('month', date_candidature)::date AS mois,
+SELECT date_trunc('month', created_at)::date AS mois,
     COUNT(*) AS nombre_candidatures
 FROM candidature
 GROUP BY 1
@@ -1144,13 +1187,13 @@ SELECT sc.libelle AS statut,
     COUNT(*) AS nombre
 FROM candidature c
     JOIN statut_candidature sc ON sc.id_statut_candidature = c.id_statut_candidature
-WHERE date_trunc('month', c.date_candidature) = date_trunc('month', CURRENT_DATE)
+WHERE date_trunc('month', c.created_at) = date_trunc('month', CURRENT_DATE)
 GROUP BY sc.libelle,
     sc.ordre_workflow
 ORDER BY sc.ordre_workflow;
 -- Statistiques mensuelles (3/4) : taux de transformation (retenues / total) par mois
 CREATE VIEW vue_stats_taux_transformation_mensuel AS
-SELECT date_trunc('month', c.date_candidature)::date AS mois,
+SELECT date_trunc('month', c.created_at)::date AS mois,
     COUNT(*) AS total_candidatures,
     COUNT(*) FILTER (
         WHERE sc.libelle = 'Retenue'

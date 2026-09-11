@@ -7,7 +7,6 @@ export default function CandidatureSpontaneePage({ onNavigate, sendFormData }) {
         prenom: '',
         email: '',
         telephone: '',
-        ville: '',
         poste_souhaite: '',
         message_motivation: '',
     });
@@ -36,7 +35,7 @@ export default function CandidatureSpontaneePage({ onNavigate, sendFormData }) {
             });
             data.append('cv', cvFile);
 
-            const res = await sendFormData('/api/public/candidature-spontanee', data);
+            const res = await sendFormData('/api/public/candidature/spontanee', data);
             setSuccessMessage(res?.message ?? 'Votre candidature spontanée a été soumise avec succès !');
         } catch (err) {
             setErrorMessage(err.message || 'Erreur lors de l\'envoi de la candidature.');

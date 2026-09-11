@@ -8,57 +8,52 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Run the migrations for type_competence, competence, competence_alias, profil_competence matching gestion_recrutement.sql
      */
     public function up(): void
     {
-        Schema::create('type_competence', function (Blueprint $table) {
-            $table->id('id_type_competence');
-            $table->string('libelle', 100)->unique();
-        });
+        if (! Schema::hasTable('type_competence')) {
+            Schema::create('type_competence', function (Blueprint $table) {
+                $table->id('id_type_competence');
+                $table->string('libelle', 100)->unique();
+            });
 
-        DB::table('type_competence')->insert([
-            ['libelle' => 'Technique'],
-            ['libelle' => 'Langue'],
-            ['libelle' => 'Logiciel'],
-            ['libelle' => 'Méthodologie'],
-            ['libelle' => 'Autre'],
-        ]);
-
-        Schema::create('competence', function (Blueprint $table) {
-            $table->id('id_competence');
-            $table->string('nom_competence', 150)->unique();
-            $table->foreignId('id_type_competence')
-                ->constrained('type_competence', 'id_type_competence')
-                ->restrictOnDelete();
-            $table->timestampsTz();
-        });
-
-        Schema::create('profil_competence', function (Blueprint $table) {
-            $table->foreignId('id_offre')
-                ->constrained('offre', 'id_offre')
-                ->cascadeOnDelete();
-            $table->foreignId('id_competence')
-                ->constrained('competence', 'id_competence')
-                ->cascadeOnDelete();
-            $table->string('niveau_requis', 30)->nullable();
-            $table->primary(['id_offre', 'id_competence']);
-        });
-
-        // Insert initial standard competencies if empty
-        $techniqueId = DB::table('type_competence')->where('libelle', 'Technique')->value('id_type_competence');
-        $logicielId = DB::table('type_competence')->where('libelle', 'Logiciel')->value('id_type_competence');
-        $langueId = DB::table('type_competence')->where('libelle', 'Langue')->value('id_type_competence');
-
-        if ($techniqueId && $logicielId && $langueId) {
-            DB::table('competence')->insertOrIgnore([
-                ['nom_competence' => 'PHP / Laravel', 'id_type_competence' => $techniqueId, 'created_at' => now(), 'updated_at' => now()],
-                ['nom_competence' => 'React.js', 'id_type_competence' => $techniqueId, 'created_at' => now(), 'updated_at' => now()],
-                ['nom_competence' => 'PostgreSQL', 'id_type_competence' => $logicielId, 'created_at' => now(), 'updated_at' => now()],
-                ['nom_competence' => 'Gestion de projet', 'id_type_competence' => $techniqueId, 'created_at' => now(), 'updated_at' => now()],
-                ['nom_competence' => 'Français (Courant)', 'id_type_competence' => $langueId, 'created_at' => now(), 'updated_at' => now()],
-                ['nom_competence' => 'Anglais (Professionnel)', 'id_type_competence' => $langueId, 'created_at' => now(), 'updated_at' => now()],
+            DB::table('type_competence')->insertOrIgnore([
+                ['id_type_competence' => 1, 'libelle' => 'Technique'],
+                ['id_type_competence' => 2, 'libelle' => 'Langue'],
+                ['id_type_competence' => 3, 'libelle' => 'Logiciel'],
+                ['id_type_competence' => 4, 'libelle' => 'Méthodologie'],
+                ['id_type_competence' => 5, 'libelle' => 'Autre'],
             ]);
+        }
+
+        if (! Schema::hasTable('competence')) {
+            Schema::create('competence', function (Blueprint $table) {
+                $table->id('id_competence');
+                $table->string('nom_competence', 150)->unique();
+                $table->foreignId('id_type_competence')->constrained('type_competence', 'id_type_competence');
+            });
+        }
+
+        if (! Schema::hasTable('competence_alias')) {
+            Schema::create('competence_alias', function (Blueprint $table) {
+                $table->id('id_alias');
+                $table->string('texte_brut', 150)->unique();
+                $table->foreignId('id_competence')->constrained('competence', 'id_competence')->cascadeOnDelete();
+                $table->foreignId('id_utilisateur')->nullable()->constrained('utilisateur', 'id_utilisateur')->nullOnDelete();
+                $table->timestampTz('created_at')->useCurrent();
+
+                $table->index('id_competence', 'idx_competence_alias_competence');
+            });
+        }
+
+        if (! Schema::hasTable('profil_competence')) {
+            Schema::create('profil_competence', function (Blueprint $table) {
+                $table->foreignId('id_offre')->constrained('offre', 'id_offre')->cascadeOnDelete();
+                $table->foreignId('id_competence')->constrained('competence', 'id_competence')->cascadeOnDelete();
+                $table->string('niveau_requis', 30)->nullable();
+                $table->primary(['id_offre', 'id_competence']);
+            });
         }
     }
 
@@ -68,6 +63,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('profil_competence');
+        Schema::dropIfExists('competence_alias');
         Schema::dropIfExists('competence');
         Schema::dropIfExists('type_competence');
     }

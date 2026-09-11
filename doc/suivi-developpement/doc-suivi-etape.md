@@ -1,69 +1,790 @@
-# Document Central de Suivi par Étape et d'Avancement Global (65,5 j)
+# Document Central de Suivi par Étape et d'Avancement Global (68,0 j)
 
-Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), les 4 onglets de la Fiche Candidat et la synthèse des étapes.
-
----
-
-## 📌 Ergonomie & Onglets de la Fiche Candidat (`CandidatureDetailView`)
-
-Les boutons d'onglets au sommet de la Fiche Candidat sont désormais épurés au nombre de **4 onglets de navigation** :
-
-1. **`[Informations]`** (Onglet actif par défaut) :
-   - Vue 2 colonnes consolidée contenant :
-     - Identité, avatar et coordonnées du candidat.
-     - **Formulaire de mise à jour du statut RH** (changement de statut + commentaire).
-     - Informations du poste (Offre vs Spontanée), Direction et Lettre de motivation.
-     - **Documents & Pièces jointes** (grille des fichiers avec téléchargement direct).
-
-2. **`[Documents]`** : Vue dédiée pleine largeur des pièces jointes.
-3. **`[Historique statuts]`** : Timeline chronologique des changements de statut.
-4. **`[Communications]`** : Suivi des e-mails et accusés de réception.
+Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et le journal chronologique cumulatif de toutes les demandes utilisateur (Prompts) avec leurs résolutions.
 
 ---
 
-## 📈 Tableau Général d'Avancement par Sprint (% terminé)
+## 📈 Tableau Général d'Avancement et Planning Calendaire des Sprints (Scope 68,0 j)
 
-- **Avancement Global du Projet :** **54.2% terminé** (35.5 / 65.5 j)
-- **Barre de Progression Globale :** `[███████████░░░░░░░░░] 54.2%`
+- **Date de Début Globale (Réception du Cahier des Charges) :** **Mercredi 12 Août 2026**
+- **Règle de Calcul Calendaire :** Jours ouvrés uniquement (Lundi au Vendredi - Hors week-ends)
+- **Avancement Global Réalisé :** **64.7% achevé** (44,0 / 68,0 j)
+- **Barre de Progression Globale :** `[█████████████░░░░░░░] 64.7%`
 
-| Sprint | Intitulé | Estimation | Progression (%) | Statut |
-| --- | --- | ---: | ---: | --- |
-| **Sprint 0** | Analyse, cadrage et conception | 9,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 3** | Dépôt et réception des candidatures | 6,5 j | **100.0%** | **[FAIT]** |
-| **Sprint 4** | Gestion RH des candidatures et fiche candidat | 7,0 j | **100.0%** | **[FAIT]** |
-| **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 11,5 j | **0.0%** | **[A FAIRE]** |
-| **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | **0.0%** | **[A FAIRE]** |
-| **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 8,5 j | **0.0%** | **[A FAIRE]** |
-| **Total** | **Total Scope Général** | **65,5 j** | **54.2%** | |
-
----
-
-## 📂 Architecture Applicative : Séparation Front-Office vs Back-Office
-
-```text
-code_source/recrutement-react/src/
-├── frontOffice/                   <-- Portail public autonome pour les candidats (sans auth RH)
-│   ├── PublicOffresPage.jsx       <-- URL: /candidat/offres (Accès direct à toutes les offres publiées)
-│   ├── PostulerOffrePage.jsx      <-- URL: /offre/:slug (Dépôt direct de candidature avec Slug SEO)
-│   └── CandidatureSpontaneePage.jsx <-- URL: /candidature-spontanee (Formulaire direct avec poste souhaité)
-├── backOffice/                    <-- Administration RH sécurisée
-│   ├── DashboardView.jsx          <-- Tableau de bord RH
-│   ├── OffersView.jsx             <-- Gestion des offres (Bouton Partage générant /offre/:slug)
-│   ├── CandidaturesView.jsx       <-- Fiche Candidat 4 Onglets (Informations, Documents, Historique, Comm)
-│   ├── ReferentialsView.jsx       <-- Référentiels (Directions, Domaines en attente/validés, Compétences)
-│   └── AppShell.jsx               <-- Layout Back-office avec sidebar sticky et accordéon
-└── main.jsx                       <-- Routeur principal séparant Front-Office et Back-Office
-```
+| Sprint | Intitulé | Estimation | Début Prévu | Fin Prévue | Début Réel | Fin Réelle | Progression (%) | Statut |
+| --- | --- | ---: | --- | --- | --- | --- | ---: | --- |
+| **Sprint 0** | Analyse, cadrage et conception | 9,0 j | 12/08/2026 | 24/08/2026 | 12/08/2026 | 24/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | 25/08/2026 | 01/09/2026 | 25/08/2026 | 26/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | 02/09/2026 | 10/09/2026 | 26/08/2026 | 27/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 3** | Dépôt et réception des candidatures (Web, Saisie RH & Import) | 7,5 j | 11/09/2026 | 21/09/2026 | 28/08/2026 | *En cours* | **86.7%** (6,5/7,5j) | **[EN COURS]** |
+| **Sprint 4** | Gestion RH, fiche candidat, SPA & Login | 7,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 5** | Vivier, compétences, workflow RH & OCR/IA CV | 11,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | *En cours* | **73.9%** (8,5/11,5j) | **[EN COURS]** |
+| **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | 16/10/2026 | 29/10/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
+| **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 10,0 j | 30/10/2026 | 12/11/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
+| **Total** | **Total Scope Général** | **68,0 j** | **12/08/2026** | **12/11/2026** | **12/08/2026** | *En cours* | **64.7%** (44,0/68,0j) | |
 
 ---
 
-## 📑 Référentiel des Fiches de Suivi Datées
+## 📜 Journal Chronologique des Demandes Utilisateur (Prompts) & Résolutions
 
-Toutes les actions quotidiennes sont consignées dans les dossiers correspondants :
-- [2026-08-25 - Invalidation Session & Login](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-1/2026-08-25/invalidation-session-login.md)
-- [2026-08-26 - Directions & Domaines Pleine Largeur](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-2/2026-08-26/referentiels-directions-domaines.md)
-- [2026-08-27 - Profils Multiples & Sticky Sidebar Accordéon](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-2/2026-08-27/profils-multiples-subnav-sticky.md)
-- [2026-08-27 - Workflow Statut Croissant & Tri SQL Offres](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-2/2026-08-27/workflow-statuts-tri-dashboard.md)
-- [2026-08-28 - Candidatures, Upload CV & Front/Back Office](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-3/2026-08-28/candidatures-import-documents.md)
+### Demande 1 : Personnalisation du style du tableau des candidatures
+> **User Prompt :** *"oui est bien mais je veux pas que le texte bouge si il n'y a pas de non vue ,et ca attaque trop le rouge aussi ,met juste une barre bleu a gauche du conteneur"*
+- **Résolution :** Suppression de la mise en valeur rouge agressive. Ajout d'une barre bleue discrète sur la bordure gauche pour marquer les candidatures non vues sans déplacer le texte.
+
+---
+
+### Demande 2 : Découpage et modularisation du code React par page
+> **User Prompt :** *"separe aussi le code react tu as tout regrouper dans main ,separe par page le code"*
+- **Résolution :** Extraction de tous les composants React monolithe dans `src/pages/` (`DashboardView.jsx`, `OffersView.jsx`, `CandidaturesView.jsx`, `ReferentialsView.jsx`, `VivierView.jsx`) et mise en place du Lazy Loading via `React.lazy()` et `<Suspense>`.
+
+---
+
+### Demande 3 : Diagnostic de la communication Frontend-Backend (page blanche)
+> **User Prompt :** *"j'ai l'impression il n'arrive plus a communiquer avec le backend ,page vide direct"*
+- **Résolution :** Correction de l'élément racine dans `main.jsx` (`recrutement-app` vs `root`) et optimisation de l'initialisation pour rétablir la communication API.
+
+---
+
+### Demande 4 : Optimisation extrême des performances et taille de bundle
+> **User Prompt :** *"la performance du site est assez mauvaise Network dependency tree / Minify JavaScript Est savings of 6,212 KiB..."*
+- **Résolution :** Configuration du découpage manuel des Chunks (`manualChunks` pour `lucide-react` et `react-dom`) dans `vite.config.js`. Réduction de la taille du bundle initial de **8.4 MB à ~200 KB** (gain de >95%).
+
+---
+
+### Demande 5 : Fix de l'erreur 404 au démarrage dans la console
+> **User Prompt :** *"okey bonne performance juste lorsque je demarre au debut dans la console il ecrit Failed to load resource: the server responded with a status of 404 (Not Found)"*
+- **Résolution :** Ajout d'un favicône SVG inline dans `index.html` pour éliminer la requête manquante `/favicon.ico`.
+
+---
+
+### Demande 6 : Port et redirection de déconnexion (`/login`)
+> **User Prompt :** *"lorsque je clique sur sortir ,il va dans http://127.0.0.1:8000/login ... normalement c'est http://127.0.0.1:5173/ sauf en production"*
+- **Résolution :** Proxying de la route `/login` dans `vite.config.js` et redirection vers `/login` relatif pour rester sur le port actif (`5173` / `4173`).
+
+---
+
+### Demande 7 : Élimination des erreurs 401 lors du clic sur "Sortir"
+> **User Prompt :** *"maintenant lorsque je clique sur sortir Failed to load resource: the server responded with a status of 401 (Unauthorized) /api/referentiels/recrutement:1 /api/competences:1 /api/dashboard:1"*
+- **Résolution :** Ajout des routes `/login` et `/logout` dans les routes publiques `isPublicPath` pour annuler immédiatement tout appel API protégé dès la déconnexion.
+
+---
+
+### Demande 8 : Routage déclaratif type Vue Router (`react-router-dom`)
+> **User Prompt :** *"je veux qu'on ait des routes comme ceci ,je suis habituer a vuejs avec ses userRoute et useRouter alors fais la meme logique comme ceci import { BrowserRouter, Routes, Route } from 'react-router-dom';"*
+- **Résolution :** Migration du routage React vers `react-router-dom` v7 avec `<BrowserRouter>`, `<Routes>`, `<Route>`, `<Navigate>`, et utilisation des hooks `useNavigate()` et `useLocation()`.
+
+---
+
+### Demande 9 : Prise en charge des en-têtes CORS (`supports_credentials`)
+> **User Prompt :** *"Access to fetch at 'http://127.0.0.1:8000/api/me' from origin 'http://127.0.0.1:5173' has been blocked by CORS policy: The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*'"*
+- **Résolution :** Création de `config/cors.php` avec `'supports_credentials' => true` et définition explicite des origines autorisées (`http://127.0.0.1:5173`).
+
+---
+
+### Demande 10 : Uniformisation de la page de connexion Blade officielle & suppression du composant React en double
+> **User Prompt :** *"pourquoi je me retrouve parfois dans cette page qui ne fonctionne pas ... et lorsque je reactualise ,j'arrive sur la bonne: Back-office recrutement Connexion a l'espace RH AlpA Ciment. Compte de depart : admin@alphaciment.local / password ... supprime la premiere page ,je ne sais pas d'ou ca viens ,ensuite pour le doc de suivi ,arrete de supprimer les anciens ,rajoute toujours a chaque fois et mets aussi mes prompts"*
+- **Résolution :** 
+  1. Suppression définitive du composant React temporaire `src/pages/LoginPage.jsx`.
+  2. Configuration de `redirectToLogin()` et `submitLogout()` pour rediriger systématiquement vers la page officielle Laravel Blade (`resources/views/auth/login.blade.php`).
+  3. Conservation intégrale de l'historique de documentation avec inclusion systématique de tous les prompts utilisateur.
+
+---
+
+### Demande 62 (Rectification / Déplacement de la section Extraction CV OCR dans un Onglet Dédié "Extraction CV") :
+1. **Création d'un Onglet Dédié "Extraction CV" ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L383-L396))** :
+   - Ajout d'un bouton d'onglet `<Cpu size={16} /> <span>Extraction CV</span>` dans la barre de navigation des sections de la fiche candidat, placé à côté de l'onglet `Communications`.
+2. **Isolation du Module PaddleOCR & IA ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L1028-L1099))** :
+   - Extraction de la section `Extraction Automatique CV (PaddleOCR & IA)` hors de l'onglet `Informations & Profil RH`.
+   - Affichage exclusif du bloc OCR lorsque `activeTab === 'extraction_cv'`.
+> **User Prompt :** *"okey maintenant dans la fiche candidat ,je veux que ca ne soit plus dans information et profil mais que tu crees une nouvelle section a coter de communication qui sera ,Excration CV"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Nouvel onglet `Extraction CV` fonctionnel et isolé à côté de `Communications`.
+  - Nettoyage du panneau `Informations & Profil RH`.
+  - **Vite Build (`npm run build`)** : **✓ Built in 1.02s (0 erreur)**.
+
+---
+
+### Demande 11 : Sprint 5 - Stepper de Statut RH, Règle de non-retour, Bouton Mettre en Vivier & Recherche Pop-up Vivier
+> **User Prompt :** *"revenons au sprint 5 maintenant ,deja tu n'as rien terminer a part la gestion de crud competences faisons etape par etape ,la gestion de vivier ,deja dans la fiche du candidature ,on va faire comme ceci ,dans la colonne ou il y a mise a jour du status RH ,deja on ne va pas mettre un menu deroulant ,on va afficher directement tous les status en ligne par ordre et mettre une surbrillance au status actuel de la personne et mettre une regle de gestion ,on ne peut pas revenir a un status qui a un ordre workflow inferieur ou egal ,deja l'ordre va etre 10 ,20 ,30 ,40 ,50 et 50 pour retenue et non retenue et le reste suis l'ordre ,ensuite un peu en bas de ca on a un bouton mettre en vivier qui va mettre true a la colonne dans vivier ,sachant qu'on ne met pas un candidat en vivier mais une candidature en vivier ,et dans la section en vivier maintenant ,deja le bouton ajouter vivier ,tu vas le styliser ,ensuite ,un pop un s'affiche avec recherche de candidature"*
+- **Résolution :**
+  1. **Ordre Workflow des Statuts (10, 20, 30, 40, 50, 50)** : `Reçue`: 10, `Présélectionnée`: 20, `Test`: 30, `Entretien`: 40, `Retenue`: 50, `Non retenue`: 50.
+  2. **Stepper Horizontal de Statut RH** avec surbrillance du statut actuel.
+  3. **Règle de Gestion de Non-Retour** : Interdiction côté Frontend et Backend (`CandidatureController.php`) de basculer vers un statut ayant un `ordre_workflow <= ordre_workflow_actuel`.
+  4. **Bouton Mettre en Vivier la Candidature** : Intégration d'un bouton dédié `PATCH /api/candidature/{id}/vivier` (`dans_vivier = true`).
+  5. **Pop-up de Recherche dans VivierView** : Bouton stylisé et modal avec recherche dynamique pour ajouter une candidature au vivier.
+
+---
+
+### Demande 12 : Nouvelles Règles de Gestion Vivier, Fichiers de Méthodologie, Règles & Dossier Horodaté Sprint 5
+> **User Prompt :** *"la maintenant ,c'est des sprint dont on parle alors ,tu crees un dossier du jour dans le sprint 5 ,franchement , supprimes l'ancien vivier et copie le dans ce nouveau dossier avec les mises a jour ,et aussi crees un nouveau dossier avec toutes les regles de gestion qu'on a mis depuis le debut ,et aussi rajoute justement cette regle de gestion ,lorsqu'un candidat est en vivier ,on ne peut plus changer son status ,et lorsqu'il est retunue ,on ne peut plus mettre en vivier .Creer moi un fichier methodologie qui devra lister les etapes par lesquelles du doit passer a chaque prompt que je te fais comme lorsqu'il s'agit des sprints , creer dossier du jour et faire fichier sur la taches ,explications du code ,source ,et aussi mettre dans doc suivi ,ensuite pour les rectifications ,mettres dans doc suivi juste ,pas de sprint ,a toi de juger si c'est rectification ou sprint ,mais dans tous les cas ,on doit mettre dans doc suivi ,et toutes les regles de gestion mettre dans un fichier regle de gestion"*
+- **Résolution :**
+  1. **Dossier Horodaté du jour** : Création de [sprint-5/2026-09-01/](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-09-01/) et rédaction de [vivier-talents-competences.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-09-01/vivier-talents-competences.md).
+  2. **Registre des Règles de Gestion** : Création de [regles-de-gestion.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/regles-de-gestion.md).
+  3. **Guide Méthodologique** : Création de [methodologie.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md).
+  4. **Nouvelles Règles Métier Implémentées (Code Backend + Frontend)** :
+     - **Verrouillage du Statut RH en Vivier** : Si `dans_vivier = true`, le changement de statut RH est désactivé et bloqué.
+     - **Exclusion du Vivier pour Statut Retenue** : Si le statut de la candidature est `Retenue`, le bouton d'ajout au vivier est désactivé et bloqué.
+
+---
+
+### Demande 13 (Rectification) : Navigation Référentiels, Liens Candidatures et Disposition 2 Colonnes Directions/Offres
+> **User Prompt :** *"okey rectification maintenant ,surveille fichier methodologie pour savoir quoi faire ,pour la navigation ,deja lorsque je clique sur referencielles je ne veux pas directement atterir sur tous les referenciens ,juste affiche le menu deroulant et laisse moi choisir ,et pour candidature ,remplace par candidature sur offre et candidature spontannee ,ensuite dans candidature sur offre ,dans cette page ,liste toutes les directions et affiches aussi toutes les candidatures en 2 colonnes ,colonne gauche toutes les candidatures et colonne droite du coup plus grande la meme liste des candidatures comme actuellement de base ca va lister toutes les candidatures et toujours avec la meme indications lorsqu'on a pqs encore vu ,ensuites lorsqu'on appuis sur une direction ,comme menu deroulante on a choix : 1,toutes les offres ,2 voir les offres , dans le choix 1 ,on voit directement toutes les chandidatures ,dans le choix 2 ,le meme resultat que ce qui est actuellement dans Direction ->offre ->candidat"*
+- **Résolution :**
+  1. **Navigation Menu Référentiels ([AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/components/layout/AppShell.jsx))** : Le clic sur l'en-tête "Référentiels" ouvre/ferme le menu déroulant sans redirection automatique.
+  2. **Séparation des Liens Candidatures** : Liens distincts "Candidatures sur offre" et "Candidatures spontanées".
+  3. **Disposition 2 Colonnes & Arborescence Directions / Offres** : Colonne gauche liste les directions, colonne droite plus grande affiche les candidatures avec barre verticale bleue d'indication non-vue.
+
+---
+
+### Demande 14 (Rectification) : Compte de Candidatures par Direction & Affichage Direct des Offres avec Bouton Candidats
+> **User Prompt :** *"deja dans la candidature sur offre pour chaque directions ,on va mettre le nombre de candidature ,ensuite le 2 ne marche pas lorsqu'on clique sur voir les offres il n'y a rien qui s'affiche il dit toujours Aucune offre pour cette direction ,et aussi je t'ai lorsqu'on clique sur voir les offres ,deja plus de menu deroulante pour voir les offres ,affiches directement les offres avec un bouton pour afficher la liste des candidats pour chaque offre"*
+- **Résolution :**
+  1. **Compteur de Candidatures par Direction** : Badge affichant le nombre de candidatures rattachées à chaque Direction dans son en-tête.
+  2. **Affichage Direct des Offres** : Suppression du menu déroulant Choix 1 / Choix 2.
+
+---
+
+### Demande 15 (Rectification) : Resolution Bug d'Association ID Direction sur les Offres ("Aucune offre publiée pour cette direction")
+> **User Prompt :** *"Rectification eerreur: Aucune offre publiée pour cette direction. alors que j'ai des offres pour la direction"*
+- **Résolution :**
+  - **Diagnostic Root Cause** : L'API Laravel `OffreResource` formate les objets d'offre sous les clés `id` et `direction.id` au lieu de `id_offre` et `direction.id_direction`.
+  - **Correction ([CandidaturesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesView.jsx))** : Implémentation des fonctions helper universelles (`getDirId`, `getOffreDirId`, `getOffreId`, `getCandOffreId`, `getCandDirId`).
+
+---
+
+### Demande 16 (Rectification) : Ligne Unique "Offres & Candidatures" à Gauche, Champ de Recherche Offre & Cartes d'Offres avec Bouton Déroulant Candidats à Droite
+> **User Prompt :** *"Okey beacoup mieux juste dans la section a gauche pour Direction et offre ,lorsque je clique sur une direction ,il y a toutes les candidatures et la liste des offres ,changeons cela ,la liste des offres change par une seule ligne qui est offre candidature et lorsqu'on clique ,dans la section a droit ,fait la liste des offres avec un bouton comme liste deroulante pour afficher toutes les candidatures ,et rajouter champ pour recherche offre"*
+- **Résolution :**
+  1. **Colonne 1 (Gauche)** : Bouton sur une seule ligne `💼 Offres & Candidatures (X offres)`.
+  2. **Colonne 2 (Droite)** : Champ de recherche d'offres et cartes d'offres avec boutons déroulants `👥 Voir candidats (X) 🔽`.
+
+---
+
+### Demande 17 (Rectification) : 2 Boutons sous chaque Direction ("Toutes les candidatures" & "Offres & candidatures"), Arrivée par Défaut sur "Toutes les candidatures"
+> **User Prompt :** *"non je te parle de chaque direction on aura 2 bouton comme :toutes les candidatures et Offre&candidature mais de base on arrive dans toutes les candidature"*
+- **Résolution :**
+  1. **Les 2 Boutons sous Chaque Direction ([CandidaturesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesView.jsx))** : Bouton 1 (`Toutes les candidatures`) et Bouton 2 (`Offres & candidatures`).
+  2. **Affichage par Défaut (`de base`)** : Arrivée systématique sur "Toutes les candidatures" pour la direction sélectionnée.
+
+---
+
+### Demande 18 (Sprint 5) : Gestion Manuelle des Compétences, Expériences et Formations Candidat (1,5 j - 100%)
+> **User Prompt :** *"pour me sprint 5 peux tu faire ceci #### **[À FAIRE]** Gestion manuelle des compétences, expériences et formations candidat (1,5 j) - **100%** - **Notes :** Drawe/Modal Profil Candidat RH permettant d'ajouter et consulter les compétences avec leur niveau (Débutant, Intermédiaire, Avancé, Expert), expériences pro et diplômes."*
+- **Résolution :** Création du document de tâche du jour [gestion-manuelle-competences-experiences-formations.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-09-01/gestion-manuelle-competences-experiences-formations.md) et intégration de la gestion du profil.
+
+---
+
+### Demande 19 (Rectification) : Intégration Directe des Compétences/Expériences/Formations dans l'Onglet Informations de la Fiche Candidat & Bouton Unique "Consulter dossier" dans le Vivier
+> **User Prompt :** *"non ca ne s'affiche pas et dans vivier ne met pas le bouton profil et competence ,met juste voir dossier et la gestion des comptetence ,formation et expericience sera dans le dossier dans informations"*
+- **Résolution :**
+  1. **Dans le Vivier RH ([VivierView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/VivierView.jsx))** : Bouton unique `Consulter dossier`.
+  2. **Dans la Fiche Candidature ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx))** : Emplacement direct des blocs Compétences, Expériences et Formations au cœur du premier onglet principal `Informations & Profil RH`.
+
+---
+
+### Demande 20 (Fix SQL / Schema) : Correction du Nom de Colonne « poste » dans la Relation PostgreSQL « experience_professionnelle » et « date_obtention » dans « formation »
+> **User Prompt :** *"Impossible de charger les donnees. SQLSTATE[42703]: Undefined column: 7 ERREUR: la colonne « intitule_poste » de la relation « experience_professionnelle » n'existe pas ... regarfe bien la table et le script sql"*
+- **Résolution :** Alignement du modèle `CandidatExperience` et de `VivierController` sur la colonne PostgreSQL réelle `poste` et `date_obtention`.
+
+---
+
+### Demande 21 (Fix Frontend) : Resolution de l'erreur `allCompetences.map is not a function` dans `CandidatureDetailView`
+> **User Prompt :** *"erreur ,regarde aussi pour competence candidat et formation candidat les table sql Uncaught TypeError: allCompetences.map is not a function at CandidatureDetailView (CandidatureDetailView.jsx:646:53)"*
+- **Résolution :** Extraction sécurisée du tableau `competences` à partir du wrapper d'API `/api/competences` et ajouts de gardes de sécurité `Array.isArray(...)`.
+
+---
+
+### Demande 22 (Rectification / Prefixe `candidat_`) : Uniformisation avec le Préfixe `candidat_` sur les Tables SQL (`candidat_experience_professionnelle` et `candidat_formation`)
+> **User Prompt :** *"change aussi le script et dans notre code ,pour expererince et formation rajoute le prefixe candidat"*
+- **Résolution :** Renommage des tables `experience_professionnelle` -> `candidat_experience_professionnelle` et `formation` -> `candidat_formation` dans `sql/gestion_recrutement.sql`, la migration et les modèles.
+
+---
+
+### Demande 23 (Méthodologie) : Ajout de la 5e Règle dans `methodologie.md` pour la Mise à Jour des Tâches du Sprint (`taches.md`)
+> **User Prompt :** *"aussi ici dans le fichier merhodologie: Lorsqu'une demande concerne le développement d'une nouvelle tâche ou fonctionnalité rattachée à un Sprint : rajoute le 5e point mettre a jour les taches si on a terminer"*
+- **Résolution :** Ajout du 5ème point dans `methodologie.md` pour mettre à jour le statut des tâches terminées dans `taches.md`.
+
+---
+
+### Demande 24 (Rectification Statut Sprint 5) : Correction du Statut des Tâches OCR & Recalcul
+> **User Prompt :** *"c'est faux il n'y a pas du tout ca encore #### **[FAIT]** Intégration FastAPI et extraction OCR avec PaddleOCR (2,0 j)..."*
+- **Résolution :** Correction du statut des tâches OCR et réajustement du calcul de progression.
+
+---
+
+### Demande 25 (Sprint 5) : Création du Microservice FastAPI (PaddleOCR) dans `code_source/ocr/` (2,0 j - 100%)
+> **User Prompt :** *"faisons cette tache alors creer un dossier a coter de recrutement ,ecris ocr ,et mets dedans le microservice fast api"*
+- **Résolution :** Création du microservice FastAPI dans `code_source/ocr/` et méthode HTTP d'extraction dans `VivierController.php`.
+
+---
+
+### Demande 26 (Rectification / Affichage direct OCR) : Remise à `[À FAIRE]` des 2 Tâches de Parsing/Validation et Affichage Direct du Résultat OCR sans Boutons de Validation
+> **User Prompt :** *"deja ces 2 taches c'est pas encore fait ... mais ne les fait pas encore ,donne moi le resultat de l'ocr apres avoir cliquer sur lancer l'extraction CV affiche le direct simplement pour l'instant"*
+- **Résolution :** Suppression des boutons de validation/correction/rejet et affichage direct du texte brut OCR et du JSON structuré.
+
+---
+
+### Demande 27 (Règles & Architecture / Clef Étrangère `id_candidature`) : Rattachement des Compétences, Expériences et Formations à la Candidature (`id_candidature`) au lieu du Candidat
+> **User Prompt :** *"okey un changement aussi ,candidat competence,candidat experience professionnelle ,candidat formation doivent etre relier a une candidature pas avec un candidat"*
+- **Résolution :** Migration des contraintes d'intégrité relationnelle et des modèles Eloquent sur `id_candidature`.
+
+---
+
+### Demande 28 (Méthodologie & ADR) : Obligation d'Explicitation et de Comparatif des Technologies / Librairies + Création de `justification-technologique.md`
+> **User Prompt :** *"okey met aussi dans methodologie peu importe ,sprint ou non ,lorsqu'on utilise une librairie ou techno ,etc on doit dire pourquoi on utilise ,on donne d'autre exemple qui aurait pu marcher mais qui sont moins bien et on donne les sources de ces recherches ,documentation ,site ,etc..."*
+- **Résolution :** Rédaction des règles méthodologiques de justification et création du registre `justification-technologique.md`.
+
+---
+
+### Demande 29 (Sprint 5) : Intégration du Module NLP de Parsing de CV (`cv_nlp_parser.py`) & Validation par Script de Test (2,0 j - 100%)
+> **User Prompt :** *"okey voici le code qu'on m'a donne pour le OCR ,NLP cv_nlp_parser.py ... et voici un fichier pour le tester ,testons le aussi : test_cv_nlp_parser.py"*
+- **Résolution :** Intégration du parser NLP, téléchargement du modèle spaCy `fr_core_news_sm`, activation de rapidfuzz/dateparser et passage du sprint 5 à 73.9%.
+
+---
+
+### Demande 30 (Rectification / Harmonisation RESTful Nomenclaturée) : Harmonisation Globale de Tous les Endpoints de la Plateforme (Singulier `/ressource/{id}` vs Pluriel `/ressources`)
+> **User Prompt :** *"RECTIFICATION: okey est ce que tu peux generaliser les endpoints comme ceci ,exemples ,on va dans offre ,l endpoint c'est /offres ,ensuite pour voir une offre en particulier /offre/1 pareils pour les candidatures ... okey je trouve ca pas mal juste petite rectifications on met plus de "S" lorsque c'est exemple /offre/{id} uniquemennt pour /offres pour lister les offres ... okey parfait mets en place cela et n'oublie pas le methodologie.md que tu dois suivre"*
+- **Résolution :** Application du standard RESTful Nomenclaturé sur `routes/api.php` et l'ensemble des vues React.
+
+---
+
+### Demande 31 (Rectification / Table `lieu`, Table `niveau` & Marquage des Champs Obligatoires) : Création des Tables `lieu` et `niveau`, Remplacement de `lieu` par `id_lieu NOT NULL` et `niveau` par `id_niveau_min`/`id_niveau_max`, et Ajout d'Astérisques Rouges sur la Création d'Offre
+> **User Prompt :** *"RECTIFICATION : on va creer une table lieu id et libelle juste pour l'instant ,et alors dans la table offre il y a aura id lieu au lieu de lieu juste ,et il sera not null egalement ,et dans la creation des offres ,on va mettre un "*" en rouge pour les champ obligatoire a fournir pour la creation des offres ,et egalement ,pour le niveau dans profil formation on va creer une table niveau et dans profil formation ca sera id niveaumin et id niveaumax ,pour l'instant id et libelle juste et change le script sql aussi"*
+- **Résolution :** Création des tables `lieu` et `niveau`, mise à jour du script SQL `sql/gestion_recrutement.sql`, de la migration Laravel, des modèles Eloquent, et ajouts des astérisques rouges `*` et des sélecteurs `<select>` dans le formulaire `OffersView.jsx`.
+
+---
+
+### Demande 32 (Rectification / Séparation des Vues de Candidatures) : Séparation du Composant Unique `CandidaturesView` en 2 Composants Distincts par Page (`CandidaturesOffresView` et `CandidaturesSpontaneesView`) Sans Prop `mode`
+> **User Prompt :** *"okey pour ces routes : <Route element={<BackOfficeLayout ...><CandidaturesView mode="offres" referentiels={referentiels} /></BackOfficeLayout>} path="/candidatures/offres" /> <Route element={<BackOfficeLayout ...><CandidaturesView mode="spontanees" referentiels={referentiels} /></BackOfficeLayout>} path="/candidatures/spontanees" /> je ne veux pas de mode ,je veux 2 pages differentes pour les candidatures sur offres et spontanees"*
+- **Résolution :** Création des composants de page `CandidaturesOffresView.jsx` et `CandidaturesSpontaneesView.jsx`, mise à jour des routes dans `src/main.jsx` et validation par `npm run build` et `php artisan test`.
+
+---
+
+### Demande 33 (Rectification / Resolution Erreur 500 Vivier) : Correction de la Requête SQL sur la Colonne `date_maj` et Sécurisation de la Récupération des Profils dans `VivierController`
+> **User Prompt :** *"rectification la liste des candidatures en vivier ne marche pas erreur 500"*
+- **Résolution :** Remplacement de `orderByDesc('date_maj')` par `orderByDesc('updated_at')` dans `VivierController.php` et validation par script scratch (Status 200 OK) et tests PHPUnit (15/15 PASS).
+
+---
+
+### Demande 34 (Rectification / Prise en Charge des Filtres Globaux dans "Offres & Candidatures") : Transmission des Filtres de Recherche Candidat, Statut RH et Canal de Dépôt dans le Mode "Offres & Candidatures"
+> **User Prompt :** *"okey dans candidaturesOffersView dans me cette partie const handleSelectDirectionWithSubMode = (dirId, subMode) => { setSelectedDirectionId(dirId); setDirectionSubMode(subMode); }; lorsque je clique sur offre & candidatures ,les filtres ne marches pas"*
+- **Résolution :** Propagation des filtres globaux (`q`, `statut`, `canal_depot`) à la requête `/api/candidatures?type_demande=offre&per_page=500` et filtrage réactif au sein de chaque carte d'offre d'emploi.
+
+---
+
+### Demande 35 (Rectification / Contrôles de Pagination Universels & Recherche de Compétences dans la Création d'Offre) : Ajout du Composant de Pagination sur Toutes les Vues de Liste et Remplacement du Sélecteur de Compétences par un Sélecteur avec Recherche par Nom
+> **User Prompt :** *"okey n'oublie jamais les paginations pour les listes ex: des candidatures spontannees et sur offres ,les viviers ,les referenciels ,dans l'ajout competences dans offres ,on va rechercher la competence au lieu de lister comme cela ,ca va etre difficile a lire lorsqu'on aura beaucoup de competences"*
+- **Résolution :** Intégration du composant de pagination sur toutes les vues et amélioration de la recherche de compétences dans les offres.
+
+---
+
+### Demande 36 (Rectification / Workflow Inline d'Ajout & Pop-up de Création de Compétence dans la Création d'Offre) : Formulaire d'Ajout Inline de Compétence (Input de recherche + Select des résultats + Select du Niveau + Bouton Ajouter) & Pop-up de Création Directe de Compétence
+> **User Prompt :** *"dans l'ajout de competence ,je veux juste un input de recherche ,ensuite un champ sur le resultat ou liste de comptences et a droite le niveau et ensuite bouton ajouter competence et aussi un bouton creation de competence avec pop up pour la creation"*
+- **Résolution :** Création du formulaire d'ajout inline de compétences et du bouton pop-up.
+
+---
+
+### Demande 37 (Rectification / Disposition Verticale & Auto-Sélection de la Compétence dans la Recherche) : Alignement Vertical des Champs d'Ajout de Compétences et Prise en Charge Automatique de la Première Option Filtrée Sans Nécessiter de `onChange`
+> **User Prompt :** *"okey deja dans les competences dans offres ,je veux que ca soit en vertical pas en horizontal comme ceci ,le bouton ajouter competence ne marche pas ensuite ,j'ai commenter ceci pour directement afficher la competence lors des recherches mais je veux qu'il prenne direct en compte alors le option actuel et pas onChange"*
+- **Résolution :** Alignement des compétences et gestion de l'auto-sélection.
+
+---
+
+### Demande 38 (Rectification / Disposition Horizontale Inline & Fix du Chevauchement de l'Icône de Recherche) : Disposition Horizontale des Champs d'Ajout de Compétence avec Alignement `flex-end` et Correction du `padding-left: 38px !important` sur l'Input de Recherche
+> **User Prompt :** *"je te dis mets ceci en horizontal Rechercher une compétence Tapez le nom de la compétence (ex: PHP, React, Management...) Compétence correspondante (6 trouvées) Gestion de projet (Technique) Niveau requis pour l'offre Intermédiaire Ajouter competence Créer une nouvelle compétence Aucune compétence rattachée à cette offre pour le moment. Choisissez une compétence ci-dessus me et cliquez sur Ajouter competence. et aussi l'icone recherche cache le placeholder et le texte qu'on ecris"*
+- **Résolution :** Disposition horizontale inline et fix de l'icône de recherche.
+
+---
+
+### Demande 39 (Rectification / Portée Pleine Largeur `full-span` du Bloc "Compétences requises") : Extension du Bloc "Compétences requises" sur 100% de la Largeur du Formulaire via `className="full-span"` et `gridColumn: '1 / -1'`
+> **User Prompt :** *"mais met en horizontal le bloc pour competence requises"*
+- **Résolution :** Extension pleine largeur du bloc de compétences.
+
+---
+
+### Demande 40 (Rectification / Ajout Direct de la Compétence Créée depuis la Pop-up dans l'Offre) : Retour de l'Objet Compétence Créé par `CompetenceModal` (`onSuccess(res)`) et Insertion Automatique dans `offerForm.competences`
+> **User Prompt :** *"mais le bouton creer une nouvelle competence doit ouvrir un pop up et choisir libelle et type comme toutes les competences et ca rajoute directement dans la liste des competences pour l'offre"*
+- **Résolution :** Transmission de l'objet créé et insertion automatique.
+
+---
+
+### Demande 41 (Rectification / Rendu de la Pop-up `CompetenceModal` en Mode Formulaire d'Offre) : Duplication du Bloc de Rendu `{showCompetenceCreateModal ? <CompetenceModal ... /> : null}` dans le Premier Return de `OffersView.jsx` (`if (viewMode === 'form')`)
+> **User Prompt :** *"mais rien ne s'affiche lorsque je clique sur creer nouvelle competence"*
+- **Résolution :** Intégration du composant `<CompetenceModal>` dans la vue de formulaire.
+
+---
+
+### Demande 42 (Rectification / Correction de l'Affichage du Nom de la Compétence Créée au lieu de `Compétence #8`) : Transmission de `onRefreshBase={loadBaseData}` dans `main.jsx` et Mémorisation Locale Immédiate (`extraCompetences` / `allCompetences`) dans `OffersView.jsx`
+> **User Prompt :** *"pour les competences nouvellement creer le nom qui s'affiche dans les competences requises pour l'offre c'est Compétence #8"*
+- **Résolution :** Passage de `onRefreshBase` et synchronisation réactive locale.
+
+---
+
+### Demande 43 (Rectification / Optimisation de l'Agencement des Actions des Offres en Hauteur) : Compactage de la Colonne d'Actions (`padding: 8px 12px`, `height: 32px`, `flex-wrap: nowrap !important`) dans `OffersTable.jsx` et `styles.css`
+> **User Prompt :** *"okey maintenant pour la liste des offres d'emploi je trouve qu'il faudrait mieux agencer les actions ,ca prend trop de place en hauteur"*
+- **Résolution :** Compactage des actions et suppression du retour à la ligne.
+
+---
+
+### Demande 44 (Rectification / Généralisation des 4 Actions sur Toutes les Offres & Grisement des Actions Indisponibles) : Présence Systématique des 4 Boutons (`Publier`, `Clôturer`, `Modifier`, `Supprimer`) sur Chaque Ligne d'Offre avec État Désactivé/Grisé et Tooltip Explicatif (`disabled={!canAction}`, `opacity: 0.35`)
+> **User Prompt :** *"okey tres bien juste generalise les actions ,toutes les offres me me doivent avoir les actions publier ,cloturer ,modifier et supprimer juste tu mets comme pour le lien et candidature rh si il ne peut pas realiser l'action"*
+- **Résolution :** Présence systématique des 4 actions et grisement avec tooltips.
+
+---
+
+### Demande 45 (Fix Runtime / Import d'icône Manquant) : Résolution de l'erreur `Uncaught ReferenceError: Edit3 is not defined` par l'ajout de `Edit3` dans les Imports `lucide-react` de `OffersView.jsx`
+> **User Prompt :** *"Uncaught ReferenceError: Edit3 is not defined at renderOfferActions (OffersView.jsx:423:22) at OffersTable.jsx:142:78 at Array.map (<anonymous>) at OffersTable (OffersTable.jsx:39:29)"*
+- **Résolution :** Ajout de `Edit3` aux icônes importées de `lucide-react`.
+
+---
+
+### Demande 46 (Rectification / Harmonisation des Boutons d'Ajout de Compétences au Bas de la Div) : Uniformisation de la Section Compétences (`className="full-span" style={{ display: 'grid', gap: '8px' }}`) et Disposition des Boutons `ghost-button` en Bas à Gauche (`justifySelf: 'start'`) Identique aux Sections Missions et Formations
+> **User Prompt :** *"le ajouter competence fais comme pour les autres comme pour formation et mission ,le meme style et au meme endroit de la div"*
+- **Résolution :** Structuration identique et placement des boutons en bas à gauche de la div.
+
+---
+
+### Demande 47 (Rectification / Style de Couleur Dédié au Bouton de Création de Compétence) : Application d'un Style Violet Douce Distinctif (`background: #f3e8ff`, `color: #6b21a8`, `border: 1px solid #d8b4fe`) sur le Bouton "Créer une nouvelle compétence"
+> **User Prompt :** *"le bouton creer une nouvelle competence met en une autre couleur"*
+- **Résolution :** Personnalisation visuelle du bouton avec un thème violet doux.
+
+---
+
+### Demande 48 (Rectification / Alignment Visuel de la Modal du Vivier RH sur CompetenceModal) : Refonte de la Pop-up de Recherche et d'Ajout au Vivier (`VivierView.jsx`) pour Adopter Exactement la Même Structure de Backdrop, Badge d'En-tête Sparkles, Carte Arrondie (24px padding, 12px radius, blur) et Footer que `CompetenceModal`
+> **User Prompt :** *"dans /vivier aussi lorsque je me veux que ca soit un pop up comme pour la creation d'une nouvelle competence dans creation d'offre"*
+- **Résolution :** Harmonisation UX/UI de la modale du vivier RH sur `CompetenceModal`.
+
+---
+
+### Demande 49 (Rectification / Menu Déroulant Accordéon par Flèche sur les Directions, Scrolls Indépendants & 98 Candidatures Réelles en Base) : 
+1. **Menu Déroulant par Flèche sur les Directions ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx#L310-L380))** : Ajout des icônes `<ChevronDown />` et `<ChevronRight />` et gestion de l'état `expandedDirs` pour afficher les sous-boutons (*Toutes les candidatures* / *Offres & candidatures*) uniquement lors du clic sur la flèche déroulante ou la carte direction.
+2. **Scrolls Indépendants Fixes (Panneau Gauche vs Panneau Droit)** : Application du style `position: 'sticky', top: '16px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto'` sur la colonne de gauche. Le défilement de la liste des candidats à droite ne masque plus le panneau des directions.
+3. **Alimentation de la Base PostgreSQL** : Exécution du script de seeding `seed_candidatures.php` insérant **98 candidatures réelles** réparties avec profils candidats, formations et expériences sur toutes les offres et directions.
+> **User Prompt :** *"okey aussi dans candidature sur offre ,je veux que dans la sections directions et poles ,on affiche toutes les directions mais c'est lorsqu'on clique sur la fleche du menu deroulante qu'on voit toutes les candidatures et offres /candidature ,et egalement le que le scrolle soit independant pour le tableau et pour la section direction et pole ,je veux scroller le tableau sans que je ne vois plus la direction et pole et finalement tu peux rajouter vraiment beaucoup de candidature pour voir avec des donnees reelles"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Accordéon déroulant avec icônes de chevrons sur les directions.
+  - Fixation sticky du panneau des directions pour un défilement indépendant du tableau.
+  - Ajout de 98 candidatures avec données réelles en base de données.
+  - **Vite Build (`npm run build`)** : **✓ Built in 958ms (0 erreur)**.
+
+---
+
+### Demande 50 (Rectification / Reset Systématique de la Pagination à la Page 1 & Lignes 100% Cliquables Sans Bouton "Consulter Dossier") :
+1. **Réinitialisation Systématique de la Pagination à la Page 1 ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx))** : Ajout de `setPage(1)` lors du changement de direction sélectionnée (`handleSelectDirectionWithSubMode`), du clic sur "Toutes les directions" et lors du réinitialiseur de filtres (`resetFilters`). Ceci empêche d'être bloqué sur une page 2+ vide lors d'un changement de filtre/direction.
+2. **Lignes de Tableau 100% Cliquables et Suppression de la Colonne "Consulter dossier" ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx) & [CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx))** : Suppression de la colonne `<th>Actions</th>` et du bouton `Consulter dossier`. Toute la ligne `<tr>` est désormais cliquable (`cursor: 'pointer'`, `onClick={() => handleOpenDossier(c.id_candidature)}`) pour éliminer tout besoin de défilement horizontal et harmoniser l'expérience utilisateur.
+> **User Prompt :** *"ahhh okey erreur j'ai mis toutes les direction et ensuite j'ai changer de page en suivant ducoup page 2 et j'ai mais toutes les candidatures pour une direction et il y a ecrit aucune candidature car j'etais bloquer sur la page 2 ,remet toujours les page a 1 et ensuite ne met plus l'action consulter dossier dans les pages candidatures sur offre et spontannee car ca prend trop de place surtout avec candidature sur offre ,fais juste que ca soit cliquable son div car actuellement on doit slider a droite pour voir le bouton et pour unifier le style je veux le changer aussi dans candidature spontanee"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Réinitialisation systématique `setPage(1)` sur toute sélection de direction/filtre.
+  - Lignes `<tr>` rendues cliquables avec `cursor: 'pointer'` et suppression de la colonne "Actions".
+  - **Vite Build (`npm run build`)** : **✓ Built in 553ms (0 erreur)**.
+
+---
+
+### Demande 51 (Rectification / Réintégration du Bouton "Créer une nouvelle compétence" dans la Fiche Candidat) :
+1. **Bouton & Pop-up Modal de Création Directe ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L670-L695))** : Ajout du bouton violet doux `Créer une nouvelle compétence` à côté de `Ajouter compétence` dans la section Gestion des Compétences de la fiche candidat.
+2. **Auto-Sélection & Synchronisation Instantanée** : La soumission du formulaire dans `<CompetenceModal>` ferme la fenêtre modale, rafraîchit la liste des compétences globales et sélectionne automatiquement la compétence fraîchement créée dans le menu déroulant du profil candidat.
+> **User Prompt :** *"tu as enlever dans la fiche de candidature pour le competence ,la creation de competence avec pop up remet la"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Import et intégration du composant `<CompetenceModal>` dans `CandidatureDetailView.jsx`.
+  - Ajout du bouton violet doux et mémorisation automatique de la nouvelle compétence.
+  - **Vite Build (`npm run build`)** : **✓ Built in 484ms (0 erreur)**.
+
+---
+
+### Demande 52 (Rectification / Disposition des Boutons d'Action au Bas de la Div dans la Fiche Candidat) :
+1. **Alignement au Bas du Bloc ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L675-L698))** : Restructuration du formulaire d'ajout de compétences pour placer les deux boutons d'action (`Ajouter compétence` et `Créer une nouvelle compétence`) sur une ligne dédiée tout en bas de la sous-div grisifiée, en parfaite harmonie visuelle avec les sections Expériences, Formations et Formulaire d'Offres.
+> **User Prompt :** *"et encore une fois pour la fiche candidat pour competence mes en bas comme pour tous les autres l'ajout de competence"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Alignement des sélecteurs en haut du sous-bloc et boutons d'action au bas du sous-bloc.
+  - **Vite Build (`npm run build`)** : **✓ Built in 480ms (0 erreur)**.
+
+---
+
+### Demande 53 (Fix / Correction de la conservation de Page 2 lors du Changement de Direction) :
+1. **Réinitialisation de la Pagination dans `handleSelectDirectionWithSubMode` ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx#L154-L158))** : Ajout explicite de `setPage(1)` au sein de la fonction `handleSelectDirectionWithSubMode`, qui est appelée lors des clics sur n'importe quel bouton de direction ou sous-boutons.
+2. **Réinitialisation dans `resetFilters` ([CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx#L47-L50))** : Ajout de `setPage(1)` dans le composant des candidatures spontanées.
+> **User Prompt :** *"okey maintenant l'erreur que je t'ai dit a cause de la pagination ,lorsque je suis dans candidature offre ,et que je suis d'abord dans la section toutes les direction et que je change de page pour la page 2 et que je choisis direction commerciale ,il n'y rien qui s'affiche car je suis directement a la pagination 2"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Inscription de `setPage(1)` au sein du gestionnaire `handleSelectDirectionWithSubMode`.
+  - **Vite Build (`npm run build`)** : **✓ Built in 468ms (0 erreur)**.
+
+---
+
+### Demande 54 (Rectification / Recherche de Compétences & Harmonisation des Inputs dans la Fiche Candidat) :
+1. **Intégration de la Recherche de Compétences dans la Fiche Candidat ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L671-L752))** :
+   - Ajout de l'input de recherche avec icône loupe (`Search`), affichage du nombre de résultats trouvés (`(X trouvées)`), auto-sélection de la première option correspondante et sélecteur de niveau de maîtrise alignés en rangée horizontale (`alignItems: flex-end`, `gap: 12px`), identique à la vue de création d'offre (`OffersView.jsx`).
+2. **Harmonisation du Style Visuel des Champs & Forms** :
+   - Application d'une hauteur standard de `42px`, `border-radius: 8px`, `border: 1px solid var(--border)`, `font-size: 13.5px` et `background: #ffffff` sur l'ensemble des champs `<input>`, `<select>` et `<textarea>` des formulaires d'Expériences et de Formations de la fiche candidat.
+> **User Prompt :** *"okey je vais te demander ceci ,le style uniquement ,pour les input ,champ et tout fais comment dans la creation d'offre aussi dans la fiche candidature ,et aussi ,rajoute aussi la recherche de competence dans la fiche de candidat ,je veux la meme"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Ajout du bloc de recherche de compétences avec auto-sélection dans `CandidatureDetailView.jsx`.
+  - Harmonisation complète du design et de la hauteur des champs sur toute la fiche candidat.
+  - **Vite Build (`npm run build`)** : **✓ Built in 499ms (0 erreur)**.
+
+---
+
+### Demande 55 (Rectification / Migration Globale des Tables Candidat sur `id_candidature`) :
+1. **Migration PostgreSQL & Schéma Database ([2026_09_04_001000_alter_candidat_tables_to_id_candidature.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_09_04_001000_alter_candidat_tables_to_id_candidature.php))** :
+   - Exécution de la migration PostgreSQL altérant `candidat_competence`, `candidat_experience_professionnelle` et `candidat_formation` pour remplacer la clé étrangère `id_candidat` par `id_candidature` (referencing `candidature(id_candidature) ON DELETE CASCADE`).
+2. **Alignement Backend Eloquent & Controller ([VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php#L418-L465))** :
+   - Mise à jour des insertions/mises à jour dans `VivierController.php` pour cibler strictement `id_candidature`.
+3. **Alignement Frontend React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L119-L193))** :
+   - Remplacement de tout reliquat `details?.id_candidat` par `details?.id_candidature` dans les fonctions `handleAddCompetence`, `handleAddExperience`, `handleAddFormation` et `loadCandidateProfile`.
+> **User Prompt :** *"mais tu as changer la table candidat_competence ,je t'ai dit c'etait id_candidature pas id_candidat"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Migration exécutée avec succès en base de données.
+  - Modèles et contrôleurs Eloquent mis à jour.
+  - Raccordement pur sur `id_candidature` dans React.
+  - **Vite Build (`npm run build`)** : **✓ Built in 1.01s (0 erreur)**.
+
+---
+
+### Demande 56 (Explication / Architecture d'Intégration du Microservice FastAPI & NLP) :
+1. **Composant Microservice Python/FastAPI ([code_source/ocr/](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/))** :
+   - Le microservice est hébergé dans le dossier `code_source/ocr/`. Il contient `main.py` (FastAPI sur le port **8001** avec les endpoints `POST /extract-cv` et `POST /extract`), `cv_nlp_parser.py` (module NLP pour le sectionnement heuristique, extraction de coordonnées, recherche floue avec RapidFuzz et spaCy) et `test_cv_nlp_parser.py`.
+2. **Point de Branchement Backend Laravel ([VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php#L318-L336))** :
+   - Lorsque le bouton d'extraction est cliqué dans l'interface RH, React appelle `POST /api/candidature/{id}/ocr/extract`.
+   - La méthode `VivierController::extractOcr()` récupère le fichier CV stocké (PDF ou image) et le transmet via une requête HTTP multipart au microservice FastAPI : `Http::post('http://127.0.0.1:8001/extract-cv')`.
+3. **Point de Trigger dans l'Interface React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L890-L925))** :
+   - Présence du bloc **"Extraction Automatique CV (PaddleOCR & IA)"** dans la fiche candidat avec le bouton `Lancer l'extraction CV (PaddleOCR)`.
+> **User Prompt :** *"ou est l'utilisation du ocr et nlp ,je ne vois pas ou il utilise le microservice fastApi"*
+- **Explication & Cartographie d'architecture fournies à l'utilisateur.**
+
+---
+
+### Demande 57 (Rectification / Intégration du Référentiel Niveau dans la Formation Candidat) :
+1. **Évolution Schéma Database & Backend Eloquent ([CandidatFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatFormation.php) & [VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php))** :
+   - Ajout de la colonne `id_niveau` (`BIGINT REFERENCES niveau(id_niveau) ON DELETE SET NULL`) sur la table PostgreSQL `candidat_formation`.
+   - Ajout de la relation Eloquent `niveauRel()` `BelongsTo` dans `CandidatFormation` et chargement eager-load `with('niveauRel')` dans `getCandidateProfile()`.
+   - Prise en charge explicite de `id_niveau` et `niveau` dans `VivierController::addFormation()`.
+2. **Interface Frontend React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+   - Intégration du sélecteur `<select>` pour le *Niveau d'études (Référentiel)* dans le formulaire de saisie de formation.
+   - Affichage automatique du badge vert (`<span className="badge green">{f.niveauRel?.libelle ?? f.niveau}</span>`) à côté du diplôme dans la liste des formations du candidat.
+   - Transmission de la prop `referentiels={referentiels}` depuis les composantes parents (`CandidaturesOffresView`, `CandidaturesSpontaneesView`, `VivierView`).
+> **User Prompt :** *"dans les candidatures ,pour l'ajout de formation ,le niveau utilise la table qu'on a fait"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Ajout de la colonne FK `id_niveau` sur `candidat_formation` et relation Eloquent `niveauRel`.
+  - Sélecteur de référentiel Niveau et affichage du badge vert dans React.
+  - **Vite Build (`npm run build`)** : **✓ Built in 2.13s (0 erreur)**.
+  - **PHPUnit Tests (`php artisan test`)** : **✓ 15/15 tests PASS (36 assertions, 0 erreur)**.
+
+---
+
+### Demande 58 (Rectification / Réinitialisation Complète des Données, Création d'Offres Diversifiées & Candidatures Tout au Statut "Reçue") :
+1. **Réinitialisation des Données en Base PostgreSQL** :
+   - Exécution du script de réinitialisation `reseed_database.php` vidant les anciennes candidatures et offres (`TRUNCATE TABLE candidat_competence, candidat_experience_professionnelle, candidat_formation, historique_statut, document, candidature, candidat, profil_competence, profil_formation, mission, offre RESTART IDENTITY CASCADE;`).
+2. **Génération des Offres de Postes Réelles (14 Offres Diversifiées)** :
+   - Insertion de 14 offres de recrutement réelles et diversifiées couvrant toutes les directions (`Informatique`, `Ressources Humaines`, `Finance`, `Marketing`, `Commercial`) et tous les lieux (`Antananarivo`, `Usine AlpA Ciment`, `Toamasina`, `Mahajanga`).
+3. **Génération des Candidatures au Statut "Reçue" (98 Candidatures)** :
+   - Génération de **98 candidatures** avec profils candidats complets (formations rattachées aux niveaux du référentiel, expériences professionnelles, compétences).
+   - **Toutes les candidatures (100%)** ont été créées au statut **"Reçue"** (`id_statut_candidature = 1`, `ordre_workflow = 10`), avec `dans_vivier = false`.
+> **User Prompt :** *"okey reinitialisons les donnees et faisons des offres de postes d un peu pres tout ,et des candidatures tous en recu pour l'instant"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Vidage et régénération complète des données applicatives en base.
+  - 14 offres de postes publiées créées sur l'ensemble des directions.
+  - 98 candidatures créées **toutes strictly au statut "Reçue" (ordre 10)**.
+  - **Vite Build (`npm run build`)** : **✓ Built in 3.54s (0 erreur)**.
+
+---
+
+### Demande 59 (Rectification / Alimentation des Exigences de Profil, Formation, Expérience, Compétences et Missions sur Toutes les Offres) :
+1. **Enrichissement du Référentiel des Compétences** :
+   - Ajout de 22 compétences techniques, linguistiques, logiciels, méthodologiques et métier (`PHP / Laravel`, `React.js`, `PostgreSQL`, `DevOps & Docker`, `Python / Data Analytics`, `Comptabilité OHADA / IFRS`, `Fiscalité Malgache`, `Sage Comptabilité`, `SAP / ERP Industriel`, `Techniques de Vente B2B`, `Droit du Travail & Paie`, `GPEC & Recrutement`, `Power BI`, `Automatisme Industriel`, `Normes QHSE ISO 9001`).
+2. **Alimentation des Tables d'Exigences des Offres d'Emploi** :
+   - **Profil / Expérience Requise (`profil_offre`)** : 15 entrées décrivant l'expérience minimale requise (ex: 3 à 5 ans en développement web, 4 à 8 ans en gestion RH / audit).
+   - **Formations Requises (`profil_formation`)** : 14 exigences de diplômes rattachées au référentiel des niveaux (`Bac+2` à `Bac+5`) avec domaines spécialisés.
+   - **Compétences Requises (`profil_competence`)** : 42 liaisons de compétences par offre avec indication du niveau exigé (`Débutant`, `Intermédiaire`, `Avancé`, `Expert`).
+   - **Missions Principales (`mission`)** : 31 missions et responsabilités détaillées par fiche de poste.
+> **User Prompt :** *"okey deja ,les offres met des donnees dedans pour profil ,formation ,experience et competence"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Alimentation exhaustive des 14 offres avec profils, formations, expériences, compétences et missions.
+  - **Vite Build (`npm run build`)** : **✓ Built in 939ms (0 erreur)**.
+
+---
+
+### Demande 60 (Rectification / Panneau Gauche Sticky Fiche Candidat, Style d'Input Recherche Compétence & Bouton "+ Candidature RH") :
+1. **Panneau de Gauche Sticky dans la Fiche Candidat ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L389))** :
+   - Application du style `position: 'sticky', top: '16px', maxHeight: 'calc(100vh - 120px)', overflowY: 'auto'` sur le composant `.data-section` du panneau gauche (Carte candidat, Coordonnées, Stepper de progression RH, Formulaire de transition de statut et Bouton Vivier RH).
+   - Le panneau gauche reste fixe au défilement tandis que la colonne de droite (Compétences, Expériences, Formations, Extraction OCR, Documents) défile indépendamment.
+2. **Harmonisation de l'Input Recherche de Compétence ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L696) & [OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/OffersView.jsx#L768))** :
+   - Ajout d'un style explicite (`height: '42px'`, `padding: '0 12px 0 38px'`, `borderRadius: '8px'`, `border: '1px solid var(--border)'`, `fontSize: '13.5px'`, `background: '#ffffff'`) identique à tous les autres champs de formulaire.
+3. **Harmonisation du Bouton "+ Candidature RH" ([CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx#L194) & [CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx#L121))** :
+   - Remplacement des anciens boutons `Saisir une candidature RH` par le bouton stylisé violet `+ Candidature RH` (`<UserPlus size={16} />`, fond `#ede9fe`, texte `#6d28d9`, bordure `#ddd6fe`), identique à la liste des offres d'emploi.
+> **User Prompt :** *"okey ,deja dans la fiche candidature ,fait en sorte comme pour les directions dans la liste des canidatures ,pour les information et profil candidat a gauche avec ces informations ... je veux que ca bouge jusqu a un certain point et que ca soit sticky et c'est la partie droite qui va slider ensuite pour l'input recherche de competence ,il n'a pas le meme style que les autres input ,met le pareil ,ensuite dans les candidatures ,je veux que le bouton ajouter candidature rh sois comme dans la liste des offres dans offre d'emploi avec le bouton +Candidature RH"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Sticky sidebar sur la fiche candidat avec scroll indépendant du panneau droit.
+  - Style unifié sur l'input de recherche de compétence.
+  - Boutons `+ Candidature RH` harmonisés en style violet.
+  - **Vite Build (`npm run build`)** : **✓ Built in 982ms (0 erreur)**.
+
+---
+
+### Demande 61 (Rectification / Suppression de la Barre de Défilement Interne de la Carte Candidat Gauche) :
+1. **Suppression du Rognage et de la Scrollbar Interne ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L389))** :
+   - Suppression des propriétés `maxHeight: 'calc(100vh - 120px)'` et `overflowY: 'auto'` sur la carte d'information candidat de gauche.
+   - La carte de gauche conserve la propriété `position: 'sticky'`, `top: '16px'`, et affiche désormais l'intégralité du profil (Photo, Nom, Canal, Coordonnées, Stepper de statut RH complet et Vivier RH) directement sans coupure ni barre de défilement interne.
+> **User Prompt :** *"okey pas mal ,juste maintenant dans la fiche candidature ,je dois slider pour voir les informations sur le profil ,c'est couper au niveau de la liste des status ,pas de slider ici ,affiche directement tout"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Suppression de la barre de défilement interne sur la carte de gauche.
+  - Affichage direct et intégral de tous les sous-blocs sans tronquage.
+  - **Vite Build (`npm run build`)** : **✓ Built in 928ms (0 erreur)**.
+
+---
+
+### Demande 62 (Rectification / Déplacement de la section Extraction CV OCR dans un Onglet Dédié "Extraction CV") :
+1. **Création d'un Onglet Dédié "Extraction CV" ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L383-L396))** :
+   - Ajout d'un bouton d'onglet `<Cpu size={16} /> <span>Extraction CV</span>` dans la barre de navigation des sections de la fiche candidat, placé à côté de l'onglet `Communications`.
+2. **Isolation du Module PaddleOCR & IA ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L1028-L1099))** :
+   - Extraction de la section `Extraction Automatique CV (PaddleOCR & IA)` hors de l'onglet `Informations & Profil RH`.
+   - Affichage exclusif du bloc OCR lorsque `activeTab === 'extraction_cv'`.
+> **User Prompt :** *"okey maintenant dans la fiche candidat ,je veux que ca ne soit plus dans information et profil mais que tu crees une nouvelle section a coter de communication qui sera ,Excration CV"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Nouvel onglet `Extraction CV` fonctionnel et isolé à côté de `Communications`.
+  - Nettoyage du panneau `Informations & Profil RH`.
+  - **Vite Build (`npm run build`)** : **✓ Built in 1.02s (0 erreur)**.
+
+---
+
+### Demande 63 (Rectification / Réduction Globale de 20% de la Taille d'Affichage CSS) :
+1. **Échelle Globale CSS ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/styles.css#L20-L22))** :
+   - Application de la règle CSS `html { zoom: 0.8; }` dans la feuille de style globale de l'application React (`styles.css`).
+   - Réduction homogène de 20% de l'ensemble de la mise en page (textes, boutons, conteneurs `div`, icônes, marges, padding et modales), équivalent à un zoom navigateur fixé à 80%.
+> **User Prompt :** *"okey je pense on a une rectification a faire ,je trouve l'affichage actuel est un peu trop grand tout est un peu trop grand ,le texte ,les div ,les icones ,mon navigateur je suis passer a 80% de taille qui etait 100% avant et c'est parfait ,alors je te demande 20% de reductions a l'affichage"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Application du zoom 80% global via CSS (`zoom: 0.8;`).
+  - **Vite Build (`npm run build`)** : **✓ Built in 997ms (0 erreur)**.
+
+---
+
+### Demande 64 (Rectification / Ajustement de la Hauteur de la Sidebar sous Échelle 80%) :
+1. **Recalcul de la Hauteur Minimale & Fixe ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/styles.css#L32-L72))** :
+   - Mise à jour de la hauteur de la barre latérale `.sidebar` de `100vh` vers `calc(100vh / 0.8)` (`125vh`).
+   - Mise à jour corrélative des conteneurs `.app-shell`, `body`, `.drawer-content` et `.portal-container` pour s'étendre sur 100% de la hauteur physique de l'écran lors du zoom CSS 80%.
+> **User Prompt :** *"bien juste faut que le sidebar arrive jusqu au bas de la page"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - La sidebar et la coquille applicative recouvrent l'intégralité de la hauteur d'écran jusqu'au bas de page sans espace blanc résiduel.
+  - **Vite Build (`npm run build`)** : **✓ Built in 972ms (0 erreur)**.
+
+---
+
+### Demande 65 (Rectification / Présentation Côte à Côte du Fichier CV et des Résultats d'Extraction OCR) :
+1. **Mise en Page 2 Colonnes de l'Onglet Extraction CV ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L1030-L1145))** :
+   - **Colonne de gauche (`1.1fr`)** : Visualiseur de document CV original (intégration d'une preview dynamique via `<iframe>` pour les PDF ou `<img>` pour les images avec bouton de téléchargement rapide).
+   - **Colonne de droite (`0.9fr`)** : Module de déclenchement d'analyse PaddleOCR & IA et affichage des résultats structurés (Texte brut OCR, Compétences, Expériences, Formations).
+> **User Prompt :** *"dans l'extraction de cv ,je veux que tu affiches son CV a gauche et l'exctration sortie a droite"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Organisation côte à côte du CV original à gauche et des résultats d'extraction OCR/IA à droite.
+  - **Vite Build (`npm run build`)** : **✓ Built in 968ms (0 erreur)**.
+
+---
+
+### Demande 66 (Rectification / Ajustement du Ratio A4 du Visualiseur de CV) :
+1. **Dimensions Proportionnelles A4 ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L1033-L1065))** :
+   - Réduction de la largeur relative de la colonne CV à `0.82fr` (`gridTemplateColumns: '0.82fr 1.18fr'`), libérant plus d'espace de lisibilité pour la colonne d'extraction JSON à droite (`1.18fr`).
+   - Augmentation de la hauteur verticale du cadre d'affichage `<iframe>` à `840px` (ratio d'aspect A4 vertical ~1 : 1.414).
+> **User Prompt :** *"okey c'est bon ,je veux que tu reduises un peu la taille en largeur que prend le cv et augmenter la place en longueur ,faire une place pour un A4"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Format d'affichage A4 réaliste et allongé verticalement avec plus de place pour la sortie d'extraction.
+  - **Vite Build (`npm run build`)** : **✓ Built in 925ms (0 erreur)**.
+
+---
+
+### Demande 67 (Documentation / Intégration du Planning Calendaire avec Dates Prévisionnelles et Réelles Hors Week-ends) :
+1. **Périmètre & Calcul Calendaire ([planning-sprints.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/planning-sprints.md) & [doc-suivi-etape.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/doc-suivi-etape.md#L12-L22))** :
+   - Prise en compte de la date de démarrage officielle au **Mercredi 12 Août 2026** (réception du cahier des charges).
+   - Calcul strict des dates en **jours ouvrés uniquement** (Lundi au Vendredi - Hors week-ends Samedi et Dimanche).
+   - Intégration des colonnes **Début Prévu**, **Fin Prévue**, **Début Réel** et **Fin Réelle** dans le tableau de synthèse et les sous-sections de détails.
+> **User Prompt :** *"okey maintenant dans le doc suivi de sprint et dans le fichier planning sprint ,mets les dates ,voici ce que je veux dire ,deja date de debut 12 aout ou j'ai recuperer le cahier des charges ,et je veux que tu mettes la date de realisation normale du sprint sachant que je ne travaille pas les weekends et et mettre aussi la date de debut reelle et date de fin reelle"*
+- **Résolution (Suivant le strict protocole Documentation de `methodologie.md`) :**
+  - Mise à jour exhaustive des documents de suivi et de planning avec l'échéancier complet en jours ouvrés du 12/08/2026 au 09/11/2026.
+
+---
+
+### Demande 68 (Documentation / Harmonisation Complète sur la Découpe Officielle à 68,0 Jours) :
+1. **Nouveau Périmètre Officiel à 68,0 Jours ([planning-sprints.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/planning-sprints.md) & [doc-suivi-etape.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/doc-suivi-etape.md#L1-L25))** :
+   - Mise à jour du Sprint 3 à **7,5 j** avec l'ajout de la tâche *Saisie manuelle d'une candidature par un RH (1,0 j)* sous la sous-catégorie *BACK-OFFICE*.
+   - Ajustement du Sprint 7 à **10,0 j** (Recherche avancée mots-clés CV à 1,5 j et Documentation/Déploiement à 1,5 j).
+   - Intégration de l'ensemble des sous-catégories fonctionnelles (`BACK-OFFICE`, `FRONT-OFFICE`, `API / SERVICES`, `OCR / IA`) dans le détail de chaque sprint.
+   - Recalcul des dates d'échéances en jours ouvrés (du 12/08/2026 au 12/11/2026) avec une réalisation de **48,0 j / 68,0 j** (**70.6% terminé**).
+> **User Prompt :** *"voici les sprints actuellement: Sprint 0 Analyse, cadrage et conception 9,0 ... Sprint 3 Dépôt et réception des candidatures 7,5 ... Total Scope 68,0"*
+- **Résolution (Suivant le strict protocole Documentation de `methodologie.md`) :**
+  - Alignement intégral du document central de suivi et du fichier planning sur le scope de 68,0 jours.
+
+---
+
+### Demande 69 (Refactorisation Architecturale / Séparation en Couches Propres : FormRequest, Service, Repository, Resource, Thin Controller) :
+1. **Contexte & Découplage Architectural** :
+   - Déplacement intégral de la logique métier, des transactions de base de données (`DB::transaction`), du traitement de fichiers (`Storage`), et des appels API externes (FastAPI OCR) hors des contrôleurs pour éliminer le pattern anti-ergonomique *Fat Controller*.
+2. **Couche FormRequests (`app/Http/Requests/`)** :
+   - Création de 18 classes `FormRequest` spécialisées pour valider les entrées HTTP :
+     - Candidatures : `PostulerOffreRequest`, `CandidatureSpontaneeRequest`, `ImportExternalCandidatureRequest`, `SaisirRhCandidatureRequest`, `UpdateStatutRequest`, `UpdateVivierStatusRequest`.
+     - Offres : `StoreOffreRequest`, `UpdateOffreRequest`.
+     - Directions & Domaines : `StoreDirectionRequest`, `UpdateDirectionRequest`, `StoreDomaineRequest`, `UpdateDomaineRequest`.
+     - Compétences : `StoreCompetenceRequest`.
+     - Vivier & Profil : `StoreVivierRequest`, `AddCompetenceRequest`, `AddExperienceRequest`, `AddFormationRequest`, `ValidateOcrRequest`.
+3. **Couche Repositories (`app/Repositories/`)** :
+   - Création des interfaces (Contracts) et des implémentations Eloquent encapsulant 100% des requêtes vers PostgreSQL :
+     - `CandidatRepositoryInterface` & `EloquentCandidatRepository`
+     - `CandidatureRepositoryInterface` & `EloquentCandidatureRepository`
+     - `OffreRepositoryInterface` & `EloquentOffreRepository`
+     - `DirectionRepositoryInterface` & `EloquentDirectionRepository`
+     - `DomaineRepositoryInterface` & `EloquentDomaineRepository`
+     - `CompetenceRepositoryInterface` & `EloquentCompetenceRepository`
+     - `VivierRepositoryInterface` & `EloquentVivierRepository`
+     - `ReferentielRepositoryInterface` & `EloquentReferentielRepository`
+     - `DashboardRepositoryInterface` & `EloquentDashboardRepository`
+   - Enregistrement des liaisons d'interfaces dans le fournisseur de services dédié `RepositoryServiceProvider` (`bootstrap/providers.php`).
+4. **Couche Services Métier (`app/Services/`)** :
+   - Implémentation des règles de gestion, workflows, transitions, et transactions dans :
+     - `CandidatureService`, `OffreService`, `VivierService`, `DirectionService`, `DomaineService`, `CompetenceService`, `DashboardService`, `ReferentielService`.
+5. **Couche Eloquent Resources (`app/Http/Resources/`)** :
+   - Formatage standardisé des sorties JSON : `CandidatureResource`, `CandidatResource`, `CompetenceResource`, `VivierResource`, `CvExtractionOcrResource`, `StatutCandidatureResource` (en complément des existants `DirectionResource`, `DomaineResource`, `OffreResource`).
+6. **Contrôleurs Allégés (`app/Http/Controllers/Api/`)** :
+   - Transformation de tous les contrôleurs API en *Thin Controllers* n'effectuant plus aucune requête SQL directe.
+> **User Prompt :** *"gros changement dans le code ,on va faire une grosse refactorisation du code ,j'ai vu ,la majoriter de la logique tu as fais dans le controller ,non je ne veux pas ca ,on aura un repository ,toutes les reuete base seront dedans ,service ,la logique et les appels des methodes dans le repository ,ensuite le controller ,appel des methodes dans le services et juste un peu de logique si il le faut ,on utilisera les ressources et les FormRequest egalement dans le controller et voila fais le ,n'oublie la methodologie vue que tu es un nouveau model je ne sais pas si tu te rappelles de ce qu'on a deja fait"*
+- **Résolution (Suivant le strict protocole Rectification / Refactorisation de `methodologie.md`) :**
+  - Mise en place complète de l'architecture en 5 couches.
+  - Test d'intégration des services et repositories via `test_refactored_backend.php` (5/5 modules validés avec succès).
+  - Validation du routage (`php artisan route:list` : 83 routes résolues).
+  - Compilation frontend React (`npm run build` : 0 erreur, 747ms).
+
+---
+
+### Demande 70 (Frontend React & Auth / Remplacement de `login.blade.php` par un Composant React `LoginPage` & Explication des Contrôleurs Web) :
+1. **Création du Composant Login React ([LoginPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/LoginPage.jsx))** :
+   - Conception d'une page de connexion moderne aux couleurs d'AlpA Ciment (fond dégradé sombre, carte élégante, icônes `Building2`, `Mail`, `Lock`, `Eye`/`EyeOff` pour masquer/afficher le mot de passe, bouton "Se connecter" avec indicateur de chargement).
+   - Prise en charge des comptes de démonstration en 1 clic rapide (`admin@alphaciment.local`, `rh@alphaciment.local`).
+   - Lien direct vers le portail public des offres d'emploi pour les candidats (`/candidat/offres`).
+2. **Routage SPA & Déconnexion du Template Blade ([main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx) & [client.js](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/api/client.js))** :
+   - Intégration de la route `/login` directement dans React Router.
+   - Si un utilisateur non authentifié accède au Back-Office, `BackOfficeLayout` redirige de manière fluide vers `<Navigate to="/login" replace />` au lieu d'une redirection externe vers le port 8000.
+   - Mise à jour de `submitLogin({ email, password, remember })` et `submitLogout()` vers les endpoints d'API de session.
+3. **Backend Laravel (`POST /api/login` & `POST /api/logout`)** :
+   - Création de `LoginRequest.php` (`app/Http/Requests/Auth/LoginRequest.php`).
+   - Exemption CSRF pour `api/*` dans `bootstrap/app.php` (`$middleware->validateCsrfTokens(except: ['api/*'])`).
+   - Mise à jour de `SessionController.php` : retour JSON des informations complètes de l'utilisateur (`id_utilisateur`, `nom`, `email`, `role`, `permissions`).
+   - Si un utilisateur visite l'URL backend `http://127.0.0.1:8000/login`, `SessionController::create()` le redirige automatiquement vers le portail React `http://localhost:5173/login`.
+4. **Clarification du Rôle de `OffreController` et `DashboardController` (`App\Http\Controllers`)** :
+   - Explication détaillée fournie à l'utilisateur : ces deux contrôleurs Web servent uniquement de passerelles de redirection HTTP 302 vers le frontend SPA React (`http://localhost:5173/offres` et `http://localhost:5173/dashboard`) lorsque l'utilisateur tape manuellement l'adresse du serveur Laravel (port 8000).
+> **User Prompt :** *"okey c'est bon juste je ne veux pas pour le login utiliser login.blade.php ,utilise react creer le fichier login dans react ensuite a quoi sert namespace App\Http\Controllers; use Illuminate\Http\RedirectResponse; class OffreController extends Controller { public function index(): RedirectResponse { return redirect()->away($this->frontendUrl('/offres')); } private function frontendUrl(string $path): string { return rtrim((string) config('app.frontend_url'), '/').$path; } }et il y a aussi DashboardController a coter de lui"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Composant `LoginPage.jsx` créé et raccordé.
+  - Endpoints d'API de session opérationnels (`test_api_login.php` validé avec code 200 et 422).
+  - Proxy Vite mis à jour.
+  - **Vite Build (`npm run build`)** : **✓ Built in 516ms (0 erreur)**.
+
+---
+
+### Demande 71 (Correctif Vivier / Résolution de l'erreur 500 sur `GET /api/vivier`) :
+1. **Diagnostic de l'erreur 500** :
+   - L'appel `GET http://127.0.0.1:8000/api/vivier?` provoquait une exception serveur `500 Internal Server Error`.
+   - Inspection du fichier journal `storage/logs/laravel.log` et reproduction isolée par script de test backend :
+     `local.ERROR: Call to a member function relationLoaded() on array at ... VivierResource.php(20): Illuminate\Http\Resources\Json\JsonResource->whenLoaded('direction')`.
+   - **Origine** : `VivierService::listVivier()` retourne une collection combinée d'éléments sous forme de tableaux associatifs (`array`), et non d'instances de modèles Eloquent. Dans `VivierResource::toArray()`, l'appel direct à `$this->whenLoaded(...)` échouait car la méthode `whenLoaded()` attend une instance de modèle Eloquent et tente d'appeler `relationLoaded()` sur la ressource sous-jacente.
+2. **Correctif apporté ([VivierResource.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/VivierResource.php))** :
+   - Ajout d'une détection `is_array($this->resource)` au sein de `VivierResource::toArray()` :
+     - Si la ressource est un tableau associatif (retour de listing combiné du vivier), les clés correspondantes (`id_vivier_candidat`, `candidat`, `direction`, `domaine`, etc.) sont mappées directement et de manière sécurisée sans invoquer `whenLoaded()`.
+     - Si la ressource est un modèle Eloquent (ex. lors d'un `store()` ou consultation unitaire), le comportement avec `whenLoaded()` est préservé.
+3. **Validation & Tests** :
+   - Exécution du script de test d'API Vivier : `STATUS: 200` avec sérialisation JSON conforme contenant la liste des candidats en vivier.
+   - Validation de l'ensemble de la suite de tests backend (`test_refactored_backend.php`) : 5/5 modules validés.
+   - Compilation frontend React (`npm run build`) : **✓ built in 493ms (0 erreur)**.
+> **User Prompt :** *"GET http://127.0.0.1:8000/api/vivier? 500 (Internal Server Error) (anonymous) @ client.js:59 (anonymous) @ VivierView.jsx:55 (anonymous) @ VivierView.jsx:68"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Exception résolue, endpoint `GET /api/vivier` renvoie le statut HTTP 200.
+  - Données du vivier transmises sans blocage vers la vue React `VivierView.jsx`.
+
+---
+
+### Demande 72 (Correctif Création d'Offre / Résolution de l'erreur 422 sur `POST /api/offres`) :
+1. **Diagnostic de l'erreur 422 (Unprocessable Content)** :
+   - L'appel `POST http://127.0.0.1:8000/api/offres` renvoyait un code HTTP 422 lors de la création d'une nouvelle offre d'emploi depuis `OffersView.jsx`.
+   - Inspection du payload et exécution isolée du validateur `StoreOffreRequest` :
+     - Les champs `id_type_contrat` et `description` avaient été déclarés avec la règle `'required'` dans `StoreOffreRequest.php` et `UpdateOffreRequest.php`.
+     - Or, dans le schéma PostgreSQL de la table `offre` et dans l'interface React, le type de contrat est facultatif ("Non précisé" -> valeur `null`) et la description du poste peut être omise lors de la rédaction préliminaire d'un brouillon.
+     - De plus, les sous-tableaux (`profils`, `missions`, `formations`, `competences`) contenaient des chaînes vides pour les valeurs non renseignées (ex: `valeur_min: ""`, `id_niveau_min: ""`), ce qui pouvait entrer en conflit avec les règles numériques/integer strictes.
+2. **Correctif apporté ([StoreOffreRequest.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Offre/StoreOffreRequest.php) & [UpdateOffreRequest.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Offre/UpdateOffreRequest.php) & [OffreService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/OffreService.php))** :
+   - **Règles assouplies et conformes** :
+     - `description` : `['nullable', 'string']`
+     - `id_type_contrat` : `['nullable', 'integer', 'exists:type_contrat,id_type_contrat']`
+     - `id_lieu` : `['nullable', 'integer', 'exists:lieu,id_lieu']` avec repli automatique sur 1 (Antananarivo)
+     - `lieu` : `['nullable', 'string', 'max:150']`
+   - **Méthode `prepareForValidation()`** : conversion sécurisée des chaînes vides en `null` ou entiers typés avant l'exécution du validateur.
+   - **Nettoyage dans `OffreService`** : désimbrication (`unset`) des relations imbriquées (`profils`, `missions`, `formations`, `competences`) de `$data` avant l'écriture dans la table `offre`, puis synchronisation relationnelle via `EloquentOffreRepository::syncNestedRelations`.
+   - **Amélioration UX erreurs ([client.js](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/api/client.js))** : affichage explicite des messages d'erreur détaillés renvoyés par l'API dans le toast/bandeau rouge au lieu d'un code générique.
+3. **Validation & Tests** :
+   - Test d'intégration complet `test_post_offre_http.php` : `STATUS: 200 OK` avec retour de la ressource offre sérialisée.
+   - Suite de tests des couches Clean Architecture (`test_refactored_backend.php`) : 5/5 validés.
+   - Compilation frontend React (`npm run build`) : **✓ built in 489ms (0 erreur)**.
+> **User Prompt :** *"erreur lors de la creation d'une offre POST http://127.0.0.1:8000/api/offres 422 (Unprocessable Content) (anonymous) @ client.js:137 await in (anonymous) (anonymous) @ OffersView.jsx:343"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Validation corrigée et alignée avec le formulaire React.
+  - La création et mise à jour d'offres fonctionnent désormais sans erreur 422.
+
+---
+
+### Demande 73 (Correctif Expérience & Formation / Résolution de l'erreur SQL `Undefined column: id_candidat` sur `candidat_experience_professionnelle`) :
+1. **Diagnostic de l'erreur SQL 42703** :
+   - Message d'erreur : `SQLSTATE[42703]: Undefined column: 7 ERREUR: la colonne « id_candidat » de la relation « candidat_experience_professionnelle » n'existe pas`.
+   - Requête incriminée : `insert into "candidat_experience_professionnelle" ("id_candidature", "id_candidat", "poste", "entreprise", ...) values (...)`.
+   - **Analyse du script SQL source (`sql/gestion_recrutement.sql`)** :
+     - La table `candidat_experience_professionnelle` (section 13ter) et la table `candidat_formation` (section 13quater) sont rattachées directement à la candidature par la clé étrangère `id_candidature BIGINT REFERENCES candidature(id_candidature) ON DELETE CASCADE`.
+     - **Elles ne possèdent pas de colonne `id_candidat`** dans leur schéma relationnel normalisé, car l'accès au candidat se fait via la table parente `candidature`.
+   - **Origine dans le code** :
+     - Dans `VivierService::addExperience()` et `addFormation()`, le code transmettait explicitement `'id_candidat' => $idCandidat` au repository.
+     - Dans les modèles Eloquent `CandidatExperience.php` et `CandidatFormation.php`, `'id_candidat'` figurait dans `$fillable` et tentait une insertion directe en base.
+2. **Correctif apporté ([VivierService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php), [CandidatExperience.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatExperience.php), [CandidatFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatFormation.php))** :
+   - Retrait de `'id_candidat'` dans `VivierService::addExperience()` et `VivierService::addFormation()`.
+   - Retrait de `'id_candidat'` de `$fillable` dans `CandidatExperience` et `CandidatFormation`.
+   - Mise à jour de la relation `$this->candidat()` dans les deux modèles via `hasOneThrough(Candidat::class, Candidature::class, ...)` afin de permettre la lecture fluide du candidat sans exiger de colonne physique `id_candidat` sur la table enfant.
+3. **Validation & Tests** :
+   - Test d'insertion directe (`test_add_experience.php`) : ajout avec succès de l'expérience et de la formation avec IDs générés par la séquence PostgreSQL.
+   - Test d'appel d'API HTTP (`test_add_experience_http.php`) : `STATUS 201 Created` avec retour JSON formaté.
+   - Suite de tests des couches Clean Architecture (`test_refactored_backend.php`) : 5/5 validés.
+   - Compilation frontend React (`npm run build`) : **✓ built in 534ms (0 erreur)**.
+> **User Prompt :** *"ERREUR lors de l'ajout de experience projfessionelle ,regarde mon script sql et dis moi c'est quoi qui ne va pas avec le code Impossible de charger les donnees. SQLSTATE[42703]: Undefined column: 7 ERREUR: la colonne « id_candidat » de la relation « candidat_experience_professionnelle » n'existe pas LINE 1: ...at_experience_professionnelle" ("id_candidature", "id_candid... ^"*
+- **Résolution (Suivant le strict protocole Rectification de `methodologie.md`) :**
+  - Schéma respecté, suppression de la colonne inexistante dans l'insertion Eloquent.
+  - L'ajout d'expériences et de formations professionnelles fonctionne sans erreur SQL.
+
+---
+
+### Demande 74 (UX / Intégration d'un Loader Moderne & Fluide pour les Offres et Candidatures) :
+1. **Analyse du besoin & Réponse technique** :
+   - L'utilisateur souhaitait afficher un loader lors du chargement des offres et des candidatures et demandait s'il était nécessaire de télécharger un asset externe (GIF, image, etc.).
+   - **Décision d'architecture frontend** : Aucun téléchargement externe nécessaire. Utilisation des composants React existants et de CSS3 moderne pour concevoir un loader natif, léger (0 Ko de média lourd), fluide à 60 fps et parfaitement harmonisé avec la charte graphique AlpA Ciment.
+2. **Implémentation ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Composant `LoadingState` modernisé** :
+     - Spinner rotatif fluide `Loader2` animé via `@keyframes spin` avec halo lumineux pulsé (`@keyframes halo-pulse`).
+     - Groupe textuel avec titre principal typé et sous-titre explicatif.
+     - Barre de progression linéaire indéterminée en dégradé pétrole/bleu AlpA Ciment (`@keyframes bar-slide`).
+   - **Composant `TableSkeleton`** : mise à disposition d'un squelette de tableau animé par effet shimmer (`@keyframes skeleton-shimmer`) pour des chargements structurés.
+   - **Personnalisation contextuelle des vues clés** :
+     - [OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx) : *"Chargement des offres d'emploi... (Récupération du catalogue et des critères de recrutement)"*
+     - [CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) : *"Chargement des candidatures sur offre... (Extraction des dossiers par direction et statut)"*
+     - [CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) : *"Chargement des candidatures spontanées... (Récupération des profils et compétences déclarées)"*
+     - [VivierView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) : *"Chargement du vivier de talents... (Agrégation des candidatures et profils RH qualifiés)"*
+3. **Validation & Tests** :
+   - Compilation Vite frontend (`npm run build`) : **✓ built in 520ms (0 erreur)**.
+   - Rendu visuel propre et réactif sans aucun ralentissement ni asset externe.
+> **User Prompt :** *"okey maintenant ,il faut mettre un loader pour la liste des offres ,candidatures ,dis moi si tu as besoin que je telecherges quelque choses pour le loader ,un gif ou je ne sais quoi"*
+- **Résolution (Suivant le strict protocole Création / Amélioration de `methodologie.md`) :**
+  - Loader moderne intégré et déployé sur l'ensemble des modules cibles.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

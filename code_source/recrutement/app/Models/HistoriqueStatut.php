@@ -11,16 +11,20 @@ class HistoriqueStatut extends Model
     use HasFactory;
 
     protected $table = 'historique_statut';
-    protected $primaryKey = 'id_historique_statut';
-    public $timestamps = false;
+    protected $primaryKey = 'id_historique';
 
     protected $fillable = [
         'id_candidature',
-        'id_statut_precedent',
-        'id_statut_nouveau',
-        'modifie_par',
+        'id_statut_candidature',
+        'date_changement',
         'commentaire',
+        'id_utilisateur',
         'created_at',
+        'updated_at',
+    ];
+
+    protected $casts = [
+        'date_changement' => 'datetime',
     ];
 
     public function candidature(): BelongsTo
@@ -28,18 +32,13 @@ class HistoriqueStatut extends Model
         return $this->belongsTo(Candidature::class, 'id_candidature', 'id_candidature');
     }
 
-    public function statutPrecedent(): BelongsTo
+    public function statut(): BelongsTo
     {
-        return $this->belongsTo(StatutCandidature::class, 'id_statut_precedent', 'id_statut_candidature');
-    }
-
-    public function statutNouveau(): BelongsTo
-    {
-        return $this->belongsTo(StatutCandidature::class, 'id_statut_nouveau', 'id_statut_candidature');
+        return $this->belongsTo(StatutCandidature::class, 'id_statut_candidature', 'id_statut_candidature');
     }
 
     public function utilisateur(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'modifie_par');
+        return $this->belongsTo(User::class, 'id_utilisateur', 'id_utilisateur');
     }
 }

@@ -12,6 +12,7 @@
   - `/offres/:id/postuler` -> Formulaire autonome de candidature sur offre (`PostulerOffrePage.jsx`).
   - `/candidature-spontanee` -> Formulaire autonome de candidature spontanée (`CandidatureSpontaneePage.jsx`).
   - `/candidat/offres` -> Portail public des offres d'emploi disponibles (`PublicOffresPage.jsx`).
+- Saisir manuelle d'une candidature par un RH (`/api/candidatures/saisir-rh`) avec modal `SaisirRhCandidatureModal` intégrée dans la liste des offres et la liste des candidatures (`canal_depot = 'rh_manuel'`).
 - Implémentation du dédoublonnage candidat par email et de la gestion transactionnelle dans `CandidatureController.php`.
 - Mise à jour des estimations de planification des sprints à 68,0 jours.
 

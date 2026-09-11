@@ -7,15 +7,38 @@ export default defineConfig(({ mode }) => {
 
     return {
         plugins: [react()],
+        build: {
+            cssMinify: true,
+            chunkSizeWarningLimit: 1000,
+            rollupOptions: {
+                output: {
+                    manualChunks(id) {
+                        if (id.includes('node_modules/lucide-react')) {
+                            return 'vendor-icons';
+                        }
+                        if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+                            return 'vendor-react';
+                        }
+                    },
+                },
+            },
+        },
+        optimizeDeps: {
+            include: ['react', 'react-dom', 'lucide-react'],
+            holdUntilCrawlEnd: false,
+        },
         server: {
             port: 5173,
             strictPort: true,
+            warmup: {
+                clientFiles: ['./src/main.jsx', './src/api/client.js', './src/styles.css'],
+            },
             proxy: {
                 '/api': {
                     target: backendUrl,
                     changeOrigin: true,
                 },
-                '/logout': {
+                '/storage': {
                     target: backendUrl,
                     changeOrigin: true,
                 },

@@ -21,10 +21,27 @@ class DatabaseSeeder extends Seeder
         $admin = User::query()->updateOrCreate([
             'email' => 'admin@alphaciment.local',
         ], [
-            'name' => 'Administrateur RH',
+            'nom' => 'Administrateur RH',
             'role' => UserRole::Admin->value,
-            'password' => Hash::make('password'),
+            'mot_de_passe' => Hash::make('password'),
         ]);
+
+        foreach ([
+            ['Dupont Jean', 'jean.dupont@entreprise.com', 'admin'],
+            ['Martin Sophie', 'sophie.martin@entreprise.com', 'rh'],
+            ['Bernard Pierre', 'pierre.bernard@entreprise.com', 'manager'],
+            ['Durand Marie', 'marie.durand@entreprise.com', 'rh'],
+            ['Petit Luc', 'luc.petit@entreprise.com', 'manager'],
+        ] as [$nom, $email, $role]) {
+            DB::table('utilisateur')->updateOrInsert([
+                'email' => $email,
+            ], [
+                'nom' => $nom,
+                'role' => $role,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
         foreach ([
             'Informatique',
@@ -63,12 +80,41 @@ class DatabaseSeeder extends Seeder
         }
 
         foreach ([
-            ['Recue', 1],
-            ['Preselectionnee', 2],
-            ['Test', 3],
-            ['Entretien', 4],
-            ['Retenue', 5],
-            ['Non retenue', 6],
+            'Antananarivo',
+            'Toamasina',
+            'Antsirabe',
+            'Mahajanga',
+            'Fianarantsoa',
+            'Toliara',
+            'Antsiranana',
+            'Usine AlpA Ciment',
+        ] as $lieuName) {
+            DB::table('lieu')->updateOrInsert([
+                'libelle' => $lieuName,
+            ]);
+        }
+
+        foreach ([
+            'CAP / BEP',
+            'Baccalauréat',
+            'Bac+2 (BTS / DUT)',
+            'Bac+3 (Licence)',
+            'Bac+4 (Master 1)',
+            'Bac+5 (Master 2 / Ingénieur)',
+            'Bac+8 (Doctorat)',
+        ] as $niveauName) {
+            DB::table('niveau')->updateOrInsert([
+                'libelle' => $niveauName,
+            ]);
+        }
+
+        foreach ([
+            ['Recue', 10],
+            ['Preselectionnee', 20],
+            ['Test', 30],
+            ['Entretien', 40],
+            ['Retenue', 50],
+            ['Non retenue', 50],
         ] as [$libelle, $ordre]) {
             DB::table('statut_candidature')->updateOrInsert([
                 'libelle' => $libelle,
@@ -80,6 +126,10 @@ class DatabaseSeeder extends Seeder
         $directionId = fn (string $nom): int => (int) DB::table('direction')
             ->where('nom_direction', $nom)
             ->value('id_direction');
+
+        $lieuId = fn (string $nom): int => (int) (DB::table('lieu')
+            ->where('libelle', $nom)
+            ->value('id_lieu') ?? 1);
 
         foreach ([
             ['Developpement Web', 'Informatique', true],
@@ -128,6 +178,7 @@ class DatabaseSeeder extends Seeder
                 'id_direction' => $directionId($direction),
                 'id_statut_offre' => $statutOffreId($statut),
                 'description' => "Offre de recrutement pour le poste {$titre}.",
+                'id_lieu' => $lieuId($lieu),
                 'lieu' => $lieu,
                 'id_type_contrat' => $typeContratId($contrat),
                 'date_publication' => $publication,
