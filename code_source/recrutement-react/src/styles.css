@@ -1751,6 +1751,105 @@ body:has(.app-shell) .cb-cursor {
     opacity: 0.8 !important;
 }
 
+/* ==========================================================================
+   PAGE PRELOADER - ALPHA CIMENT
+   - Fond d'ecran 100% rouge #FF0D00
+   - Logo / Image loader.png au centre absolu de l'ecran
+   - Animation de semi-cercle blanc lumineux en rotation continue autour du logo
+   ========================================================================== */
+
+.preloader,
+.preloader-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: #FF0000 !important;
+    background: #FF0000 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999999 !important;
+    opacity: 1;
+    pointer-events: all;
+    transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.5s ease;
+}
+
+.preloader.fade-out,
+.preloader-overlay.fade-out {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.loading-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Semi-cercle tournant autour de l'image centrale */
+.loading-container .loading {
+    position: absolute;
+    width: 112px;
+    height: 112px;
+    border-radius: 50%;
+    border: 3.5px solid transparent;
+    border-top: 3.5px solid #ffffff;
+    border-right: 3.5px solid #ffffff;
+    animation: preloaderSemiCircleSpin 0.9s cubic-bezier(0.5, 0.15, 0.5, 0.85) infinite;
+    box-sizing: border-box;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+/* Emplacement du logo au centre - parfaitement confondu sans aucune ombre */
+#loading-icon,
+.loading-container .loading-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    z-index: 3;
+}
+
+#loading-icon img,
+.loading-container .loading-icon img {
+    max-width: 62px;
+    max-height: 42px;
+    object-fit: contain;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+@keyframes preloaderSemiCircleSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 .main-footer {
     background: #FF0D00 !important;
     color: #ffffff !important;

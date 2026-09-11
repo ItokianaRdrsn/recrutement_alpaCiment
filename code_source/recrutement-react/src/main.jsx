@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import './styles.css';
 import { backendPath, getJson, getPublicJson, sendPublicFormData } from './api/client';
-import { ErrorState, LoadingState } from './components/common/FeedbackStates';
+import { ErrorState, LoadingState, PagePreloader } from './components/common/FeedbackStates';
 import { AppShell } from './components/layout/AppShell';
 import { PublicLayout } from './components/layout/PublicLayout';
 
@@ -22,7 +22,7 @@ const PublicOffresPage = lazy(() => import('./frontOffice/PublicOffresPage'));
 
 function BackOfficeLayout({ bootstrapError, bootstrapLoading, children, user }) {
     if (bootstrapError) return <ErrorState message={bootstrapError} />;
-    if (bootstrapLoading) return <LoadingState />;
+    if (bootstrapLoading) return <PagePreloader />;
     if (!user) {
         return <Navigate replace to="/login" />;
     }
@@ -105,13 +105,24 @@ function MainApp() {
         await loadBaseData();
     };
 
+    useEffect(() => {
+        const preloader = document.getElementById('site-preloader');
+        if (preloader) {
+            preloader.classList.add('fade-out');
+            const timer = setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 550);
+            return () => clearTimeout(timer);
+        }
+    }, []);
+
     function handleSelectOfferFromDashboard(offre) {
         setEditingOffer(offre);
         navigate('/offres');
     }
 
     return (
-        <Suspense fallback={<LoadingState />}>
+        <Suspense fallback={<PagePreloader />}>
             <Routes>
                 {/* LOGIN ROUTE */}
                 <Route

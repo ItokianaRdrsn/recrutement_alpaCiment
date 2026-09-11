@@ -1,6 +1,19 @@
 import React from 'react';
 import { Loader2, RefreshCw } from 'lucide-react';
 
+export function PagePreloader() {
+    return (
+        <div className="preloader-overlay">
+            <div className="loading-container">
+                <div className="loading"></div>
+                <div id="loading-icon">
+                    <img src="/themes/custom/apiqa/images/loader.png" alt="Alpha Ciment" />
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export function LoadingState({
     message = "Chargement des données en cours...",
     subtitle = "Veuillez patienter un instant"

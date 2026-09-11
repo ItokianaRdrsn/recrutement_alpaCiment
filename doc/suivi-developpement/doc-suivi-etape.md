@@ -907,6 +907,104 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
   - Dimensions 1:1 et coordonnées curseur frontoffice rétablies (suppression du zoom perturbateur).
   - Animations d'affichage et de survol de haut en bas implémentées avec fluidité.
 
+---
+
+### Demande 79 (Rétablissement du Format Compact / Zoom 0.8 Exclusivement dans le Back Office) :
+1. **Analyse du besoin & Spécifications** :
+   - Constat : le retrait du zoom global a rétabli les dimensions réelles du Front Office, mais a agrandi l'interface du Back Office (sidebar, tableaux, cartes KPI, filtres) rendant les composants trop imposants par rapport à l'affichage compact apprécié initialement.
+   - Objectif : réappliquer le format compact (zoom 0.8) **strictement et exclusivement dans le Back Office**, sans réintroduire d'impact sur le Front Office (qui doit conserver ses dimensions 1:1 et la précision de son curseur).
+2. **Implémentation Réalisée** :
+   - **Ciblage CSS Strictement Délimité ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - Application de `zoom: 0.8;` sur le sélecteur d'état `body.in-backoffice` (activé dynamiquement par `<AppShell>`).
+     - Conservation de `html { zoom: 1; }` et `body { min-height: 100vh; }` pour l'ensemble du Front Office.
+     - Ajustement des hauteurs de conteneurs pour le Back Office : `.app-shell`, `.sidebar` et `.drawer-content` reçoivent `min-height: calc(100vh / 0.8)` et `height: calc(100vh / 0.8)` pour occuper 100% de la fenêtre physique sans rupture d'affichage.
+3. **Validation & Tests** :
+   - Build Vite réussi (`npm run build`) : **✓ built in 2.31s (0 erreur, 22 modules)**.
+   - Back Office retrouvé dans sa densité d'origine (mise à l'échelle compacte 0.8 idéale pour la gestion des données RH).
+   - Front Office préservé en taille naturelle 1:1 fidèle à la maquette Drupal avec suivi parfait du curseur rouge.
+> **User Prompt :** *"okey c'est bien juste dans le back office ,reduit la taille de tout ,tout est un peu trop gros la taille garde comme avant"*
+- **Résolution (Suivant le strict protocole Amélioration / Harmonisation de `methodologie.md`) :**
+  - Zoom compact 0.8 appliqué strictement sur `body.in-backoffice` et `.app-shell`.
+  - Isolation totale vis-à-vis du Front Office.
+
+---
+
+### Demande 80 (Déploiement du Préchargeur Plein Écran Rouge avec Logo Centré et Animation Semi-Cercle) :
+1. **Analyse du besoin & Spécifications** :
+   - Exploiter le fichier image `loader.png` présent dans le dossier `logo/images/`.
+   - Mettre en place un préchargeur de page complet pour les chargements d'écrans :
+     - Écran entièrement rouge (`#FF0D00`, couleur corporate d'Alpha Ciment).
+     - Image `loader.png` placée au centre absolu de l'écran.
+     - Animation d'un semi-cercle blanc lumineux en rotation continue autour du logo.
+   - Maintenir les indicateurs de chargement des données (`LoadingState` dans les tables, cartes et filtres) inchangés car ils fonctionnent déjà parfaitement.
+2. **Implémentation Réalisée** :
+   - **Déploiement des Assets & Image Loader** :
+     - Vérification et synchronisation de `logo/images/loader.png` (dimensions 134x74, RGBA avec fond rouge et lettrage blanc `αC`) vers `code_source/recrutement-react/public/themes/custom/apiqa/images/loader.png` et `public/images/loader.png`.
+   - **Stylisation CSS Dédiée ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - `.preloader`, `.preloader-overlay` configurés en `position: fixed`, `inset: 0`, `z-index: 99999999`, plein écran `100vw x 100vh` avec fond rouge pur `#FF0D00 !important`.
+     - `.loading-container` (120x120px) centré au milieu de la fenêtre.
+     - Semi-cercle tournant `.loading` (112x112px) avec bordure supérieure et droite blanches (`border-top: 3.5px solid #ffffff; border-right: 3.5px solid #ffffff;`) animé par `@keyframes preloaderSemiCircleSpin 0.9s infinite`.
+     - Logo centré `#loading-icon` avec `mix-blend-mode: lighten` assurant une intégration harmonieuse du symbole blanc `αC` sans découpe disgracieuse et avec pulsation douce.
+   - **Intégration au Document Racine ([index.html](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/index.html))** :
+     - Insertion du bloc `<div id="site-preloader" class="preloader">` dès l'ouverture du `<body>` pour garantir un rendu rouge immédiat dès la première seconde de chargement du navigateur.
+   - **Composant React & Transitions ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+     - Création et exportation du composant `<PagePreloader />`.
+     - Utilisation de `<PagePreloader />` pour l'état d'amorçage applicatif (`bootstrapLoading`) et le fallback Suspense de React Router lors des transitions entre pages.
+     - Fondu enchaîné doux (`preloader.classList.add('fade-out')`) au montage du frontend React.
+     - Conservation stricte des états de chargement de données unitaires (`LoadingState`).
+3. **Validation & Tests** :
+   - Build Vite réussi (`npm run build`) : **✓ built in 2.21s (0 erreur, 22 modules)**.
+   - Affichage immédiat du préchargeur plein écran rouge avec logo officiel et semi-cercle rotatif blanc.
+   - Disparition fluide dès que la page est prête.
+> **User Prompt :** *"okey maintenant dans le dossier logo ,on a le dossier image ,dedans il y aura loader et tu vas l'utiliser pour le pre loader des pages ,pour les donnees gardes comme cela ,ca marche deja mais pour load la page utilise l'image loader au centre de l'ecran et avec l'animation de semi cercle autour de l'image et la page tout tout en rouge"*
+- **Résolution (Suivant le strict protocole Amélioration de `methodologie.md`) :**
+  - Image `loader.png` utilisée au centre de l'écran.
+  - Animation de semi-cercle blanc rotatif autour du logo.
+  - Fond de préchargement de page 100% rouge `#FF0D00`.
+  - Préservation des loaders de données existants.
+
+---
+
+### Demande 81 (Ajustement Chromatique du Préchargeur Plein Écran à #FF0000) :
+1. **Analyse du besoin & Spécifications** :
+   - Ajuster la couleur d'arrière-plan de l'écran lors du chargement de page (`.preloader`, `.preloader-overlay`) pour adopter la teinte rouge pure `#FF0000`.
+   - Correspondance parfaite 1:1 avec les pixels d'arrière-plan du fichier `loader.png` (`rgb(255, 0, 0)`), assurant une fusion chromatique sans le moindre contour de délimitation.
+2. **Implémentation Réalisée** :
+   - Dans [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css) :
+     - `background-color: #FF0000 !important;` et `background: #FF0000 !important;` appliqués sur `.preloader` et `.preloader-overlay`.
+3. **Validation & Tests** :
+   - Build Vite réussi (`npm run build`) : **✓ built in 2.06s (0 erreur, 22 modules)**.
+   - Teinte rouge `#FF0000` appliquée sur tout l'écran au préchargement avec intégration continue du logo `loader.png`.
+> **User Prompt :** *"okey pour la couleur de la page lors du loading de la page c'est #FF0000"*
+- **Résolution (Suivant le strict protocole Amélioration de `methodologie.md`) :**
+  - Couleur du fond plein écran du préchargeur mise à jour en `#FF0000`.
+
+---
+
+### Demande 82 (Suppression des Ombres du Logo et Retrait Intégral du Texte dans le Préchargeur) :
+1. **Analyse du besoin & Spécifications** :
+   - Constat : une ombre portée (`drop-shadow`) sur l'image du loader créait un contour rectangulaire sombre visible autour du logo, empêchant sa fusion homogène avec le fond rouge.
+   - Demande : supprimer toute ombre sur l'image pour que le rouge du logo se confonde à 100% avec le fond `#FF0000` de l'écran, et retirer tout texte du préchargeur pour un rendu ultra épuré et minimaliste.
+2. **Implémentation Réalisée** :
+   - **Nettoyage CSS ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - Suppression de `drop-shadow` sur `#loading-icon` et `#loading-icon img` (`box-shadow: none !important; filter: none !important; border: none !important;`).
+     - Suppression définitive de la classe `.preloader-message`.
+     - Arc blanc du semi-cercle rotatif `.loading` conservé net et précis sans ombres parasites.
+   - **Nettoyage Composant React ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+     - Retrait du bloc de texte `{message && ...}` dans `<PagePreloader />`.
+     - Retrait de la prop `message="..."` dans `<BackOfficeLayout />`.
+3. **Validation & Tests** :
+   - Build Vite réussi (`npm run build`) : **✓ built in 2.01s (0 erreur, 22 modules)**.
+   - Préchargeur parfaitement épuré : fond rouge unifié `#FF0000`, fusion invisible du rectangle de l'image, affichage pur du symbole blanc `αC` au centre du semi-cercle tournant, zéro texte.
+> **User Prompt :** *"okey je crois qu il y a du shadow sur l'image dans le loading ,je veux que ca se confonde et pas de texte dans la page loader"*
+- **Résolution (Suivant le strict protocole Amélioration de `methodologie.md`) :**
+  - Ombres et filtres supprimés sur l'image du loader.
+  - Tous les textes retirés du préchargeur.
+
+
+
+
+
 
 
 
