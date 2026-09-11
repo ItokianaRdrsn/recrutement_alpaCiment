@@ -124,13 +124,11 @@ class VivierService
     {
         $candidature = Candidature::find($id);
         $idCandidature = $candidature ? $candidature->id_candidature : $id;
-        $idCandidat = $candidature ? $candidature->id_candidat : $id;
 
         $posteTitle = trim($data['poste'] ?? $data['intitule_poste'] ?? 'Poste non spécifié');
 
         return $this->vivierRepository->createExperience([
             'id_candidature' => $idCandidature,
-            'id_candidat' => $idCandidat,
             'poste' => $posteTitle,
             'entreprise' => $data['entreprise'] ?? null,
             'date_debut' => $data['date_debut'] ?? null,
@@ -145,7 +143,6 @@ class VivierService
     {
         $candidature = Candidature::find($id);
         $idCandidature = $candidature ? $candidature->id_candidature : $id;
-        $idCandidat = $candidature ? $candidature->id_candidat : $id;
 
         $dateObt = null;
         if (!empty($data['date_obtention'])) {
@@ -171,7 +168,6 @@ class VivierService
 
         $form = $this->vivierRepository->createFormation([
             'id_candidature' => $idCandidature,
-            'id_candidat' => $idCandidat,
             'diplome' => $data['diplome'],
             'etablissement' => $data['etablissement'] ?? null,
             'date_obtention' => $dateObt,

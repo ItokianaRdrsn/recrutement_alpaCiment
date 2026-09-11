@@ -176,48 +176,6 @@ export function CandidaturesOffresView({ referentiels }) {
 
     return (
         <div className="view-stack">
-            {/* HAUT DE PAGE : TITRE ET BOUTON SAISIR RH */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <div>
-                    <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>
-                        Candidatures sur Offres d'Emploi
-                    </h2>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#64748b' }}>
-                        Sélectionnez une direction et basculez entre Toutes les candidatures ou Offres & candidatures.
-                    </p>
-                </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button className="ghost-button" onClick={loadData} type="button">
-                        <RefreshCw size={16} />
-                        <span>Actualiser</span>
-                    </button>
-                    <button
-                        onClick={() => setShowSaisirModal(true)}
-                        style={{
-                            background: '#ede9fe',
-                            color: '#6d28d9',
-                            border: '1px solid #ddd6fe',
-                            borderRadius: '8px',
-                            height: '40px',
-                            padding: '0 14px',
-                            fontWeight: '600',
-                            fontSize: '13.5px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                            boxShadow: '0 1px 2px rgba(109, 40, 217, 0.08)',
-                            transition: 'all 0.15s ease',
-                        }}
-                        type="button"
-                    >
-                        <UserPlus size={16} />
-                        <span>+ Candidature RH</span>
-                    </button>
-                </div>
-            </div>
-
             {/* BARRE DE FILTRES GLOBALE */}
             <section className="filter-bar" style={{ gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '16px' }}>
                 <label className="search-field" style={{ minWidth: '240px', flex: 1 }}>
@@ -290,6 +248,7 @@ export function CandidaturesOffresView({ referentiels }) {
                             <Building2 size={18} />
                             <span>Directions & Pôles</span>
                         </h3>
+                       
                     </div>
 
                     <button
@@ -497,7 +456,10 @@ export function CandidaturesOffresView({ referentiels }) {
                             </div>
 
                             {loading ? (
-                                <LoadingState />
+                                <LoadingState
+                                    message="Chargement des offres..."
+                                    subtitle="Préparation des dossiers par offre"
+                                />
                             ) : error ? (
                                 <ErrorState message={error} onRetry={loadData} />
                             ) : !filteredOffresForRightCol.length ? (
@@ -671,10 +633,43 @@ export function CandidaturesOffresView({ referentiels }) {
                                         : `Toutes les candidatures sur offre (Toutes directions)`}
                                     <span className="badge blue" style={{ marginLeft: '10px' }}>{paginationMeta.total} dossiers</span>
                                 </h3>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button className="ghost-button" onClick={loadData} type="button">
+                                        <RefreshCw size={16} />
+                                        <span>Actualiser</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setShowSaisirModal(true)}
+                                        style={{
+                                            background: '#ede9fe',
+                                            color: '#6d28d9',
+                                            border: '1px solid #ddd6fe',
+                                            borderRadius: '8px',
+                                            height: '40px',
+                                            padding: '0 14px',
+                                            fontWeight: '600',
+                                            fontSize: '13.5px',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            cursor: 'pointer',
+                                            whiteSpace: 'nowrap',
+                                            boxShadow: '0 1px 2px rgba(109, 40, 217, 0.08)',
+                                            transition: 'all 0.15s ease',
+                                        }}
+                                        type="button"
+                                    >
+                                        <UserPlus size={16} />
+                                        <span>+ Candidature RH</span>
+                                    </button>
+                                </div>
                             </div>
 
                             {loading ? (
-                                <LoadingState />
+                                <LoadingState
+                                    message="Chargement des candidatures sur offre..."
+                                    subtitle="Extraction des dossiers par direction et statut"
+                                />
                             ) : error ? (
                                 <ErrorState message={error} onRetry={loadData} />
                             ) : !candidatures.length ? (

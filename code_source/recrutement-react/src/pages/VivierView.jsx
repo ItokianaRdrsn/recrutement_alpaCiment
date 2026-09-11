@@ -234,7 +234,10 @@ export function VivierView({ referentiels }) {
                 </div>
 
                 {loading ? (
-                    <LoadingState />
+                    <LoadingState
+                        message="Chargement du vivier de talents..."
+                        subtitle="Agrégation des candidatures et profils RH qualifiés"
+                    />
                 ) : error ? (
                     <ErrorState message={error} onRetry={loadVivier} />
                 ) : !vivierList.length ? (

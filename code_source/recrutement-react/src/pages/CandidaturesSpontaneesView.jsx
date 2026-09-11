@@ -103,48 +103,6 @@ export function CandidaturesSpontaneesView({ referentiels }) {
 
     return (
         <div className="view-stack">
-            {/* HAUT DE PAGE : TITRE ET BOUTON SAISIR RH */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <div>
-                    <h2 style={{ margin: 0, fontSize: '20px', color: '#0f172a' }}>
-                        Candidatures Spontanées
-                    </h2>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '13px', color: '#64748b' }}>
-                        Liste et traitement des candidatures spontanées soumises sans offre spécifique.
-                    </p>
-                </div>
-                <div style={{ display: 'flex', gap: '10px' }}>
-                    <button className="ghost-button" onClick={loadData} type="button">
-                        <RefreshCw size={16} />
-                        <span>Actualiser</span>
-                    </button>
-                    <button
-                        onClick={() => setShowSaisirModal(true)}
-                        style={{
-                            background: '#ede9fe',
-                            color: '#6d28d9',
-                            border: '1px solid #ddd6fe',
-                            borderRadius: '8px',
-                            height: '40px',
-                            padding: '0 14px',
-                            fontWeight: '600',
-                            fontSize: '13.5px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                            boxShadow: '0 1px 2px rgba(109, 40, 217, 0.08)',
-                            transition: 'all 0.15s ease',
-                        }}
-                        type="button"
-                    >
-                        <UserPlus size={16} />
-                        <span>+ Candidature RH</span>
-                    </button>
-                </div>
-            </div>
-
             {/* BARRE DE FILTRES GLOBALE */}
             <section className="filter-bar" style={{ gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '16px' }}>
                 <label className="search-field" style={{ minWidth: '240px', flex: 1 }}>
@@ -203,10 +161,43 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                         Dossiers de Candidatures Spontanées
                         <span className="badge amber" style={{ marginLeft: '10px' }}>{paginationMeta.total} dossiers</span>
                     </h3>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="ghost-button" onClick={loadData} type="button">
+                        <RefreshCw size={16} />
+                        <span>Actualiser</span>
+                    </button>
+                    <button
+                        onClick={() => setShowSaisirModal(true)}
+                        style={{
+                            background: '#ede9fe',
+                            color: '#6d28d9',
+                            border: '1px solid #ddd6fe',
+                            borderRadius: '8px',
+                            height: '40px',
+                            padding: '0 14px',
+                            fontWeight: '600',
+                            fontSize: '13.5px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            boxShadow: '0 1px 2px rgba(109, 40, 217, 0.08)',
+                            transition: 'all 0.15s ease',
+                        }}
+                        type="button"
+                    >
+                        <UserPlus size={16} />
+                        <span>+ Candidature RH</span>
+                    </button>
+                </div>
                 </div>
 
                 {loading ? (
-                    <LoadingState />
+                    <LoadingState
+                        message="Chargement des candidatures spontanées..."
+                        subtitle="Récupération des profils et compétences déclarées"
+                    />
                 ) : error ? (
                     <ErrorState message={error} onRetry={loadData} />
                 ) : !candidatures.length ? (

@@ -321,7 +321,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                         <span>Exporter en PDF / Imprimer</span>
                     </button>
                     <span className="status-pill success" style={{ fontSize: '14px', padding: '6px 14px' }}>
-                        Statut actuel : {currentStatus?.libelle ?? 'Reçue'} ({currentWorkflowOrder})
+                        Statut actuel : {currentStatus?.libelle ?? 'Reçue'} 
                     </span>
                 </div>
             </div>
@@ -367,7 +367,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     type="button"
                 >
                     <CalendarDays size={16} />
-                    <span>Historique statuts ({details.historique?.length ?? 0})</span>
+                    <span>Parcours ({details.historique?.length ?? 0})</span>
                 </button>
 
                 <button
@@ -528,7 +528,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                                             fontWeight: 'bold',
                                                         }}
                                                     >
-                                                        {s.ordre_workflow}
+                                                        {/* {s.ordre_workflow} */}
                                                     </span>
                                                     <span>{s.libelle}</span>
                                                 </div>

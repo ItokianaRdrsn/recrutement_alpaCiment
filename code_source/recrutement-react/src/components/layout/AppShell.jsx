@@ -178,7 +178,6 @@ export function AppShell({ children, user }) {
             <div className="content-area">
                 <header className="topbar">
                     <div>
-                        <p className="eyebrow">Back-office RH</p>
                         <h1>
                             {activePath === '/candidatures/offres'
                                 ? 'Candidatures sur offre'

@@ -157,7 +157,12 @@ export async function sendJson(url, { body, method = 'POST' } = {}) {
     const payload = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-        throw new Error(payload.message ?? `Erreur HTTP ${response.status}`);
+        let msg = payload.message ?? `Erreur HTTP ${response.status}`;
+        if (payload.errors) {
+            const errList = Object.values(payload.errors).flat().join(' | ');
+            msg = `${msg}: ${errList}`;
+        }
+        throw new Error(msg);
     }
 
     return payload;

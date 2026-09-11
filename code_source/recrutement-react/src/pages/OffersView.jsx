@@ -1032,7 +1032,10 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                 {error ? (
                     <ErrorState message={error} onRetry={loadOffers} />
                 ) : loading ? (
-                    <LoadingState />
+                    <LoadingState
+                        message="Chargement des offres d'emploi..."
+                        subtitle="Récupération du catalogue et des critères de recrutement"
+                    />
                 ) : (
                     <OffersTable
                         offers={offersResponse.data}

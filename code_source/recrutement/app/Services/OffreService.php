@@ -42,6 +42,9 @@ class OffreService
     public function create(array $data, array $relationsData): Offre
     {
         $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->offreRepository->getStatusId('Brouillon');
+        $data['id_lieu'] = !empty($data['id_lieu']) ? (int) $data['id_lieu'] : 1;
+
+        unset($data['profil'], $data['profils'], $data['missions'], $data['formations'], $data['competences']);
 
         return DB::transaction(function () use ($data, $relationsData) {
             $offre = $this->offreRepository->create($data);
@@ -55,6 +58,12 @@ class OffreService
         if (isset($data['id_statut_offre']) && (int) $data['id_statut_offre'] !== (int) $offre->id_statut_offre) {
             $this->validateWorkflowProgression($offre, (int) $data['id_statut_offre']);
         }
+
+        if (array_key_exists('id_lieu', $data) && empty($data['id_lieu'])) {
+            $data['id_lieu'] = 1;
+        }
+
+        unset($data['profil'], $data['profils'], $data['missions'], $data['formations'], $data['competences']);
 
         return DB::transaction(function () use ($offre, $data, $relationsData) {
             $this->offreRepository->update($offre, $data);

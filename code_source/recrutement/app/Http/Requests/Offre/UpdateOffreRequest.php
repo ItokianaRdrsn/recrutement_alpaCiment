@@ -11,44 +11,37 @@ class UpdateOffreRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'id_direction' => $this->id_direction ? (int) $this->id_direction : null,
+            'id_type_contrat' => $this->id_type_contrat ? (int) $this->id_type_contrat : null,
+            'id_statut_offre' => $this->id_statut_offre ? (int) $this->id_statut_offre : null,
+            'id_lieu' => $this->id_lieu ? (int) $this->id_lieu : 1,
+            'date_publication' => $this->date_publication ?: null,
+            'date_limite' => $this->date_limite ?: null,
+            'description' => $this->description ? trim($this->description) : null,
+            'lieu' => $this->lieu ? trim($this->lieu) : null,
+        ]);
+    }
+
     public function rules(): array
     {
         return [
+            'titre_poste' => ['required', 'string', 'max:200'],
             'id_direction' => ['required', 'integer', 'exists:direction,id_direction'],
-            'id_type_contrat' => ['required', 'integer', 'exists:type_contrat,id_type_contrat'],
-            'id_statut_offre' => ['nullable', 'integer', 'exists:statut_offre,id_statut_offre'],
-            'id_lieu' => ['required', 'integer', 'exists:lieu,id_lieu'],
-            'titre_poste' => ['required', 'string', 'max:150'],
-            'description' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
+            'id_lieu' => ['nullable', 'integer', 'exists:lieu,id_lieu'],
+            'lieu' => ['nullable', 'string', 'max:150'],
+            'id_type_contrat' => ['nullable', 'integer', 'exists:type_contrat,id_type_contrat'],
             'date_publication' => ['nullable', 'date'],
             'date_limite' => ['nullable', 'date', 'after_or_equal:date_publication'],
+            'id_statut_offre' => ['nullable', 'integer', 'exists:statut_offre,id_statut_offre'],
             'profil' => ['nullable', 'array'],
-            'profil.description' => ['nullable', 'string'],
-            'profil.type_valeur' => ['nullable', 'string', 'max:50'],
-            'profil.valeur_min' => ['nullable', 'numeric'],
-            'profil.valeur_max' => ['nullable', 'numeric'],
-            'profil.valeur_attendue' => ['nullable', 'string', 'max:100'],
-            'profil.unite_valeur' => ['nullable', 'string', 'max:50'],
             'profils' => ['nullable', 'array'],
-            'profils.*.description' => ['required_with:profils', 'string'],
-            'profils.*.type_valeur' => ['nullable', 'string', 'max:50'],
-            'profils.*.valeur_min' => ['nullable', 'numeric'],
-            'profils.*.valeur_max' => ['nullable', 'numeric'],
-            'profils.*.valeur_attendue' => ['nullable', 'string', 'max:100'],
-            'profils.*.unite_valeur' => ['nullable', 'string', 'max:50'],
             'missions' => ['nullable', 'array'],
-            'missions.*.description' => ['required_with:missions', 'string'],
-            'missions.*.ordre' => ['nullable', 'integer', 'min:1'],
             'formations' => ['nullable', 'array'],
-            'formations.*.domaine' => ['nullable', 'string', 'max:150'],
-            'formations.*.id_niveau_min' => ['nullable', 'integer', 'exists:niveau,id_niveau'],
-            'formations.*.id_niveau_max' => ['nullable', 'integer', 'exists:niveau,id_niveau'],
-            'formations.*.niveau_min' => ['nullable', 'string', 'max:100'],
-            'formations.*.niveau_max' => ['nullable', 'string', 'max:100'],
-            'formations.*.obligatoire' => ['nullable', 'boolean'],
             'competences' => ['nullable', 'array'],
-            'competences.*.id_competence' => ['required_with:competences', 'integer', 'exists:competence,id_competence'],
-            'competences.*.niveau_requis' => ['nullable', 'string', 'max:50'],
         ];
     }
 }

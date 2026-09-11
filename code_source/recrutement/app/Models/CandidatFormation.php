@@ -23,7 +23,6 @@ class CandidatFormation extends Model
 
     protected $fillable = [
         'id_candidature',
-        'id_candidat',
         'diplome',
         'etablissement',
         'domaine_etude',
@@ -54,9 +53,9 @@ class CandidatFormation extends Model
         return $this->belongsTo(Candidature::class, 'id_candidature', 'id_candidature');
     }
 
-    public function candidat(): BelongsTo
+    public function candidat()
     {
-        return $this->belongsTo(Candidat::class, 'id_candidat', 'id_candidat');
+        return $this->hasOneThrough(Candidat::class, Candidature::class, 'id_candidature', 'id_candidat', 'id_candidature', 'id_candidat');
     }
 
     public function niveauRel(): BelongsTo

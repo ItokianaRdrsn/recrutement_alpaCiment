@@ -58,8 +58,8 @@ class SessionController extends Controller
             return response()->json([
                 'message' => 'Connexion réussie',
                 'data' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
+                    'id' => $user->id_utilisateur ?? $user->id,
+                    'name' => $user->nom ?? $user->name,
                     'email' => $user->email,
                     'role' => $user->role,
                     'role_label' => $user->roleEnum()?->label(),
