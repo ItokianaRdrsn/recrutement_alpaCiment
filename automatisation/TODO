@@ -1,0 +1,18 @@
+recuperer l'email 
+identification de l'objet:
+    demande sur offre
+        enregistrement des dossiers
+        creation de la fiche candidat pour l'offre
+        analyse du CV 
+        recuperation des donnees
+        NER
+        mathing offre
+        score
+    demande spontanee
+        enregistrement des dossiers
+        creation de la fiche candidat pour l'offre
+        analyse du CV 
+        recuperation des donnees
+        NER
+    information
+        AGENT IA ????

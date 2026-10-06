@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
+    BookmarkCheck,
     BriefcaseBusiness,
     Building2,
     ChevronDown,
@@ -44,6 +46,16 @@ export function CandidaturesOffresView({ referentiels }) {
     const [expandedDirs, setExpandedDirs] = useState({});
     const [searchOffreQuery, setSearchOffreQuery] = useState('');
     const [expandedOffresInRightCol, setExpandedOffresInRightCol] = useState({});
+
+    const [searchParams] = useSearchParams();
+    const urlOffreId = searchParams.get('offre') || searchParams.get('id_offre');
+    const [appliedUrlOffreId, setAppliedUrlOffreId] = useState(null);
+
+    // Candidatures en vivier par direction (liées par domaine)
+    const [vivierDataByDir, setVivierDataByDir] = useState({});
+    const [vivierCountsByDir, setVivierCountsByDir] = useState({});
+    const [loadingVivierByDir, setLoadingVivierByDir] = useState({});
+    const [offerSubTab, setOfferSubTab] = useState({}); // { [offreId]: 'candidatures' | 'vivier' }
 
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState(50);
@@ -134,23 +146,71 @@ export function CandidaturesOffresView({ referentiels }) {
         loadData();
     }, [loadData]);
 
-    if (selectedCandidatureId) {
-        return (
-            <CandidatureDetailView
-                idCandidature={selectedCandidatureId}
-                onBack={() => setSelectedCandidatureId(null)}
-                onRefreshList={loadData}
-                referentiels={referentiels}
-                statutsList={statutsList}
-            />
-        );
-    }
+    useEffect(() => {
+        if (!urlOffreId || !offresList.length) return;
+        if (appliedUrlOffreId === urlOffreId) return;
 
-    const toggleOffreDropdownInRightCol = (offreId) => {
-        setExpandedOffresInRightCol((prev) => ({
-            ...prev,
-            [offreId]: !prev[offreId],
-        }));
+        const targetOffreId = Number(urlOffreId);
+        const targetOffre = offresList.find((o) => getOffreId(o) === targetOffreId);
+        if (targetOffre) {
+            setAppliedUrlOffreId(urlOffreId);
+            const dirId = getOffreDirId(targetOffre);
+            if (dirId) {
+                setSelectedDirectionId(dirId);
+                setExpandedDirs((prev) => ({ ...prev, [dirId]: true }));
+            }
+            setDirectionSubMode('offres_candidatures');
+            setExpandedOffresInRightCol((prev) => ({ ...prev, [targetOffreId]: true }));
+        }
+    }, [urlOffreId, offresList, appliedUrlOffreId]);
+
+    const loadVivierForDirection = useCallback(async (dirId) => {
+        if (!dirId) return [];
+        setLoadingVivierByDir((prev) => ({ ...prev, [dirId]: true }));
+        try {
+            const res = await getJson(`/api/vivier?direction=${dirId}&domaine_direction_only=1`);
+            const items = res?.data ?? [];
+            setVivierDataByDir((prev) => ({ ...prev, [dirId]: items }));
+            setVivierCountsByDir((prev) => ({ ...prev, [dirId]: items.length }));
+            return items;
+        } catch (err) {
+            console.error('Erreur chargement vivier direction:', err);
+            return [];
+        } finally {
+            setLoadingVivierByDir((prev) => ({ ...prev, [dirId]: false }));
+        }
+    }, []);
+
+    useEffect(() => {
+        if (selectedDirectionId) {
+            loadVivierForDirection(selectedDirectionId);
+        }
+    }, [selectedDirectionId, loadVivierForDirection]);
+
+    const toggleOffreDropdownInRightCol = (offreId, dirId) => {
+        setExpandedOffresInRightCol((prev) => {
+            const willBeExpanded = !prev[offreId];
+            if (willBeExpanded && dirId && vivierCountsByDir[dirId] === undefined) {
+                loadVivierForDirection(dirId);
+            }
+            return {
+                ...prev,
+                [offreId]: willBeExpanded,
+            };
+        });
+    };
+
+    const handleToggleVivierForOffre = (offreId, dirId) => {
+        if (dirId) {
+            loadVivierForDirection(dirId);
+        }
+        setOfferSubTab((prev) => {
+            const currentTab = prev[offreId] || 'candidatures';
+            return {
+                ...prev,
+                [offreId]: currentTab === 'vivier' ? 'candidatures' : 'vivier',
+            };
+        });
     };
 
     const handleSelectDirectionWithSubMode = (dirId, subMode) => {
@@ -173,6 +233,18 @@ export function CandidaturesOffresView({ referentiels }) {
     });
 
     const activeDirectionName = referentiels.directions?.find((d) => getDirId(d) === selectedDirectionId)?.nom_direction ?? 'Toutes les directions';
+
+    if (selectedCandidatureId) {
+        return (
+            <CandidatureDetailView
+                idCandidature={selectedCandidatureId}
+                onBack={() => setSelectedCandidatureId(null)}
+                onRefreshList={loadData}
+                referentiels={referentiels}
+                statutsList={statutsList}
+            />
+        );
+    }
 
     return (
         <div className="view-stack">
@@ -499,6 +571,23 @@ export function CandidaturesOffresView({ referentiels }) {
                                             return true;
                                         });
                                         const offreCandCount = offreCands.length;
+                                        const currentDirId = getOffreDirId(o) || selectedDirectionId;
+                                        const currentTab = offerSubTab[currentOffreId] || 'candidatures';
+                                        const dirVivierCount = vivierCountsByDir[currentDirId] ?? 0;
+
+                                        const filteredVivierCands = (vivierDataByDir[currentDirId] ?? []).filter((v) => {
+                                            if (filters.q) {
+                                                const query = filters.q.toLowerCase().trim();
+                                                const prenom = (v.candidat?.prenom ?? '').toLowerCase();
+                                                const nom = (v.candidat?.nom ?? '').toLowerCase();
+                                                const email = (v.candidat?.email ?? '').toLowerCase();
+                                                const full = `${prenom} ${nom}`;
+                                                if (!prenom.includes(query) && !nom.includes(query) && !email.includes(query) && !full.includes(query)) {
+                                                    return false;
+                                                }
+                                            }
+                                            return true;
+                                        });
 
                                         return (
                                             <div
@@ -536,85 +625,290 @@ export function CandidaturesOffresView({ referentiels }) {
                                                         </div>
                                                     </div>
 
-                                                    <button
-                                                        onClick={() => toggleOffreDropdownInRightCol(currentOffreId)}
-                                                        style={{
-                                                            padding: '8px 14px',
-                                                            borderRadius: '8px',
-                                                            fontSize: '12.5px',
-                                                            fontWeight: '600',
-                                                            background: isExpanded ? '#4f46e5' : '#ffffff',
-                                                            color: isExpanded ? '#ffffff' : '#4338ca',
-                                                            border: isExpanded ? 'none' : '1.5px solid #6366f1',
-                                                            cursor: 'pointer',
-                                                            display: 'inline-flex',
-                                                            alignItems: 'center',
-                                                            gap: '8px',
-                                                            boxShadow: '0 2px 6px rgba(99, 102, 241, 0.15)',
-                                                            transition: 'all 0.15s ease',
-                                                        }}
-                                                        type="button"
-                                                    >
-                                                        <Users size={15} />
-                                                        <span>{isExpanded ? 'Masquer candidats' : `Voir candidats (${offreCandCount})`}</span>
-                                                    </button>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        {isExpanded ? (
+                                                            <button
+                                                                onClick={() => handleToggleVivierForOffre(currentOffreId, currentDirId)}
+                                                                style={{
+                                                                    padding: '8px 14px',
+                                                                    borderRadius: '8px',
+                                                                    fontSize: '12.5px',
+                                                                    fontWeight: '600',
+                                                                    background: currentTab === 'vivier' ? '#059669' : '#ecfdf5',
+                                                                    color: currentTab === 'vivier' ? '#ffffff' : '#047857',
+                                                                    border: currentTab === 'vivier' ? '1.5px solid #059669' : '1.5px solid #a7f3d0',
+                                                                    cursor: 'pointer',
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    boxShadow: '0 2px 6px rgba(16, 185, 129, 0.15)',
+                                                                    transition: 'all 0.15s ease',
+                                                                }}
+                                                                title={`Consulter les candidatures en vivier rattachées aux domaines de cette direction`}
+                                                                type="button"
+                                                            >
+                                                                <BookmarkCheck size={15} />
+                                                                <span>Vivier ({dirVivierCount})</span>
+                                                            </button>
+                                                        ) : null}
+
+                                                        <button
+                                                            onClick={() => toggleOffreDropdownInRightCol(currentOffreId, currentDirId)}
+                                                            style={{
+                                                                padding: '8px 14px',
+                                                                borderRadius: '8px',
+                                                                fontSize: '12.5px',
+                                                                fontWeight: '600',
+                                                                background: isExpanded ? '#4f46e5' : '#ffffff',
+                                                                color: isExpanded ? '#ffffff' : '#4338ca',
+                                                                border: isExpanded ? 'none' : '1.5px solid #6366f1',
+                                                                cursor: 'pointer',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '8px',
+                                                                boxShadow: '0 2px 6px rgba(99, 102, 241, 0.15)',
+                                                                transition: 'all 0.15s ease',
+                                                            }}
+                                                            type="button"
+                                                        >
+                                                            <Users size={15} />
+                                                            <span>{isExpanded ? 'Masquer candidats' : `Voir candidats (${offreCandCount})`}</span>
+                                                        </button>
+                                                    </div>
                                                 </div>
 
                                                 {isExpanded ? (
-                                                    <div style={{ padding: '12px 16px', background: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
-                                                        {!offreCands.length ? (
-                                                            <div className="empty-state" style={{ padding: '16px' }}>
-                                                                Aucune candidature déposée pour cette offre pour le moment.
+                                                    <div style={{ padding: '14px 16px', background: '#ffffff', borderTop: '1px solid #e2e8f0' }}>
+                                                        {/* ONGLET DE NAVIGATION : CANDIDATURES SUR LE POSTE VS VIVIER DE LA DIRECTION */}
+                                                        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px', flexWrap: 'wrap' }}>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => setOfferSubTab((prev) => ({ ...prev, [currentOffreId]: 'candidatures' }))}
+                                                                style={{
+                                                                    padding: '6px 14px',
+                                                                    borderRadius: '7px',
+                                                                    fontSize: '12.5px',
+                                                                    fontWeight: '600',
+                                                                    cursor: 'pointer',
+                                                                    border: currentTab === 'candidatures' ? '1.5px solid #3b82f6' : '1px solid #e2e8f0',
+                                                                    background: currentTab === 'candidatures' ? '#eff6ff' : '#f8fafc',
+                                                                    color: currentTab === 'candidatures' ? '#1d4ed8' : '#64748b',
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    transition: 'all 0.15s ease',
+                                                                }}
+                                                            >
+                                                                <Users size={14} />
+                                                                <span>Candidatures sur l'offre ({offreCandCount})</span>
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setOfferSubTab((prev) => ({ ...prev, [currentOffreId]: 'vivier' }));
+                                                                    if (currentDirId) loadVivierForDirection(currentDirId);
+                                                                }}
+                                                                style={{
+                                                                    padding: '6px 14px',
+                                                                    borderRadius: '7px',
+                                                                    fontSize: '12.5px',
+                                                                    fontWeight: '600',
+                                                                    cursor: 'pointer',
+                                                                    border: currentTab === 'vivier' ? '1.5px solid #059669' : '1px solid #e2e8f0',
+                                                                    background: currentTab === 'vivier' ? '#ecfdf5' : '#f8fafc',
+                                                                    color: currentTab === 'vivier' ? '#047857' : '#64748b',
+                                                                    display: 'inline-flex',
+                                                                    alignItems: 'center',
+                                                                    gap: '6px',
+                                                                    transition: 'all 0.15s ease',
+                                                                }}
+                                                            >
+                                                                <BookmarkCheck size={14} />
+                                                                <span>Candidatures en vivier (Direction) ({dirVivierCount})</span>
+                                                            </button>
+                                                        </div>
+
+                                                        {currentTab === 'vivier' ? (
+                                                            <div>
+                                                                <div
+                                                                    style={{
+                                                                        padding: '10px 14px',
+                                                                        background: '#f0fdf4',
+                                                                        border: '1px solid #bbf7d0',
+                                                                        borderRadius: '8px',
+                                                                        marginBottom: '12px',
+                                                                        fontSize: '13px',
+                                                                        color: '#166534',
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'space-between',
+                                                                        gap: '8px',
+                                                                        flexWrap: 'wrap',
+                                                                    }}
+                                                                >
+                                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                        <BookmarkCheck size={16} />
+                                                                        <span>
+                                                                            Candidatures en <strong>vivier RH</strong> dont le <strong>domaine</strong> est rattaché à la direction <strong>{o.direction?.nom ?? o.direction?.nom_direction ?? 'associée'}</strong>.
+                                                                        </span>
+                                                                    </div>
+                                                                    <span className="badge green" style={{ fontSize: '11px', fontWeight: 'bold' }}>
+                                                                        {filteredVivierCands.length} profil(s) éligible(s)
+                                                                    </span>
+                                                                </div>
+
+                                                                {loadingVivierByDir[currentDirId] ? (
+                                                                    <LoadingState
+                                                                        message="Chargement des candidatures en vivier..."
+                                                                        subtitle="Filtrage des talents par domaine rattaché à cette direction"
+                                                                    />
+                                                                ) : !filteredVivierCands.length ? (
+                                                                    <div className="empty-state" style={{ padding: '24px' }}>
+                                                                        Aucune candidature en vivier n'a été trouvée pour les domaines rattachés à cette direction.
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="table-wrap">
+                                                                        <table>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Candidat</th>
+                                                                                    <th>Contact</th>
+                                                                                    <th>Domaine Rattaché</th>
+                                                                                    <th>Poste souhaité / Contexte</th>
+                                                                                    <th>Date Vivier</th>
+                                                                                    <th>Statut</th>
+                                                                                    <th style={{ textAlign: 'right' }}>Action</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {filteredVivierCands.map((v) => {
+                                                                                    const isUnread = !v.vue;
+                                                                                    const candId = v.id_candidature;
+
+                                                                                    return (
+                                                                                        <tr
+                                                                                            key={v.id_vivier_candidat ?? `cand_${candId}`}
+                                                                                            onClick={() => candId && handleOpenDossier(candId)}
+                                                                                            style={{
+                                                                                                cursor: candId ? 'pointer' : 'default',
+                                                                                                background: isUnread && candId ? '#f0fdf4' : '#ffffff',
+                                                                                                transition: 'background 0.15s ease',
+                                                                                            }}
+                                                                                            title={candId ? 'Cliquer pour consulter le dossier complet du candidat' : undefined}
+                                                                                        >
+                                                                                            <td>
+                                                                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                                                    {isUnread && candId ? (
+                                                                                                        <span title="Dossier non encore consulté" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#059669', flexShrink: 0 }} />
+                                                                                                    ) : null}
+                                                                                                    <strong style={{ color: '#0f172a' }}>
+                                                                                                        {v.candidat?.prenom} {v.candidat?.nom}
+                                                                                                    </strong>
+                                                                                                </div>
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <span>{v.candidat?.email ?? '-'}</span>
+                                                                                                {v.candidat?.telephone ? (
+                                                                                                    <small style={{ display: 'block', color: '#64748b' }}>
+                                                                                                        {v.candidat.telephone}
+                                                                                                    </small>
+                                                                                                ) : null}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <span className="badge green" style={{ fontSize: '11px', fontWeight: '600' }}>
+                                                                                                    {v.domaine?.nom_domaine ?? 'Domaine relié'}
+                                                                                                </span>
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <span style={{ fontSize: '12.5px', color: '#334155' }}>
+                                                                                                    {v.poste_souhaite || v.motif_ajout || 'Candidature spontanée'}
+                                                                                                </span>
+                                                                                            </td>
+                                                                                            <td>{formatDate(v.created_at)}</td>
+                                                                                            <td>
+                                                                                                <span className="status-pill success">{v.statut ?? 'Actif'}</span>
+                                                                                            </td>
+                                                                                            <td style={{ textAlign: 'right' }}>
+                                                                                                {candId ? (
+                                                                                                    <button
+                                                                                                        className="filter-button"
+                                                                                                        onClick={(e) => {
+                                                                                                            e.stopPropagation();
+                                                                                                            handleOpenDossier(candId);
+                                                                                                        }}
+                                                                                                        style={{ padding: '5px 12px', fontSize: '12px', gap: '5px' }}
+                                                                                                        type="button"
+                                                                                                    >
+                                                                                                        <Eye size={13} />
+                                                                                                        <span>Consulter dossier</span>
+                                                                                                    </button>
+                                                                                                ) : null}
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    );
+                                                                                })}
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         ) : (
-                                                            <div className="table-wrap">
-                                                                <table>
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Candidat</th>
-                                                                            <th>Email & Téléphone</th>
-                                                                            <th>Date de Dépôt</th>
-                                                                            <th>Statut RH</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {offreCands.map((c) => {
-                                                                            const isUnread = !c.vue;
+                                                            /* CANDIDATURES DIRECTES SUR L'OFFRE */
+                                                            !offreCands.length ? (
+                                                                <div className="empty-state" style={{ padding: '16px' }}>
+                                                                    Aucune candidature déposée pour cette offre pour le moment.
+                                                                </div>
+                                                            ) : (
+                                                                <div className="table-wrap">
+                                                                    <table>
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Candidat</th>
+                                                                                <th>Email & Téléphone</th>
+                                                                                <th>Date de Dépôt</th>
+                                                                                <th>Statut RH</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {offreCands.map((c) => {
+                                                                                const isUnread = !c.vue;
 
-                                                                            return (
-                                                                                <tr
-                                                                                    key={c.id_candidature}
-                                                                                    onClick={() => handleOpenDossier(c.id_candidature)}
-                                                                                    style={{
-                                                                                        background: isUnread ? '#eff6ff' : '#ffffff',
-                                                                                        borderLeft: isUnread ? '4px solid #2563eb' : 'none',
-                                                                                        fontWeight: isUnread ? '600' : 'normal',
-                                                                                        cursor: 'pointer',
-                                                                                    }}
-                                                                                    title="Cliquer pour consulter le dossier de ce candidat"
-                                                                                >
-                                                                                    <td>
-                                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                                            {isUnread ? (
-                                                                                                <span title="Candidature non encore vue" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2563eb', flexShrink: 0 }} />
-                                                                                            ) : null}
-                                                                                            <strong style={{ color: '#0f172a' }}>{c.candidat?.prenom} {c.candidat?.nom}</strong>
-                                                                                        </div>
-                                                                                    </td>
-                                                                                    <td>
-                                                                                        <span>{c.candidat?.email}</span>
-                                                                                        {c.candidat?.telephone ? <small style={{ display: 'block', color: '#64748b' }}>{c.candidat.telephone}</small> : null}
-                                                                                    </td>
-                                                                                    <td>{formatDate(c.created_at)}</td>
-                                                                                    <td>
-                                                                                        <span className="status-pill success">{c.statut?.libelle ?? 'Reçue'}</span>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            );
-                                                                        })}
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
+                                                                                return (
+                                                                                    <tr
+                                                                                        key={c.id_candidature}
+                                                                                        onClick={() => handleOpenDossier(c.id_candidature)}
+                                                                                        style={{
+                                                                                            background: isUnread ? '#eff6ff' : '#ffffff',
+                                                                                            borderLeft: isUnread ? '4px solid #2563eb' : 'none',
+                                                                                            fontWeight: isUnread ? '600' : 'normal',
+                                                                                            cursor: 'pointer',
+                                                                                        }}
+                                                                                        title="Cliquer pour consulter le dossier de ce candidat"
+                                                                                    >
+                                                                                        <td>
+                                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                                                {isUnread ? (
+                                                                                                    <span title="Candidature non encore vue" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2563eb', flexShrink: 0 }} />
+                                                                                                ) : null}
+                                                                                                <strong style={{ color: '#0f172a' }}>{c.candidat?.prenom} {c.candidat?.nom}</strong>
+                                                                                            </div>
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <span>{c.candidat?.email}</span>
+                                                                                            {c.candidat?.telephone ? <small style={{ display: 'block', color: '#64748b' }}>{c.candidat.telephone}</small> : null}
+                                                                                        </td>
+                                                                                        <td>{formatDate(c.created_at)}</td>
+                                                                                        <td>
+                                                                                            <span className="status-pill success">{c.statut?.libelle ?? 'Reçue'}</span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                );
+                                                                            })}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            )
                                                         )}
                                                     </div>
                                                 ) : null}

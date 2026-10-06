@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
     BookmarkCheck,
     BriefcaseBusiness,
@@ -313,34 +314,17 @@ export function VivierView({ referentiels }) {
             </section>
 
             {/* POPUP MODAL : RECHERCHE ET SELECTION DE CANDIDATURE A METTRE EN VIVIER */}
-            {showAddModal && (
+            {showAddModal && createPortal(
                 <div
                     className="modal-backdrop"
                     onClick={() => setShowAddModal(false)}
-                    style={{
-                        zIndex: 1100,
-                        position: 'fixed',
-                        inset: 0,
-                        background: 'rgba(15, 23, 42, 0.6)',
-                        backdropFilter: 'blur(4px)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
                 >
                     <div
                         className="modal-card"
                         onClick={(e) => e.stopPropagation()}
                         style={{
                             maxWidth: '680px',
-                            width: '90%',
-                            maxHeight: '85vh',
-                            background: '#ffffff',
-                            borderRadius: '12px',
-                            padding: '24px',
-                            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                            display: 'flex',
-                            flexDirection: 'column',
+                            width: '92%',
                         }}
                     >
                         {/* HEADER DU POPUP MODAL EN HARMONIE AVEC COMPETENCEMODAL */}
@@ -528,7 +512,8 @@ export function VivierView({ referentiels }) {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

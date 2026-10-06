@@ -31,6 +31,7 @@ export function CandidaturesSpontaneesView({ referentiels }) {
         q: '',
         statut: '',
         canal_depot: '',
+        direction: '',
     });
 
     const handleOpenDossier = useCallback(async (id) => {
@@ -46,7 +47,7 @@ export function CandidaturesSpontaneesView({ referentiels }) {
     }, []);
 
     const resetFilters = () => {
-        setFilters({ q: '', statut: '', canal_depot: '' });
+        setFilters({ q: '', statut: '', canal_depot: '', direction: '' });
         setPage(1);
     };
 
@@ -63,6 +64,7 @@ export function CandidaturesSpontaneesView({ referentiels }) {
             if (filters.q) params.set('q', filters.q);
             if (filters.statut) params.set('statut', filters.statut);
             if (filters.canal_depot) params.set('canal_depot', filters.canal_depot);
+            if (filters.direction) params.set('direction', filters.direction);
 
             const [candResponse, statutsResponse] = await Promise.all([
                 getJson(`/api/candidatures?${params.toString()}`),
@@ -125,6 +127,21 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                         {statutsList.map((st) => (
                             <option key={st.id_statut_candidature} value={st.id_statut_candidature}>
                                 {st.libelle}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                <label style={{ minWidth: '180px' }}>
+                    <span>Direction suggérée</span>
+                    <select
+                        onChange={(e) => setFilters((curr) => ({ ...curr, direction: e.target.value }))}
+                        value={filters.direction}
+                    >
+                        <option value="">Toutes les directions</option>
+                        {(referentiels?.directions ?? []).map((dir) => (
+                            <option key={dir.id_direction ?? dir.id} value={dir.id_direction ?? dir.id}>
+                                {dir.nom_direction ?? dir.nom}
                             </option>
                         ))}
                     </select>
@@ -209,7 +226,8 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                                 <tr>
                                     <th>Candidat</th>
                                     <th>Poste Souhaité</th>
-                                    <th>Domaine / Direction Suggérée</th>
+                                    <th>Domaine</th>
+                                    <th>Direction Suggérée</th>
                                     <th>Date de Dépôt</th>
                                     <th>Statut RH</th>
                                 </tr>
@@ -246,7 +264,12 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                                                 <strong>{c.poste_souhaite ?? 'Spontanée'}</strong>
                                             </td>
                                             <td>
-                                                <span>{c.domaine?.nom_domaine ?? 'Spontanée'}</span>
+                                                <span>{c.domaine?.nom_domaine ?? 'Non spécifié'}</span>
+                                            </td>
+                                            <td>
+                                                <span style={{ color: (c.domaine?.direction?.nom_direction || c.direction?.nom_direction || c.offre?.direction?.nom_direction) ? '#0f172a' : '#64748b' }}>
+                                                    {c.domaine?.direction?.nom_direction ?? c.direction?.nom_direction ?? c.offre?.direction?.nom_direction ?? 'Non spécifiée'}
+                                                </span>
                                             </td>
                                             <td>{formatDate(c.created_at)}</td>
                                             <td>

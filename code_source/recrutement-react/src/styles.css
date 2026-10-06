@@ -845,29 +845,139 @@ td span {
     gap: 6px;
 }
 
+/* ==========================================================================
+   MODAL & OVERLAY UNIFIÉS - COMPATIBILITÉ ÉCHELLE ZOOM 80% & CENTRAGE UNIVERSEL
+   ========================================================================== */
+.modal-backdrop,
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(15, 23, 42, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 20px;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 99999 !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
 }
 
+/* Règle vitale pour body.in-backoffice avec zoom: 0.8 :
+   En zoom 0.8, 100vw physique = calc(100vw / 0.8) = 125vw dans l'espace CSS.
+   Cela garantit une couverture complète à 100% sans bordures blanches et un centrage physique parfait */
+body.in-backoffice .modal-backdrop,
+body.in-backoffice .modal-overlay,
+body.in-backoffice .drawer-overlay {
+    width: calc(100vw / 0.8) !important;
+    height: calc(100vh / 0.8) !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: auto !important;
+    bottom: auto !important;
+}
+
+.modal-card,
 .modal-content {
-    background: var(--panel);
-    border-radius: 12px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    max-width: 700px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    border: 1px solid var(--border);
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid var(--border) !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    position: relative !important;
+    margin: auto !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.modal-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-bottom: 14px !important;
+    margin-bottom: 18px !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.modal-header-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.modal-icon-badge {
+    background: #ede9fe !important;
+    color: #6d28d9 !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+.modal-title {
+    margin: 0 !important;
+    color: #1e1b4b !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+.modal-subtitle {
+    margin: 2px 0 0 0 !important;
+    font-size: 12.5px !important;
+    color: #64748b !important;
+}
+
+.modal-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+}
+
+.modal-footer {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-top: 18px !important;
+    padding-top: 14px !important;
+    border-top: 1px solid var(--border) !important;
+}
+
+.modal-submit-btn {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 9px 18px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.modal-submit-btn:hover:not(:disabled) {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.45) !important;
+}
+
+.modal-submit-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
 }
 
 .drawer-overlay {

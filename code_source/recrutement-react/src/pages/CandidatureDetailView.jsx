@@ -654,20 +654,39 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                     {details.canal_depot === 'rh_manuel' ? 'Saisie Manuelle RH' : 'Portail Web'}
                                 </span>
                             </p>
-                            <p style={{ margin: '6px 0' }}>
-                                <strong>Poste / Domaine :</strong>{' '}
-                                {details.offre ? (
-                                    <strong style={{ color: 'var(--primary)' }}>Offre : {details.offre.titre_poste}</strong>
-                                ) : details.domaine && (details.domaine.valide === true || details.domaine.valide === 1) ? (
-                                    <strong>Domaine : {details.domaine.nom_domaine}</strong>
-                                ) : (
-                                    <span>Poste souhaité : {details.poste_souhaite ?? 'Non spécifié'} <span className="badge amber" style={{ marginLeft: '6px' }}>En attente de validation RH</span></span>
-                                )}
-                            </p>
-                            <p style={{ margin: '6px 0' }}>
-                                <strong>Direction de rattachement :</strong>{' '}
-                                {details.offre?.direction?.nom_direction ?? (details.domaine && (details.domaine.valide === true || details.domaine.valide === 1) ? details.domaine?.direction?.nom_direction : 'Non spécifiée (En attente de validation RH)')}
-                            </p>
+                            {details.offre ? (
+                                <>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Offre postulée :</strong>{' '}
+                                        <strong style={{ color: 'var(--primary)' }}>{details.offre.titre_poste}</strong>
+                                    </p>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Direction de rattachement :</strong>{' '}
+                                        {details.offre.direction?.nom_direction ?? 'Non spécifiée'}
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Poste souhaité :</strong>{' '}
+                                        <strong>{details.poste_souhaite ?? 'Non spécifié'}</strong>
+                                    </p>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Domaine :</strong>{' '}
+                                        {details.domaine && (details.domaine.valide === true || details.domaine.valide === 1) ? (
+                                            <span>{details.domaine.nom_domaine}</span>
+                                        ) : details.domaine?.nom_domaine ? (
+                                            <span>{details.domaine.nom_domaine} <span className="badge amber" style={{ marginLeft: '6px' }}>En attente de validation RH</span></span>
+                                        ) : (
+                                            <span>Non spécifié</span>
+                                        )}
+                                    </p>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Direction suggérée :</strong>{' '}
+                                        {details.domaine?.direction?.nom_direction ?? details.direction?.nom_direction ?? 'Non spécifiée (En attente de validation RH)'}
+                                    </p>
+                                </>
+                            )}
                             <p style={{ margin: '6px 0' }}><strong>Date de dépôt :</strong> {formatDate(details.created_at)}</p>
 
                             <div style={{ marginTop: '16px' }}>

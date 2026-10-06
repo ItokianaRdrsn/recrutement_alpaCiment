@@ -7,7 +7,7 @@ export function LoginPage({ onLoginSuccess }) {
     const navigate = useNavigate();
     const [email, setEmail] = useState('admin@alphaciment.local');
     const [password, setPassword] = useState('password');
-    const [remember, setRemember] = useState(true);
+    const [remember, setRemember] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -241,7 +241,7 @@ export function LoginPage({ onLoginSuccess }) {
                             </div>
                         </div>
 
-                        <div style={{
+                        {/* <div style={{
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
@@ -264,7 +264,7 @@ export function LoginPage({ onLoginSuccess }) {
                                 />
                                 Se souvenir de moi
                             </label>
-                        </div>
+                        </div> */}
 
                         <button
                             type="submit"

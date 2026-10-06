@@ -34,6 +34,7 @@ class EloquentOffreRepository implements OffreRepositoryInterface
 
         return Offre::query()
             ->with($this->resourceRelations())
+            ->withCount('candidatures')
             ->when($filters['direction'] ?? null, fn ($query, int $direction) => $query->where('id_direction', $direction))
             ->when($filters['statut'] ?? null, fn ($query, int $statut) => $query->where('id_statut_offre', $statut))
             ->when($filters['type_contrat'] ?? null, fn ($query, int $typeContrat) => $query->where('id_type_contrat', $typeContrat))
@@ -64,6 +65,7 @@ class EloquentOffreRepository implements OffreRepositoryInterface
 
         return Offre::query()
             ->with($this->resourceRelations())
+            ->withCount('candidatures')
             ->where('id_statut_offre', $publieeId)
             ->orderByDesc('date_publication')
             ->orderByDesc('created_at')

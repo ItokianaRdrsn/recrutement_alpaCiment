@@ -82,4 +82,9 @@ class Offre extends Model
         return $this->belongsToMany(Competence::class, 'profil_competence', 'id_offre', 'id_competence')
             ->withPivot('niveau_requis');
     }
+
+    public function candidatures(): HasMany
+    {
+        return $this->hasMany(Candidature::class, 'id_offre', 'id_offre');
+    }
 }

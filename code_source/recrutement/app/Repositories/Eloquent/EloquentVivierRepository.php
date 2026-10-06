@@ -28,8 +28,24 @@ class EloquentVivierRepository implements VivierRepositoryInterface
             });
         }
 
-        if (!empty($filters['direction'])) {
-            $query->where('id_direction', $filters['direction']);
+        if (!empty($filters['domaine_direction_only']) && !empty($filters['direction'])) {
+            $dirId = (int) $filters['direction'];
+            $query->where(function ($qDir) use ($dirId) {
+                $qDir->whereHas('domaine', function ($s) use ($dirId) {
+                    $s->where('id_direction', $dirId);
+                })->orWhere(function ($sub) use ($dirId) {
+                    $sub->whereNull('id_domaine')
+                        ->where('id_direction', $dirId);
+                });
+            });
+        } elseif (!empty($filters['direction'])) {
+            $dirId = (int) $filters['direction'];
+            $query->where(function ($qDir) use ($dirId) {
+                $qDir->where('id_direction', $dirId)
+                    ->orWhereHas('domaine', function ($s) use ($dirId) {
+                        $s->where('id_direction', $dirId);
+                    });
+            });
         }
 
         if (!empty($filters['domaine'])) {
@@ -57,7 +73,19 @@ class EloquentVivierRepository implements VivierRepositoryInterface
             });
         }
 
-        if (!empty($filters['direction'])) {
+        if (!empty($filters['domaine_direction_only']) && !empty($filters['direction'])) {
+            $dirId = (int) $filters['direction'];
+            $candQuery->where(function ($qDir) use ($dirId) {
+                $qDir->whereHas('domaine', function ($s) use ($dirId) {
+                    $s->where('id_direction', $dirId);
+                })->orWhere(function ($sub) use ($dirId) {
+                    $sub->whereNull('id_domaine')
+                        ->whereHas('offre', function ($s) use ($dirId) {
+                            $s->where('id_direction', $dirId);
+                        });
+                });
+            });
+        } elseif (!empty($filters['direction'])) {
             $dirId = (int) $filters['direction'];
             $candQuery->where(function ($qDir) use ($dirId) {
                 $qDir->whereHas('offre', function ($s) use ($dirId) {

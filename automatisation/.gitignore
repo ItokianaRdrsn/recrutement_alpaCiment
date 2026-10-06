@@ -1,0 +1,6 @@
+# Environment files
+.env
+
+# n8n local data (if local directory is used)
+n8n_data/
+.n8n/

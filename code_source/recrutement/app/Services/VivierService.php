@@ -37,6 +37,7 @@ class VivierService
                 'direction' => $cand->direction ?? $cand->offre?->direction ?? $cand->domaine?->direction,
                 'domaine' => $cand->domaine,
                 'motif_ajout' => $cand->offre ? 'Mis en vivier RH (Candidature sur offre)' : 'Candidature spontanée (En vivier par défaut)',
+                'poste_souhaite' => $cand->poste_souhaite ?? null,
                 'statut' => 'Actif',
                 'created_at' => $cand->created_at,
             ]);

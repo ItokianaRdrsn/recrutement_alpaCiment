@@ -1001,6 +1001,76 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
   - Ombres et filtres supprimés sur l'image du loader.
   - Tous les textes retirés du préchargeur.
 
+### Demande 84 : Rédaction et simplification du README du projet (Démarrage & Commandes directes)
+- **Besoin :** Fournir un README clair et synthétique contenant uniquement les grands titres et les commandes exactes à exécuter sans explications superflues, les dossiers à nettoyer pour transmission du code, les URLs d'accès et les identifiants d'administration par défaut.
+- **Résolution :**
+  - Fichiers `README.md` et `README` mis à jour à la racine.
+  - Configuration par défaut PostgreSQL reportée dans `code_source/recrutement/.env.example`.
+  - Commandes épurées pour Laravel (backend), React (frontend) et FastAPI (OCR).
+
+### Demande 85 : Résolution Erreur 403 Forbidden sur l'affichage CV & Erreurs JS Matomo
+- **Besoin :** Lors du partage du projet sans les builds, un ami rencontre une erreur HTTP 403 Forbidden lors de l'affichage du CV (PDF) dans l'onglet Extraction CV, ainsi que des erreurs JS `trackUrlFragments` / `trackDownload`.
+- **Analyse des causes :**
+  1. Le dossier `public/storage` sous Windows est un lien symbolique (junction NTFS) qui pointait en dur vers le chemin absolu de l'auteur original (`C:\Users\Strix\...`). Sur le PC de l'ami, le chemin est inaccessible ou introuvable, ce qui conduit le serveur web à renvoyer 403 (Access Denied). De plus, `php artisan storage:link` ignorait la recréation car le dossier existait déjà.
+  2. Le script Drupal hérité `js_ffcD9FB9b55EDTvf0v_CyEaKnYI-lMfzc1E0QUv5q34.js` tentait d'appeler `_paq.trackDownload` / `_paq.trackUrlFragments` sur les liens de téléchargement de documents sans que Matomo ne soit défini.
+- **Résolution :**
+  1. Ajout d'un stub sécurisé pour `window._paq` dans `recrutement-react/index.html` pour éliminer les plantages `TypeError`.
+  2. Ajout de `rm -rf code_source/recrutement/public/storage` dans les consignes de nettoyage du `README.md`.
+  3. Renforcement de la route de fallback Laravel `storage.local` dans `routes/web.php` avec les en-têtes CORS et `inline` pour l'iframe.
+
+### Demande 86 : Séparation Domaine / Direction Suggérée dans les Candidatures Spontanées
+- **Besoin :** Dans l'affichage des candidatures spontanées du Back-Office, séparer clairement "Domaine" et "Direction Suggérée" qui étaient auparavant regroupés sous une seule colonne.
+- **Résolution :**
+  1. Dans `CandidaturesSpontaneesView.jsx` :
+     - Ajout de deux colonnes distinctes dans le tableau : `<th>Domaine</th>` et `<th>Direction Suggérée</th>`.
+     - Affichage précis de `c.domaine?.nom_domaine` dans la colonne Domaine, et de la direction rattachée (`c.domaine?.direction?.nom_direction ?? c.direction?.nom_direction ?? 'Non spécifiée'`) dans la colonne Direction Suggérée.
+     - Ajout d'un filtre dédié "Direction suggérée" dans la barre de filtres, interfacé avec le paramètre `direction` du backend.
+  2. Dans `CandidatureDetailView.jsx` :
+     - Séparation des champs dans la fiche détaillée pour les candidatures spontanées ("Poste souhaité", "Domaine" et "Direction suggérée").
+  3. Validation : Build frontend `npm run build` exécuté avec succès (0 erreur).
+
+---
+
+### Demande 87 : Nombre de Candidatures dans les Offres et Lien Direct vers les Candidatures
+- **Besoin :** Dans la table des offres d'emploi (Back-Office), afficher le nombre de candidatures reçues pour chaque offre et fournir un lien/bouton direct permettant de naviguer vers les candidatures de cette offre.
+- **Résolution :**
+  1. **Backend Laravel** :
+     - Dans `app/Models/Offre.php` : ajout de la relation `candidatures(): HasMany`.
+     - Dans `app/Repositories/Eloquent/EloquentOffreRepository.php` : ajout de `->withCount('candidatures')` dans les requêtes de recherche et pagination (`paginateFiltered`, `paginatePublished`).
+     - Dans `app/Http/Resources/OffreResource.php` : exposition du champ `'candidatures_count' => (int) ($this->candidatures_count ?? ...)`.
+  2. **Frontend React** :
+     - Dans `src/pages/OffersTable.jsx` :
+       - Ajout d'une colonne `Candidatures` dans le tableau (en-tête et cellules).
+       - Badge interactif cliquable affichant l'icône utilisateur, le nombre de candidatures et une flèche de navigation.
+       - Bouton dédié "Consulter les candidatures (X)" dans le volet déroulant des détails de l'offre.
+       - Clic dirigeant vers `/candidatures/offres?offre={id}`.
+     - Dans `src/pages/CandidaturesOffresView.jsx` :
+       - Récupération du paramètre d'URL `?offre=` via `useSearchParams()`.
+       - Effet automatique sélectionnant la direction correspondante, basculant en sous-mode "Offres & candidatures" et dépliant directement la liste des candidats de l'offre ciblée.
+  3. **Validation & Tests** :
+     - Build Vite exécuté avec succès (0 erreur, 1.28s).
+
+---
+
+### Demande 88 : Bouton Vivier à côté de « Masquer Candidats » et Affichage des Candidatures en Vivier Liées par Domaine
+- **Besoin :** Dans l'écran *Candidatures sur offre* -> Liste des directions -> Liste des offres, lorsqu'une offre est sélectionnée et dépliée pour afficher ses candidatures, ajouter un bouton **« Vivier »** à côté du bouton **« Masquer candidats »**, permettant de récupérer et afficher toutes les candidatures en vivier dont le domaine de compétences est rattaché à cette direction.
+- **Résolution :**
+  1. **Backend Laravel** :
+     - Dans [`app/Repositories/Eloquent/EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php) :
+       - Prise en charge du paramètre `domaine_direction_only` dans `getVivierEntries` et `getCandidaturesEnVivier` pour filtrer précisément les candidatures en vivier rattachées aux domaines de la direction spécifiée (`whereHas('domaine', fn($s) => $s->where('id_direction', $dirId))`).
+     - Dans [`app/Services/VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php) et [`app/Http/Resources/VivierResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/VivierResource.php) :
+       - Ajout du champ `poste_souhaite` pour un affichage complet des contextes de candidatures spontanées ou archivées en vivier.
+  2. **Frontend React** :
+     - Dans [`src/pages/CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) :
+       - Ajout du bouton d'action stylisé **« Vivier (X) »** (avec icône `BookmarkCheck`, compteur dynamique et état actif vert émeraude) immédiatement à côté du bouton « Masquer candidats » lorsque l'offre est dépliée.
+       - Ajout d'onglets de navigation intégrés au volet déplié de l'offre :
+         - Onglet 1 : **« Candidatures sur l'offre (X) »** (affiche les postulants directs).
+         - Onglet 2 : **« Candidatures en vivier (Direction) (Y) »** (affiche les profils du vivier rattachés par domaine).
+       - Le clic sur le bouton « Vivier » bascule instantanément l'affichage sur la liste des candidats du vivier de cette direction.
+       - Table dédiée pour le vivier affichant : Candidat (nom, email, tel), Domaine rattaché, Poste souhaité / Contexte, Date vivier, Statut et bouton d'action **« Consulter dossier »** ouvrant la fiche détaillée `CandidatureDetailView`.
+       - Prise en compte de la recherche `filters.q` sur la liste des candidats du vivier.
+  3. **Validation & Tests** :
+     - Build Vite exécuté avec succès (`npm run build` en 1.10s, 0 erreur).
 
 
 
@@ -1022,5 +1092,49 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 
 
+
+
+
+
+---
+
+### Demande 89 : Correction des Erreurs React Hooks et Google Analytics trackDownload
+- **Erreurs rencontrees :**
+  1. Rendered fewer hooks than expected dans CandidaturesOffresView lors du clic sur Consulter dossier.
+  2. Cannot read properties of undefined (reading trackDownload) provenant du script legacy Drupal.
+- **Causes identifiees :**
+  1. Le retour anticipe if (selectedCandidatureId) dans CandidaturesOffresView etait situe avant les hooks useCallback et useEffect du Vivier, violant les regles React Hooks.
+  2. Le script Drupal cherchait a acceder a drupalSettings.google_analytics qui etait non defini.
+- **Resolution :**
+  1. Deplacement du retour anticipe a la fin du composant, strictement apres tous les hooks.
+  2. Initialisation de window.drupalSettings.google_analytics et window.gtag dans index.html.
+  3. Validation : Build Vite execute avec succes (0 erreur).
+
+---
+
+### Demande 90 : Évolution du Filtrage Vivier par Direction & Harmonisation Universelle des Modales CRUD
+1. **Évolution du Filtrage Vivier ([EloquentVivierRepository.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php))** :
+   - Mise à jour de la requête `getCandidaturesEnVivier` et `getVivierEntries` lors du filtrage d'une offre/direction (`domaine_direction_only`) :
+     - Si la candidature a un domaine rattaché (`id_domaine` non nul), la direction de son domaine est prise en compte (`domaine.id_direction == $dirId`).
+     - Si la candidature n'a pas de domaine (`id_domaine` nul), vérification de la direction de l'offre à laquelle elle est rattachée (`offre.id_direction == $dirId`).
+2. **Correction du Bug d'Affichage & Flou Décentré sous Zoom 80% ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Diagnostic** : La règle `body.in-backoffice { zoom: 0.8; }` réduisait la grille de calcul du viewport de `position: fixed` à 80% depuis le coin supérieur gauche (`100vw * 0.8 = 80vw`, `100vh * 0.8 = 80vh`), limitant le fond flou au quart haut-gauche et excentrant les fenêtres modales.
+   - **Correction CSS Universelle** : Application de `calc(100vw / 0.8)` (`125vw`) et `calc(100vh / 0.8)` (`125vh`) sur `.modal-backdrop`, `.modal-overlay` et `.drawer-overlay` sous `body.in-backoffice`, restaurant un recouvrement 100% physique plein écran et un alignement `flex` parfaitement centré au milieu de la vue.
+3. **Harmonisation Globale des Modales CRUD ([CompetenceModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/CompetenceModal.jsx), [DirectionModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/DirectionModal.jsx), [DomaineModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/DomaineModal.jsx), [SaisirRhCandidatureModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/SaisirRhCandidatureModal.jsx), [VivierView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx))** :
+   - Migration de toutes les modales vers `createPortal(..., document.body)` afin d'éviter tout conflit de superposition ou de conteneur父.
+   - Design unifié : badge d'icône violet/indigo arrondi (`40x40px`, fond `#ede9fe`), typographie soignée (`.modal-title`, `.modal-subtitle`), boutons d'actions alignés (`.modal-submit-btn` avec dégradé et ombre, `.ghost-button`), bandeau d'erreur compact et gestion de la touche Échap (`Escape`).
+4. **Validation & Tests** :
+   - Build Vite exécuté avec succès (`npm run build` en 1.15s, 0 erreur).
+   - Contrôle syntaxique PHP (`php -l EloquentVivierRepository.php` : OK).
+
+---
+
+### Demande 91 : Exclusion Git du venv Python et Cache OCR
+1. **Configuration Git Ignore** :
+   - Création de [`code_source/ocr/.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/.gitignore) et du fichier racine [`.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/.gitignore).
+   - Exclusion de `venv/`, `.venv/`, `env/`, des caches Python `__pycache__/` et des artefacts de compilation `*.pyc`.
+2. **Validation** :
+   - Commande `git check-ignore -v code_source/ocr/venv/` vérifiée avec succès.
+   - Les dossiers virtuels et fichiers compilés ne figurent plus dans les fichiers non suivis de Git.
 
 
