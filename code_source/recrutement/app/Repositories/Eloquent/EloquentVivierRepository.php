@@ -182,4 +182,10 @@ class EloquentVivierRepository implements VivierRepositoryInterface
             $attributes
         );
     }
+
+    public function updateExtractionOcr(CvExtractionOcr $extraction, array $attributes): CvExtractionOcr
+    {
+        $extraction->update($attributes);
+        return $extraction;
+    }
 }

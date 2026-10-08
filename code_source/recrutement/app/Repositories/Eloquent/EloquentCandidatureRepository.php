@@ -70,7 +70,7 @@ class EloquentCandidatureRepository implements CandidatureRepositoryInterface
         if (!empty($relations)) {
             $query->with($relations);
         } else {
-            $query->with(['candidat', 'offre.direction', 'domaine.direction', 'typeDemande', 'statut', 'documents', 'historique.statut', 'historique.utilisateur']);
+            $query->with(['candidat', 'offre.direction', 'domaine.direction', 'typeDemande', 'statut', 'documents', 'cvExtractionOcr', 'historique.statut', 'historique.utilisateur']);
         }
 
         return $query->findOrFail($id);

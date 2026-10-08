@@ -3,50 +3,33 @@
 namespace Tests\Unit;
 
 use App\Http\Controllers\Api\DashboardController;
-use Illuminate\Support\Facades\Schema;
+use App\Services\DashboardService;
+use Illuminate\Http\Request;
 use Tests\TestCase;
 
 class DashboardControllerTest extends TestCase
 {
-    public function test_recent_offers_are_not_loaded_when_a_related_table_is_missing(): void
+    public function test_dashboard_controller_returns_service_data(): void
     {
-        Schema::shouldReceive('hasTable')
-            ->once()
-            ->with('offre')
-            ->andReturnTrue();
-        Schema::shouldReceive('hasTable')
-            ->once()
-            ->with('direction')
-            ->andReturnFalse();
+        $service = $this->createMock(DashboardService::class);
+        $service->expects($this->once())
+            ->method('getDashboardData')
+            ->willReturn([
+                'kpis' => [
+                    'candidatures_sur_offre' => 5,
+                    'candidatures_spontanees' => 2,
+                    'offres_total' => 10,
+                    'offres_publiees' => 7,
+                    'domaines_en_attente' => 1,
+                ],
+                'offres_recentes' => [],
+            ]);
 
-        $controller = new class extends DashboardController
-        {
-            public function canLoadRecentOffersForTest(): bool
-            {
-                return $this->canLoadRecentOffers();
-            }
-        };
+        $controller = new DashboardController($service);
+        $response = $controller(new Request());
 
-        $this->assertFalse($controller->canLoadRecentOffersForTest());
-    }
-
-    public function test_recent_offers_can_be_loaded_when_all_required_tables_exist(): void
-    {
-        foreach (['offre', 'direction', 'statut_offre', 'type_contrat'] as $table) {
-            Schema::shouldReceive('hasTable')
-                ->once()
-                ->with($table)
-                ->andReturnTrue();
-        }
-
-        $controller = new class extends DashboardController
-        {
-            public function canLoadRecentOffersForTest(): bool
-            {
-                return $this->canLoadRecentOffers();
-            }
-        };
-
-        $this->assertTrue($controller->canLoadRecentOffersForTest());
+        $this->assertEquals(200, $response->getStatusCode());
+        $data = $response->getData(true);
+        $this->assertEquals(5, $data['data']['kpis']['candidatures_sur_offre']);
     }
 }

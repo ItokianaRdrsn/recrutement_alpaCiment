@@ -81,7 +81,23 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                         </td>
                                     ) : null}
                                     <td>
-                                        <strong>{offre.titre_poste}</strong>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                            {offre.reference && (
+                                                <span style={{
+                                                    fontSize: '0.72rem',
+                                                    fontWeight: 700,
+                                                    padding: '2px 7px',
+                                                    borderRadius: '4px',
+                                                    background: '#e0f2fe',
+                                                    color: '#0369a1',
+                                                    border: '1px solid #bae6fd',
+                                                    letterSpacing: '0.5px'
+                                                }}>
+                                                    {offre.reference}
+                                                </span>
+                                            )}
+                                            <strong>{offre.titre_poste}</strong>
+                                        </div>
                                         <span>{offre.lieu ?? '-'}</span>
                                     </td>
                                     <td>{offre.direction?.nom ?? '-'}</td>

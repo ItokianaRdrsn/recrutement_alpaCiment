@@ -14,6 +14,7 @@ class OffreResource extends JsonResource
     {
         return [
             'id' => $this->id_offre,
+            'reference' => $this->reference,
             'slug' => \Illuminate\Support\Str::slug($this->titre_poste),
             'titre_poste' => $this->titre_poste,
             'description' => $this->description,
@@ -25,6 +26,7 @@ class OffreResource extends JsonResource
             'direction' => $this->whenLoaded('direction', fn () => [
                 'id' => $this->direction->id_direction,
                 'nom' => $this->direction->nom_direction,
+                'alias' => $this->direction->alias,
             ]),
             'statut' => $this->whenLoaded('statut', fn () => [
                 'id' => $this->statut->id_statut_offre,

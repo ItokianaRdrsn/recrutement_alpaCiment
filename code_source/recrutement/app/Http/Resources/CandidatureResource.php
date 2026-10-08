@@ -34,6 +34,7 @@ class CandidatureResource extends JsonResource
             'typeDemande' => $this->whenLoaded('typeDemande'),
             'statut' => $this->whenLoaded('statut'),
             'documents' => $this->whenLoaded('documents'),
+            'cv_extraction_ocr' => $this->whenLoaded('cvExtractionOcr'),
             'historique' => $this->whenLoaded('historique'),
         ];
     }

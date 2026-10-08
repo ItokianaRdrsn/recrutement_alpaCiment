@@ -1137,4 +1137,43 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Commande `git check-ignore -v code_source/ocr/venv/` vérifiée avec succès.
    - Les dossiers virtuels et fichiers compilés ne figurent plus dans les fichiers non suivis de Git.
 
+---
+
+### Demande 92 : Simplification Pure OCR (Retrait du Référentiel et des Compétences Fictives)
+1. **Contexte & Spécification** :
+   - L'utilisateur souhaite que le microservice OCR et la chaîne d'extraction réalisent uniquement l'extraction de texte brute du CV (OCR pur via PaddleOCR et PyPDF), sans référentiel de compétences ni données simulées.
+2. **Implémentation** :
+   - **FastAPI ([main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py))** :
+     - Retrait du paramètre de formulaire `referentiel_competences` et de la désérialisation JSON.
+     - Suppression des anciens modèles de compétences et expériences mockées en dur.
+     - L'endpoint `/extract-cv` renvoie directement le texte brut extrait (`texte_brut_ocr` et `donnees_json: {"texte_brut": raw_text}`).
+   - **Laravel Backend ([VivierService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php))** :
+     - Nettoyage du fallback pour n'enregistrer que le texte OCR brut sans injecter de compétences ou expériences simulées.
+3. **Validation & Tests** :
+   - Test d'extraction d'image CV via `TestClient` FastAPI : Code `200 OK`, retour du texte brut fidèle (`texte_brut_ocr`).
+   - Contrôle syntaxique PHP (`php -l VivierService.php` : OK).
+
+---
+
+### Demande 93 : Architecture Modulaire OCR / NER et Intégration LLM Local (Ollama + Mistral 7B)
+1. **Contexte & Spécification** :
+   - Découplage complet des responsabilités du microservice de parsing CV.
+   - Intégration d'un grand modèle de langage local (LLM) sous Ollama (Mistral 7B) pour la reconnaissance des entités nommées (NER) et la structuration JSON de haute fidélité.
+2. **Implémentation Réalisée** :
+   - **Extraction OCR Isolée ([cv_ocr_extractor.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_ocr_extractor.py))** :
+     - Module dédié à l'extraction de texte brut via PaddleOCR (images/scans) et PyPDF (PDFs texte).
+     - Gestion des variables anti-conflits CPU oneDNN pour Windows.
+   - **Structuration NER par LLM Local ([cv_llm_parser.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py))** :
+     - Module dédié à l'appel de l'API locale Ollama (`http://127.0.0.1:11434/api/generate`) avec `model: "mistral"` et `format: "json"`.
+     - Prompting système strict pour extraire le contact (nom, email, tel, ville), les compétences individuelles réelles avec niveau, les expériences et les formations.
+     - Mode dégradé sécurisé en cas d'indisponibilité du serveur Ollama.
+   - **Point d'Entrée FastAPI Orchestrateur ([main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py))** :
+     - Contrôleur épuré orchestrant les deux modules : OCR $\rightarrow$ NER LLM $\rightarrow$ Réponse JSON.
+     - Endpoint `/health` enrichi indiquant la connectivité de PaddleOCR, PyPDF et Ollama Mistral.
+3. **Validation & Tests** :
+   - Test unitaire `/health` : `200 OK`, `ollama_connected: true`, `paddle_ocr_installed: true`.
+   - Test d'inférence en conditions réelles sur un CV complet : extraction et structuration JSON parfaites sans hallucination (`source_parsing: ollama_mistral`).
+
+
+
 
