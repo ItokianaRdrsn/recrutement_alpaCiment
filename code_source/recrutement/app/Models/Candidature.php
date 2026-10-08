@@ -86,6 +86,11 @@ class Candidature extends Model
         return $this->hasMany(Document::class, 'id_candidature', 'id_candidature');
     }
 
+    public function cvExtractionOcr(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(CvExtractionOcr::class, 'id_candidature', 'id_candidature')->latest('id_extraction');
+    }
+
     public function historique(): HasMany
     {
         return $this->hasMany(HistoriqueStatut::class, 'id_candidature', 'id_candidature')->orderBy('created_at', 'desc');

@@ -1,0 +1,266 @@
+{
+  "name": "Projet Test - Triage Candidats AlpA Ciment (FastAPI)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "node-trigger",
+      "name": "Déclenchement Manuel",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://host.docker.internal:8000/api/candidats/en-attente",
+        "options": {}
+      },
+      "id": "node-get-candidates",
+      "name": "1. Récupérer Candidats en Attente",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/evaluer-candidat",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "node-eval-fastapi",
+      "name": "2. Évaluer Candidat (FastAPI)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-retenu",
+              "leftValue": "={{ $json.decision }}",
+              "rightValue": "RETENU",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "node-if-decision",
+      "name": "3. Retenu (Score >= 70) ?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        940,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:8000/api/candidats/{{ $json.candidat_id }}/statut",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"nouveau_statut\": \"RETENU_POUR_ENTRETIEN\",\n  \"remarque\": \"Qualification automatique via n8n (Score: {{ $json.score_global }}/100)\"\n}",
+        "options": {}
+      },
+      "id": "node-statut-retenu",
+      "name": "4A. Statut RETENU",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/notifications/envoyer",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"destinataire_email\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.email }}\",\n  \"destinataire_nom\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}\",\n  \"objet\": \"Convocation entretien - AlpA Ciment\",\n  \"contenu\": \"Bonjour {{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}, votre candidature pour {{ $('2. Évaluer Candidat (FastAPI)').item.json.poste }} a été retenue.\",\n  \"type_notification\": \"CONVOCATION_ENTRETIEN\"\n}",
+        "options": {}
+      },
+      "id": "node-email-convoc",
+      "name": "5A. Simuler Convocation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:8000/api/candidats/{{ $json.candidat_id }}/statut",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"nouveau_statut\": \"REFUSE\",\n  \"remarque\": \"Non retenu par filtre automatique : {{ $json.motif }}\"\n}",
+        "options": {}
+      },
+      "id": "node-statut-refuse",
+      "name": "4B. Statut REFUSE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1220,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/notifications/envoyer",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"destinataire_email\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.email }}\",\n  \"destinataire_nom\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}\",\n  \"objet\": \"Information candidature - AlpA Ciment\",\n  \"contenu\": \"Bonjour {{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}, nous vous remercions pour votre intérêt. Votre profil n'a pas été retenu pour le poste de {{ $('2. Évaluer Candidat (FastAPI)').item.json.poste }}.\",\n  \"type_notification\": \"REJET\"\n}",
+        "options": {}
+      },
+      "id": "node-email-rejet",
+      "name": "5B. Simuler Mail Rejet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1460,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Synthèse finale en JavaScript\nconst items = $input.all();\nreturn [{\n  json: {\n    date_execution: new Date().toISOString(),\n    total_notifications_envoyees: items.length,\n    statut_workflow: \"Succès\"\n  }\n}];"
+      },
+      "id": "node-code-synthese",
+      "name": "6. Code JS - Synthèse",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Déclenchement Manuel": {
+      "main": [
+        [
+          {
+            "node": "1. Récupérer Candidats en Attente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Récupérer Candidats en Attente": {
+      "main": [
+        [
+          {
+            "node": "2. Évaluer Candidat (FastAPI)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Évaluer Candidat (FastAPI)": {
+      "main": [
+        [
+          {
+            "node": "3. Retenu (Score >= 70) ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Retenu (Score >= 70) ?": {
+      "main": [
+        [
+          {
+            "node": "4A. Statut RETENU",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "4B. Statut REFUSE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4A. Statut RETENU": {
+      "main": [
+        [
+          {
+            "node": "5A. Simuler Convocation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5A. Simuler Convocation": {
+      "main": [
+        [
+          {
+            "node": "6. Code JS - Synthèse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4B. Statut REFUSE": {
+      "main": [
+        [
+          {
+            "node": "5B. Simuler Mail Rejet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5B. Simuler Mail Rejet": {
+      "main": [
+        [
+          {
+            "node": "6. Code JS - Synthèse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

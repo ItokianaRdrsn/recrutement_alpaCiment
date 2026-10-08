@@ -19,6 +19,7 @@ class Offre extends Model
      */
     protected $fillable = [
         'titre_poste',
+        'reference',
         'id_direction',
         'description',
         'id_lieu',
@@ -28,6 +29,17 @@ class Offre extends Model
         'date_limite',
         'id_statut_offre',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (Offre $offre) {
+            if (empty($offre->reference)) {
+                $alias = $offre->direction?->alias ?? 'REF';
+                $offre->reference = strtoupper(trim($alias)) . '-' . $offre->id_offre;
+                $offre->saveQuietly();
+            }
+        });
+    }
 
     protected function casts(): array
     {
@@ -81,5 +93,10 @@ class Offre extends Model
     {
         return $this->belongsToMany(Competence::class, 'profil_competence', 'id_offre', 'id_competence')
             ->withPivot('niveau_requis');
+    }
+
+    public function candidatures(): HasMany
+    {
+        return $this->hasMany(Candidature::class, 'id_offre', 'id_offre');
     }
 }

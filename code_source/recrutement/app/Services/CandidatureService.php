@@ -158,19 +158,47 @@ class CandidatureService
     public function importExternalCandidature(array $data, $request): Candidature
     {
         return DB::transaction(function () use ($data, $request) {
+            // Extraction robuste du nom et prénom (soit fournis, soit déduits de nom_complet, soit de l'email)
+            $nom = trim($data['nom'] ?? '');
+            $prenom = trim($data['prenom'] ?? '');
+            if (empty($nom) && !empty($data['nom_complet'])) {
+                $parts = explode(' ', trim($data['nom_complet']), 2);
+                $nom = $parts[0] ?? 'Candidat';
+                $prenom = $parts[1] ?? '';
+            }
+            if (empty($nom)) {
+                $nom = explode('@', $data['email'])[0];
+            }
+
             $candidat = $this->candidatRepository->firstOrCreate(
                 ['email' => strtolower(trim($data['email']))],
                 [
-                    'nom' => trim($data['nom']),
-                    'prenom' => trim($data['prenom']),
+                    'nom' => $nom,
+                    'prenom' => $prenom ?: null,
                     'telephone' => $data['telephone'] ?? null,
                 ]
             );
 
             $recueStatusId = $this->candidatureRepository->getStatusIdByLibelle(['Reçue', 'Recue']);
-            $typeDemandeId = !empty($data['id_offre'])
-                ? $this->candidatureRepository->getTypeDemandeIdByLibelle('Offre')
-                : $this->candidatureRepository->getTypeDemandeIdByLibelle('Spontanee');
+            
+            // Résolution du type de demande (priorité à ce qui est envoyé par le switch n8n ou déduit de l'offre)
+            if (!empty($data['id_type_demande'])) {
+                $typeDemandeId = (int) $data['id_type_demande'];
+            } elseif (!empty($data['type_demande'])) {
+                $tdLower = strtolower(trim($data['type_demande']));
+                if (str_contains($tdLower, 'offre') || $tdLower === '1') {
+                    $typeDemandeId = $this->candidatureRepository->getTypeDemandeIdByLibelle('Offre');
+                } else {
+                    $typeDemandeId = $this->candidatureRepository->getTypeDemandeIdByLibelle('Spontanee');
+                }
+            } else {
+                $typeDemandeId = !empty($data['id_offre'])
+                    ? $this->candidatureRepository->getTypeDemandeIdByLibelle('Offre')
+                    : $this->candidatureRepository->getTypeDemandeIdByLibelle('Spontanee');
+            }
+
+            $offreIdTypeDemande = $this->candidatureRepository->getTypeDemandeIdByLibelle('Offre');
+            $isOffre = ($typeDemandeId === $offreIdTypeDemande) || !empty($data['id_offre']);
 
             $candidature = $this->candidatureRepository->create([
                 'id_candidat' => $candidat->id_candidat,
@@ -178,7 +206,7 @@ class CandidatureService
                 'id_offre' => $data['id_offre'] ?? null,
                 'id_domaine' => $data['id_domaine'] ?? null,
                 'id_statut_candidature' => $recueStatusId,
-                'dans_vivier' => empty($data['id_offre']),
+                'dans_vivier' => empty($data['id_offre']) && !$isOffre,
                 'poste_souhaite' => $data['poste_souhaite'] ?? null,
                 'message' => $data['message_motivation'] ?? null,
                 'canal_depot' => 'site_externe',
@@ -189,11 +217,32 @@ class CandidatureService
                 'id_candidature' => $candidature->id_candidature,
                 'id_statut_candidature' => $recueStatusId,
                 'date_changement' => now(),
-                'commentaire' => 'Réception et importation automatique depuis ' . ($data['source'] ?? 'e-mail / site externe'),
+                'commentaire' => 'Réception et importation automatique depuis ' . ($data['source'] ?? 'e-mail / n8n'),
                 'id_utilisateur' => null,
             ]);
 
-            $this->storeFiles($candidature, $request, 'import_externe');
+            $this->storeFiles($candidature, $request, 'import_externe', $data);
+
+            // Enregistrement direct des données OCR & NER extraites si transmises
+            if (!empty($data['donnees_json']) || !empty($data['texte_brut_ocr'])) {
+                $donneesJson = $data['donnees_json'];
+                if (is_string($donneesJson)) {
+                    $donneesJson = json_decode($donneesJson, true);
+                }
+
+                // 1. Sauvegarde dans cv_extraction_ocr
+                \App\Models\CvExtractionOcr::create([
+                    'id_candidature' => $candidature->id_candidature,
+                    'texte_brut_ocr' => $data['texte_brut_ocr'] ?? null,
+                    'donnees_json' => $donneesJson,
+                    'statut_validation' => 'valide',
+                ]);
+
+                // 2. Insertion directe dans les tables de profil (compétences, expériences, formations)
+                if (is_array($donneesJson)) {
+                    $this->insertExtractedProfileData($candidature->id_candidature, $donneesJson);
+                }
+            }
 
             return $candidature->load(['candidat', 'offre', 'statut']);
         });
@@ -318,9 +367,10 @@ class CandidatureService
         return $this->candidatureRepository->getStatuts();
     }
 
-    protected function storeFiles(Candidature $candidature, $request, string $sourceSuffix): void
+    protected function storeFiles(Candidature $candidature, $request, string $sourceSuffix, array $data = []): void
     {
-        if ($request->hasFile('cv')) {
+        // 1. Upload de fichier binaire classique (Multipart Form-Data)
+        if ($request && method_exists($request, 'hasFile') && $request->hasFile('cv')) {
             $file = $request->file('cv');
             $path = $file->store('documents/cv', 'public');
             $this->candidatureRepository->createDocument([
@@ -332,6 +382,51 @@ class CandidatureService
                 'mime_type' => $file->getClientMimeType(),
                 'description' => 'Curriculum Vitae' . ($sourceSuffix !== 'site_externe' ? " ($sourceSuffix)" : ''),
             ]);
+        }
+        // 2. Upload Base64 (idéal pour n8n en mode JSON 'Using fields below')
+        else {
+            $base64 = ($request && method_exists($request, 'input')) ? $request->input('cv_base64') : null;
+            if (!$base64 && !empty($data['cv_base64'])) {
+                $base64 = $data['cv_base64'];
+            }
+
+            if (!empty($base64)) {
+                try {
+                    // Supprimer un préfixe data:application/pdf;base64,... éventuel
+                    if (str_contains($base64, ';base64,')) {
+                        $parts = explode(';base64,', $base64);
+                        $base64 = end($parts);
+                    }
+
+                    $nomFichier = ($request && method_exists($request, 'input')) ? $request->input('cv_nom') : null;
+                    if (!$nomFichier && !empty($data['cv_nom'])) {
+                        $nomFichier = $data['cv_nom'];
+                    }
+                    $filename = $nomFichier ?: ('cv_' . $candidature->id_candidature . '.pdf');
+
+                    $mimeType = ($request && method_exists($request, 'input')) ? $request->input('cv_mime') : null;
+                    if (!$mimeType && !empty($data['cv_mime'])) {
+                        $mimeType = $data['cv_mime'];
+                    }
+                    $mimeType = $mimeType ?: 'application/pdf';
+
+                    $decoded = base64_decode($base64);
+                    $path = 'documents/cv/' . uniqid() . '_' . $filename;
+                    \Illuminate\Support\Facades\Storage::disk('public')->put($path, $decoded);
+
+                    $this->candidatureRepository->createDocument([
+                        'id_candidature' => $candidature->id_candidature,
+                        'type_document' => 'CV',
+                        'nom_fichier' => $filename,
+                        'chemin_fichier' => $path,
+                        'taille_octets' => strlen($decoded),
+                        'mime_type' => $mimeType,
+                        'description' => 'Curriculum Vitae (Import JSON n8n)',
+                    ]);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::warning("Erreur stockage cv_base64 : " . $e->getMessage());
+                }
+            }
         }
 
         if ($request->hasFile('photo')) {
@@ -362,5 +457,106 @@ class CandidatureService
                 ]);
             }
         }
+    }
+
+    /**
+     * Insère directement les compétences, expériences et formations extraites dans le profil du candidat.
+     */
+    protected function insertExtractedProfileData(int $idCandidature, array $donneesJson): void
+    {
+        // 1. Compétences
+        if (!empty($donneesJson['competences']) && is_array($donneesJson['competences'])) {
+            foreach ($donneesJson['competences'] as $comp) {
+                if (empty($comp['nom'])) continue;
+                $compModel = \App\Models\Competence::firstOrCreate(
+                    ['nom_competence' => trim($comp['nom'])],
+                    ['id_type_competence' => 1]
+                );
+
+                \Illuminate\Support\Facades\DB::table('candidat_competence')->updateOrInsert(
+                    [
+                        'id_candidature' => $idCandidature,
+                        'id_competence' => $compModel->id_competence,
+                    ],
+                    [
+                        'niveau' => $comp['niveau'] ?? 'Intermédiaire',
+                        'valide' => true,
+                        'source' => 'cv_ocr',
+                        'score_confiance' => 0.95,
+                    ]
+                );
+            }
+        }
+
+        // 2. Expériences
+        if (!empty($donneesJson['experiences']) && is_array($donneesJson['experiences'])) {
+            foreach ($donneesJson['experiences'] as $exp) {
+                $posteTitle = trim($exp['poste'] ?? $exp['intitule_poste'] ?? 'Poste non spécifié');
+                $dateDebut = $this->parseDateSafely($exp['date_debut'] ?? null);
+                $dateFin = $this->parseDateSafely($exp['date_fin'] ?? null);
+                $posteActuel = false;
+
+                if (!empty($exp['date_fin'])) {
+                    $dfLower = strtolower(trim($exp['date_fin']));
+                    if (str_contains($dfLower, 'présent') || str_contains($dfLower, 'present') || str_contains($dfLower, 'cours')) {
+                        $posteActuel = true;
+                    }
+                }
+
+                \App\Models\CandidatExperience::create([
+                    'id_candidature' => $idCandidature,
+                    'poste' => $posteTitle,
+                    'entreprise' => $exp['entreprise'] ?? null,
+                    'date_debut' => $dateDebut,
+                    'date_fin' => $dateFin,
+                    'poste_actuel' => $posteActuel,
+                    'description' => $exp['description'] ?? null,
+                    'valide' => true,
+                    'source' => 'cv_ocr',
+                ]);
+            }
+        }
+
+        // 3. Formations
+        if (!empty($donneesJson['formations']) && is_array($donneesJson['formations'])) {
+            foreach ($donneesJson['formations'] as $form) {
+                if (empty($form['diplome'])) continue;
+                $dateObt = $this->parseDateSafely($form['date_obtention'] ?? $form['annee_obtention'] ?? null);
+
+                \App\Models\CandidatFormation::create([
+                    'id_candidature' => $idCandidature,
+                    'diplome' => $form['diplome'],
+                    'etablissement' => $form['etablissement'] ?? null,
+                    'domaine_etude' => $form['domaine_etude'] ?? null,
+                    'date_obtention' => $dateObt,
+                    'valide' => true,
+                    'source' => 'cv_ocr',
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Analyse et convertit une chaîne de date en format ISO Y-m-d sécurisé pour PostgreSQL.
+     */
+    protected function parseDateSafely(?string $val): ?string
+    {
+        if (empty($val)) return null;
+        $val = trim($val);
+        $lower = strtolower($val);
+        if (str_contains($lower, 'présent') || str_contains($lower, 'present') || str_contains($lower, 'cours')) {
+            return null;
+        }
+        if (preg_match('/^\d{4}$/', $val)) {
+            return $val . '-01-01';
+        }
+        if (preg_match('/^\d{4}-\d{2}$/', $val)) {
+            return $val . '-01';
+        }
+        $ts = strtotime($val);
+        if ($ts && $ts > 0) {
+            return date('Y-m-d', $ts);
+        }
+        return null;
     }
 }

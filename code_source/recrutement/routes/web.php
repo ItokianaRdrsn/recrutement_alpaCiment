@@ -17,7 +17,10 @@ Route::get('/storage/{path}', function (string $path) {
     if (!file_exists($fullPath)) {
         abort(404, 'Fichier introuvable');
     }
-    return response()->file($fullPath);
+    return response()->file($fullPath, [
+        'Access-Control-Allow-Origin' => '*',
+        'Content-Disposition' => 'inline',
+    ]);
 })->where('path', '.*')->name('storage.local');
 
 Route::middleware(['auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {

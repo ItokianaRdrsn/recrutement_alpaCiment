@@ -37,6 +37,7 @@ class VivierService
                 'direction' => $cand->direction ?? $cand->offre?->direction ?? $cand->domaine?->direction,
                 'domaine' => $cand->domaine,
                 'motif_ajout' => $cand->offre ? 'Mis en vivier RH (Candidature sur offre)' : 'Candidature spontanée (En vivier par défaut)',
+                'poste_souhaite' => $cand->poste_souhaite ?? null,
                 'statut' => 'Actif',
                 'created_at' => $cand->created_at,
             ]);
@@ -194,7 +195,7 @@ class VivierService
             if ($cvDocument && file_exists(storage_path('app/public/' . $cvDocument->chemin_fichier))) {
                 $filePath = storage_path('app/public/' . $cvDocument->chemin_fichier);
 
-                $response = Http::timeout(5)
+                $response = Http::timeout(60)
                     ->attach('file', file_get_contents($filePath), $cvDocument->nom_fichier)
                     ->post('http://127.0.0.1:8001/extract-cv', [
                         'candidature_id' => $idCandidature,
@@ -211,36 +212,14 @@ class VivierService
         }
 
         if (!$extractedData) {
-            $rawText = 'Texte OCR extrait pour le candidat ' . $candidature->candidat->nom . ' ' . $candidature->candidat->prenom;
+            $rawText = 'Texte OCR non extrait pour le candidat ' . $candidature->candidat->nom . ' ' . $candidature->candidat->prenom;
             $extractedData = [
-                'competences' => [
-                    ['nom' => 'PHP / Laravel', 'niveau' => 'Avancé'],
-                    ['nom' => 'React.js', 'niveau' => 'Intermédiaire'],
-                    ['nom' => 'PostgreSQL', 'niveau' => 'Avancé'],
-                    ['nom' => 'Gestion de projet', 'niveau' => 'Intermédiaire'],
-                ],
-                'experiences' => [
-                    [
-                        'poste' => 'Développeur Fullstack Web',
-                        'entreprise' => 'Alpha Ciment Services',
-                        'date_debut' => '2023-01-01',
-                        'date_fin' => '2025-12-31',
-                        'description' => 'Développement d’applications web complexes et APIs RESTful.',
-                    ],
-                ],
-                'formations' => [
-                    [
-                        'diplome' => 'Master 2 Génie Logiciel',
-                        'etablissement' => 'Université d’Antananarivo / ITU',
-                        'annee_obtention' => 2022,
-                        'domaine_etude' => 'Informatique',
-                    ],
-                ],
+                'texte_brut' => $rawText,
             ];
         }
 
         return $this->vivierRepository->updateOrCreateExtractionOcr($idCandidature, [
-            'texte_brut_ocr' => $rawText ?? ('PaddleOCR Raw Text: CV ' . $candidature->candidat->nom . ' ' . $candidature->candidat->prenom . ' - Développeur Informatique M2 Software Engineering.'),
+            'texte_brut_ocr' => $rawText,
             'donnees_json' => $extractedData,
             'statut_validation' => 'en_attente',
         ]);
@@ -253,7 +232,7 @@ class VivierService
             abort(404, 'Extraction OCR introuvable.');
         }
 
-        $extraction->update([
+        $extraction = $this->vivierRepository->updateExtractionOcr($extraction, [
             'statut_validation' => $data['statut_validation'],
             'commentaire_rh' => $data['commentaire_rh'] ?? null,
         ]);

@@ -18,6 +18,7 @@ class Direction extends Model
      */
     protected $fillable = [
         'nom_direction',
+        'alias',
     ];
 
     public function domaines(): HasMany

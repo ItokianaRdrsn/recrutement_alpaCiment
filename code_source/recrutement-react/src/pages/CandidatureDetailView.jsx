@@ -41,6 +41,8 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const [ocrExtracting, setOcrExtracting] = useState(false);
     const [ocrData, setOcrData] = useState(null);
     const [ocrSuccessMsg, setOcrSuccessMsg] = useState('');
+    const [ocrCommentaireRh, setOcrCommentaireRh] = useState('');
+    const [isEditingOcr, setIsEditingOcr] = useState(false);
     const [statusSuccessMsg, setStatusSuccessMsg] = useState('');
 
     // Profil candidat RH (Compétences, Expériences, Formations)
@@ -100,6 +102,20 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
             setDetails(data);
             if (data?.statut?.id_statut_candidature) {
                 setTargetStatusId(data.statut.id_statut_candidature);
+            }
+            if (data?.cv_extraction_ocr) {
+                setOcrData({
+                    texte_brut: data.cv_extraction_ocr.texte_brut_ocr,
+                    donnees_json: data.cv_extraction_ocr.donnees_json,
+                    competences: data.cv_extraction_ocr.donnees_json?.competences ?? [],
+                    experiences: data.cv_extraction_ocr.donnees_json?.experiences ?? [],
+                    formations: data.cv_extraction_ocr.donnees_json?.formations ?? [],
+                    contact: data.cv_extraction_ocr.donnees_json?.contact ?? null,
+                    profil: data.cv_extraction_ocr.donnees_json?.profil ?? null,
+                    statut_validation: data.cv_extraction_ocr.statut_validation ?? 'en_attente',
+                    commentaire_rh: data.cv_extraction_ocr.commentaire_rh ?? '',
+                });
+                setOcrCommentaireRh(data.cv_extraction_ocr.commentaire_rh ?? '');
             }
         } catch (err) {
             setError(err.message);
@@ -223,21 +239,58 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     async function handleValidateOcr(statusVal) {
         if (!ocrData) return;
         try {
-            await sendJson(`/api/candidature/${idCandidature}/ocr/validate`, {
+            setError('');
+            const res = await sendJson(`/api/candidature/${idCandidature}/ocr/validate`, {
                 body: {
                     statut_validation: statusVal,
+                    commentaire_rh: ocrCommentaireRh.trim() || null,
                     competences: ocrData.competences ?? [],
                     experiences: ocrData.experiences ?? [],
                     formations: ocrData.formations ?? [],
                 },
             });
-            setOcrSuccessMsg(`Données du CV ${statusVal === 'valide' ? 'validées' : statusVal} et enregistrées dans le profil candidat !`);
+            const actionLabel = statusVal === 'valide' 
+                ? 'validées et intégrées au profil' 
+                : statusVal === 'corrige' 
+                    ? 'corrigées et enregistrées' 
+                    : 'rejetées';
+            setOcrSuccessMsg(`Données du CV ${actionLabel} avec succès !`);
+            setIsEditingOcr(false);
+            setOcrData((prev) => ({
+                ...prev,
+                statut_validation: statusVal,
+                commentaire_rh: ocrCommentaireRh,
+            }));
             if (details?.id_candidat) {
                 await loadCandidateProfile(details.id_candidat);
             }
         } catch (err) {
             setError(err.message);
         }
+    }
+
+    function removeExtractedComp(index) {
+        setOcrData((prev) => {
+            const list = [...(prev.competences ?? [])];
+            list.splice(index, 1);
+            return { ...prev, competences: list };
+        });
+    }
+
+    function removeExtractedExp(index) {
+        setOcrData((prev) => {
+            const list = [...(prev.experiences ?? [])];
+            list.splice(index, 1);
+            return { ...prev, experiences: list };
+        });
+    }
+
+    function removeExtractedForm(index) {
+        setOcrData((prev) => {
+            const list = [...(prev.formations ?? [])];
+            list.splice(index, 1);
+            return { ...prev, formations: list };
+        });
     }
 
     async function handleStatusSubmit(e) {
@@ -654,20 +707,39 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                     {details.canal_depot === 'rh_manuel' ? 'Saisie Manuelle RH' : 'Portail Web'}
                                 </span>
                             </p>
-                            <p style={{ margin: '6px 0' }}>
-                                <strong>Poste / Domaine :</strong>{' '}
-                                {details.offre ? (
-                                    <strong style={{ color: 'var(--primary)' }}>Offre : {details.offre.titre_poste}</strong>
-                                ) : details.domaine && (details.domaine.valide === true || details.domaine.valide === 1) ? (
-                                    <strong>Domaine : {details.domaine.nom_domaine}</strong>
-                                ) : (
-                                    <span>Poste souhaité : {details.poste_souhaite ?? 'Non spécifié'} <span className="badge amber" style={{ marginLeft: '6px' }}>En attente de validation RH</span></span>
-                                )}
-                            </p>
-                            <p style={{ margin: '6px 0' }}>
-                                <strong>Direction de rattachement :</strong>{' '}
-                                {details.offre?.direction?.nom_direction ?? (details.domaine && (details.domaine.valide === true || details.domaine.valide === 1) ? details.domaine?.direction?.nom_direction : 'Non spécifiée (En attente de validation RH)')}
-                            </p>
+                            {details.offre ? (
+                                <>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Offre postulée :</strong>{' '}
+                                        <strong style={{ color: 'var(--primary)' }}>{details.offre.titre_poste}</strong>
+                                    </p>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Direction de rattachement :</strong>{' '}
+                                        {details.offre.direction?.nom_direction ?? 'Non spécifiée'}
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Poste souhaité :</strong>{' '}
+                                        <strong>{details.poste_souhaite ?? 'Non spécifié'}</strong>
+                                    </p>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Domaine :</strong>{' '}
+                                        {details.domaine && (details.domaine.valide === true || details.domaine.valide === 1) ? (
+                                            <span>{details.domaine.nom_domaine}</span>
+                                        ) : details.domaine?.nom_domaine ? (
+                                            <span>{details.domaine.nom_domaine} <span className="badge amber" style={{ marginLeft: '6px' }}>En attente de validation RH</span></span>
+                                        ) : (
+                                            <span>Non spécifié</span>
+                                        )}
+                                    </p>
+                                    <p style={{ margin: '6px 0' }}>
+                                        <strong>Direction suggérée :</strong>{' '}
+                                        {details.domaine?.direction?.nom_direction ?? details.direction?.nom_direction ?? 'Non spécifiée (En attente de validation RH)'}
+                                    </p>
+                                </>
+                            )}
                             <p style={{ margin: '6px 0' }}><strong>Date de dépôt :</strong> {formatDate(details.created_at)}</p>
 
                             <div style={{ marginTop: '16px' }}>
@@ -1118,48 +1190,197 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                         ) : null}
 
                         {ocrData ? (
-                            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gap: '12px' }}>
-                                <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--primary)' }}>Données reçues du Microservice FastAPI</h4>
+                            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)', display: 'grid', gap: '14px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <h4 style={{ margin: 0, fontSize: '14px', color: 'var(--primary)' }}>Données Extraites (PaddleOCR & LLM)</h4>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span className={`badge ${ocrData.statut_validation === 'valide' ? 'green' : ocrData.statut_validation === 'rejete' ? 'red' : ocrData.statut_validation === 'corrige' ? 'blue' : 'gray'}`}>
+                                            Statut : {ocrData.statut_validation === 'valide' ? 'Validé' : ocrData.statut_validation === 'corrige' ? 'Corrigé' : ocrData.statut_validation === 'rejete' ? 'Rejeté' : 'En attente'}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className="filter-button"
+                                            onClick={() => setIsEditingOcr(!isEditingOcr)}
+                                            style={{ fontSize: '12px', padding: '4px 10px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                        >
+                                            <Edit3 size={13} />
+                                            <span>{isEditingOcr ? 'Quitter correction' : 'Corriger les éléments'}</span>
+                                        </button>
+                                    </div>
+                                </div>
                                 
                                 {ocrData.texte_brut ? (
                                     <div>
                                         <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Texte Brut OCR Extrait :</strong>
-                                        <pre style={{ background: '#0f172a', color: '#38bdf8', padding: '12px', borderRadius: '6px', fontSize: '12px', whiteSpace: 'pre-wrap', maxHeight: '180px', overflowY: 'auto' }}>
+                                        <pre style={{ background: '#0f172a', color: '#38bdf8', padding: '12px', borderRadius: '6px', fontSize: '12px', whiteSpace: 'pre-wrap', maxHeight: '160px', overflowY: 'auto' }}>
                                             {ocrData.texte_brut}
                                         </pre>
                                     </div>
                                 ) : null}
 
+                                {ocrData.contact && (
+                                    <div style={{ background: '#eff6ff', padding: '12px 16px', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
+                                        <strong style={{ fontSize: '13px', color: '#1e40af', display: 'block', marginBottom: '6px' }}>Coordonnées extraites (NER) :</strong>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', fontSize: '12.5px', color: '#1e293b' }}>
+                                            {ocrData.contact.nom_complet && <div><strong>Nom :</strong> {ocrData.contact.nom_complet}</div>}
+                                            {ocrData.contact.email && <div><strong>Email :</strong> {ocrData.contact.email}</div>}
+                                            {ocrData.contact.telephone && <div><strong>Tél :</strong> {ocrData.contact.telephone}</div>}
+                                            {ocrData.contact.ville && <div><strong>Ville :</strong> {ocrData.contact.ville}</div>}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {ocrData.profil && (
+                                    <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '12.5px' }}>
+                                        <strong style={{ color: 'var(--primary)', display: 'block', marginBottom: '2px' }}>Profil / Résumé :</strong>
+                                        <p style={{ margin: 0, color: 'var(--text)', fontStyle: 'italic' }}>{ocrData.profil}</p>
+                                    </div>
+                                )}
+
                                 <div>
-                                    <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Données Structurées Extraites (JSON) :</strong>
-                                    <div style={{ display: 'grid', gap: '10px', fontSize: '13px', background: '#ffffff', padding: '12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                    <strong style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}>Données Structurées Extraites :</strong>
+                                    <div style={{ display: 'grid', gap: '12px', fontSize: '13px', background: '#ffffff', padding: '14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                         <div>
-                                            <strong>Compétences identifiées :</strong>
-                                            <div className="tags-list" style={{ marginTop: '4px' }}>
-                                                {(ocrData.donnees_json?.competences ?? ocrData.competences ?? []).map((c, i) => (
-                                                    <span key={i} className="badge green">{c.nom ?? c.nom_competence} ({c.niveau})</span>
+                                            <strong style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0f766e' }}>
+                                                <BookmarkCheck size={16} />
+                                                Compétences identifiées ({(ocrData.competences ?? []).length}) :
+                                            </strong>
+                                            <div className="tags-list" style={{ marginTop: '6px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                                {(ocrData.competences ?? []).map((c, i) => (
+                                                    <span key={i} className="badge green" style={{ padding: '4px 10px', fontSize: '12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                                                        <span>{c.nom ?? c.nom_competence}</span>
+                                                        {c.niveau ? <span style={{ opacity: 0.8 }}>• {c.niveau}</span> : null}
+                                                        {isEditingOcr && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeExtractedComp(i)}
+                                                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#b91c1c', padding: 0 }}
+                                                                title="Supprimer cette compétence"
+                                                            >
+                                                                <X size={12} />
+                                                            </button>
+                                                        )}
+                                                    </span>
                                                 ))}
                                             </div>
                                         </div>
 
-                                        <div>
-                                            <strong>Expériences identifiées :</strong>
-                                            <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                                {(ocrData.donnees_json?.experiences ?? ocrData.experiences ?? []).map((exp, i) => (
-                                                    <li key={i}><strong>{exp.poste ?? exp.intitule_poste}</strong> chez {exp.entreprise} ({exp.date_debut} à {exp.date_fin})</li>
+                                        <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                                            <strong style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1d4ed8' }}>
+                                                <BriefcaseBusiness size={16} />
+                                                Expériences identifiées ({(ocrData.experiences ?? []).length}) :
+                                            </strong>
+                                            <div style={{ display: 'grid', gap: '8px', marginTop: '6px' }}>
+                                                {(ocrData.experiences ?? []).map((exp, i) => (
+                                                    <div key={i} style={{ background: '#f8fafc', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <strong style={{ color: '#0f172a' }}>{exp.poste ?? exp.intitule_poste}</strong>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                <span style={{ fontSize: '11.5px', color: 'var(--muted)' }}>
+                                                                    {exp.date_debut || exp.date_fin ? `${exp.date_debut ?? '?'} → ${exp.date_fin ?? 'Présent'}` : ''}
+                                                                </span>
+                                                                {isEditingOcr && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeExtractedExp(i)}
+                                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#b91c1c' }}
+                                                                        title="Supprimer cette expérience"
+                                                                    >
+                                                                        <X size={14} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {exp.entreprise && <div style={{ fontSize: '12px', color: '#475569' }}>Entreprise / Organisation : {exp.entreprise}</div>}
+                                                        {exp.description && <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>{exp.description}</div>}
+                                                    </div>
                                                 ))}
-                                            </ul>
+                                            </div>
                                         </div>
 
-                                        <div>
-                                            <strong>Formations identifiées :</strong>
-                                            <ul style={{ margin: '4px 0 0 16px', padding: 0 }}>
-                                                {(ocrData.donnees_json?.formations ?? ocrData.formations ?? []).map((f, i) => (
-                                                    <li key={i}><strong>{f.diplome}</strong> - {f.etablissement} ({f.annee_obtention ?? f.date_obtention})</li>
+                                        <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                                            <strong style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7c3aed' }}>
+                                                <GraduationCap size={16} />
+                                                Formations identifiées ({(ocrData.formations ?? []).length}) :
+                                            </strong>
+                                            <div style={{ display: 'grid', gap: '8px', marginTop: '6px' }}>
+                                                {(ocrData.formations ?? []).map((f, i) => (
+                                                    <div key={i} style={{ background: '#f8fafc', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <strong style={{ color: '#0f172a' }}>{f.diplome}</strong>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                <span style={{ fontSize: '11.5px', color: 'var(--muted)' }}>
+                                                                    {f.annee_obtention ?? f.date_obtention ?? ''}
+                                                                </span>
+                                                                {isEditingOcr && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeExtractedForm(i)}
+                                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#b91c1c' }}
+                                                                        title="Supprimer cette formation"
+                                                                    >
+                                                                        <X size={14} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {f.etablissement && <div style={{ fontSize: '12px', color: '#475569' }}>Établissement : {f.etablissement}</div>}
+                                                        {f.domaine_etude && f.domaine_etude !== 'null' && <div style={{ fontSize: '11.5px', color: '#64748b' }}>Domaine : {f.domaine_etude}</div>}
+                                                    </div>
                                                 ))}
-                                            </ul>
+                                            </div>
                                         </div>
                                     </div>
+                                </div>
+
+                                {/* COMMENTAIRE RH */}
+                                <div style={{ marginTop: '4px' }}>
+                                    <label style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--primary)', display: 'block', marginBottom: '4px' }}>
+                                        Commentaire RH sur l'extraction :
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="search-input"
+                                        value={ocrCommentaireRh}
+                                        onChange={(e) => setOcrCommentaireRh(e.target.value)}
+                                        placeholder="Ex: Expériences vérifiées, doublon retiré..."
+                                        style={{ width: '100%', fontSize: '13px' }}
+                                    />
+                                </div>
+
+                                {/* BOUTONS D'ACTION DU WORKFLOW RH (Valider, Corriger, Rejeter) */}
+                                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '6px', flexWrap: 'wrap' }}>
+                                    <button
+                                        type="button"
+                                        className="filter-button"
+                                        onClick={() => handleValidateOcr('rejete')}
+                                        style={{ fontSize: '13px', padding: '8px 14px', color: '#dc2626', borderColor: '#fca5a5', gap: '6px', display: 'inline-flex', alignItems: 'center' }}
+                                    >
+                                        <X size={16} />
+                                        <span>Rejeter les données</span>
+                                    </button>
+
+                                    {isEditingOcr && (
+                                        <button
+                                            type="button"
+                                            className="secondary-button"
+                                            onClick={() => handleValidateOcr('corrige')}
+                                            style={{ fontSize: '13px', padding: '8px 14px', gap: '6px', display: 'inline-flex', alignItems: 'center' }}
+                                        >
+                                            <Save size={16} />
+                                            <span>Enregistrer les corrections</span>
+                                        </button>
+                                    )}
+
+                                    <button
+                                        type="button"
+                                        className="primary-button"
+                                        onClick={() => handleValidateOcr('valide')}
+                                        style={{ fontSize: '13px', padding: '8px 16px', gap: '6px', display: 'inline-flex', alignItems: 'center' }}
+                                    >
+                                        <Check size={16} />
+                                        <span>Valider & Importer au profil</span>
+                                    </button>
                                 </div>
                             </div>
                         ) : (

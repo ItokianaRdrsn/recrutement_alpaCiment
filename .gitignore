@@ -1,0 +1,22 @@
+# Python Virtual Environments & Cache
+code_source/ocr/venv/
+code_source/ocr/.venv/
+code_source/ocr/env/
+code_source/ocr/__pycache__/
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets & Credentials
+automatisation/client_secret*.json
+client_secret*.json
+*.secret.json
+credentials.json

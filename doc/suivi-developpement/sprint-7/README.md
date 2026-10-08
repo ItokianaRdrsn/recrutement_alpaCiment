@@ -1,17 +1,17 @@
-# Sprint 7 - Dashboard, recherche avancée, matching et finalisation
+# Sprint 7 - Dashboard, recherche avancée, matching, audit logs et finalisation
 
 ## Objectif
 
-Finaliser la V1 avec les indicateurs, la recherche avancée, un premier score de matching et la préparation du déploiement.
+Finaliser la plateforme avec les indicateurs et KPI du tableau de bord, la recherche avancée multi-critères, le score de matching candidat-offre, la consultation du journal d'audit RH et la préparation du déploiement.
 
 ## Estimation
 
-7,0 jours.
+11,0 jours.
 
 ## Documents du sprint
 
-- `taches.md` : liste des tâches prévues.
-- Les fiches datées sur le dashboard, le matching et la finalisation seront ajoutées ici.
+- `taches.md` : liste des tâches prévues et avancement.
+- Les fiches datées sur le dashboard, le journal d'audit, le matching et la finalisation seront ajoutées ici.
 
 ## Sources utiles
 

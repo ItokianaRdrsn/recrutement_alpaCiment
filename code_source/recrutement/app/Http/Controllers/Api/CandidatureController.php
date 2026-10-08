@@ -58,6 +58,7 @@ class CandidatureController extends Controller
      */
     public function importExternalCandidature(ImportExternalCandidatureRequest $request): JsonResponse
     {
+        \Illuminate\Support\Facades\Log::info("ImportExternalCandidature request keys: " . json_encode(array_keys($request->all())) . " | has cv_base64: " . ($request->has('cv_base64') ? 'YES, len=' . strlen($request->input('cv_base64')) : 'NO') . " | has cv file: " . ($request->hasFile('cv') ? 'YES' : 'NO'));
         $candidature = $this->candidatureService->importExternalCandidature($request->validated(), $request);
 
         return response()->json([

@@ -14,6 +14,7 @@ class OffreResource extends JsonResource
     {
         return [
             'id' => $this->id_offre,
+            'reference' => $this->reference,
             'slug' => \Illuminate\Support\Str::slug($this->titre_poste),
             'titre_poste' => $this->titre_poste,
             'description' => $this->description,
@@ -21,9 +22,11 @@ class OffreResource extends JsonResource
             'lieu' => $this->relationLoaded('lieuRef') && $this->lieuRef ? $this->lieuRef->libelle : ($this->lieu ?? 'Antananarivo'),
             'date_publication' => $this->date_publication?->toDateString(),
             'date_limite' => $this->date_limite?->toDateString(),
+            'candidatures_count' => (int) ($this->candidatures_count ?? ($this->relationLoaded('candidatures') ? $this->candidatures->count() : $this->candidatures()->count())),
             'direction' => $this->whenLoaded('direction', fn () => [
                 'id' => $this->direction->id_direction,
                 'nom' => $this->direction->nom_direction,
+                'alias' => $this->direction->alias,
             ]),
             'statut' => $this->whenLoaded('statut', fn () => [
                 'id' => $this->statut->id_statut_offre,

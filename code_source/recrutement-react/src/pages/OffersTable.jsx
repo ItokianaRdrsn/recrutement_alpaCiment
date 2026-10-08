@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Edit3, Share2, UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowUpRight, ChevronDown, ChevronUp, Edit3, Share2, UserPlus, Users } from 'lucide-react';
 import { formatDate } from '../utils/formatters';
 
 export function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = null, onSelectOffer = null, renderActions = null }) {
+    const navigate = useNavigate();
     const [expandedRow, setExpandedRow] = useState(null);
 
     if (!offers.length) {
@@ -11,6 +13,16 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
 
     function toggleExpand(id) {
         setExpandedRow((curr) => (curr === id ? null : id));
+    }
+
+    function goToCandidatures(e, offre) {
+        e.stopPropagation();
+        const targetUrl = `/candidatures/offres?offre=${offre.id}`;
+        if (onNavigate) {
+            onNavigate(targetUrl);
+        } else {
+            navigate(targetUrl);
+        }
     }
 
     function copyCandidateLink(offre) {
@@ -29,6 +41,7 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                         <th>Poste</th>
                         <th>Direction</th>
                         <th>Contrat</th>
+                        <th style={{ textAlign: 'center' }}>Candidatures</th>
                         <th>Publication</th>
                         {!compact ? <th>Limite</th> : null}
                         <th>Statut</th>
@@ -68,11 +81,52 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                         </td>
                                     ) : null}
                                     <td>
-                                        <strong>{offre.titre_poste}</strong>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                            {offre.reference && (
+                                                <span style={{
+                                                    fontSize: '0.72rem',
+                                                    fontWeight: 700,
+                                                    padding: '2px 7px',
+                                                    borderRadius: '4px',
+                                                    background: '#e0f2fe',
+                                                    color: '#0369a1',
+                                                    border: '1px solid #bae6fd',
+                                                    letterSpacing: '0.5px'
+                                                }}>
+                                                    {offre.reference}
+                                                </span>
+                                            )}
+                                            <strong>{offre.titre_poste}</strong>
+                                        </div>
                                         <span>{offre.lieu ?? '-'}</span>
                                     </td>
                                     <td>{offre.direction?.nom ?? '-'}</td>
                                     <td>{offre.type_contrat?.libelle ?? '-'}</td>
+                                    <td style={{ textAlign: 'center' }}>
+                                        <button
+                                            type="button"
+                                            onClick={(e) => goToCandidatures(e, offre)}
+                                            className="row-button"
+                                            style={{
+                                                background: (offre.candidatures_count ?? 0) > 0 ? '#eff6ff' : '#f8fafc',
+                                                border: (offre.candidatures_count ?? 0) > 0 ? '1px solid #bfdbfe' : '1px solid #e2e8f0',
+                                                color: (offre.candidatures_count ?? 0) > 0 ? '#1d4ed8' : '#64748b',
+                                                padding: '4px 10px',
+                                                borderRadius: '20px',
+                                                fontSize: '12px',
+                                                fontWeight: '600',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '5px',
+                                                cursor: 'pointer',
+                                            }}
+                                            title={`Voir les ${offre.candidatures_count ?? 0} candidature(s)`}
+                                        >
+                                            <Users size={13} />
+                                            <span>{offre.candidatures_count ?? 0}</span>
+                                            {(offre.candidatures_count ?? 0) > 0 ? <ArrowUpRight size={12} style={{ opacity: 0.7 }} /> : null}
+                                        </button>
+                                    </td>
                                     <td>{formatDate(offre.date_publication)}</td>
                                     {!compact ? <td>{formatDate(offre.date_limite)}</td> : null}
                                     <td>
@@ -146,7 +200,7 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                 </tr>
                                 {!compact && isExpanded ? (
                                     <tr>
-                                        <td colSpan={renderActions ? 8 : 7} style={{ padding: 0 }}>
+                                        <td colSpan={renderActions || onNavigate ? 9 : 8} style={{ padding: 0 }}>
                                             <div className="expanded-details">
                                                 {profilsList.length ? (
                                                     <div className="detail-block">
@@ -199,6 +253,30 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                         </div>
                                                     </div>
                                                 ) : null}
+
+                                                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                                                    <button
+                                                        type="button"
+                                                        onClick={(e) => goToCandidatures(e, offre)}
+                                                        style={{
+                                                            background: '#2563eb',
+                                                            color: '#fff',
+                                                            border: 'none',
+                                                            borderRadius: '6px',
+                                                            padding: '7px 14px',
+                                                            fontSize: '12px',
+                                                            fontWeight: '600',
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            gap: '6px',
+                                                            cursor: 'pointer'
+                                                        }}
+                                                    >
+                                                        <Users size={14} />
+                                                        <span>Consulter les candidatures ({offre.candidatures_count ?? 0})</span>
+                                                        <ArrowUpRight size={13} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>

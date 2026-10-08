@@ -1,20 +1,34 @@
-import os
-import re
-import json
+# -*- coding: utf-8 -*-
+"""
+main.py
+=======
+Microservice FastAPI pour AlpA Ciment :
+- Orchestration du pipeline OCR (PaddleOCR / PyPDF)
+- Structuration sémantique NER (LLM local Llama 3.2 via Ollama)
+"""
+
 import logging
-from typing import Optional, List, Dict, Any
+import json
+import time
+from typing import Optional, List, Dict, Any, Union
+from pydantic import BaseModel
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-# Configuration du logging
+# Modules séparés
+from cv_ocr_extractor import extract_raw_text_from_bytes, PADDLE_AVAILABLE, PYPDF_AVAILABLE
+from cv_llm_parser import parse_cv_with_llm, is_ollama_available, DEFAULT_MODEL
+from email_classifier import classify_email_intent
+
+# Configuration des logs
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("AlpaCimentOCR")
 
 app = FastAPI(
-    title="AlpA Ciment - Microservice FastAPI OCR & Parsing CV (PaddleOCR)",
-    description="Microservice d'extraction de texte et de parsing IA de CVs pour la plateforme de recrutement AlpA Ciment.",
-    version="1.0.0",
+    title="AlpA Ciment - Microservice OCR & NER (PaddleOCR + Llama 3.2 LLM)",
+    description="Microservice d'extraction optique (OCR) et de structuration intelligente (NER Llama 3.2) de CVs.",
+    version="2.0.0",
 )
 
 # Configuration CORS pour autoriser Laravel (8000) et React (5173)
@@ -26,200 +40,204 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Tente d'importer PaddleOCR et PyPDF
-PADDLE_AVAILABLE = False
-try:
-    from paddleocr import PaddleOCR
-    ocr_engine = PaddleOCR(use_angle_cls=True, lang='fr', show_log=False)
-    PADDLE_AVAILABLE = True
-    logger.info("Moteur PaddleOCR initialisé avec succès en français.")
-except Exception as e:
-    logger.warning(f"PaddleOCR non disponible ou en cours de chargement ({e}). Mode fallback activé.")
-
-PYPDF_AVAILABLE = False
-try:
-    import pypdf
-    PYPDF_AVAILABLE = True
-except ImportError:
-    logger.warning("pypdf non disponible pour la lecture des PDF texte.")
-
-
-def extract_raw_text_from_bytes(file_bytes: bytes, filename: str) -> str:
-    """Extraire le texte brut du fichier (PDF ou image) via pypdf ou PaddleOCR."""
-    text_chunks = []
-    
-    # 1. Tentative d'extraction directe PDF via pypdf
-    if filename.lower().endswith(".pdf") and PYPDF_AVAILABLE:
-        try:
-            import io
-            reader = pypdf.PdfReader(io.BytesIO(file_bytes))
-            for page in reader.pages:
-                extracted = page.extract_text()
-                if extracted:
-                    text_chunks.append(extracted)
-        except Exception as err:
-            logger.warning(f"Erreur pypdf: {err}")
-
-    # 2. Tentative via PaddleOCR si image ou si PDF texte vide
-    if not text_chunks and PADDLE_AVAILABLE:
-        try:
-            import tempfile
-            ext = os.path.splitext(filename)[1] or ".png"
-            with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
-                tmp.write(file_bytes)
-                tmp_path = tmp.name
-
-            result = ocr_engine.ocr(tmp_path, cls=True)
-            os.remove(tmp_path)
-
-            if result and result[0]:
-                for line in result[0]:
-                    if line and len(line) >= 2:
-                        text_chunks.append(line[1][0])
-        except Exception as err:
-            logger.warning(f"Erreur execution PaddleOCR: {err}")
-
-    raw_text = "\n".join(text_chunks).strip()
-    return raw_text if raw_text else "Texte brut non extrait ou document image scanné sans OCR texte."
-
-
-def parse_cv_text_to_json(raw_text: str, filename: str) -> Dict[str, Any]:
-    """Parseur heuristique & NLP pour extraire les informations clés du CV."""
-    
-    # Extraction email
-    email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', raw_text)
-    email = email_match.group(0) if email_match else None
-
-    # Extraction téléphone
-    phone_match = re.search(r'(\+?\d{2,3}[\s\.-]?)?\(?\d{2,3}\)?[\s\.-]?\d{2,3}[\s\.-]?\d{2,4}', raw_text)
-    phone = phone_match.group(0) if phone_match else None
-
-    # Extraction des compétences connues avec leur niveau
-    known_skills = [
-        ("PHP / Laravel", "Avancé"),
-        ("React.js", "Intermédiaire"),
-        ("JavaScript / TypeScript", "Avancé"),
-        ("PostgreSQL / SQL", "Avancé"),
-        ("Python / FastAPI", "Intermédiaire"),
-        ("Gestion de Projet RH", "Expert"),
-        ("Docker & DevOps", "Débutant"),
-        ("Comptabilité / Finance", "Intermédiaire"),
-        ("Maintenance Industrielle", "Avancé"),
-    ]
-
-    found_skills = []
-    text_lower = raw_text.lower()
-    for skill_name, default_level in known_skills:
-        clean_skill_kw = skill_name.split("/")[0].strip().lower()
-        if clean_skill_kw in text_lower:
-            found_skills.append({
-                "nom": skill_name,
-                "niveau": default_level
-            })
-
-    if not found_skills:
-        found_skills = [
-            {"nom": "PHP / Laravel", "niveau": "Avancé"},
-            {"nom": "React.js", "niveau": "Intermédiaire"},
-            {"nom": "PostgreSQL", "niveau": "Avancé"},
-            {"nom": "Gestion de projet RH", "niveau": "Intermédiaire"}
-        ]
-
-    # Extraction des expériences
-    experiences = [
-        {
-            "poste": "Développeur Fullstack Web & Mobile",
-            "entreprise": "Alpha Ciment Services",
-            "date_debut": "2023-01-15",
-            "date_fin": "2025-12-31",
-            "description": "Développement et maintenance des applications web de gestion de production et RH."
-        },
-        {
-            "poste": "Assistant Gestionnaire de Projets SI",
-            "entreprise": "AlpA Tech Consult",
-            "date_debut": "2021-06-01",
-            "date_fin": "2022-12-20",
-            "description": "Analyse des besoins utilisateurs, rédaction des spécifications et tests d'intégration."
-        }
-    ]
-
-    # Extraction des formations
-    formations = [
-        {
-            "diplome": "Master 2 Génie Software & Systèmes d'Information",
-            "etablissement": "Institut Supérieur de Technologie / ITU",
-            "annee_obtention": 2022,
-            "domaine_etude": "Informatique et Génie Logiciel"
-        },
-        {
-            "diplome": "Licence Professionnelle Informatique",
-            "etablissement": "Université d'Antananarivo",
-            "annee_obtention": 2020,
-            "domaine_etude": "Sciences et Technologies"
-        }
-    ]
-
-    return {
-        "texte_brut": raw_text,
-        "contact": {
-            "email": email,
-            "telephone": phone
-        },
-        "competences": found_skills,
-        "experiences": experiences,
-        "formations": formations,
-    }
-
 
 @app.get("/")
 @app.get("/health")
 def health_check():
+    """Vérifie l'état de santé des moteurs OCR et du LLM local."""
+    ollama_ok = is_ollama_available()
     return {
         "status": "ok",
-        "service": "AlpA Ciment - Microservice FastAPI OCR & Parsing CV",
+        "service": "AlpA Ciment - Microservice OCR & NER",
         "paddle_ocr_installed": PADDLE_AVAILABLE,
         "pypdf_installed": PYPDF_AVAILABLE,
-        "version": "1.0.0"
+        "ollama_connected": ollama_ok,
+        "llm_model": DEFAULT_MODEL,
+        "version": "2.0.0"
     }
 
 
-from cv_nlp_parser import parse_cv_text_to_json
+# =====================================================================
+# 1. NOEUD 1 : OCR PUR (Extraction de texte brut + transport base64)
+# =====================================================================
+@app.post("/ocr")
+async def extract_ocr_only(
+    file: UploadFile = File(...),
+    candidature_id: Optional[int] = Form(None),
+    id_offre: Optional[int] = Form(None)
+):
+    """
+    Étape 1 du pipeline :
+    - Extrait le texte brut du CV via pypdf / PaddleOCR
+    - Encode le fichier en Base64 pour le stockage final
+    - Propage et retourne systématiquement l'id_offre reçu (ou null si spontanée)
+    """
+    try:
+        logger.info(f"[OCR] Traitement fichier : {file.filename} (id_offre: {id_offre})")
+        file_bytes = await file.read()
 
+        if not file_bytes:
+            raise HTTPException(status_code=400, detail="Fichier CV vide ou corrompu.")
+
+        t0 = time.time()
+        raw_text = extract_raw_text_from_bytes(file_bytes, file.filename)
+        t_ocr = round(time.time() - t0, 3)
+
+        import base64
+        cv_b64 = base64.b64encode(file_bytes).decode('utf-8')
+        mime_type = file.content_type or 'application/pdf'
+
+        return {
+            "success": True,
+            "message": f"Extraction OCR effectuée en {t_ocr}s.",
+            "candidature_id": candidature_id,
+            "id_offre": id_offre,
+            "filename": file.filename,
+            "cv_nom": file.filename or "cv.pdf",
+            "cv_mime": mime_type,
+            "cv_base64": cv_b64,
+            "texte_brut_ocr": raw_text,
+            "duree_secondes": {"ocr": t_ocr}
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"[OCR] Erreur : {e}")
+        raise HTTPException(status_code=500, detail=f"Erreur OCR : {str(e)}")
+
+
+# =====================================================================
+# 2. NOEUD 2 : NER PUR (Structuration sémantique via LLM Llama 3.2)
+# =====================================================================
+class NerParseRequest(BaseModel):
+    texte_brut_ocr: str
+    id_offre: Optional[int] = None
+    cv_base64: Optional[str] = None
+    cv_nom: Optional[str] = None
+    cv_mime: Optional[str] = None
+    candidature_id: Optional[int] = None
+
+
+@app.post("/ner")
+def parse_ner_only(req: NerParseRequest):
+    """
+    Étape 2 du pipeline :
+    - Prend le texte brut OCR en JSON
+    - Extrait les entités (contact, compétences, expériences, formations) via Llama 3.2
+    - Propage et retourne systématiquement l'id_offre et cv_base64
+    """
+    try:
+        logger.info(f"[NER] Structuration du texte (id_offre: {req.id_offre})")
+        t0 = time.time()
+        structured_data = parse_cv_with_llm(req.texte_brut_ocr)
+        t_llm = round(time.time() - t0, 3)
+
+        return {
+            "success": True,
+            "message": f"Structuration NER effectuée en {t_llm}s.",
+            "id_offre": req.id_offre,
+            "candidature_id": req.candidature_id,
+            "cv_base64": req.cv_base64,
+            "cv_nom": req.cv_nom,
+            "cv_mime": req.cv_mime,
+            "texte_brut_ocr": req.texte_brut_ocr,
+            "donnees_json": structured_data,
+            "duree_secondes": {"llm": t_llm}
+        }
+    except Exception as e:
+        logger.error(f"[NER] Erreur : {e}")
+        raise HTTPException(status_code=500, detail=f"Erreur NER : {str(e)}")
+
+
+# =====================================================================
+# 3. COMBINÉ (OCR + NER) - Conservé pour compatibilité
+# =====================================================================
 @app.post("/extract-cv")
 @app.post("/extract")
 async def extract_cv(
     file: UploadFile = File(...),
     candidature_id: Optional[int] = Form(None),
-    referentiel_competences: Optional[str] = Form(None)
+    id_offre: Optional[int] = Form(None)
 ):
+    """Pipeline combiné OCR + NER en un seul appel."""
     try:
-        logger.info(f"Traitement du fichier CV reçu : {file.filename} (Candidature ID: {candidature_id})")
+        logger.info(f"Traitement du CV combiné : {file.filename} (id_offre: {id_offre})")
         file_bytes = await file.read()
-        
+
         if not file_bytes:
             raise HTTPException(status_code=400, detail="Fichier CV vide ou corrompu.")
 
-        ref_comp_list = None
-        if referentiel_competences:
-            try:
-                ref_comp_list = json.loads(referentiel_competences)
-            except Exception as err:
-                logger.warning(f"Erreur parsing referentiel_competences JSON: {err}")
-
+        t0 = time.time()
         raw_text = extract_raw_text_from_bytes(file_bytes, file.filename)
-        parsed_json = parse_cv_text_to_json(raw_text, file.filename, referentiel_competences=ref_comp_list)
+        t_ocr = round(time.time() - t0, 3)
+
+        t1 = time.time()
+        structured_data = parse_cv_with_llm(raw_text)
+        t_llm = round(time.time() - t1, 3)
+        t_total = round(t_ocr + t_llm, 3)
+
+        import base64
+        cv_b64 = base64.b64encode(file_bytes).decode('utf-8')
+        mime_type = file.content_type or 'application/pdf'
 
         return {
             "success": True,
-            "message": "Extraction OCR et parsing IA effectués avec succès.",
+            "message": f"Extraction OCR ({t_ocr}s) et structuration NER ({t_llm}s) effectuées en {t_total}s.",
             "candidature_id": candidature_id,
+            "id_offre": id_offre,
             "filename": file.filename,
+            "cv_nom": file.filename or "cv.pdf",
+            "cv_mime": mime_type,
+            "cv_base64": cv_b64,
             "texte_brut_ocr": raw_text,
-            "donnees_json": parsed_json
+            "donnees_json": structured_data,
+            "duree_secondes": {
+                "ocr": t_ocr,
+                "llm": t_llm,
+                "total": t_total,
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur lors du traitement du CV : {e}")
+        raise HTTPException(status_code=500, detail=f"Erreur microservice OCR/NER : {str(e)}")
+
+
+class EmailClassifyRequest(BaseModel):
+    subject: str
+    body: str
+    active_offers: Optional[Union[List[Any], str]] = None
+
+
+@app.post("/classify-email")
+def classify_email(req: EmailClassifyRequest):
+    """
+    Analyse l'intention d'un email (demande_offre, demande_spontanee, demande_information)
+    via le modèle local Llama 3.2.
+    """
+    try:
+        offers = req.active_offers
+        if isinstance(offers, str):
+            try:
+                offers = json.loads(offers) if offers.strip() else []
+            except Exception:
+                offers = []
+        if not isinstance(offers, list):
+            offers = []
+
+        classification = classify_email_intent(
+            subject=req.subject,
+            body=req.body,
+            active_offers=offers
+        )
+        return {
+            "success": True,
+            "classification": classification
         }
     except Exception as e:
-        logger.error(f"Erreur lors de l'extraction OCR : {e}")
-        raise HTTPException(status_code=500, detail=f"Erreur microservice OCR : {str(e)}")
+        logger.error(f"Erreur lors de la classification de l'email : {e}")
+        raise HTTPException(status_code=500, detail=f"Erreur classification IA : {str(e)}")
 
 
 if __name__ == "__main__":

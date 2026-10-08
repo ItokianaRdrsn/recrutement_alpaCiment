@@ -29,4 +29,5 @@ interface VivierRepositoryInterface
     // OCR
     public function getExtractionOcrByCandidature(int $idCandidature): ?CvExtractionOcr;
     public function updateOrCreateExtractionOcr(int $idCandidature, array $attributes): CvExtractionOcr;
+    public function updateExtractionOcr(CvExtractionOcr $extraction, array $attributes): CvExtractionOcr;
 }
