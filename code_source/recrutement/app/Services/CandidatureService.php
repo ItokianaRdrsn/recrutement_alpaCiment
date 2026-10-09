@@ -20,8 +20,13 @@ class CandidatureService
         protected CandidatureRepositoryInterface $candidatureRepository,
         protected CandidatRepositoryInterface $candidatRepository,
         protected OffreRepositoryInterface $offreRepository,
-        protected DomaineRepositoryInterface $domaineRepository
-    ) {}
+        protected DomaineRepositoryInterface $domaineRepository,
+        protected ?AuditLogService $auditLogService = null,
+        protected ?CommunicationService $communicationService = null
+    ) {
+        $this->auditLogService = $auditLogService ?? app(AuditLogService::class);
+        $this->communicationService = $communicationService ?? app(CommunicationService::class);
+    }
 
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
     {
@@ -100,6 +105,13 @@ class CandidatureService
             // 5. Store files
             $this->storeFiles($candidature, $request, 'site_externe');
 
+            // 6. Accusé de réception automatique par email
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception candidature #{$candidature->id_candidature}: " . $e->getMessage());
+            }
+
             return $candidature->load(['candidat', 'offre', 'statut']);
         });
     }
@@ -150,6 +162,13 @@ class CandidatureService
             ]);
 
             $this->storeFiles($candidature, $request, 'site_externe');
+
+            // Accusé de réception automatique par email
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception candidature spontanée #{$candidature->id_candidature}: " . $e->getMessage());
+            }
 
             return $candidature->load(['candidat', 'domaine', 'statut']);
         });
@@ -329,7 +348,7 @@ class CandidatureService
             ]);
         }
 
-        DB::transaction(function () use ($candidature, $newStatusId, $commentaire, $userId) {
+        DB::transaction(function () use ($candidature, $newStatusId, $commentaire, $userId, $currentStatut, $newStatut) {
             $this->candidatureRepository->update($candidature, ['id_statut_candidature' => $newStatusId]);
 
             $this->candidatureRepository->createHistorique([
@@ -339,6 +358,17 @@ class CandidatureService
                 'commentaire' => $commentaire ?? 'Changement de statut',
                 'id_utilisateur' => $userId,
             ]);
+
+            $nomCandidat = $candidature->candidat ? "{$candidature->candidat->nom} {$candidature->candidat->prenom}" : "Candidature #{$candidature->id_candidature}";
+            $this->auditLogService->log(
+                action: 'CHANGEMENT_STATUT_CANDIDAT',
+                entite: 'Candidature',
+                idEntite: $candidature->id_candidature,
+                description: "Changement de statut pour {$nomCandidat} : {$currentStatut?->libelle} -> {$newStatut?->libelle}",
+                anciennesValeurs: ['id_statut_candidature' => $candidature->id_statut_candidature, 'statut' => $currentStatut?->libelle],
+                nouvellesValeurs: ['id_statut_candidature' => $newStatusId, 'statut' => $newStatut?->libelle, 'commentaire' => $commentaire],
+                idUtilisateur: $userId
+            );
         });
 
         return $candidature->fresh(['statut', 'historique']);
@@ -358,6 +388,16 @@ class CandidatureService
         }
 
         $this->candidatureRepository->update($candidature, ['dans_vivier' => $dansVivier]);
+
+        $nomCandidat = $candidature->candidat ? "{$candidature->candidat->nom} {$candidature->candidat->prenom}" : "Candidature #{$candidature->id_candidature}";
+        $this->auditLogService->log(
+            action: $dansVivier ? 'AJOUT_VIVIER' : 'RETRAIT_VIVIER',
+            entite: 'Candidature',
+            idEntite: $candidature->id_candidature,
+            description: ($dansVivier ? "Placement dans le vivier RH : " : "Retrait du vivier RH : ") . $nomCandidat,
+            anciennesValeurs: ['dans_vivier' => $candidature->dans_vivier],
+            nouvellesValeurs: ['dans_vivier' => $dansVivier]
+        );
 
         return $candidature;
     }

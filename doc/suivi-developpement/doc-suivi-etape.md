@@ -1172,8 +1172,162 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Endpoint `/health` enrichi indiquant la connectivité de PaddleOCR, PyPDF et Ollama Mistral.
 3. **Validation & Tests** :
    - Test unitaire `/health` : `200 OK`, `ollama_connected: true`, `paddle_ocr_installed: true`.
-   - Test d'inférence en conditions réelles sur un CV complet : extraction et structuration JSON parfaites sans hallucination (`source_parsing: ollama_mistral`).
+---
 
+### Demande 94 : Log et Journalisation des actions RH (Audit Log & Traçabilité)
+1. **Contexte & Spécification** :
+   - Mise en place du module complet d'audit log pour la traçabilité immuable des actions sensibles : création, modification, publication et clôture d'offres d'emploi, changements de statuts des candidatures, opérations de validation/correction/rejet OCR et gestion du vivier.
+2. **Implémentation Réalisée** :
+   - **Base de données & Modèle** :
+     - Migration `2026_10_09_000000_create_audit_log_table.php` créant la table `audit_log` (avec colonnes `anciennes_valeurs` et `nouvelles_valeurs` JSONB, `ip_adresse`, `user_agent`, et index composites).
+     - Modèle Eloquent [`AuditLog.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/AuditLog.php).
+   - **Services Métiers** :
+     - Service réutilisable [`AuditLogService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/AuditLogService.php).
+     - Intégration dans `OffreService` (`CREATION_OFFRE`, `MODIFICATION_OFFRE`, `PUBLICATION_OFFRE`, `CLOTURE_OFFRE`, `SUPPRESSION_OFFRE`), `CandidatureService` (`CHANGEMENT_STATUT_CANDIDAT`, `AJOUT_VIVIER`, `RETRAIT_VIVIER`) et `VivierService` (`VALIDATION_OCR`, `CORRECTION_OCR`, `REJET_OCR`).
+   - **API & Interface Frontend** :
+     - Contrôleur API [`AuditLogController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/AuditLogController.php) et route `GET /api/audit-logs`.
+     - Page React [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx) avec barre de filtres (action, entité, texte, dates), pagination, et modale de visualisation des différences (diff JSON).
+     - Ajout du lien dans le menu [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et de la route dans [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx).
+3. **Validation & Tests** :
+   - Suite complète PHPUnit : 18/18 tests passés avec succès (`AuditLogTest.php`).
+   - Build React : `npm run build` exécuté sans avertissement ni erreur.
+   - Documentation créée : [`doc/suivi-developpement/sprint-6/2026-10-09/journal-audit-actions-rh.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-6/2026-10-09/journal-audit-actions-rh.md).
 
+---
 
+### Demande 95 : Règle Méthodologique de Synchronisation Continue de `gestion_recrutement.sql`
+1. **Contexte & Spécification** :
+   - L'utilisateur demande que toute modification ou ajout dans le schéma de la base de données soit systématiquement reporté dans le script maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
+   - Cette règle doit obligatoirement être inscrite dans le document de référence méthodologique [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md) pour être consultée et appliquée à chaque prompt.
+2. **Implémentation Réalisée** :
+   - **Mise à jour de `methodologie.md`** : ajout d'une section dédiée *"Règle Impérative de Synchronisation de la Base de Données (gestion_recrutement.sql)"* et ajout d'un point de contrôle dans la *Checklist Obligatoire avant de Terminer un Prompt*.
+   - **Mise à jour du script maître** : ajout de la table `audit_log` et de ses index dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
+
+---
+
+### Demande 96 : Règle de Recommandation Systématique du Bon Prompt et des Commandes Slash (`/`)
+1. **Contexte & Spécification** :
+   - L'utilisateur souhaite que l'assistant lui suggère systématiquement, à la clôture de chaque intervention, le prompt textuel exact prêt à l'emploi pour aborder l'étape suivante, accompagné de la commande slash appropriée (`/plan`, `/grill-me`, `/goal`, etc.) si pertinent.
+2. **Implémentation Réalisée** :
+   - **Mise à jour de [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md)** : ajout de la section *"Règle de Clôture : Recommandation Systématique du Bon Prompt et des Commandes Slash (/)"* et inscription dans la checklist obligatoire.
+
+---
+
+### Demande 97 : Gestion des Rendez-vous RH & Agenda Interactif FullCalendar
+1. **Contexte & Spécification** :
+   - Implémentation du CRUD des rendez-vous RH (tests et entretiens) et intégration de l'agenda FullCalendar v6 dans le front-office React avec synchronisation du statut candidat et audit log.
+2. **Implémentation Réalisée** :
+   - **Backend Laravel** :
+     - Modèles Eloquent [`RendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/RendezVous.php), [`TypeRendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/TypeRendezVous.php), [`StatutRendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/StatutRendezVous.php), [`ModeRealisation.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/ModeRealisation.php).
+     - Relation `rendezVous()` (hasMany) dans [`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Candidature.php).
+     - Service métier [`RendezVousService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/RendezVousService.php) avec validation chronologique (`date_fin > date_debut`), mise à jour synchronisée du statut de la candidature et traçabilité via `AuditLogService` (`PLANIFICATION_RDV`, `MODIFICATION_RDV`, `ANNULATION_RDV`, `SUPPRESSION_RDV`).
+     - Contrôleur [`RendezVousController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/RendezVousController.php) et routes API REST dans `routes/api.php`.
+   - **Frontend React & FullCalendar** :
+     - Installation de `@fullcalendar/react`, `@fullcalendar/core`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction` v6.
+     - Page d'agenda [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) (vues Mois, Semaine, Jour, filtres type/statut/mode/recruteur, glisser-déposer `eventDrop` et redimensionnement `eventResize`).
+     - Modale de planification / modification [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
+     - Onglet *Rendez-vous* dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx).
+### Demande 98 : Résolution Cache Vite (Outdated Optimize Dep) & Affichage Référentiels Rendez-vous
+1. **Contexte & Spécification** :
+   - Erreur de chargement des chunks Vite à chaud (`504 Outdated Optimize Dep` pour `@fullcalendar_react.js`, etc.) due au remplacement à chaud des modules.
+   - Les listes déroulantes de types d'événements, modes et statuts dans la modale de planification n'affichaient pas leurs libellés lorsque les props n'étaient pas encore pré-chargées depuis le composant parent.
+2. **Implémentation Réalisée** :
+   - **Dépendances & Cache Vite** :
+     - Les dépendances FullCalendar ont été alignées de manière homogène sur la branche officielle `^6.1.15` avec les plugins `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction`.
+     - Rafraîchissement complet du bundle (`npm run build` compilé avec succès en 616ms).
+   - **Composant Modale [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx)** :
+     - Ajout de constantes de repli (fallbacks) immédiates pour `types` (Test, Entretien), `statuts` (A venir, Réalisé, Annulé), et `modes` (Présentiel, Visioconférence, Téléphone) pour garantir un affichage instantané des menus sans aucun temps mort ni champ vide.
+     - Déclenchement automatique et systématique du chargement API `/api/rendez-vous/referentiels` à l'ouverture si les données parentes ne sont pas encore disponibles.
+3. **Validation & Tests** :
+   - Tests PHPUnit : 21/21 tests passés avec succès.
+   - Build React : `npm run build` 100% propre, 0 erreur.
+
+---
+
+### Demande 99 : Correction ReferenceError `isEditing` dans RendezVousModal
+1. **Contexte & Spécification** :
+   - Erreur JavaScript `Uncaught ReferenceError: isEditing is not defined` à la ligne 288 lors de l'ouverture de la modale de planification de rendez-vous.
+2. **Implémentation Réalisée** :
+   - Réintégration de la constante `const isEditing = Boolean(initialData?.id_rendez_vous);` en tête du composant [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
+3. **Validation & Tests** :
+   - Compilation React (`npm run build`) validée avec succès en 594ms sans aucune erreur.
+
+---
+
+### Demande 100 : Correction Erreur 422 Unprocessable Content lors du POST Rendez-vous
+1. **Contexte & Spécification** :
+   - Erreur HTTP `422 (Unprocessable Content)` renvoyée par l'API lors de la soumission du formulaire de rendez-vous.
+   - La fonction `sendJson(url, { body, method })` du client API attendait un objet d'options `{ body, method }` et non des arguments positionnels `(url, method, payload)`, causant l'envoi d'un corps de requête `undefined` et l'échec de la validation Laravel (`required`).
+2. **Implémentation Réalisée** :
+   - **Correction des appels `sendJson`** dans [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx) : passage conforme du payload via `{ method: 'POST'|'PUT'|'DELETE', body: payload }`.
+   - **Correction des appels `sendJson`** dans [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) pour les événements de glisser-déposer (`eventDrop`) et de redimensionnement (`eventResize`).
+3. **Validation & Tests** :
+   - Tests PHPUnit : 21/21 tests passés avec succès.
+   - Compilation React (`npm run build`) validée avec succès en 589ms (0 erreur).
+
+### Demande 101 : Formatage personnalisé de l'affichage des événements dans l'Agenda FullCalendar
+1. **Contexte & Spécification** :
+   - Masquer l'affichage brut de l'heure sur les étiquettes de rendez-vous dans le calendrier.
+   - Afficher au format compact : la Direction et le prénom du candidat (ex: `[IT] Faniry (Entretien)`).
+   - En cas d'événements multiples sur un même créneau ou une même journée, condenser l'affichage avec un badge discret `+2 autres` et une popover interactive.
+2. **Implémentation Réalisée** :
+   - **Contrôleur & Resource API** : Eager loading de `candidature.offre.direction` et ajout de `direction` (`nom_direction`, `alias`) dans [`RendezVousResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/RendezVousResource.php).
+   - **Frontend [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx)** :
+     - Titre de l'événement mis en forme dynamiquement : `[${directionLabel}] ${prenom} (${typeLibelle})`.
+     - Configuration des options FullCalendar : `displayEventTime={false}`, `dayMaxEvents={2}`, `dayMaxEventRows={true}`, et `moreLinkClick="popover"`.
+3. **Validation & Tests** :
+   - Tests PHPUnit : 21/21 tests passés avec succès.
+   - Compilation frontend (`npm run build`) validée en 597ms sans erreur.
+
+---
+
+### Demande 102 : Module de Communication et Modèles d'E-mails RH (Sprint 6)
+1. **Contexte & Spécification** :
+   - Gestion complète des modèles d'e-mails personnalisables (`modele_message`) avec tags dynamiques (`{prenom}`, `{nom}`, `{poste}`, `{direction}`, `{date_rdv}`, `{heure_rdv}`, `{mode_rdv}`, `{lieu_rdv}`, `{date_jour}`).
+   - Envoi automatique d'accusé de réception lors du dépôt d'une candidature.
+   - Envoi automatique de convocation par e-mail lors de la planification d'un rendez-vous RH.
+   - Envoi manuel personnalisé direct depuis le dossier candidat avec historique complet (`communication`) et journalisation d'audit (`audit_log`).
+   - Interface web de gestion des modèles dans le portail RH avec simulation / prévisualisation instantanée.
+2. **Implémentation Réalisée** :
+   - **Modèles Eloquent & Mailable** :
+     - [`TypeMessage.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/TypeMessage.php), [`ModeleMessage.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/ModeleMessage.php), [`Communication.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Communication.php).
+     - [`CandidatureCommunicationMail.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Mail/CandidatureCommunicationMail.php) avec vue Blade responsive [`candidature_communication.blade.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/resources/views/emails/candidature_communication.blade.php).
+   - **Service & Contrôleurs API** :
+     - [`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CommunicationService.php) avec moteur Regex insensible à la casse pour les variables.
+     - [`ModeleMessageController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/ModeleMessageController.php) et [`CommunicationController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/CommunicationController.php).
+     - Déclencheur automatique de convocation dans [`RendezVousService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/RendezVousService.php) et d'accusé de réception dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php).
+   - **Frontend React** :
+     - Page [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx) intégrée dans la barre latérale [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et les routes [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx).
+     - Modal d'envoi rapide [`EnvoyerMessageModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/EnvoyerMessageModal.jsx).
+     - Onglet *Communications* enrichi avec historique complet dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx).
+     - Case à cocher de convocation par e-mail dans [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
+3. **Validation & Tests** :
+   - Suite de tests unitaires [`CommunicationTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/CommunicationTest.php) (4/4 tests validés).
+   - Suite PHPUnit globale : `php artisan test` -> **25/25 tests passés (96 assertions)**.
+   - Build React : `npm run build` réussi en 838ms (0 erreur).
+   - Script SQL maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) mis à jour avec les 5 templates initiaux.
+
+---
+
+### Demande 103 : Optimisation de l'Export PDF & Impression de la Fiche Candidat
+1. **Contexte & Spécification** :
+   - Régler l'exportation PDF / impression de la fiche candidat (`window.print()`).
+   - Masquer tous les éléments parasites et interactifs de l'interface (barre latérale, barre supérieure, onglets, boutons d'action, formulaires d'ajout de compétences/expériences/formations, curseur suiveur, préchargeurs).
+   - Fournir une mise en page A4 élégante et professionnelle avec en-tête institutionnel AlpA Ciment (`.print-only-header`), carte récapitulative du candidat (photo, nom, coordonnées, badge de statut et vivier) et sections complètes (dossier, compétences avec niveaux, expériences professionnelles, diplômes et formations).
+   - Neutraliser le `zoom: 0.8` du back-office lors de l'impression (`zoom: 1 !important`) et éliminer les coupures inopportunes (`page-break-inside: avoid`).
+2. **Implémentation Réalisée** :
+   - **Styles CSS d'impression ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - Règle `@page { size: A4 portrait; margin: 12mm 15mm; }`.
+     - Réinitialisation complète `html, body, body.in-backoffice { zoom: 1 !important; overflow: visible !important; }`.
+     - Masquage strict de `.sidebar`, `.topbar`, `.ghost-button`, `.filter-button`, `.candidature-tabs-header`, `.no-print`, `form`, `button`, `.modal-backdrop`, `.cb-cursor`, `.preloader`.
+     - Suppression des URLs automatiques ajoutées après les liens via `a[href]:after { content: "" !important; }`.
+     - Stylisation de la carte candidat imprimée `.candidate-sidebar-card` en bandeau exécutif horizontal avec avatar, informations personnelles et coordonnées.
+     - Prise en charge des sauts de page propres avec `page-break-inside: avoid !important; break-inside: avoid !important;` sur `.data-section`, `.history-item`, et `.print-break-inside-avoid`.
+   - **Composant React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+     - Intégration de `.print-only-header` avec le logo officiel AlpA Ciment, titre RH, numéro de dossier, date du jour et statut actuel.
+     - Fonction intelligente `handlePrintPdf` qui bascule automatiquement sur l'onglet *Informations & Profil RH* avant d'invoquer l'impression si l'utilisateur consultait un autre onglet.
+     - Application de la classe `.no-print` aux formulaires de saisie de compétence, d'expérience et de formation pour ne faire figurer que les données enregistrées.
+3. **Validation & Tests** :
+   - Tests PHPUnit Laravel : **25/25 tests passés (96 assertions)**.
+   - Compilation Vite frontend (`npm run build`) : **✓ built in 1.16s (0 erreur)**.
 

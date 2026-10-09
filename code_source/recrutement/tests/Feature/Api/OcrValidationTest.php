@@ -70,7 +70,10 @@ class OcrValidationTest extends TestCase
                 'source' => 'cv_ocr',
             ]);
 
-        $service = new VivierService($vivierRepo, $competenceRepo);
+        $auditMock = $this->createMock(\App\Services\AuditLogService::class);
+        $auditMock->expects($this->once())->method('log');
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'valide',
@@ -122,7 +125,10 @@ class OcrValidationTest extends TestCase
         $vivierRepo->expects($this->never())->method('createExperience');
         $vivierRepo->expects($this->never())->method('createFormation');
 
-        $service = new VivierService($vivierRepo, $competenceRepo);
+        $auditMock = $this->createMock(\App\Services\AuditLogService::class);
+        $auditMock->expects($this->once())->method('log');
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'rejete',
@@ -173,7 +179,10 @@ class OcrValidationTest extends TestCase
                 return $exp['poste'] === 'Lead Architecte' && $exp['source'] === 'cv_ocr';
             }));
 
-        $service = new VivierService($vivierRepo, $competenceRepo);
+        $auditMock = $this->createMock(\App\Services\AuditLogService::class);
+        $auditMock->expects($this->once())->method('log');
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'corrige',

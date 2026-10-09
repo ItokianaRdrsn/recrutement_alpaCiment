@@ -572,6 +572,70 @@ CREATE INDEX idx_modele_message_statut ON modele_message(id_statut_candidature);
 CREATE UNIQUE INDEX idx_modele_unique_auto_par_statut ON modele_message(id_statut_candidature)
 WHERE envoi_automatique = TRUE
     AND actif = TRUE;
+
+INSERT INTO modele_message (id_type_message, id_statut_candidature, nom_modele, objet, contenu, envoi_automatique, actif)
+VALUES
+    (1, 1, 'Accusé de réception de candidature', 'AlpA Ciment - Accusé de réception de votre candidature pour {poste}', 'Bonjour {prenom} {nom},
+
+Nous accusons bonne réception de votre candidature pour le poste de {poste} au sein de la direction {direction}.
+
+Nos équipes RH étudient actuellement votre profil avec la plus grande attention. Vous serez recontacté(e) dans les meilleurs délais pour la suite du processus de recrutement.
+
+Bien cordialement,
+L''équipe Ressources Humaines
+AlpA Ciment', TRUE, TRUE),
+    (2, 3, 'Convocation à un test de compétences', 'AlpA Ciment - Convocation : Test technique pour {poste}', 'Bonjour {prenom} {nom},
+
+Dans le cadre du processus de recrutement pour le poste de {poste}, nous avons le plaisir de vous inviter à passer une session de test.
+
+Détails de votre rendez-vous :
+- Date : {date_rdv}
+- Heure : {heure_rdv}
+- Mode : {mode_rdv}
+- Lieu / Modalités : {lieu_rdv}
+
+Merci de bien vouloir nous confirmer votre disponibilité par retour de cet e-mail.
+
+Cordialement,
+L''équipe Ressources Humaines
+AlpA Ciment', FALSE, TRUE),
+    (2, 4, 'Convocation à un entretien de recrutement', 'AlpA Ciment - Convocation : Entretien pour {poste}', 'Bonjour {prenom} {nom},
+
+Suite à l''étude de votre candidature pour le poste de {poste}, nous serions ravis d''échanger avec vous lors d''un entretien d''embauche.
+
+Détails de votre entretien :
+- Date : {date_rdv}
+- Heure : {heure_rdv}
+- Mode : {mode_rdv}
+- Lieu / Lien : {lieu_rdv}
+
+Nous vous prions de bien vouloir confirmer votre présence en répondant à cet e-mail.
+
+Bien cordialement,
+L''équipe Ressources Humaines
+AlpA Ciment', FALSE, TRUE),
+    (4, NULL, 'Demande de documents complémentaires', 'AlpA Ciment - Pièces justificatives complémentaires pour votre candidature', 'Bonjour {prenom} {nom},
+
+Afin de compléter l''instruction de votre dossier de candidature pour le poste de {poste}, nous vous serions reconnaissants de bien vouloir nous transmettre les pièces justificatives manquantes (diplômes, certificats de travail, pièces d''identité).
+
+Vous pouvez nous les adresser par retour d''e-mail dans les plus brefs délais.
+
+Avec nos remerciements,
+L''équipe Ressources Humaines
+AlpA Ciment', FALSE, TRUE),
+    (5, 6, 'Notification de non-retenue', 'AlpA Ciment - Suite donnée à votre candidature pour {poste}', 'Bonjour {prenom} {nom},
+
+Nous tenons à vous remercier pour l''intérêt que vous portez à AlpA Ciment et pour le temps consacré à votre candidature pour le poste de {poste}.
+
+Après examen attentif de l''ensemble des profils reçus, nous avons le regret de vous informer que nous n''avons pas retenu votre candidature pour cette opportunité.
+
+Avec votre accord, nous conservons votre dossier au sein de notre vivier de talents afin de pouvoir vous solliciter si une nouvelle opportunité correspondant à vos compétences venait à s''ouvrir.
+
+Nous vous souhaitons pleine réussite dans vos projets professionnels.
+
+Cordialement,
+L''équipe Ressources Humaines
+AlpA Ciment', FALSE, TRUE);
 -- ============================================================
 -- 17. COMMUNICATION
 -- ============================================================
@@ -600,6 +664,30 @@ CREATE TABLE communication (
 );
 CREATE INDEX idx_communication_candidature ON communication(id_candidature);
 CREATE INDEX idx_communication_type ON communication(id_type_message);
+
+-- ============================================================
+-- 17bis. AUDIT_LOG (Journalisation des actions RH)
+-- ============================================================
+CREATE TABLE audit_log (
+    id_audit_log BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_utilisateur BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE SET NULL,
+    action VARCHAR(50) NOT NULL,
+    entite VARCHAR(100) NOT NULL,
+    id_entite BIGINT,
+    description VARCHAR(255),
+    anciennes_valeurs JSONB,
+    nouvelles_valeurs JSONB,
+    ip_adresse VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_audit_log_action ON audit_log(action);
+CREATE INDEX idx_audit_log_entite ON audit_log(entite);
+CREATE INDEX idx_audit_log_id_entite ON audit_log(id_entite);
+CREATE INDEX idx_audit_log_id_utilisateur ON audit_log(id_utilisateur);
+CREATE INDEX idx_audit_log_created_at ON audit_log(created_at);
+
 -- ============================================================
 -- 18. FONCTION POUR VALIDER UN DOMAINE
 -- ============================================================

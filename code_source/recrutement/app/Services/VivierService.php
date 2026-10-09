@@ -18,8 +18,11 @@ class VivierService
 {
     public function __construct(
         protected VivierRepositoryInterface $vivierRepository,
-        protected CompetenceRepositoryInterface $competenceRepository
-    ) {}
+        protected CompetenceRepositoryInterface $competenceRepository,
+        protected ?AuditLogService $auditLogService = null
+    ) {
+        $this->auditLogService = $auditLogService ?? app(AuditLogService::class);
+    }
 
     public function listVivier(array $filters): Collection
     {
@@ -293,6 +296,25 @@ class VivierService
                 }
             }
         }
+
+        $actionLabel = $data['statut_validation'] === 'valide'
+            ? 'VALIDATION_OCR'
+            : ($data['statut_validation'] === 'corrige' ? 'CORRECTION_OCR' : 'REJET_OCR');
+
+        $this->auditLogService->log(
+            action: $actionLabel,
+            entite: 'Candidature',
+            idEntite: $idCandidature,
+            description: "Décision RH sur extraction CV (Statut: {$data['statut_validation']}) - Candidature #{$idCandidature}",
+            anciennesValeurs: ['statut_validation' => 'en_attente'],
+            nouvellesValeurs: [
+                'statut_validation' => $data['statut_validation'],
+                'commentaire_rh' => $data['commentaire_rh'] ?? null,
+                'nb_competences' => count($data['competences'] ?? []),
+                'nb_experiences' => count($data['experiences'] ?? []),
+                'nb_formations' => count($data['formations'] ?? []),
+            ]
+        );
 
         return $extraction;
     }
