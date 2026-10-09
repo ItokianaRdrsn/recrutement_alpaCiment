@@ -95,4 +95,9 @@ class Candidature extends Model
     {
         return $this->hasMany(HistoriqueStatut::class, 'id_candidature', 'id_candidature')->orderBy('created_at', 'desc');
     }
+
+    public function rendezVous(): HasMany
+    {
+        return $this->hasMany(RendezVous::class, 'id_candidature', 'id_candidature')->orderBy('date_debut', 'asc');
+    }
 }

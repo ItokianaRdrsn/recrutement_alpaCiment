@@ -124,12 +124,12 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 
 ---
 
-### Sprint 6 : Rendez-vous, communications, automatisation et modèles (12,0 j - 20.8% EN COURS)
+### Sprint 6 : Rendez-vous, communications, automatisation et modèles (12,0 j - 58.3% EN COURS)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **16/10/2026** au **31/10/2026** (12,0 j)
 - ⏱️ **Dates Réelles** : Du **07/10/2026** au *En cours*
 - **BACK-OFFICE** :
-  - CRUD des rendez-vous : test, entretien, statut, mode, responsable (2,0 j) - **[À FAIRE]**
-  - Vue agenda par utilisateur, candidature et période (1,0 j) - **[À FAIRE]**
+  - CRUD des rendez-vous : test, entretien, statut, mode, responsable (2,0 j) - **[FAIT]**
+  - Vue agenda par utilisateur, candidature et période (1,0 j) - **[FAIT]**
   - Communication liée aux rendez-vous (1,0 j) - **[À FAIRE]**
   - CRUD des modèles de communication (1,0 j) - **[À FAIRE]**
   - Accusé de réception et première communication automatique (0,5 j) - **[À FAIRE]**
@@ -138,9 +138,9 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
   - Récupération et ingestion des candidatures par E-mail via n8n & FastAPI OCR/LLM (1,5 j) - **[FAIT]**
   - Automatisation n8n : classification, routage, switch offre/spontanée et synchronisation (1,0 j) - **[EN COURS]**
   - Envoi manuel, historique des communications et préparation des rappels (1,5 j) - **[À FAIRE]**
-  - Log et Journalisation des actions RH (Audit Log) (1,5 j) - **[À FAIRE]**
+  - Log et Journalisation des actions RH (Audit Log) (1,5 j) - **[FAIT]**
   - Tests et debug (0,5 j) - **[À FAIRE]**
-- **Sous-total : 2,5 j / 12,0 j (20.8% EN COURS)**
+- **Sous-total : 7,0 j / 12,0 j (58.3% EN COURS)**
 
 ---
 

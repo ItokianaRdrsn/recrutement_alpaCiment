@@ -12,8 +12,11 @@ use Illuminate\Validation\ValidationException;
 class OffreService
 {
     public function __construct(
-        protected OffreRepositoryInterface $offreRepository
-    ) {}
+        protected OffreRepositoryInterface $offreRepository,
+        protected ?AuditLogService $auditLogService = null
+    ) {
+        $this->auditLogService = $auditLogService ?? app(AuditLogService::class);
+    }
 
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
     {
@@ -49,7 +52,24 @@ class OffreService
         return DB::transaction(function () use ($data, $relationsData) {
             $offre = $this->offreRepository->create($data);
             $this->offreRepository->syncNestedRelations($offre, $relationsData);
-            return $this->offreRepository->findById($offre->id_offre);
+            $createdOffre = $this->offreRepository->findById($offre->id_offre);
+
+            $this->auditLogService->log(
+                action: 'CREATION_OFFRE',
+                entite: 'Offre',
+                idEntite: $createdOffre->id_offre,
+                description: "Création de l'offre d'emploi : {$createdOffre->titre_poste} ({$createdOffre->reference_offre})",
+                anciennesValeurs: null,
+                nouvellesValeurs: [
+                    'titre_poste' => $createdOffre->titre_poste,
+                    'reference_offre' => $createdOffre->reference_offre,
+                    'id_direction' => $createdOffre->id_direction,
+                    'id_domaine' => $createdOffre->id_domaine,
+                    'id_statut_offre' => $createdOffre->id_statut_offre,
+                ]
+            );
+
+            return $createdOffre;
         });
     }
 
@@ -63,12 +83,35 @@ class OffreService
             $data['id_lieu'] = 1;
         }
 
+        $anciennesValeurs = [
+            'titre_poste' => $offre->titre_poste,
+            'reference_offre' => $offre->reference_offre,
+            'id_statut_offre' => $offre->id_statut_offre,
+            'id_direction' => $offre->id_direction,
+        ];
+
         unset($data['profil'], $data['profils'], $data['missions'], $data['formations'], $data['competences']);
 
-        return DB::transaction(function () use ($offre, $data, $relationsData) {
+        return DB::transaction(function () use ($offre, $data, $relationsData, $anciennesValeurs) {
             $this->offreRepository->update($offre, $data);
             $this->offreRepository->syncNestedRelations($offre, $relationsData);
-            return $this->offreRepository->findById($offre->id_offre);
+            $updatedOffre = $this->offreRepository->findById($offre->id_offre);
+
+            $this->auditLogService->log(
+                action: 'MODIFICATION_OFFRE',
+                entite: 'Offre',
+                idEntite: $updatedOffre->id_offre,
+                description: "Modification de l'offre d'emploi : {$updatedOffre->titre_poste} ({$updatedOffre->reference_offre})",
+                anciennesValeurs: $anciennesValeurs,
+                nouvellesValeurs: [
+                    'titre_poste' => $updatedOffre->titre_poste,
+                    'reference_offre' => $updatedOffre->reference_offre,
+                    'id_statut_offre' => $updatedOffre->id_statut_offre,
+                    'id_direction' => $updatedOffre->id_direction,
+                ]
+            );
+
+            return $updatedOffre;
         });
     }
 
@@ -86,7 +129,18 @@ class OffreService
             'date_publication' => $offre->date_publication ?? today(),
         ]);
 
-        return $this->offreRepository->findById($offre->id_offre);
+        $published = $this->offreRepository->findById($offre->id_offre);
+
+        $this->auditLogService->log(
+            action: 'PUBLICATION_OFFRE',
+            entite: 'Offre',
+            idEntite: $published->id_offre,
+            description: "Publication de l'offre : {$published->titre_poste} ({$published->reference_offre})",
+            anciennesValeurs: ['id_statut_offre' => $offre->id_statut_offre],
+            nouvellesValeurs: ['id_statut_offre' => $targetId, 'date_publication' => $published->date_publication]
+        );
+
+        return $published;
     }
 
     public function close(Offre $offre): Offre
@@ -103,7 +157,18 @@ class OffreService
             'date_limite' => $offre->date_limite ?? today(),
         ]);
 
-        return $this->offreRepository->findById($offre->id_offre);
+        $closed = $this->offreRepository->findById($offre->id_offre);
+
+        $this->auditLogService->log(
+            action: 'CLOTURE_OFFRE',
+            entite: 'Offre',
+            idEntite: $closed->id_offre,
+            description: "Clôture de l'offre : {$closed->titre_poste} ({$closed->reference_offre})",
+            anciennesValeurs: ['id_statut_offre' => $offre->id_statut_offre],
+            nouvellesValeurs: ['id_statut_offre' => $targetId, 'date_limite' => $closed->date_limite]
+        );
+
+        return $closed;
     }
 
     public function delete(Offre $offre): void
@@ -116,7 +181,22 @@ class OffreService
             ]);
         }
 
+        $deletedDetails = [
+            'id_offre' => $offre->id_offre,
+            'titre_poste' => $offre->titre_poste,
+            'reference_offre' => $offre->reference_offre,
+        ];
+
         $this->offreRepository->delete($offre);
+
+        $this->auditLogService->log(
+            action: 'SUPPRESSION_OFFRE',
+            entite: 'Offre',
+            idEntite: $deletedDetails['id_offre'],
+            description: "Suppression définitive du brouillon de l'offre : {$deletedDetails['titre_poste']}",
+            anciennesValeurs: $deletedDetails,
+            nouvellesValeurs: null
+        );
     }
 
     public function validateWorkflowProgression(Offre $offre, int $targetStatusId): void

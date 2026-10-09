@@ -20,8 +20,13 @@ class CandidatureService
         protected CandidatureRepositoryInterface $candidatureRepository,
         protected CandidatRepositoryInterface $candidatRepository,
         protected OffreRepositoryInterface $offreRepository,
-        protected DomaineRepositoryInterface $domaineRepository
-    ) {}
+        protected DomaineRepositoryInterface $domaineRepository,
+        protected ?AuditLogService $auditLogService = null,
+        protected ?CommunicationService $communicationService = null
+    ) {
+        $this->auditLogService = $auditLogService ?? app(AuditLogService::class);
+        $this->communicationService = $communicationService ?? app(CommunicationService::class);
+    }
 
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
     {
@@ -100,6 +105,13 @@ class CandidatureService
             // 5. Store files
             $this->storeFiles($candidature, $request, 'site_externe');
 
+            // 6. Accusé de réception automatique par email
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception candidature #{$candidature->id_candidature}: " . $e->getMessage());
+            }
+
             return $candidature->load(['candidat', 'offre', 'statut']);
         });
     }
@@ -150,6 +162,13 @@ class CandidatureService
             ]);
 
             $this->storeFiles($candidature, $request, 'site_externe');
+
+            // Accusé de réception automatique par email
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception candidature spontanée #{$candidature->id_candidature}: " . $e->getMessage());
+            }
 
             return $candidature->load(['candidat', 'domaine', 'statut']);
         });
@@ -238,10 +257,32 @@ class CandidatureService
                     'statut_validation' => 'valide',
                 ]);
 
-                // 2. Insertion directe dans les tables de profil (compétences, expériences, formations)
+                // 2. Insertion directe dans les tables de profil (compétences, expériences, formations, projets)
                 if (is_array($donneesJson)) {
                     $this->insertExtractedProfileData($candidature->id_candidature, $donneesJson);
                 }
+            }
+
+            // 3. Archivage de l'e-mail source reçu dans la table communication (RG-COM-03)
+            $sujetEmail = $data['sujet_email'] ?? $data['sujet'] ?? ('Candidature reçue par e-mail - ' . ($candidature->poste_souhaite ?? 'Dossier'));
+            $corpsEmail = $data['corps_email'] ?? $data['contenu_email'] ?? $data['message_motivation'] ?? 'Candidature transmise via scénario d\'ingestion automatique n8n.';
+            
+            \App\Models\Communication::create([
+                'id_candidature' => $candidature->id_candidature,
+                'id_modele_message' => null,
+                'id_type_message' => 6, // 6 = Autre (Message entrant archivé)
+                'objet' => $sujetEmail,
+                'contenu' => $corpsEmail,
+                'mode_envoi' => 'auto',
+                'date_envoi' => now(),
+                'id_utilisateur' => null,
+            ]);
+
+            // 4. Déclenchement automatique de l'accusé de réception par e-mail (RG-COM-02)
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception import externe #{$candidature->id_candidature}: " . $e->getMessage());
             }
 
             return $candidature->load(['candidat', 'offre', 'statut']);
@@ -329,7 +370,7 @@ class CandidatureService
             ]);
         }
 
-        DB::transaction(function () use ($candidature, $newStatusId, $commentaire, $userId) {
+        DB::transaction(function () use ($candidature, $newStatusId, $commentaire, $userId, $currentStatut, $newStatut) {
             $this->candidatureRepository->update($candidature, ['id_statut_candidature' => $newStatusId]);
 
             $this->candidatureRepository->createHistorique([
@@ -339,6 +380,17 @@ class CandidatureService
                 'commentaire' => $commentaire ?? 'Changement de statut',
                 'id_utilisateur' => $userId,
             ]);
+
+            $nomCandidat = $candidature->candidat ? "{$candidature->candidat->nom} {$candidature->candidat->prenom}" : "Candidature #{$candidature->id_candidature}";
+            $this->auditLogService->log(
+                action: 'CHANGEMENT_STATUT_CANDIDAT',
+                entite: 'Candidature',
+                idEntite: $candidature->id_candidature,
+                description: "Changement de statut pour {$nomCandidat} : {$currentStatut?->libelle} -> {$newStatut?->libelle}",
+                anciennesValeurs: ['id_statut_candidature' => $candidature->id_statut_candidature, 'statut' => $currentStatut?->libelle],
+                nouvellesValeurs: ['id_statut_candidature' => $newStatusId, 'statut' => $newStatut?->libelle, 'commentaire' => $commentaire],
+                idUtilisateur: $userId
+            );
         });
 
         return $candidature->fresh(['statut', 'historique']);
@@ -358,6 +410,16 @@ class CandidatureService
         }
 
         $this->candidatureRepository->update($candidature, ['dans_vivier' => $dansVivier]);
+
+        $nomCandidat = $candidature->candidat ? "{$candidature->candidat->nom} {$candidature->candidat->prenom}" : "Candidature #{$candidature->id_candidature}";
+        $this->auditLogService->log(
+            action: $dansVivier ? 'AJOUT_VIVIER' : 'RETRAIT_VIVIER',
+            entite: 'Candidature',
+            idEntite: $candidature->id_candidature,
+            description: ($dansVivier ? "Placement dans le vivier RH : " : "Retrait du vivier RH : ") . $nomCandidat,
+            anciennesValeurs: ['dans_vivier' => $candidature->dans_vivier],
+            nouvellesValeurs: ['dans_vivier' => $dansVivier]
+        );
 
         return $candidature;
     }
@@ -529,6 +591,31 @@ class CandidatureService
                     'etablissement' => $form['etablissement'] ?? null,
                     'domaine_etude' => $form['domaine_etude'] ?? null,
                     'date_obtention' => $dateObt,
+                    'valide' => true,
+                    'source' => 'cv_ocr',
+                ]);
+            }
+        }
+
+        // 4. Projets & Réalisations
+        if (!empty($donneesJson['projets']) && is_array($donneesJson['projets'])) {
+            foreach ($donneesJson['projets'] as $proj) {
+                $titre = trim($proj['titre_projet'] ?? $proj['titre'] ?? $proj['nom'] ?? '');
+                if (empty($titre)) continue;
+
+                $dateDebut = $this->parseDateSafely($proj['date_debut'] ?? null);
+                $dateFin = $this->parseDateSafely($proj['date_fin'] ?? null);
+                $techs = is_array($proj['technologies'] ?? null) ? implode(', ', $proj['technologies']) : ($proj['technologies'] ?? null);
+
+                \App\Models\CandidatProjet::create([
+                    'id_candidature' => $idCandidature,
+                    'titre_projet' => $titre,
+                    'role' => $proj['role'] ?? null,
+                    'technologies' => $techs,
+                    'url_projet' => $proj['url_projet'] ?? $proj['url'] ?? null,
+                    'date_debut' => $dateDebut,
+                    'date_fin' => $dateFin,
+                    'description' => $proj['description'] ?? null,
                     'valide' => true,
                     'source' => 'cv_ocr',
                 ]);

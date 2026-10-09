@@ -144,8 +144,36 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::post('/candidature/{idCandidature}/formations', [VivierController::class, 'addFormation'])->name('api.candidature.add-formation');
     Route::post('/candidatures/{idCandidature}/formations', [VivierController::class, 'addFormation']); // Alias
 
+    Route::post('/candidature/{idCandidature}/projets', [VivierController::class, 'addProjet'])->name('api.candidature.add-projet');
+    Route::post('/candidatures/{idCandidature}/projets', [VivierController::class, 'addProjet']); // Alias
+
     // --- VIVIER RH ---
     Route::get('/vivier', [VivierController::class, 'index'])->name('api.vivier.index');
     Route::post('/vivier', [VivierController::class, 'store'])->name('api.vivier.store');
     Route::delete('/vivier/{id}', [VivierController::class, 'destroy'])->name('api.vivier.destroy');
+
+    // --- JOURNAL D'AUDIT DES ACTIONS RH (Sprint 6) ---
+    Route::get('/audit-logs', [App\Http\Controllers\Api\AuditLogController::class, 'index'])->name('api.audit-logs.index');
+    Route::get('/audit/logs', [App\Http\Controllers\Api\AuditLogController::class, 'index']); // Alias
+
+    // --- GESTION DES RENDEZ-VOUS & AGENDA RH (Sprint 6) ---
+    Route::get('/rendez-vous/referentiels', [\App\Http\Controllers\Api\RendezVousController::class, 'referentiels'])->name('api.rendez-vous.referentiels');
+    Route::post('/rendez-vous/{rendezVous}/annuler', [\App\Http\Controllers\Api\RendezVousController::class, 'cancel'])->name('api.rendez-vous.cancel');
+    Route::apiResource('rendez-vous', \App\Http\Controllers\Api\RendezVousController::class);
+
+    // --- MODULE DE COMMUNICATION & MODÈLES D'EMAILS (Sprint 6) ---
+    Route::get('/modeles-messages/referentiels', [\App\Http\Controllers\Api\ModeleMessageController::class, 'referentiels'])->name('api.modeles-messages.referentiels');
+    Route::post('/modeles-messages/apercu', [\App\Http\Controllers\Api\ModeleMessageController::class, 'apercu'])->name('api.modeles-messages.apercu');
+    Route::apiResource('modeles-messages', \App\Http\Controllers\Api\ModeleMessageController::class);
+
+    // Aliases pour modeles-emails
+    Route::get('/modeles-emails/referentiels', [\App\Http\Controllers\Api\ModeleMessageController::class, 'referentiels']);
+    Route::post('/modeles-emails/apercu', [\App\Http\Controllers\Api\ModeleMessageController::class, 'apercu']);
+    Route::apiResource('modeles-emails', \App\Http\Controllers\Api\ModeleMessageController::class);
+
+    Route::get('/candidature/{id}/communications', [\App\Http\Controllers\Api\CommunicationController::class, 'indexCandidature'])->name('api.candidature.communications.index');
+    Route::get('/candidatures/{id}/communications', [\App\Http\Controllers\Api\CommunicationController::class, 'indexCandidature']); // Alias
+    Route::post('/candidature/{id}/communications', [\App\Http\Controllers\Api\CommunicationController::class, 'envoyer'])->name('api.candidature.communications.envoyer');
+    Route::post('/candidatures/{id}/communications', [\App\Http\Controllers\Api\CommunicationController::class, 'envoyer']); // Alias
 });
+

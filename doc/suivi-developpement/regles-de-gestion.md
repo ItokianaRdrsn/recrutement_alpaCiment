@@ -48,5 +48,19 @@ Ce document répertorie l'ensemble des règles de gestion métier appliquées su
 
 ## 📌 6. Règles de Nomenclatures d'Endpoints API & Routage RESTful
 - **RG-END-01 : Harmonisation des Endpoints (Singulier vs Pluriel)** :
-  - **Pluriel avec `s`** (`/offres`, `/candidatures`, `/directions`, `/domaines`, `/competences`) pour toutes les routes d'API renvoyant une collection ou liste de ressources.
-  - **Singulier sans `s`** (`/offre/{id}`, `/candidature/{id}`, `/direction/{id}`, `/domaine/{id}`, `/competence/{id}`) pour toutes les routes ciblant une ressource spécifique identifiée par son `{id}`.
+  - **Pluriel avec `s`** (`/offres`, `/candidatures`, `/directions`, `/domaines`, `/competences`, `/modeles-messages`) pour toutes les routes d'API renvoyant une collection ou liste de ressources.
+  - **Singulier sans `s`** (`/offre/{id}`, `/candidature/{id}`, `/direction/{id}`, `/domaine/{id}`, `/competence/{id}`, `/modele-message/{id}`) pour toutes les routes ciblant une ressource spécifique identifiée par son `{id}`.
+
+---
+
+## 📌 7. Règles de Gestion sur la Planification des Rendez-vous RH
+- **RG-RDV-01 : Cohérence Chronologique** : La date et heure de fin d'un rendez-vous doit obligatoirement être strictement supérieure à la date et heure de début (`date_fin > date_debut`).
+- **RG-RDV-02 : Notification Automatique** : Lors de la création d'un rendez-vous, une convocation par e-mail est envoyée par défaut au candidat contenant les détails précis du créneau (date, heure, mode, lien ou lieu physique).
+
+---
+
+## 📌 8. Règles de Gestion sur les Communications & Modèles d'E-mails
+- **RG-COM-01 : Envoi Automatique et Statut Déclencheur** : Un modèle d'e-mail configuré avec `envoi_automatique = true` doit impérativement avoir un statut déclencheur associé (`id_statut_candidature IS NOT NULL`). La base garantit l'unicité par statut (`idx_modele_unique_auto_par_statut`).
+- **RG-COM-02 : Accusé de Réception Systématique** : Tout dépôt de candidature (sur offre ou spontanée) déclenche un accusé de réception automatique à destination de l'adresse e-mail renseignée par le candidat.
+- **RG-COM-03 : Immuabilité de la Preuve de Communication** : Le message réellement transmis est consigné de façon figée dans la table `communication` (`objet`, `contenu`, `date_envoi`, `id_utilisateur`). Les futures éditions du modèle source n'altèrent en rien l'historique archivé.
+

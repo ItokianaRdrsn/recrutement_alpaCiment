@@ -56,9 +56,36 @@ Pour **TOUTE** décision technique ou sélection de librairie / framework / outi
 
 ---
 
+## 🗄️ Règle Impérative de Synchronisation de la Base de Données (`gestion_recrutement.sql`)
+
+Dès qu'une modification de structure de base de données est réalisée (nouvelle table, ajout ou renommage de colonne, index, contrainte `CHECK` ou clé étrangère) via une migration Laravel ou directement :
+
+1. **Mise à jour obligatoire du script maître** :
+   - Reporter **systématiquement et immédiatement** le script SQL correspondant dans le fichier maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
+2. **Garantie d'intégrité** :
+   - Le fichier [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) doit impérativement rester le reflet exact à 100% de la structure de base de données du projet, directement ré-exécutable de bout en bout pour reconstruire la base PostgreSQL complète.
+
+---
+
+## 💡 Règle de Clôture : Recommandation Systématique du Bon Prompt et des Commandes Slash (`/`)
+
+À la fin de chaque réponse, l'assistant doit obligatoirement :
+1. **Identifier la ou les prochaines étapes concrètes** à réaliser selon l'ordre du sprint en cours.
+2. **Fournir à l'utilisateur le texte exact du prochain prompt prêt à copier-coller**, formulé de façon optimale et précise.
+3. **Associer la commande slash (`/`) appropriée** si la tâche s'y prête :
+   - `/plan` : pour structurer une tâche complexe touchant plusieurs couches avant de coder.
+   - `/grill-me` : pour affiner des exigences ou arbitrages fonctionnels/UX par un questionnement interactif.
+   - `/goal` : pour exécuter un sous-ensemble complet de bout en bout de façon autonome.
+   - `/boost` : pour les algorithmes complexes, le matching sémantique ou les calculs de scoring critiques.
+   - `/learn` : lorsqu'une correction méthodologique ou règle persistante doit être ancrée définitivement.
+
+---
+
 ## ✅ Checklist Obligatoire avant de Terminer un Prompt
 - [ ] Code backend & frontend modifié et vérifié.
 - [ ] Compilation frontend effectuée (`npm run build`).
 - [ ] Suite de tests backend validée (`php artisan test`).
+- [ ] **Mise à jour du fichier maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql)** si une modification ou un ajout touche la base de données.
 - [ ] Fichiers de documentation générés ou mis à jour selon la méthodologie (Sprint vs Rectification).
 - [ ] Registre de justification technologique (`justification-technologique.md`) renseigné si une technologie/librairie est concernée.
+- [ ] **Recommandation du prompt exact optimal et de la commande slash (`/`) idoine** fournie à la fin de la réponse.

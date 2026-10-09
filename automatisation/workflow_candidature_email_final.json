@@ -1,0 +1,295 @@
+{
+  "name": "AlpA Ciment - Scénario Ingestion Candidatures & Classification Emails",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "email-inbox",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "node-trigger-webhook",
+      "name": "1. E-mail Entrant (Trigger Webhook)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        180,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/classifier-intention",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"sender\": \"{{ $json.body?.sender || $json.body?.from || $json.sender || 'candidat@example.com' }}\",\n  \"subject\": \"{{ $json.body?.subject || $json.subject || 'Candidature spontanée Développeur' }}\",\n  \"content\": \"{{ $json.body?.content || $json.body?.text || $json.content || 'Bonjour, je vous transmets mon CV ci-joint.' }}\"\n}",
+        "options": {}
+      },
+      "id": "node-ia-classifier",
+      "name": "2. Classifier Intention (IA / NLP)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intention }}",
+                    "rightValue": "demande_emploi",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intention }}",
+                    "rightValue": "information",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.intention }}",
+                    "rightValue": "spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-switch-intention",
+      "name": "3. Aiguillage par Intention",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        680,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/extraire-cv-ocr",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"texte\": \"{{ $('1. E-mail Entrant (Trigger Webhook)').item.json.body?.content || $('1. E-mail Entrant (Trigger Webhook)').item.json.content || '' }}\",\n  \"email\": \"{{ $json.email_expediteur }}\",\n  \"nom_fichier\": \"CV_entrant.pdf\"\n}",
+        "options": {}
+      },
+      "id": "node-extract-ocr",
+      "name": "4A. Extraire CV (OCR/LLM avec Projets)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        940,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ocrResult = $input.item.json;\nconst classifierNode = $('2. Classifier Intention (IA / NLP)').item.json;\nconst emailNode = $('1. E-mail Entrant (Trigger Webhook)').item.json;\n\nconst idOffre = classifierNode.id_offre || null;\nconst emailSubject = classifierNode.sujet || emailNode.body?.subject || emailNode.subject || 'Candidature par email';\nconst emailBody = emailNode.body?.content || emailNode.body?.text || emailNode.content || 'Bonjour, je vous soumets ma candidature.';\n\nreturn {\n  json: {\n    nom: ocrResult.contact?.nom || 'Candidat',\n    prenom: ocrResult.contact?.prenom || '',\n    nom_complet: ocrResult.contact?.nom_complet || 'Candidat',\n    email: classifierNode.email_expediteur || ocrResult.contact?.email || 'candidat@example.local',\n    telephone: ocrResult.contact?.telephone || null,\n    ville: ocrResult.contact?.ville || null,\n    id_offre: idOffre,\n    source: 'email / n8n',\n    sujet_email: emailSubject,\n    corps_email: emailBody,\n    message_motivation: emailBody,\n    texte_brut_ocr: ocrResult.texte_brut_ocr || null,\n    donnees_json: {\n      contact: ocrResult.contact,\n      competences: ocrResult.competences || [],\n      experiences: ocrResult.experiences || [],\n      projets: ocrResult.projets || [],\n      formations: ocrResult.formations || []\n    }\n  }\n};"
+      },
+      "id": "node-format-laravel",
+      "name": "5A. Formater Payload Laravel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/public/import-candidature",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "node-send-laravel",
+      "name": "6A. Synchroniser avec Laravel (Candidature + Comm)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1420,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"statut\": \"succes\",\n  \"intention\": \"demande_emploi\",\n  \"type\": \"{{ $('2. Classifier Intention (IA / NLP)').item.json.est_spontanee ? 'Spontanée (Vivier auto)' : 'Sur Offre #' + $('2. Classifier Intention (IA / NLP)').item.json.id_offre }}\",\n  \"candidature_id\": {{ $json.data?.id_candidature || 'null' }},\n  \"candidat\": {{ JSON.stringify($json.data?.candidat) }},\n  \"message\": \"Candidature et profil (projets/expériences) enregistrés avec accusé de réception automatique.\"\n}",
+        "options": {}
+      },
+      "id": "node-response-success",
+      "name": "7A. Répondre Succès",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1660,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"statut\": \"traite\",\n  \"intention\": \"information\",\n  \"message\": \"Demande d'information identifiée. Notification transmise à l'accueil RH.\",\n  \"expediteur\": \"{{ $json.email_expediteur }}\",\n  \"sujet\": \"{{ $json.sujet }}\"\n}",
+        "options": {}
+      },
+      "id": "node-response-info",
+      "name": "4B. Traiter Demande Information",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        940,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"statut\": \"ignore\",\n  \"intention\": \"spam\",\n  \"message\": \"E-mail classé comme spam ou non pertinent. Aucune insertion en base de données.\",\n  \"expediteur\": \"{{ $json.email_expediteur }}\"\n}",
+        "options": {}
+      },
+      "id": "node-response-spam",
+      "name": "4C. Ignorer Spam",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        940,
+        460
+      ]
+    }
+  ],
+  "connections": {
+    "1. E-mail Entrant (Trigger Webhook)": {
+      "main": [
+        [
+          {
+            "node": "2. Classifier Intention (IA / NLP)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Classifier Intention (IA / NLP)": {
+      "main": [
+        [
+          {
+            "node": "3. Aiguillage par Intention",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Aiguillage par Intention": {
+      "main": [
+        [
+          {
+            "node": "4A. Extraire CV (OCR/LLM avec Projets)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "4B. Traiter Demande Information",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "4C. Ignorer Spam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4A. Extraire CV (OCR/LLM avec Projets)": {
+      "main": [
+        [
+          {
+            "node": "5A. Formater Payload Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5A. Formater Payload Laravel": {
+      "main": [
+        [
+          {
+            "node": "6A. Synchroniser avec Laravel (Candidature + Comm)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6A. Synchroniser avec Laravel (Candidature + Comm)": {
+      "main": [
+        [
+          {
+            "node": "7A. Répondre Succès",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

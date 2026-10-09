@@ -14,6 +14,9 @@ const CandidaturesOffresView = lazy(() => import('./pages/CandidaturesOffresView
 const CandidaturesSpontaneesView = lazy(() => import('./pages/CandidaturesSpontaneesView').then((m) => ({ default: m.CandidaturesSpontaneesView })));
 const ReferentialsView = lazy(() => import('./pages/ReferentialsView').then((m) => ({ default: m.ReferentialsView })));
 const VivierView = lazy(() => import('./pages/VivierView').then((m) => ({ default: m.VivierView })));
+const AgendaView = lazy(() => import('./pages/AgendaView').then((m) => ({ default: m.AgendaView })));
+const ModelesEmailsView = lazy(() => import('./pages/ModelesEmailsView').then((m) => ({ default: m.ModelesEmailsView })));
+const AuditLogsView = lazy(() => import('./pages/AuditLogsView').then((m) => ({ default: m.AuditLogsView })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 
 const CandidatureSpontaneePage = lazy(() => import('./frontOffice/CandidatureSpontaneePage'));
@@ -236,6 +239,30 @@ function MainApp() {
                         </BackOfficeLayout>
                     }
                     path="/vivier"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <AgendaView />
+                        </BackOfficeLayout>
+                    }
+                    path="/agenda"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <ModelesEmailsView />
+                        </BackOfficeLayout>
+                    }
+                    path="/modeles-emails"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <AuditLogsView />
+                        </BackOfficeLayout>
+                    }
+                    path="/audit-logs"
                 />
                 <Route
                     element={
