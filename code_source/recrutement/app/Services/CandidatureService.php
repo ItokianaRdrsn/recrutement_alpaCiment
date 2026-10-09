@@ -257,10 +257,32 @@ class CandidatureService
                     'statut_validation' => 'valide',
                 ]);
 
-                // 2. Insertion directe dans les tables de profil (compétences, expériences, formations)
+                // 2. Insertion directe dans les tables de profil (compétences, expériences, formations, projets)
                 if (is_array($donneesJson)) {
                     $this->insertExtractedProfileData($candidature->id_candidature, $donneesJson);
                 }
+            }
+
+            // 3. Archivage de l'e-mail source reçu dans la table communication (RG-COM-03)
+            $sujetEmail = $data['sujet_email'] ?? $data['sujet'] ?? ('Candidature reçue par e-mail - ' . ($candidature->poste_souhaite ?? 'Dossier'));
+            $corpsEmail = $data['corps_email'] ?? $data['contenu_email'] ?? $data['message_motivation'] ?? 'Candidature transmise via scénario d\'ingestion automatique n8n.';
+            
+            \App\Models\Communication::create([
+                'id_candidature' => $candidature->id_candidature,
+                'id_modele_message' => null,
+                'id_type_message' => 6, // 6 = Autre (Message entrant archivé)
+                'objet' => $sujetEmail,
+                'contenu' => $corpsEmail,
+                'mode_envoi' => 'auto',
+                'date_envoi' => now(),
+                'id_utilisateur' => null,
+            ]);
+
+            // 4. Déclenchement automatique de l'accusé de réception par e-mail (RG-COM-02)
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception import externe #{$candidature->id_candidature}: " . $e->getMessage());
             }
 
             return $candidature->load(['candidat', 'offre', 'statut']);
@@ -569,6 +591,31 @@ class CandidatureService
                     'etablissement' => $form['etablissement'] ?? null,
                     'domaine_etude' => $form['domaine_etude'] ?? null,
                     'date_obtention' => $dateObt,
+                    'valide' => true,
+                    'source' => 'cv_ocr',
+                ]);
+            }
+        }
+
+        // 4. Projets & Réalisations
+        if (!empty($donneesJson['projets']) && is_array($donneesJson['projets'])) {
+            foreach ($donneesJson['projets'] as $proj) {
+                $titre = trim($proj['titre_projet'] ?? $proj['titre'] ?? $proj['nom'] ?? '');
+                if (empty($titre)) continue;
+
+                $dateDebut = $this->parseDateSafely($proj['date_debut'] ?? null);
+                $dateFin = $this->parseDateSafely($proj['date_fin'] ?? null);
+                $techs = is_array($proj['technologies'] ?? null) ? implode(', ', $proj['technologies']) : ($proj['technologies'] ?? null);
+
+                \App\Models\CandidatProjet::create([
+                    'id_candidature' => $idCandidature,
+                    'titre_projet' => $titre,
+                    'role' => $proj['role'] ?? null,
+                    'technologies' => $techs,
+                    'url_projet' => $proj['url_projet'] ?? $proj['url'] ?? null,
+                    'date_debut' => $dateDebut,
+                    'date_fin' => $dateFin,
+                    'description' => $proj['description'] ?? null,
                     'valide' => true,
                     'source' => 'cv_ocr',
                 ]);

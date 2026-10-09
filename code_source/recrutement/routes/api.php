@@ -144,6 +144,9 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::post('/candidature/{idCandidature}/formations', [VivierController::class, 'addFormation'])->name('api.candidature.add-formation');
     Route::post('/candidatures/{idCandidature}/formations', [VivierController::class, 'addFormation']); // Alias
 
+    Route::post('/candidature/{idCandidature}/projets', [VivierController::class, 'addProjet'])->name('api.candidature.add-projet');
+    Route::post('/candidatures/{idCandidature}/projets', [VivierController::class, 'addProjet']); // Alias
+
     // --- VIVIER RH ---
     Route::get('/vivier', [VivierController::class, 'index'])->name('api.vivier.index');
     Route::post('/vivier', [VivierController::class, 'store'])->name('api.vivier.store');

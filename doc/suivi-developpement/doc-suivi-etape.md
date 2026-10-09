@@ -1331,3 +1331,48 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Tests PHPUnit Laravel : **25/25 tests passés (96 assertions)**.
    - Compilation Vite frontend (`npm run build`) : **✓ built in 1.16s (0 erreur)**.
 
+---
+
+### Demande 104 : Finalisation de l'Automatisation n8n, Extraction OCR/LLM avec Séparation des Projets & Synchronisation Candidature/Communication
+1. **Contexte & Spécification** :
+   - Finaliser le pipeline d'ingestion des e-mails avec n8n.
+   - Classifier l'intention en 3 catégories : `demande_emploi` (sur offre ou spontanée), `information` et `spam`.
+   - Distinguer strictement dans l'extraction OCR / LLM les **Expériences professionnelles** (en entreprise) des **Projets & Réalisations** (académiques, personnels, open-source) pour éliminer les confusions fréquentes des LLM.
+   - Si `id_offre` est `null`, basculer automatiquement la candidature dans le vivier (**RG-VIV-02**).
+   - Enregistrer l'e-mail source reçu dans la table `communication` (**RG-COM-03**) et déclencher l'accusé de réception automatique (**RG-COM-02**).
+2. **Implémentation Réalisée** :
+   - **Base de données & Modèle Clean Architecture** :
+     - Table `candidat_projet` créée via migration `2026_10_09_000100_create_candidat_projet_table.php` et synchronisée dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
+     - Modèle Eloquent [`CandidatProjet.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatProjet.php).
+     - Repositories (`VivierRepositoryInterface`, `EloquentVivierRepository`) avec méthodes `getProjetsByCandidature()` et `createProjet()`.
+     - Services (`VivierService`, `CandidatureService`) pour intégrer les projets à la fois lors de l'ingestion API directe, lors de la saisie manuelle et lors de la validation OCR par les RH.
+     - Enregistrement de l'email reçu dans `communication` et déclenchement de l'accusé de réception officiel AlpA Ciment.
+   - **Microservice FastAPI & n8n** :
+     - Endpoint `POST /api/classifier-intention` avec 3 intentions (`demande_emploi`, `information`, `spam`) et détection de l'`id_offre`.
+     - Endpoint `POST /api/extraire-cv-ocr` avec séparation explicite des `experiences` et `projets`.
+     - Workflow n8n exporté et prêt à l'emploi : [`workflow_candidature_email_final.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_email_final.json).
+   - **Frontend React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+     - Bloc *Projets & Réalisations* dans l'onglet *Informations* avec formulaire de saisie manuelle et affichage des technologies.
+     - Bloc des *Projets & Réalisations identifiés* dans l'onglet *Extraction OCR* avec suppression individuelle et importation directe au profil.
+     - Intégration transparente dans l'impression et export PDF A4.
+3. **Validation & Tests** :
+   - Test automatisé PHPUnit dédié [`ImportCandidatureN8nTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/ImportCandidatureN8nTest.php).
+### Demande 105 : Intégration de la Dissociation Projets / Expériences dans le System Prompt du LLM Parser OCR (`cv_llm_parser.py`)
+1. **Contexte & Spécification** :
+   - Mise à jour du System Prompt dans le module Python de structuration intelligente par LLM ([`cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py)).
+   - Obligation d'instruire explicitement le modèle local (Llama 3.2 via Ollama) de séparer strictement les contrats/postes en entreprise (`experiences`) des projets d'études, projets personnels, hackathons ou open-source (`projets`).
+   - Schéma JSON de sortie enrichi avec la collection `projets` (titre_projet, role, technologies, url_projet, date_debut, date_fin, description).
+2. **Implémentation Réalisée** :
+   - **Module `code_source/ocr/cv_llm_parser.py`** :
+     - Enrichissement de `SYSTEM_PROMPT` avec consigne stricte de dissociation : interdiction formelle de classifier des projets académiques ou personnels dans les expériences en entreprise.
+     - Spécification de la structure exacte pour chaque élément de la liste `projets`.
+     - Intégration du champ `projets: []` dans la signature des retours structurés (`parse_cv_with_llm`, fallbacks en cas d'erreur / timeout / serveur hors-ligne, et méthode de réparation de JSON tronqué `_repair_truncated_json`).
+     - Mise à jour du jeu de données de test autonome `sample_cv` pour valider l'extraction conjointe des expériences et des projets.
+   - **Microservice `code_source/ocr/main.py`** :
+     - Mise à jour des annotations et docstrings de l'endpoint `/ner` pour refléter l'extraction conjointe des projets.
+3. **Validation & Tests** :
+   - Compilation et validation de syntaxe Python (`py_compile`) : syntaxe 100% valide.
+   - Test unitaire PHPUnit Laravel : **26/26 tests validés (103 assertions)**.
+
+
+

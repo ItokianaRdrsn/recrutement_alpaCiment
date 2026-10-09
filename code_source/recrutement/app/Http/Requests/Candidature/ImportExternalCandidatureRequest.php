@@ -53,6 +53,10 @@ class ImportExternalCandidatureRequest extends FormRequest
             'photo' => ['nullable', 'file', 'image', 'max:5120'],
             'texte_brut_ocr' => ['nullable', 'string'],
             'donnees_json' => ['nullable'],
+            'sujet_email' => ['nullable', 'string', 'max:255'],
+            'sujet' => ['nullable', 'string', 'max:255'],
+            'corps_email' => ['nullable', 'string'],
+            'contenu_email' => ['nullable', 'string'],
         ];
     }
 }

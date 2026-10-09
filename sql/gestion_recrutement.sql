@@ -464,6 +464,50 @@ CREATE TABLE candidat_formation (
         )
 );
 CREATE INDEX idx_formation_candidature ON candidat_formation(id_candidature);
+
+-- ============================================================
+-- 13quinquies. CANDIDAT_PROJET (Projets & Réalisations)
+-- ============================================================
+CREATE TABLE candidat_projet (
+    id_projet BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
+    titre_projet VARCHAR(200) NOT NULL,
+    role VARCHAR(150),
+    technologies VARCHAR(255),
+    url_projet VARCHAR(255),
+    date_debut DATE,
+    date_fin DATE,
+    description TEXT,
+    source VARCHAR(20) NOT NULL DEFAULT 'manuel' CHECK (source IN ('manuel', 'cv_ocr')),
+    score_confiance NUMERIC(4, 3),
+    id_document BIGINT REFERENCES document(id_document) ON DELETE SET NULL,
+    valide BOOLEAN NOT NULL DEFAULT FALSE,
+    date_validation TIMESTAMPTZ,
+    valide_par BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT chk_projet_dates CHECK (
+        date_fin IS NULL
+        OR date_debut IS NULL
+        OR date_fin >= date_debut
+    )
+);
+CREATE INDEX idx_projet_candidature ON candidat_projet(id_candidature);
+
+-- ============================================================
+-- 13sexies. CV_EXTRACTION_OCR (Stockage données OCR & NER)
+-- ============================================================
+CREATE TABLE cv_extraction_ocr (
+    id_extraction BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
+    texte_brut_ocr TEXT,
+    donnees_json JSONB,
+    statut_validation VARCHAR(50) NOT NULL DEFAULT 'en_attente',
+    commentaire_rh TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_cv_extraction_candidature ON cv_extraction_ocr(id_candidature);
 -- ============================================================
 -- 14. RENDEZ-VOUS (test / entretien)
 -- ============================================================

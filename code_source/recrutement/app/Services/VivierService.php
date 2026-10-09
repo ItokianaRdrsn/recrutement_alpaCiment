@@ -101,6 +101,7 @@ class VivierService
 
         $experiences = $idCandidature ? $this->vivierRepository->getExperiencesByCandidature($idCandidature) : collect();
         $formations = $idCandidature ? $this->vivierRepository->getFormationsByCandidature($idCandidature) : collect();
+        $projets = $idCandidature ? $this->vivierRepository->getProjetsByCandidature($idCandidature) : collect();
         $competences = $idCandidature ? $this->vivierRepository->getCompetencesByCandidature($idCandidature) : collect();
 
         return [
@@ -109,6 +110,7 @@ class VivierService
             'competences' => $competences,
             'experiences' => $experiences,
             'formations' => $formations,
+            'projets' => $projets,
         ];
     }
 
@@ -135,6 +137,25 @@ class VivierService
             'id_candidature' => $idCandidature,
             'poste' => $posteTitle,
             'entreprise' => $data['entreprise'] ?? null,
+            'date_debut' => $data['date_debut'] ?? null,
+            'date_fin' => $data['date_fin'] ?? null,
+            'description' => $data['description'] ?? null,
+            'valide' => true,
+            'source' => 'manuel',
+        ]);
+    }
+
+    public function addProjet(int $id, array $data)
+    {
+        $candidature = Candidature::find($id);
+        $idCandidature = $candidature ? $candidature->id_candidature : $id;
+
+        return $this->vivierRepository->createProjet([
+            'id_candidature' => $idCandidature,
+            'titre_projet' => trim($data['titre_projet'] ?? 'Projet / Réalisation'),
+            'role' => $data['role'] ?? null,
+            'technologies' => $data['technologies'] ?? null,
+            'url_projet' => $data['url_projet'] ?? null,
             'date_debut' => $data['date_debut'] ?? null,
             'date_fin' => $data['date_fin'] ?? null,
             'description' => $data['description'] ?? null,
@@ -295,6 +316,25 @@ class VivierService
                     ]);
                 }
             }
+
+            // 4. Projets & Réalisations
+            if (!empty($data['projets'])) {
+                foreach ($data['projets'] as $proj) {
+                    $titre = trim($proj['titre_projet'] ?? $proj['titre'] ?? $proj['nom'] ?? 'Projet / Réalisation');
+                    $this->vivierRepository->createProjet([
+                        'id_candidature' => $idCandidature,
+                        'titre_projet' => $titre,
+                        'role' => $proj['role'] ?? null,
+                        'technologies' => is_array($proj['technologies'] ?? null) ? implode(', ', $proj['technologies']) : ($proj['technologies'] ?? null),
+                        'url_projet' => $proj['url_projet'] ?? $proj['url'] ?? null,
+                        'date_debut' => $proj['date_debut'] ?? null,
+                        'date_fin' => $proj['date_fin'] ?? null,
+                        'description' => $proj['description'] ?? null,
+                        'valide' => true,
+                        'source' => 'cv_ocr',
+                    ]);
+                }
+            }
         }
 
         $actionLabel = $data['statut_validation'] === 'valide'
@@ -313,6 +353,7 @@ class VivierService
                 'nb_competences' => count($data['competences'] ?? []),
                 'nb_experiences' => count($data['experiences'] ?? []),
                 'nb_formations' => count($data['formations'] ?? []),
+                'nb_projets' => count($data['projets'] ?? []),
             ]
         );
 

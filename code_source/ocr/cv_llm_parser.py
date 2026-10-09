@@ -25,6 +25,10 @@ DEFAULT_MODEL = "llama3.2"
 SYSTEM_PROMPT = """Tu es un expert RH et un analyseur de CV ultra-précis pour AlpA Ciment.
 Ta tâche est d'analyser le texte brut suivant issu de l'OCR d'un CV et d'en extraire les informations sous un format JSON strict.
 
+Tu dois impérativement DISSOCIER STRICTEMENT :
+1. Les "experiences" : STRICTEMENT les emplois réels, postes occupés, contrats en entreprise ou organisations professionnelles (CDI, CDD, Alternance, Stage conventionné en entreprise).
+2. Les "projets" : Réalisations personnelles, projets académiques, projets d'études, projets open-source, hackathons, portfolios ou applications développées. Ne place JAMAIS un projet d'école ou personnel dans les expériences professionnelles !
+
 Tu dois respecter EXACTEMENT ce schéma JSON :
 {
   "contact": {
@@ -42,11 +46,22 @@ Tu dois respecter EXACTEMENT ce schéma JSON :
   ],
   "experiences": [
     {
-      "poste": "Intitulé du poste occupé",
-      "entreprise": "Nom de l'entreprise ou organisation",
+      "poste": "Intitulé du poste occupé en entreprise",
+      "entreprise": "Nom de l'entreprise ou organisation employeur",
       "date_debut": "Date ou année de début (ex: 2021 ou Janvier 2021)",
       "date_fin": "Date ou année de fin ou 'En cours' ou null",
-      "description": "Courte synthèse des missions réalisées ou null"
+      "description": "Courte synthèse des missions réalisées en entreprise"
+    }
+  ],
+  "projets": [
+    {
+      "titre_projet": "Nom ou intitulé du projet/réalisation",
+      "role": "Rôle dans le projet (ex: Lead Developer, Concepteur, Développeur Fullstack) ou null",
+      "technologies": "Technologies ou outils utilisés (ex: React, Laravel, Docker) ou null",
+      "url_projet": "Lien GitHub, URL de démo ou null",
+      "date_debut": "Date ou année de début ou null",
+      "date_fin": "Date ou année de fin ou null",
+      "description": "Description des objectifs et résultats du projet"
     }
   ],
   "formations": [
@@ -61,11 +76,12 @@ Tu dois respecter EXACTEMENT ce schéma JSON :
 
 RÈGLES IMPORTANTES :
 1. Réponds UNIQUEMENT avec l'objet JSON valide, sans texte d'introduction ni de conclusion.
-2. Si une information n'est pas présente dans le texte, mets null ou une liste vide [].
-3. N'invente AUCUNE information qui n'est pas dans le document.
-4. Corrige les coquilles évidentes de l'OCR dans les noms d'outils (ex: 'Phtyon' -> 'Python').
-5. Sois concis et synthétique dans les descriptions de missions (maximum 2 phrases par expérience).
-6. Si tu ne trouves rien par exemple dans experiences ou formations ou tous les autres ,n'essaie pas de rassembler des bout d'informations entre eux
+2. DISSOCIATION OBLIGATOIRE : Si une section du CV s'intitule "Projets", "Réalisations", "Projets académiques", "Projets personnels" ou s'il s'agit d'une application/plateforme créée sans employeur contractuel, classe-la TOUJOURS dans "projets", JAMAIS dans "experiences".
+3. Si une information n'est pas présente dans le texte, mets null ou une liste vide [].
+4. N'invente AUCUNE information qui n'est pas dans le document.
+5. Corrige les coquilles évidentes de l'OCR dans les noms d'outils (ex: 'Phtyon' -> 'Python').
+6. Sois concis et synthétique dans les descriptions de missions (maximum 2 phrases par expérience ou projet).
+7. Si tu ne trouves rien par exemple dans experiences, projets ou formations, laisse la liste vide [] sans essayer de rassembler des fragments disparates.
 """
 
 
@@ -93,6 +109,7 @@ def parse_cv_with_llm(
     - profil
     - competences
     - experiences
+    - projets
     - formations
     - texte_brut
     """
@@ -103,6 +120,7 @@ def parse_cv_with_llm(
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": [],
             "source_parsing": "aucun_texte"
         }
@@ -116,6 +134,7 @@ def parse_cv_with_llm(
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": [],
             "source_parsing": "fallback_ollama_offline"
         }
@@ -162,6 +181,7 @@ def parse_cv_with_llm(
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": [],
             "source_parsing": "fallback_timeout"
         }
@@ -173,6 +193,7 @@ def parse_cv_with_llm(
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": [],
             "source_parsing": f"fallback_erreur_{type(e).__name__}"
         }
@@ -247,6 +268,7 @@ def _repair_truncated_json(text: str) -> Dict[str, Any]:
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": []
         }
 
@@ -269,11 +291,16 @@ if __name__ == "__main__":
     Développeur Junior - IT Solutions (2020 - 2022)
     Maintenance d'applications web et APIs REST.
     
+    PROJETS & RÉALISATIONS
+    Plateforme E-commerce B2B (2021)
+    Développement d'un portail de commandes en React et Laravel avec passerelle de paiement.
+    URL: https://github.com/example/ecommerce-b2b
+
     FORMATIONS
     Master 2 en Informatique - ITU (2020)
     Licence Informatique - Université d'Antananarivo (2018)
     """
 
-    print("Test d'extraction avec Ollama + Mistral...")
+    print("Test d'extraction avec Ollama + Llama 3.2...")
     res = parse_cv_with_llm(sample_cv)
     print(json.dumps(res, indent=2, ensure_ascii=False))

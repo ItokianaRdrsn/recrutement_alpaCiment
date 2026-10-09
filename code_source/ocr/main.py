@@ -123,7 +123,7 @@ def parse_ner_only(req: NerParseRequest):
     """
     Étape 2 du pipeline :
     - Prend le texte brut OCR en JSON
-    - Extrait les entités (contact, compétences, expériences, formations) via Llama 3.2
+    - Extrait les entités (contact, compétences, expériences, projets, formations) via Llama 3.2
     - Propage et retourne systématiquement l'id_offre et cv_base64
     """
     try:

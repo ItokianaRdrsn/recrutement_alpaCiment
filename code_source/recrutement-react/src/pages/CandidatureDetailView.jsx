@@ -10,6 +10,7 @@ import {
     Download,
     Edit3,
     FileText,
+    FolderGit2,
     GraduationCap,
     Layers,
     Lock,
@@ -67,6 +68,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const [showCompetenceCreateModal, setShowCompetenceCreateModal] = useState(false);
     const [newComp, setNewComp] = useState({ id_competence: '', niveau: 'Intermédiaire' });
     const [newExp, setNewExp] = useState({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
+    const [newProj, setNewProj] = useState({ titre_projet: '', role: '', technologies: '', url_projet: '', date_debut: '', date_fin: '', description: '' });
     const [newForm, setNewForm] = useState({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '', id_niveau: '', niveau: '' });
     const [profileMsg, setProfileMsg] = useState('');
 
@@ -124,6 +126,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     competences: data.cv_extraction_ocr.donnees_json?.competences ?? [],
                     experiences: data.cv_extraction_ocr.donnees_json?.experiences ?? [],
                     formations: data.cv_extraction_ocr.donnees_json?.formations ?? [],
+                    projets: data.cv_extraction_ocr.donnees_json?.projets ?? [],
                     contact: data.cv_extraction_ocr.donnees_json?.contact ?? null,
                     profil: data.cv_extraction_ocr.donnees_json?.profil ?? null,
                     statut_validation: data.cv_extraction_ocr.statut_validation ?? 'en_attente',
@@ -253,6 +256,23 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         }
     }
 
+    async function handleAddProjet(e) {
+        e.preventDefault();
+        const targetId = idCandidature || details?.id_candidature;
+        if (!targetId || !newProj.titre_projet) return;
+        setProfileMsg('');
+        try {
+            await sendJson(`/api/candidature/${targetId}/projets`, {
+                body: newProj,
+            });
+            setNewProj({ titre_projet: '', role: '', technologies: '', url_projet: '', date_debut: '', date_fin: '', description: '' });
+            setProfileMsg('Projet / Réalisation ajouté(e) à la candidature !');
+            await loadCandidateProfile(targetId);
+        } catch (err) {
+            setError(err.message);
+        }
+    }
+
     async function handleAddFormation(e) {
         e.preventDefault();
         const targetId = idCandidature || details?.id_candidature;
@@ -295,6 +315,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     competences: ocrData.competences ?? [],
                     experiences: ocrData.experiences ?? [],
                     formations: ocrData.formations ?? [],
+                    projets: ocrData.projets ?? [],
                 },
             });
             const actionLabel = statusVal === 'valide' 
@@ -330,6 +351,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
             const list = [...(prev.experiences ?? [])];
             list.splice(index, 1);
             return { ...prev, experiences: list };
+        });
+    }
+
+    function removeExtractedProj(index) {
+        setOcrData((prev) => {
+            const list = [...(prev.projets ?? [])];
+            list.splice(index, 1);
+            return { ...prev, projets: list };
         });
     }
 
@@ -1025,6 +1054,116 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             </form>
                         </div>
 
+                        {/* SECTION DIRECTE : PROJETS & RÉALISATIONS */}
+                        <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                            <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FolderGit2 size={18} />
+                                <span>Projets & Réalisations ({profileData?.projets?.length ?? 0})</span>
+                            </h3>
+
+                            <div style={{ display: 'grid', gap: '10px', marginBottom: '16px' }}>
+                                {(profileData?.projets ?? []).map((p) => (
+                                    <div key={p.id_projet} style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <strong style={{ fontSize: '14.5px', color: '#0f172a' }}>{p.titre_projet}</strong>
+                                                {p.role && <span className="badge blue" style={{ fontSize: '11px' }}>{p.role}</span>}
+                                            </div>
+                                            <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                                                {p.date_debut || p.date_fin ? `${p.date_debut ?? '?'} → ${p.date_fin ?? 'Présent'}` : ''}
+                                            </span>
+                                        </div>
+                                        {p.technologies && (
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '4px 0' }}>
+                                                {p.technologies.split(',').map((tech, ti) => (
+                                                    <span key={ti} className="badge gray" style={{ fontSize: '11px', padding: '2px 8px' }}>
+                                                        {tech.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {p.url_projet && (
+                                            <div style={{ fontSize: '12px', color: '#0284c7', margin: '2px 0' }}>
+                                                <a href={p.url_projet} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>
+                                                    {p.url_projet}
+                                                </a>
+                                            </div>
+                                        )}
+                                        {p.description && <p style={{ margin: '4px 0 0', fontSize: '12.5px', color: '#475569' }}>{p.description}</p>}
+                                    </div>
+                                ))}
+                                {(!profileData?.projets || profileData.projets.length === 0) && (
+                                    <div style={{ fontSize: '12.5px', color: 'var(--muted)', fontStyle: 'italic', padding: '6px 0' }}>
+                                        Aucun projet ou réalisation enregistré pour l'instant.
+                                    </div>
+                                )}
+                            </div>
+
+                            <form className="no-print" onSubmit={handleAddProjet} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                <strong style={{ fontSize: '14px', color: '#0f172a' }}>Saisir un nouveau projet / réalisation :</strong>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, titre_projet: e.target.value }))}
+                                        placeholder="Titre du projet (ex: ERP AlpA Ciment)..."
+                                        required
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="text"
+                                        value={newProj.titre_projet}
+                                    />
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, role: e.target.value }))}
+                                        placeholder="Rôle (ex: Lead Developer, Créateur)..."
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="text"
+                                        value={newProj.role}
+                                    />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, technologies: e.target.value }))}
+                                        placeholder="Technologies (ex: React, Laravel, Docker)..."
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="text"
+                                        value={newProj.technologies}
+                                    />
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, url_projet: e.target.value }))}
+                                        placeholder="Lien / Dépôt (ex: https://github.com/...)..."
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="url"
+                                        value={newProj.url_projet}
+                                    />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, date_debut: e.target.value }))}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="date"
+                                        value={newProj.date_debut}
+                                    />
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, date_fin: e.target.value }))}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="date"
+                                        value={newProj.date_fin}
+                                    />
+                                </div>
+                                <textarea
+                                    onChange={(e) => setNewProj((curr) => ({ ...curr, description: e.target.value }))}
+                                    placeholder="Description de la réalisation, architecture, objectifs atteints..."
+                                    rows={2}
+                                    style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                    value={newProj.description}
+                                />
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                    <button className="ghost-button" style={{ justifySelf: 'start' }} type="submit">
+                                        <Plus size={16} />
+                                        <span>Ajouter le projet</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
                         {/* SECTION DIRECTE : FORMATIONS ET DIPLÔMES */}
                         <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                             <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1506,6 +1645,52 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                                         {f.domaine_etude && f.domaine_etude !== 'null' && <div style={{ fontSize: '11.5px', color: '#64748b' }}>Domaine : {f.domaine_etude}</div>}
                                                     </div>
                                                 ))}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                                            <strong style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0284c7' }}>
+                                                <FolderGit2 size={16} />
+                                                Projets & Réalisations identifiés ({(ocrData.projets ?? []).length}) :
+                                            </strong>
+                                            <div style={{ display: 'grid', gap: '8px', marginTop: '6px' }}>
+                                                {(ocrData.projets ?? []).map((p, i) => (
+                                                    <div key={i} style={{ background: '#f8fafc', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                <strong style={{ color: '#0f172a' }}>{p.titre_projet ?? p.titre ?? p.nom}</strong>
+                                                                {p.role && <span className="badge blue" style={{ fontSize: '10.5px' }}>{p.role}</span>}
+                                                            </div>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                <span style={{ fontSize: '11.5px', color: 'var(--muted)' }}>
+                                                                    {p.date_debut || p.date_fin ? `${p.date_debut ?? '?'} → ${p.date_fin ?? 'Présent'}` : ''}
+                                                                </span>
+                                                                {isEditingOcr && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeExtractedProj(i)}
+                                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#b91c1c' }}
+                                                                        title="Supprimer ce projet"
+                                                                    >
+                                                                        <X size={14} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {p.technologies && (
+                                                            <div style={{ fontSize: '12px', color: '#475569', marginTop: '2px' }}>
+                                                                <strong>Technologies :</strong> {Array.isArray(p.technologies) ? p.technologies.join(', ') : p.technologies}
+                                                            </div>
+                                                        )}
+                                                        {p.url_projet && <div style={{ fontSize: '11.5px', color: '#0284c7' }}>Lien : {p.url_projet}</div>}
+                                                        {p.description && <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>{p.description}</div>}
+                                                    </div>
+                                                ))}
+                                                {(!ocrData.projets || ocrData.projets.length === 0) && (
+                                                    <div style={{ fontSize: '12px', color: 'var(--muted)', fontStyle: 'italic' }}>
+                                                        Aucun projet distinct détecté dans ce CV.
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
