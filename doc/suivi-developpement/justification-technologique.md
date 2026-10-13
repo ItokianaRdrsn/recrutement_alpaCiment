@@ -164,3 +164,71 @@ Pour chaque choix, il présente les **motifs de sélection**, les **alternatives
 - [Martin Fowler: Repository Pattern & Service Layer](https://martinfowler.com/eaaCatalog/repository.html)
 - [Design Patterns: Elements of Reusable Object-Oriented Software (GoF)](https://en.wikipedia.org/wiki/Design_Patterns)
 
+---
+
+## ✉️ 8. Moteur d'Emails & Templating Dynamique : Laravel Mailable & PCRE Regex Substitution
+
+### 📌 Pourquoi cette solution ?
+- **Robustesse & Standardisation (Laravel Mail & Blade)** : Utilisation native des classes `Mailable` (`Illuminate\Mail\Mailable`) et de templates Blade responsive. Assure une compatibilité éprouvée avec tous les webmails (Gmail, Outlook, Apple Mail) et supporte indifféremment l'envoi SMTP réel (TLS port 587/465) ou le mode `log` local pour les environnements de test.
+- **Moteur d'Interpolation Regex Tolérant** : Substitution dynamique des tags (`{prenom}`, `{nom}`, `{poste}`, `{date_rdv}`, etc.) basée sur les expressions régulières PCRE avec support sans friction des variantes `{variable}` et `{{variable}}`, insensible à la casse et tolérant les espaces (`preg_replace('/\{\{\s*cle\s*\}\}/i')`).
+- **Immuabilité Historique (Table `communication`)** : Copie figée du message envoyé stockée en base de données, garantissant qu'une modification ultérieure d'un modèle n'altère jamais la preuve d'échange envoyée à une date antérieure.
+
+### ⚖️ Comparatif & Alternatives Évaluées
+
+| Solution d'Emails | Avantages (Pour) | Inconvénients (Contre) | Décision |
+| --- | --- | --- | --- |
+| **Laravel Mailable + Blade + Regex Engine** | • Aucune dépendance externe lourde requise<br>• Rendu HTML élégant aux couleurs de la marque<br>• Simulation et aperçu instantané avant envoi<br>• Historisation fidèle et immuable dans PostgreSQL | • Nécessite de configurer les identifiants SMTP pour l'envoi réel en production | **Retenu ✅** |
+| **Service Tiers Clé en Main (SendGrid, Mailjet, Brevo via API)** | • Statistiques d'ouverture et clics automatiques | • Dépendance à un fournisseur tiers et coûts par quota d'e-mails<br>• Problèmes potentiels de conformité données si hébergé hors UE/local | **Écarté (Pour l'instant) ❌** |
+| **Interpolation Twig / Mustache externe** | • Syntaxe de templating connue | • Ajout de dépendances Composer redondantes avec Blade et complexité inutile pour de simples variables RH | **Écarté ❌** |
+
+### 📚 Sources & Documentations
+- [Laravel Mail Documentation](https://laravel.com/docs/11.x/mail)
+- [PHP PCRE Regex Documentation (`preg_replace`)](https://www.php.net/manual/fr/function.preg-replace.php)
+
+---
+
+## 🤖 9. Orchestration Low-Code & Parsing LLM : n8n & Séparation Stricte Projets vs Expériences
+
+### 📌 Pourquoi n8n et la dissociation Expériences / Projets ?
+- **Orchestration Souple et Souveraine (n8n Docker)** : Permet d'automatiser des flux asynchrones (réception e-mail via IMAP ou Webhook, routage conditionnel avec `Switch`, requêtes REST multi-services) sans modifier le cœur de l'application Laravel et sans coût de licence SaaS.
+- **Résolution du Biais LLM (Hallucination Contrat vs Projet)** : Les modèles de langage ont tendance à classer par défaut les projets académiques et portfolios dans les contrats ou expériences de travail. L'introduction d'un schéma explicite séparant `experiences` (postes en entreprise) et `projets` (réalisations pratiques, académiques, open-source) élimine cette confusion et offre aux recruteurs une vision claire des compétences pratiques du candidat.
+
+### ⚖️ Comparatif & Alternatives Évaluées
+
+| Solution d'Automatisation | Avantages (Pour) | Inconvénients (Contre) | Décision |
+| --- | --- | --- | --- |
+| **n8n Self-Hosted (Docker)** | • 100% Hors-Connexion et gratuit (Open Source)<br>• Confidentialité totale des CVs et e-mails candidats<br>• Noeuds flexibles (Webhook, HTTP, Code JS, Switch) | • Nécessite la gestion d'un conteneur Docker local | **Retenu ✅** |
+| **Zapier / Make (SaaS)** | • Configuration rapide sans infrastructure locale | • Coûteux sur gros volumes<br>• Dépendance Internet permanente obligatoire<br>• Risque RGPD/confidentialité des pièces jointes | **Écarté ❌** |
+| **Parsing CV Monolithique (Tout dans `experiences`)** | • Un seul tableau en base de données | • Fausse qualification des projets étudiants en contrats d'entreprise<br>• Perte des technologies, liens GitHub et rôles spécifiques | **Écarté ❌** |
+
+### 📚 Sources & Documentations
+- [Documentation Officielle n8n](https://docs.n8n.io/)
+- [n8n Docker Setup Guide](https://docs.n8n.io/hosting/installation/docker/)
+- [Prompt Engineering Guide for Structured Outputs & NER](https://www.promptingguide.ai/)
+
+---
+
+## 🧠 10. Modèle LLM Local pour NER & Structuration JSON : Qwen 2.5 (7B) via Ollama
+
+### 📌 Pourquoi Qwen 2.5 (7B) ?
+- **Supériorité sur le JSON Structuré & Consignes Négatives** : Qwen 2.5 (7B) surpasse largement Llama 3.2 (3B) et Mistral (7B) dans les benchmarks d'extraction d'information structurée (Information Extraction / NER). Il respecte à la perfection les consignes négatives critiques (ex: *"ne jamais placer un projet d'école dans les expériences en entreprise"*).
+- **Compréhension Multilingue & Sémantique** : Excellente compréhension du vocabulaire académique et professionnel francophone (diplômes, contrats, intitulés de postes, technologies).
+- **Format JSON Garanti via Ollama** : L'utilisation conjointe avec l'option `format="json"` d'Ollama garantit une réponse parsable sans balises superflues de texte conversationnel.
+- **Souveraineté & Respect RGPD** : Le modèle s'exécute à 100% en local sur la machine ou le serveur d'AlpA Ciment sans transmettre les données personnelles des candidats à des tiers.
+
+### ⚖️ Comparatif & Alternatives Évaluées
+
+| Modèle LLM | Précision NER & JSON | Taille / Ressources | Confidentialité | Décision |
+| --- | --- | --- | --- | --- |
+| **Qwen 2.5 (7B Instruct)** | • Excellente précision sémantique<br>• Respect parfait des schémas JSON hiérarchisés<br>• Dissociation nette Projets vs Expériences | ~4.7 Go VRAM / RAM (Très accessible sur GPU standard ou 16 Go RAM) | 100% Local (Ollama) | **Retenu ✅** |
+| **Llama 3.2 (3B)** | • Très rapide | ~2.0 Go | 100% Local (Ollama) | **Remplacé (Manque de discernement sur les consignes négatives)** |
+| **Mistral (7B Instruct v0.3)** | • Bon en français | ~4.4 Go | 100% Local (Ollama) | **Alternative Solide** |
+| **OpenAI GPT-4o / Claude 3.5 Sonnet (API)** | • Précision maximale | Exige connexion Cloud | Données transmises à des tiers (Risque RGPD) | **Écarté (Non-souverain) ❌** |
+
+### 📚 Sources & Documentations
+- [Qwen 2.5 Technical Report & Benchmarks (Alibaba Cloud)](https://qwenlm.github.io/blog/qwen2.5/)
+- [Ollama Model Library - Qwen 2.5](https://ollama.com/library/qwen2.5)
+- [HuggingFace Open LLM Leaderboard (Structured Outputs)](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard)
+
+
+

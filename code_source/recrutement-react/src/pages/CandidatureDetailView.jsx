@@ -10,9 +10,11 @@ import {
     Download,
     Edit3,
     FileText,
+    FolderGit2,
     GraduationCap,
     Layers,
     Lock,
+    Mail,
     Plus,
     Printer,
     Save,
@@ -25,17 +27,30 @@ import {
 import { backendPath, getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
 import { CompetenceModal } from '../components/modals/CompetenceModal';
+import { RendezVousModal } from '../components/modals/RendezVousModal';
+import { EnvoyerMessageModal } from '../components/modals/EnvoyerMessageModal';
 import { formatDate } from '../utils/formatters';
 
 export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsList, referentiels }) {
     const [details, setDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [activeTab, setActiveTab] = useState('informations'); // 'informations', 'documents', 'historique_statuts', 'communications'
+    const [activeTab, setActiveTab] = useState('informations'); // 'informations', 'documents', 'historique_statuts', 'communications', 'rendez_vous'
     const [targetStatusId, setTargetStatusId] = useState(null);
     const [commentaire, setCommentaire] = useState('');
     const [updatingStatus, setUpdatingStatus] = useState(false);
     const [updatingVivier, setUpdatingVivier] = useState(false);
+
+    // Rendez-vous / Entretiens
+    const [rendezVousList, setRendezVousList] = useState([]);
+    const [loadingRdv, setLoadingRdv] = useState(false);
+    const [rdvModalOpen, setRdvModalOpen] = useState(false);
+    const [selectedRdv, setSelectedRdv] = useState(null);
+
+    // Communications / Emails
+    const [communicationsList, setCommunicationsList] = useState([]);
+    const [loadingCommunications, setLoadingCommunications] = useState(false);
+    const [messageModalOpen, setMessageModalOpen] = useState(false);
 
     // Extraction OCR
     const [ocrExtracting, setOcrExtracting] = useState(false);
@@ -53,6 +68,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const [showCompetenceCreateModal, setShowCompetenceCreateModal] = useState(false);
     const [newComp, setNewComp] = useState({ id_competence: '', niveau: 'Intermédiaire' });
     const [newExp, setNewExp] = useState({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
+    const [newProj, setNewProj] = useState({ titre_projet: '', role: '', technologies: '', url_projet: '', date_debut: '', date_fin: '', description: '' });
     const [newForm, setNewForm] = useState({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '', id_niveau: '', niveau: '' });
     const [profileMsg, setProfileMsg] = useState('');
 
@@ -110,6 +126,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     competences: data.cv_extraction_ocr.donnees_json?.competences ?? [],
                     experiences: data.cv_extraction_ocr.donnees_json?.experiences ?? [],
                     formations: data.cv_extraction_ocr.donnees_json?.formations ?? [],
+                    projets: data.cv_extraction_ocr.donnees_json?.projets ?? [],
                     contact: data.cv_extraction_ocr.donnees_json?.contact ?? null,
                     profil: data.cv_extraction_ocr.donnees_json?.profil ?? null,
                     statut_validation: data.cv_extraction_ocr.statut_validation ?? 'en_attente',
@@ -146,13 +163,47 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         }
     }, []);
 
+    const loadRendezVous = useCallback(async (targetId) => {
+        if (!targetId) return;
+        setLoadingRdv(true);
+        try {
+            const res = await getJson(`/api/rendez-vous?id_candidature=${targetId}`);
+            if (res?.data) {
+                setRendezVousList(res.data);
+            }
+        } catch (err) {
+            console.error('Erreur chargement rendez-vous candidature:', err);
+        } finally {
+            setLoadingRdv(false);
+        }
+    }, []);
+
+    const loadCommunications = useCallback(async (targetId) => {
+        if (!targetId) return;
+        setLoadingCommunications(true);
+        try {
+            const res = await getJson(`/api/candidature/${targetId}/communications`);
+            if (res?.data) {
+                setCommunicationsList(res.data);
+            }
+        } catch (err) {
+            console.error('Erreur chargement communications candidature:', err);
+        } finally {
+            setLoadingCommunications(false);
+        }
+    }, []);
+
     useEffect(() => {
         if (idCandidature) {
             loadCandidateProfile(idCandidature);
+            loadRendezVous(idCandidature);
+            loadCommunications(idCandidature);
         } else if (details?.id_candidature) {
             loadCandidateProfile(details.id_candidature);
+            loadRendezVous(details.id_candidature);
+            loadCommunications(details.id_candidature);
         }
-    }, [idCandidature, details?.id_candidature, loadCandidateProfile]);
+    }, [idCandidature, details?.id_candidature, loadCandidateProfile, loadRendezVous, loadCommunications]);
 
     async function handleAddCompetence(e) {
         e.preventDefault();
@@ -205,6 +256,23 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         }
     }
 
+    async function handleAddProjet(e) {
+        e.preventDefault();
+        const targetId = idCandidature || details?.id_candidature;
+        if (!targetId || !newProj.titre_projet) return;
+        setProfileMsg('');
+        try {
+            await sendJson(`/api/candidature/${targetId}/projets`, {
+                body: newProj,
+            });
+            setNewProj({ titre_projet: '', role: '', technologies: '', url_projet: '', date_debut: '', date_fin: '', description: '' });
+            setProfileMsg('Projet / Réalisation ajouté(e) à la candidature !');
+            await loadCandidateProfile(targetId);
+        } catch (err) {
+            setError(err.message);
+        }
+    }
+
     async function handleAddFormation(e) {
         e.preventDefault();
         const targetId = idCandidature || details?.id_candidature;
@@ -247,6 +315,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     competences: ocrData.competences ?? [],
                     experiences: ocrData.experiences ?? [],
                     formations: ocrData.formations ?? [],
+                    projets: ocrData.projets ?? [],
                 },
             });
             const actionLabel = statusVal === 'valide' 
@@ -282,6 +351,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
             const list = [...(prev.experiences ?? [])];
             list.splice(index, 1);
             return { ...prev, experiences: list };
+        });
+    }
+
+    function removeExtractedProj(index) {
+        setOcrData((prev) => {
+            const list = [...(prev.projets ?? [])];
+            list.splice(index, 1);
+            return { ...prev, projets: list };
         });
     }
 
@@ -337,6 +414,17 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         }
     }
 
+    const handlePrintPdf = () => {
+        if (activeTab !== 'informations') {
+            setActiveTab('informations');
+            setTimeout(() => {
+                window.print();
+            }, 150);
+        } else {
+            window.print();
+        }
+    };
+
     if (loading) {
         return <LoadingState />;
     }
@@ -362,14 +450,34 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
     return (
         <div className="view-stack">
-            {/* EN-TÊTE FICHE CANDIDATURE */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            {/* EN-TÊTE IMPRESSION PAPIER / PDF OFFICIEL */}
+            <div className="print-only-header">
+                <div className="print-brand">
+                    <img
+                        src="/themes/custom/apiqa/images/logo-cut.png"
+                        alt="AlpA Ciment"
+                        style={{ height: '42px', width: 'auto' }}
+                    />
+                    <div>
+                        <strong style={{ fontSize: '18pt', display: 'block', color: '#0f172a' }}>AlpA Ciment</strong>
+                        <span style={{ fontSize: '10pt', color: '#64748b' }}>Direction des Ressources Humaines • Dossier de Candidature</span>
+                    </div>
+                </div>
+                <div className="print-header-meta">
+                    <div><strong>Dossier N° :</strong> #{details.id_candidature}</div>
+                    <div><strong>Date d'édition :</strong> {new Date().toLocaleDateString('fr-FR')}</div>
+                    <div><strong>Statut actuel :</strong> {currentStatus?.libelle ?? 'Reçue'}</div>
+                </div>
+            </div>
+
+            {/* EN-TÊTE FICHE CANDIDATURE ÉCRAN */}
+            <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <button className="ghost-button" onClick={onBack} type="button">
                     <ArrowLeft size={18} />
                     <span>Retour aux candidatures</span>
                 </button>
                 <div className="section-heading-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    <button className="filter-button" onClick={() => window.print()} style={{ gap: '6px', fontSize: '13px' }} type="button">
+                    <button className="filter-button" onClick={handlePrintPdf} style={{ gap: '6px', fontSize: '13px' }} type="button">
                         <Printer size={16} />
                         <span>Exporter en PDF / Imprimer</span>
                     </button>
@@ -379,8 +487,8 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                 </div>
             </div>
 
-            {/* SECTIONS TABS */}
-            <div style={{ display: 'flex', gap: '8px', borderBottom: '2px solid var(--border)', paddingBottom: '8px', marginBottom: '16px', background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+            {/* SECTIONS TABS (MASQUÉES À L'IMPRESSION) */}
+            <div className="candidature-tabs-header no-print" style={{ display: 'flex', gap: '8px', borderBottom: '2px solid var(--border)', paddingBottom: '8px', marginBottom: '16px', background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
                 <button
                     className={`ghost-button ${activeTab === 'informations' ? 'primary' : ''}`}
                     onClick={() => setActiveTab('informations')}
@@ -424,6 +532,20 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                 </button>
 
                 <button
+                    className={`ghost-button ${activeTab === 'rendez_vous' ? 'primary' : ''}`}
+                    onClick={() => setActiveTab('rendez_vous')}
+                    style={{
+                        fontWeight: activeTab === 'rendez_vous' ? 'bold' : 'normal',
+                        borderBottom: activeTab === 'rendez_vous' ? '2px solid var(--primary)' : 'none',
+                        borderRadius: 0,
+                    }}
+                    type="button"
+                >
+                    <CalendarDays size={16} />
+                    <span>Rendez-vous ({rendezVousList.length})</span>
+                </button>
+
+                <button
                     className={`ghost-button ${activeTab === 'communications' ? 'primary' : ''}`}
                     onClick={() => setActiveTab('communications')}
                     style={{
@@ -434,7 +556,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     type="button"
                 >
                     <Send size={16} />
-                    <span>Communications</span>
+                    <span>Communications ({communicationsList.length})</span>
                 </button>
 
                 <button
@@ -454,18 +576,20 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
             {/* TAB INFORMATIONS (INCLUANT TOUTE LA GESTION DES COMPÉTENCES, EXPÉRIENCES ET FORMATIONS) */}
             {activeTab === 'informations' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: '20px', alignItems: 'start' }}>
+                <div className="candidature-detail-grid">
                     {/* CARTE CANDIDAT & WORKFLOW SIDEBAR GAUCHE */}
-                    <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)', position: 'sticky', top: '16px' }}>
-                        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                    <div className="data-section candidate-sidebar-card" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                        <div className="candidate-profile-top" style={{ textAlign: 'center', marginBottom: '20px' }}>
                             {photoDoc ? (
                                 <img
                                     alt="Photo candidat"
+                                    className="candidate-avatar"
                                     src={backendPath(`/storage/${photoDoc.chemin_fichier}`)}
                                     style={{ width: '110px', height: '110px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--primary)', margin: '0 auto' }}
                                 />
                             ) : (
                                 <div
+                                    className="candidate-avatar candidate-avatar-placeholder"
                                     style={{
                                         width: '90px',
                                         height: '90px',
@@ -481,27 +605,29 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                     <User size={44} />
                                 </div>
                             )}
-                            <h2 style={{ fontSize: '19px', margin: '12px 0 4px 0', color: 'var(--text)' }}>
-                                {details.candidat?.prenom} {details.candidat?.nom}
-                            </h2>
-                            <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '6px' }}>
-                                <span className={`badge ${details.id_type_demande === 2 || !details.id_offre ? 'amber' : 'blue'}`}>
-                                    {details.id_type_demande === 2 || !details.id_offre ? 'Spontanée' : 'Sur offre'}
-                                </span>
-                                <span className={`badge ${details.canal_depot === 'rh_manuel' ? 'purple' : 'gray'}`}>
-                                    {details.canal_depot === 'rh_manuel' ? 'Saisie RH' : 'Portail Web'}
-                                </span>
+                            <div className="candidate-name-block">
+                                <h2 style={{ fontSize: '19px', margin: '12px 0 4px 0', color: 'var(--text)' }}>
+                                    {details.candidat?.prenom} {details.candidat?.nom}
+                                </h2>
+                                <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '6px' }}>
+                                    <span className={`badge ${details.id_type_demande === 2 || !details.id_offre ? 'amber' : 'blue'}`}>
+                                        {details.id_type_demande === 2 || !details.id_offre ? 'Spontanée' : 'Sur offre'}
+                                    </span>
+                                    <span className={`badge ${details.canal_depot === 'rh_manuel' ? 'purple' : 'gray'}`}>
+                                        {details.canal_depot === 'rh_manuel' ? 'Saisie RH' : 'Portail Web'}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="detail-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '14px', gap: '8px' }}>
+                        <div className="detail-block candidate-coords-block" style={{ borderTop: '1px solid var(--border)', paddingTop: '14px', gap: '8px' }}>
                             <strong>Coordonnées du candidat</strong>
                             <p style={{ margin: 0, fontSize: '13.5px' }}><strong>Email:</strong> {details.candidat?.email}</p>
                             <p style={{ margin: 0, fontSize: '13.5px' }}><strong>Téléphone:</strong> {details.candidat?.telephone ?? '-'}</p>
                         </div>
 
-                        {/* SECTION 1: WORKFLOW RH DES STATUTS */}
-                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
+                        {/* SECTION 1: WORKFLOW RH DES STATUTS (MASQUÉE À L'IMPRESSION) */}
+                        <div className="no-print" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
                             <strong style={{ color: 'var(--primary)', fontSize: '14px', display: 'block', marginBottom: '8px' }}>
                                 Progression du Statut RH
                             </strong>
@@ -622,8 +748,8 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             </form>
                         </div>
 
-                        {/* SECTION 2: BOUTON & GESTION EN VIVIER DE LA CANDIDATURE */}
-                        <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
+                        {/* SECTION 2: BOUTON & GESTION EN VIVIER DE LA CANDIDATURE (MASQUÉE À L'IMPRESSION) */}
+                        <div className="no-print" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
                             <strong style={{ color: '#334155', fontSize: '13.5px', display: 'block', marginBottom: '8px' }}>
                                 Conservation en Vivier RH
                             </strong>
@@ -758,7 +884,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             </h3>
 
                             {profileMsg ? (
-                                <div className="status-pill success" style={{ padding: '8px 12px', marginBottom: '12px', display: 'inline-block', fontSize: '13px' }}>
+                                <div className="status-pill success no-print" style={{ padding: '8px 12px', marginBottom: '12px', display: 'inline-block', fontSize: '13px' }}>
                                     {profileMsg}
                                 </div>
                             ) : null}
@@ -771,7 +897,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 ))}
                             </div>
 
-                            <form onSubmit={handleAddCompetence} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                            <form className="no-print" onSubmit={handleAddCompetence} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
                                 <strong style={{ fontSize: '14px', color: '#0f172a' }}>Ajouter une compétence au profil candidat :</strong>
 
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-end', gap: '12px', flexWrap: 'wrap' }}>
@@ -879,7 +1005,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 ))}
                             </div>
 
-                            <form onSubmit={handleAddExperience} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                            <form className="no-print" onSubmit={handleAddExperience} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
                                 <strong style={{ fontSize: '14px', color: '#0f172a' }}>Saisir une nouvelle expérience :</strong>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <input
@@ -928,6 +1054,116 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             </form>
                         </div>
 
+                        {/* SECTION DIRECTE : PROJETS & RÉALISATIONS */}
+                        <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                            <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <FolderGit2 size={18} />
+                                <span>Projets & Réalisations ({profileData?.projets?.length ?? 0})</span>
+                            </h3>
+
+                            <div style={{ display: 'grid', gap: '10px', marginBottom: '16px' }}>
+                                {(profileData?.projets ?? []).map((p) => (
+                                    <div key={p.id_projet} style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <strong style={{ fontSize: '14.5px', color: '#0f172a' }}>{p.titre_projet}</strong>
+                                                {p.role && <span className="badge blue" style={{ fontSize: '11px' }}>{p.role}</span>}
+                                            </div>
+                                            <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                                                {p.date_debut || p.date_fin ? `${p.date_debut ?? '?'} → ${p.date_fin ?? 'Présent'}` : ''}
+                                            </span>
+                                        </div>
+                                        {p.technologies && (
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', margin: '4px 0' }}>
+                                                {p.technologies.split(',').map((tech, ti) => (
+                                                    <span key={ti} className="badge gray" style={{ fontSize: '11px', padding: '2px 8px' }}>
+                                                        {tech.trim()}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {p.url_projet && (
+                                            <div style={{ fontSize: '12px', color: '#0284c7', margin: '2px 0' }}>
+                                                <a href={p.url_projet} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>
+                                                    {p.url_projet}
+                                                </a>
+                                            </div>
+                                        )}
+                                        {p.description && <p style={{ margin: '4px 0 0', fontSize: '12.5px', color: '#475569' }}>{p.description}</p>}
+                                    </div>
+                                ))}
+                                {(!profileData?.projets || profileData.projets.length === 0) && (
+                                    <div style={{ fontSize: '12.5px', color: 'var(--muted)', fontStyle: 'italic', padding: '6px 0' }}>
+                                        Aucun projet ou réalisation enregistré pour l'instant.
+                                    </div>
+                                )}
+                            </div>
+
+                            <form className="no-print" onSubmit={handleAddProjet} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                <strong style={{ fontSize: '14px', color: '#0f172a' }}>Saisir un nouveau projet / réalisation :</strong>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, titre_projet: e.target.value }))}
+                                        placeholder="Titre du projet (ex: ERP AlpA Ciment)..."
+                                        required
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="text"
+                                        value={newProj.titre_projet}
+                                    />
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, role: e.target.value }))}
+                                        placeholder="Rôle (ex: Lead Developer, Créateur)..."
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="text"
+                                        value={newProj.role}
+                                    />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, technologies: e.target.value }))}
+                                        placeholder="Technologies (ex: React, Laravel, Docker)..."
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="text"
+                                        value={newProj.technologies}
+                                    />
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, url_projet: e.target.value }))}
+                                        placeholder="Lien / Dépôt (ex: https://github.com/...)..."
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="url"
+                                        value={newProj.url_projet}
+                                    />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, date_debut: e.target.value }))}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="date"
+                                        value={newProj.date_debut}
+                                    />
+                                    <input
+                                        onChange={(e) => setNewProj((curr) => ({ ...curr, date_fin: e.target.value }))}
+                                        style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                        type="date"
+                                        value={newProj.date_fin}
+                                    />
+                                </div>
+                                <textarea
+                                    onChange={(e) => setNewProj((curr) => ({ ...curr, description: e.target.value }))}
+                                    placeholder="Description de la réalisation, architecture, objectifs atteints..."
+                                    rows={2}
+                                    style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                    value={newProj.description}
+                                />
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                    <button className="ghost-button" style={{ justifySelf: 'start' }} type="submit">
+                                        <Plus size={16} />
+                                        <span>Ajouter le projet</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
                         {/* SECTION DIRECTE : FORMATIONS ET DIPLÔMES */}
                         <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                             <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -954,7 +1190,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 ))}
                             </div>
 
-                            <form onSubmit={handleAddFormation} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                            <form className="no-print" onSubmit={handleAddFormation} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
                                 <strong style={{ fontSize: '14px', color: '#0f172a' }}>Saisir une nouvelle formation :</strong>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <input
@@ -1087,16 +1323,97 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
             {/* TAB COMMUNICATIONS */}
             {activeTab === 'communications' && (
                 <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                    <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>Historique des Communications avec le Candidat</h3>
-                    <div className="empty-state" style={{ textAlign: 'left', padding: '16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                            <CheckCircle2 color="green" size={20} />
-                            <strong>E-mail automatique d'accusé de réception envoyé lors du dépôt.</strong>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                        <div>
+                            <h3 style={{ margin: 0, color: 'var(--primary)', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Mail size={20} />
+                                <span>Historique des Communications ({communicationsList.length})</span>
+                            </h3>
+                            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>
+                                Trace intégrale des e-mails envoyés (accusés de réception, convocations, messages manuels).
+                            </p>
                         </div>
-                        <p style={{ margin: 0, fontSize: '13px', color: 'var(--muted)' }}>
-                            Date d'envoi : {formatDate(details.created_at)} | Destinataire : {details.candidat?.email}
-                        </p>
+                        <button
+                            className="action-button primary"
+                            onClick={() => setMessageModalOpen(true)}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                            type="button"
+                        >
+                            <Send size={16} />
+                            <span>Envoyer un nouvel e-mail</span>
+                        </button>
                     </div>
+
+                    {loadingCommunications ? (
+                        <LoadingState message="Chargement de l'historique des échanges..." />
+                    ) : !communicationsList.length ? (
+                        <div className="empty-state" style={{ textAlign: 'left', padding: '20px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                                <CheckCircle2 color="green" size={20} />
+                                <strong>Aucun e-mail consigné pour cette candidature.</strong>
+                            </div>
+                            <p style={{ margin: 0, fontSize: '13px', color: 'var(--muted)' }}>
+                                Utilisez le bouton ci-dessus pour envoyer une communication directe ou une convocation.
+                            </p>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'grid', gap: '16px' }}>
+                            {communicationsList.map((comm) => (
+                                <div
+                                    key={comm.id_communication}
+                                    style={{
+                                        background: '#f8fafc',
+                                        padding: '16px 20px',
+                                        borderRadius: '10px',
+                                        border: '1px solid var(--border)',
+                                        borderLeft: comm.mode_envoi === 'auto' ? '4px solid #10b981' : '4px solid #2563eb',
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px', marginBottom: '10px' }}>
+                                        <div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                                <span className={`badge ${comm.mode_envoi === 'auto' ? 'green' : 'blue'}`} style={{ fontSize: '11px' }}>
+                                                    {comm.mode_envoi === 'auto' ? 'Automatique' : 'Manuel'}
+                                                </span>
+                                                <span className="badge gray" style={{ fontSize: '11px' }}>
+                                                    {comm.type_message?.libelle || 'Message'}
+                                                </span>
+                                                {comm.modele_message?.nom_modele ? (
+                                                    <small style={{ color: '#64748b' }}>
+                                                        (Modèle: {comm.modele_message.nom_modele})
+                                                    </small>
+                                                ) : null}
+                                            </div>
+                                            <h4 style={{ margin: '8px 0 2px 0', fontSize: '15px', fontWeight: 600, color: '#0f172a' }}>
+                                                {comm.objet}
+                                            </h4>
+                                        </div>
+                                        <div style={{ textAlign: 'right', fontSize: '12.5px', color: '#64748b' }}>
+                                            <div>{formatDate(comm.date_envoi)}</div>
+                                            {comm.utilisateur?.nom ? (
+                                                <small>Par : {comm.utilisateur.nom}</small>
+                                            ) : null}
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        style={{
+                                            background: '#ffffff',
+                                            padding: '14px',
+                                            borderRadius: '8px',
+                                            border: '1px solid #e2e8f0',
+                                            fontSize: '13.5px',
+                                            lineHeight: '1.5',
+                                            whiteSpace: 'pre-line',
+                                            color: '#334155',
+                                        }}
+                                    >
+                                        {comm.contenu}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -1330,6 +1647,52 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                                 ))}
                                             </div>
                                         </div>
+
+                                        <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                                            <strong style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0284c7' }}>
+                                                <FolderGit2 size={16} />
+                                                Projets & Réalisations identifiés ({(ocrData.projets ?? []).length}) :
+                                            </strong>
+                                            <div style={{ display: 'grid', gap: '8px', marginTop: '6px' }}>
+                                                {(ocrData.projets ?? []).map((p, i) => (
+                                                    <div key={i} style={{ background: '#f8fafc', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                                <strong style={{ color: '#0f172a' }}>{p.titre_projet ?? p.titre ?? p.nom}</strong>
+                                                                {p.role && <span className="badge blue" style={{ fontSize: '10.5px' }}>{p.role}</span>}
+                                                            </div>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                <span style={{ fontSize: '11.5px', color: 'var(--muted)' }}>
+                                                                    {p.date_debut || p.date_fin ? `${p.date_debut ?? '?'} → ${p.date_fin ?? 'Présent'}` : ''}
+                                                                </span>
+                                                                {isEditingOcr && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeExtractedProj(i)}
+                                                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#b91c1c' }}
+                                                                        title="Supprimer ce projet"
+                                                                    >
+                                                                        <X size={14} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                        {p.technologies && (
+                                                            <div style={{ fontSize: '12px', color: '#475569', marginTop: '2px' }}>
+                                                                <strong>Technologies :</strong> {Array.isArray(p.technologies) ? p.technologies.join(', ') : p.technologies}
+                                                            </div>
+                                                        )}
+                                                        {p.url_projet && <div style={{ fontSize: '11.5px', color: '#0284c7' }}>Lien : {p.url_projet}</div>}
+                                                        {p.description && <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '4px' }}>{p.description}</div>}
+                                                    </div>
+                                                ))}
+                                                {(!ocrData.projets || ocrData.projets.length === 0) && (
+                                                    <div style={{ fontSize: '12px', color: 'var(--muted)', fontStyle: 'italic' }}>
+                                                        Aucun projet distinct détecté dans ce CV.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1354,7 +1717,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                         type="button"
                                         className="filter-button"
                                         onClick={() => handleValidateOcr('rejete')}
-                                        style={{ fontSize: '13px', padding: '8px 14px', color: '#dc2626', borderColor: '#fca5a5', gap: '6px', display: 'inline-flex', alignItems: 'center' }}
+                                        style={{ fontSize: '13px', padding: '8px 14px', color: '#ffffff', borderColor: '#fca5a5', gap: '6px', display: 'inline-flex', alignItems: 'center' }}
                                     >
                                         <X size={16} />
                                         <span>Rejeter les données</span>
@@ -1392,6 +1755,142 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     </div>
                 </div>
             )}
+
+            {/* TAB RENDEZ-VOUS & ENTRETIENS */}
+            {activeTab === 'rendez_vous' && (
+                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+                        <div>
+                            <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <CalendarDays size={20} className="text-primary" /> Entretiens et Tests Planifiés
+                            </h3>
+                            <p style={{ margin: '4px 0 0', color: '#64748b', fontSize: '0.85rem' }}>
+                                Liste des créneaux passés ou à venir pour cette candidature.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            className="primary-button"
+                            onClick={() => {
+                                setSelectedRdv(null);
+                                setRdvModalOpen(true);
+                            }}
+                            style={{ gap: '6px', display: 'inline-flex', alignItems: 'center' }}
+                        >
+                            <Plus size={16} />
+                            <span>Planifier un entretien / test</span>
+                        </button>
+                    </div>
+
+                    {loadingRdv ? (
+                        <LoadingState message="Chargement des rendez-vous..." />
+                    ) : rendezVousList.length === 0 ? (
+                        <div className="empty-state" style={{ padding: '48px 16px', textAlign: 'center', background: '#f8fafc', borderRadius: '8px', border: '1px dashed var(--border)' }}>
+                            <CalendarDays size={36} color="var(--muted)" style={{ margin: '0 auto 8px auto', display: 'block' }} />
+                            <p style={{ margin: 0, fontWeight: 500, color: '#475569' }}>Aucun rendez-vous planifié pour cette candidature.</p>
+                            <span style={{ fontSize: '13px', color: '#64748b' }}>Cliquez sur "Planifier un entretien / test" pour définir un créneau.</span>
+                        </div>
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {rendezVousList.map((rdv) => {
+                                const isEntretien = rdv.id_type_rendez_vous === 2;
+                                const isRealise = rdv.id_statut_rendez_vous === 2;
+                                const isAnnule = rdv.id_statut_rendez_vous === 3;
+
+                                return (
+                                    <div
+                                        key={rdv.id_rendez_vous}
+                                        style={{
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '8px',
+                                            padding: '16px',
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                            background: isAnnule ? '#f8fafc' : '#ffffff',
+                                            opacity: isAnnule ? 0.75 : 1,
+                                            borderLeft: `4px solid ${isAnnule ? '#94a3b8' : isRealise ? '#10b981' : isEntretien ? '#3b82f6' : '#8b5cf6'}`,
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <strong style={{ fontSize: '1rem', color: '#0f172a' }}>
+                                                    {rdv.type_rendez_vous?.libelle || (isEntretien ? 'Entretien' : 'Test')}
+                                                </strong>
+                                                <span
+                                                    style={{
+                                                        fontSize: '0.75rem',
+                                                        padding: '2px 8px',
+                                                        borderRadius: '12px',
+                                                        fontWeight: 600,
+                                                        background: isRealise ? '#dcfce7' : isAnnule ? '#fee2e2' : '#dbeafe',
+                                                        color: isRealise ? '#166534' : isAnnule ? '#991b1b' : '#1e40af',
+                                                    }}
+                                                >
+                                                    {rdv.statut_rendez_vous?.libelle || 'A venir'}
+                                                </span>
+                                                <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                                                    • {rdv.mode_realisation?.libelle || 'Présentiel'}
+                                                </span>
+                                            </div>
+
+                                            <div style={{ fontSize: '0.85rem', color: '#475569', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                                                <span>
+                                                    📅 Du <strong>{formatDate(rdv.date_debut)}</strong> au <strong>{formatDate(rdv.date_fin)}</strong>
+                                                </span>
+                                                {rdv.details_lieu && <span>📍 {rdv.details_lieu}</span>}
+                                                {rdv.responsable && <span>👤 Responsable : {rdv.responsable.nom}</span>}
+                                            </div>
+
+                                            {rdv.commentaire && (
+                                                <p style={{ margin: '4px 0 0', fontSize: '0.82rem', color: '#64748b', fontStyle: 'italic' }}>
+                                                    "{rdv.commentaire}"
+                                                </p>
+                                            )}
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            className="action-button secondary"
+                                            onClick={() => {
+                                                setSelectedRdv(rdv);
+                                                setRdvModalOpen(true);
+                                            }}
+                                            style={{ padding: '6px 12px', fontSize: '0.8rem' }}
+                                        >
+                                            Modifier
+                                        </button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* MODAL PLANIFICATION RDV */}
+            <RendezVousModal
+                isOpen={rdvModalOpen}
+                onClose={() => setRdvModalOpen(false)}
+                onSuccess={() => {
+                    loadRendezVous(details?.id_candidature || idCandidature);
+                    loadCommunications(details?.id_candidature || idCandidature);
+                    loadDetails();
+                }}
+                initialData={selectedRdv}
+                defaultCandidature={details}
+                referentiels={referentiels}
+            />
+
+            {/* MODAL ENVOI D'E-MAIL AU CANDIDAT */}
+            <EnvoyerMessageModal
+                isOpen={messageModalOpen}
+                onClose={() => setMessageModalOpen(false)}
+                onSuccess={() => {
+                    loadCommunications(details?.id_candidature || idCandidature);
+                }}
+                candidature={details}
+            />
 
             {/* MODAL CRÉATION DE COMPÉTENCE */}
             {showCompetenceCreateModal && (

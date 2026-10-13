@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Vivier\AddCompetenceRequest;
 use App\Http\Requests\Vivier\AddExperienceRequest;
 use App\Http\Requests\Vivier\AddFormationRequest;
+use App\Http\Requests\Vivier\AddProjetRequest;
 use App\Http\Requests\Vivier\StoreVivierRequest;
 use App\Http\Requests\Vivier\ValidateOcrRequest;
 use App\Http\Resources\CvExtractionOcrResource;
@@ -101,6 +102,16 @@ class VivierController extends Controller
         $form = $this->vivierService->addFormation($idCandidature, $request->validated());
 
         return response()->json(['message' => 'Formation ajoutée.', 'data' => $form], 201);
+    }
+
+    /**
+     * Add candidate project on Candidature
+     */
+    public function addProjet(AddProjetRequest $request, int $idCandidature): JsonResponse
+    {
+        $projet = $this->vivierService->addProjet($idCandidature, $request->validated());
+
+        return response()->json(['message' => 'Projet ajouté avec succès.', 'data' => $projet], 201);
     }
 
     /**

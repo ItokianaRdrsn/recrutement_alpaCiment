@@ -130,6 +130,14 @@ class EloquentVivierRepository implements VivierRepositoryInterface
         return new Collection();
     }
 
+    public function getProjetsByCandidature(int $idCandidature): Collection
+    {
+        if (Schema::hasTable('candidat_projet')) {
+            return \App\Models\CandidatProjet::where('id_candidature', $idCandidature)->orderByDesc('date_debut')->orderByDesc('id_projet')->get();
+        }
+        return new Collection();
+    }
+
     public function getCompetencesByCandidature(int $idCandidature): SupportCollection
     {
         if (Schema::hasColumn('candidat_competence', 'id_candidature')) {
@@ -168,6 +176,11 @@ class EloquentVivierRepository implements VivierRepositoryInterface
     public function createFormation(array $attributes): CandidatFormation
     {
         return CandidatFormation::create($attributes);
+    }
+
+    public function createProjet(array $attributes): \App\Models\CandidatProjet
+    {
+        return \App\Models\CandidatProjet::create($attributes);
     }
 
     public function getExtractionOcrByCandidature(int $idCandidature): ?CvExtractionOcr

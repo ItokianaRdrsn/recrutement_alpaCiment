@@ -1,0 +1,76 @@
+{
+  "name": "AlpA Ciment - Error Handler (Dead Letter Queue)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "node-error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const errorData = $json;\nconst execution = errorData.execution || {};\nconst workflow = errorData.workflow || {};\nconst lastNode = execution.lastNodeExecuted || 'Inconnu';\nconst errorMsg = execution.error?.message || errorData.message || 'Erreur non spécifiée';\n\nreturn {\n  json: {\n    timestamp: new Date().toISOString(),\n    workflow_id: workflow.id || 'alpa-recrutement',\n    workflow_name: workflow.name || 'Ingestion Candidature',\n    noeud_en_echec: lastNode,\n    message_erreur: errorMsg,\n    details: execution.error || {},\n    severite: 'CRITIQUE',\n    alerte: `⚠️ Échec d'ingestion e-mail AlpA Ciment sur le nœud [${lastNode}]: ${errorMsg}`\n  }\n};"
+      },
+      "id": "node-format-error",
+      "name": "1. Formater Données Erreur",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/public/pipeline-log-error",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "node-log-laravel-error",
+      "name": "2. Logger Erreur dans Laravel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        680,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "1. Formater Données Erreur",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1. Formater Données Erreur": {
+      "main": [
+        [
+          {
+            "node": "2. Logger Erreur dans Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -20,8 +20,13 @@ class CandidatureService
         protected CandidatureRepositoryInterface $candidatureRepository,
         protected CandidatRepositoryInterface $candidatRepository,
         protected OffreRepositoryInterface $offreRepository,
-        protected DomaineRepositoryInterface $domaineRepository
-    ) {}
+        protected DomaineRepositoryInterface $domaineRepository,
+        protected ?AuditLogService $auditLogService = null,
+        protected ?CommunicationService $communicationService = null
+    ) {
+        $this->auditLogService = $auditLogService ?? app(AuditLogService::class);
+        $this->communicationService = $communicationService ?? app(CommunicationService::class);
+    }
 
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
     {
@@ -100,6 +105,13 @@ class CandidatureService
             // 5. Store files
             $this->storeFiles($candidature, $request, 'site_externe');
 
+            // 6. Accusé de réception automatique par email
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception candidature #{$candidature->id_candidature}: " . $e->getMessage());
+            }
+
             return $candidature->load(['candidat', 'offre', 'statut']);
         });
     }
@@ -151,6 +163,13 @@ class CandidatureService
 
             $this->storeFiles($candidature, $request, 'site_externe');
 
+            // Accusé de réception automatique par email
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception candidature spontanée #{$candidature->id_candidature}: " . $e->getMessage());
+            }
+
             return $candidature->load(['candidat', 'domaine', 'statut']);
         });
     }
@@ -158,6 +177,37 @@ class CandidatureService
     public function importExternalCandidature(array $data, $request): Candidature
     {
         return DB::transaction(function () use ($data, $request) {
+            $cleIdempotence = !empty($data['cle_idempotence'])
+                ? trim($data['cle_idempotence'])
+                : (!empty($data['email_message_id']) ? trim($data['email_message_id']) : null);
+            
+            // GARDE D'IDEMPOTENCE : Si cet e-mail a déjà été ingéré, ne pas dupliquer
+            if ($cleIdempotence) {
+                $candidatureExistante = \App\Models\Candidature::where('cle_idempotence', $cleIdempotence)->first();
+                if ($candidatureExistante) {
+                    \Illuminate\Support\Facades\Log::info("Idempotence active : Candidature #{$candidatureExistante->id_candidature} déjà importée pour la clé [{$cleIdempotence}].");
+                    try {
+                        if (\Illuminate\Support\Facades\Schema::hasTable('pipeline_metrics')) {
+                            \App\Models\PipelineMetric::create([
+                                'id_candidature' => $candidatureExistante->id_candidature,
+                                'id_offre' => $candidatureExistante->id_offre,
+                                'cle_idempotence' => $cleIdempotence,
+                                'email_expediteur' => $data['email'] ?? null,
+                                'sujet_email' => $data['sujet_email'] ?? $data['sujet'] ?? null,
+                                'intention' => 'demande_emploi',
+                                'statut' => 'doublon_ignore',
+                                'duree_ocr_s' => (float) ($data['duree_ocr_s'] ?? 0),
+                                'duree_ner_s' => (float) ($data['duree_ner_s'] ?? 0),
+                                'duree_totale_s' => (float) ($data['duree_totale_s'] ?? (($data['duree_ocr_s'] ?? 0) + ($data['duree_ner_s'] ?? 0))),
+                            ]);
+                        }
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning("Erreur enregistrement pipeline_metrics (doublon) : " . $e->getMessage());
+                    }
+                    return $candidatureExistante->load(['candidat', 'offre', 'statut']);
+                }
+            }
+
             // Extraction robuste du nom et prénom (soit fournis, soit déduits de nom_complet, soit de l'email)
             $nom = trim($data['nom'] ?? '');
             $prenom = trim($data['prenom'] ?? '');
@@ -180,7 +230,7 @@ class CandidatureService
             );
 
             $recueStatusId = $this->candidatureRepository->getStatusIdByLibelle(['Reçue', 'Recue']);
-            
+
             // Résolution du type de demande (priorité à ce qui est envoyé par le switch n8n ou déduit de l'offre)
             if (!empty($data['id_type_demande'])) {
                 $typeDemandeId = (int) $data['id_type_demande'];
@@ -211,6 +261,7 @@ class CandidatureService
                 'message' => $data['message_motivation'] ?? null,
                 'canal_depot' => 'site_externe',
                 'id_utilisateur_depot' => null,
+                'cle_idempotence' => $cleIdempotence,
             ]);
 
             $this->candidatureRepository->createHistorique([
@@ -223,11 +274,15 @@ class CandidatureService
 
             $this->storeFiles($candidature, $request, 'import_externe', $data);
 
+            $donneesJsonArray = [];
             // Enregistrement direct des données OCR & NER extraites si transmises
             if (!empty($data['donnees_json']) || !empty($data['texte_brut_ocr'])) {
-                $donneesJson = $data['donnees_json'];
+                $donneesJson = $data['donnees_json'] ?? [];
                 if (is_string($donneesJson)) {
-                    $donneesJson = json_decode($donneesJson, true);
+                    $donneesJson = json_decode($donneesJson, true) ?: [];
+                }
+                if (is_array($donneesJson)) {
+                    $donneesJsonArray = $donneesJson;
                 }
 
                 // 1. Sauvegarde dans cv_extraction_ocr
@@ -238,10 +293,63 @@ class CandidatureService
                     'statut_validation' => 'valide',
                 ]);
 
-                // 2. Insertion directe dans les tables de profil (compétences, expériences, formations)
+                // 2. Insertion directe dans les tables de profil (compétences, expériences, formations, projets)
                 if (is_array($donneesJson)) {
                     $this->insertExtractedProfileData($candidature->id_candidature, $donneesJson);
                 }
+            }
+
+            // 3. Archivage de l'e-mail source reçu dans la table communication (RG-COM-03)
+            $sujetEmail = $data['sujet_email'] ?? $data['sujet'] ?? ('Candidature reçue par e-mail - ' . ($candidature->poste_souhaite ?? 'Dossier'));
+            $corpsEmail = $data['corps_email'] ?? $data['contenu_email'] ?? $data['message_motivation'] ?? 'Candidature transmise via scénario d\'ingestion automatique n8n.';
+
+            \App\Models\Communication::create([
+                'id_candidature' => $candidature->id_candidature,
+                'id_modele_message' => null,
+                'id_type_message' => 6, // 6 = Autre (Message entrant archivé)
+                'objet' => $sujetEmail,
+                'contenu' => $corpsEmail,
+                'mode_envoi' => 'auto',
+                'date_envoi' => now(),
+                'id_utilisateur' => null,
+            ]);
+
+            // 4. Enregistrement dans pipeline_metrics (P2 - Monitoring & Temps d'exécution)
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('pipeline_metrics')) {
+                    $dureeClassif = (float) ($data['duree_classification_s'] ?? 0);
+                    $dureeOcr = (float) ($data['duree_ocr_s'] ?? 0);
+                    $dureeNer = (float) ($data['duree_ner_s'] ?? 0);
+                    $dureeTotale = (float) ($data['duree_totale_s'] ?? round($dureeClassif + $dureeOcr + $dureeNer, 3));
+
+                    \App\Models\PipelineMetric::create([
+                        'id_candidature' => $candidature->id_candidature,
+                        'id_offre' => $candidature->id_offre,
+                        'cle_idempotence' => $cleIdempotence,
+                        'email_expediteur' => $data['email'] ?? null,
+                        'sujet_email' => mb_substr((string) $sujetEmail, 0, 250),
+                        'intention' => 'demande_emploi',
+                        'statut' => 'succes',
+                        'duree_classification_s' => $dureeClassif,
+                        'duree_ocr_s' => $dureeOcr,
+                        'duree_ner_s' => $dureeNer,
+                        'duree_totale_s' => $dureeTotale,
+                        'nb_caracteres_ocr' => !empty($data['texte_brut_ocr']) ? mb_strlen((string) $data['texte_brut_ocr']) : 0,
+                        'nb_competences' => isset($donneesJsonArray['competences']) && is_array($donneesJsonArray['competences']) ? count($donneesJsonArray['competences']) : 0,
+                        'nb_experiences' => isset($donneesJsonArray['experiences']) && is_array($donneesJsonArray['experiences']) ? count($donneesJsonArray['experiences']) : 0,
+                        'nb_projets' => isset($donneesJsonArray['projets']) && is_array($donneesJsonArray['projets']) ? count($donneesJsonArray['projets']) : 0,
+                        'nb_formations' => isset($donneesJsonArray['formations']) && is_array($donneesJsonArray['formations']) ? count($donneesJsonArray['formations']) : 0,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur enregistrement pipeline_metrics : " . $e->getMessage());
+            }
+
+            // 5. Déclenchement automatique de l'accusé de réception par e-mail (RG-COM-02)
+            try {
+                $this->communicationService->envoyerAccuseReception($candidature);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur envoi accusé de réception import externe #{$candidature->id_candidature}: " . $e->getMessage());
             }
 
             return $candidature->load(['candidat', 'offre', 'statut']);
@@ -329,7 +437,7 @@ class CandidatureService
             ]);
         }
 
-        DB::transaction(function () use ($candidature, $newStatusId, $commentaire, $userId) {
+        DB::transaction(function () use ($candidature, $newStatusId, $commentaire, $userId, $currentStatut, $newStatut) {
             $this->candidatureRepository->update($candidature, ['id_statut_candidature' => $newStatusId]);
 
             $this->candidatureRepository->createHistorique([
@@ -339,6 +447,17 @@ class CandidatureService
                 'commentaire' => $commentaire ?? 'Changement de statut',
                 'id_utilisateur' => $userId,
             ]);
+
+            $nomCandidat = $candidature->candidat ? "{$candidature->candidat->nom} {$candidature->candidat->prenom}" : "Candidature #{$candidature->id_candidature}";
+            $this->auditLogService->log(
+                action: 'CHANGEMENT_STATUT_CANDIDAT',
+                entite: 'Candidature',
+                idEntite: $candidature->id_candidature,
+                description: "Changement de statut pour {$nomCandidat} : {$currentStatut?->libelle} -> {$newStatut?->libelle}",
+                anciennesValeurs: ['id_statut_candidature' => $candidature->id_statut_candidature, 'statut' => $currentStatut?->libelle],
+                nouvellesValeurs: ['id_statut_candidature' => $newStatusId, 'statut' => $newStatut?->libelle, 'commentaire' => $commentaire],
+                idUtilisateur: $userId
+            );
         });
 
         return $candidature->fresh(['statut', 'historique']);
@@ -358,6 +477,16 @@ class CandidatureService
         }
 
         $this->candidatureRepository->update($candidature, ['dans_vivier' => $dansVivier]);
+
+        $nomCandidat = $candidature->candidat ? "{$candidature->candidat->nom} {$candidature->candidat->prenom}" : "Candidature #{$candidature->id_candidature}";
+        $this->auditLogService->log(
+            action: $dansVivier ? 'AJOUT_VIVIER' : 'RETRAIT_VIVIER',
+            entite: 'Candidature',
+            idEntite: $candidature->id_candidature,
+            description: ($dansVivier ? "Placement dans le vivier RH : " : "Retrait du vivier RH : ") . $nomCandidat,
+            anciennesValeurs: ['dans_vivier' => $candidature->dans_vivier],
+            nouvellesValeurs: ['dans_vivier' => $dansVivier]
+        );
 
         return $candidature;
     }
@@ -529,6 +658,31 @@ class CandidatureService
                     'etablissement' => $form['etablissement'] ?? null,
                     'domaine_etude' => $form['domaine_etude'] ?? null,
                     'date_obtention' => $dateObt,
+                    'valide' => true,
+                    'source' => 'cv_ocr',
+                ]);
+            }
+        }
+
+        // 4. Projets & Réalisations
+        if (!empty($donneesJson['projets']) && is_array($donneesJson['projets'])) {
+            foreach ($donneesJson['projets'] as $proj) {
+                $titre = trim($proj['titre_projet'] ?? $proj['titre'] ?? $proj['nom'] ?? '');
+                if (empty($titre)) continue;
+
+                $dateDebut = $this->parseDateSafely($proj['date_debut'] ?? null);
+                $dateFin = $this->parseDateSafely($proj['date_fin'] ?? null);
+                $techs = is_array($proj['technologies'] ?? null) ? implode(', ', $proj['technologies']) : ($proj['technologies'] ?? null);
+
+                \App\Models\CandidatProjet::create([
+                    'id_candidature' => $idCandidature,
+                    'titre_projet' => $titre,
+                    'role' => $proj['role'] ?? null,
+                    'technologies' => $techs,
+                    'url_projet' => $proj['url_projet'] ?? $proj['url'] ?? null,
+                    'date_debut' => $dateDebut,
+                    'date_fin' => $dateFin,
+                    'description' => $proj['description'] ?? null,
                     'valide' => true,
                     'source' => 'cv_ocr',
                 ]);

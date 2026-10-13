@@ -32,6 +32,10 @@ Dans chaque dossier de sprint :
 - les tests ou vérifications réalisés ;
 - la suite logique.
 
+## Règle impérative pour la base de données (SQL)
+
+- **Synchronisation continue du script maître** : Dès qu'une modification, une nouvelle table ou une colonne est ajoutée dans la base de données (via une migration Laravel ou directement), il faut **systématiquement reporter l'ajout ou la modification dans le fichier maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql)** afin que ce script reste toujours exécutable et à jour à 100%.
+
 ## Convention de nommage
 
 Format recommandé :

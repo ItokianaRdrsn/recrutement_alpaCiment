@@ -19,53 +19,74 @@ from typing import Dict, Any, Optional
 logger = logging.getLogger("AlpaCimentOCR.llm")
 
 OLLAMA_API_URL = "http://127.0.0.1:11434/api/generate"
-DEFAULT_MODEL = "llama3.2"
+DEFAULT_MODEL = "qwen2.5:7b"
 
 
 SYSTEM_PROMPT = """Tu es un expert RH et un analyseur de CV ultra-précis pour AlpA Ciment.
 Ta tâche est d'analyser le texte brut suivant issu de l'OCR d'un CV et d'en extraire les informations sous un format JSON strict.
 
-Tu dois respecter EXACTEMENT ce schéma JSON :
+Tu dois impérativement DISSOCIER STRICTEMENT :
+1. Les "experiences" : STRICTEMENT les emplois réels, postes occupés, contrats en entreprise ou organisations professionnelles (CDI, CDD, Alternance, Stage conventionné en entreprise).
+2. Les "projets" : Réalisations personnelles, projets académiques, projets d'études, projets open-source, hackathons, portfolios ou applications développées. Ne place JAMAIS un projet d'école ou personnel dans les expériences professionnelles !
+
+Tu dois respecter EXACTEMENT ce schéma JSON avec les types de données indiqués :
 {
   "contact": {
-    "nom_complet": "Nom et prénom du candidat ou null",
-    "email": "Adresse email ou null",
-    "telephone": "Numéro de téléphone ou null",
-    "ville": "Ville de résidence ou null"
+    "nom_complet": "string | null (Nom et prénom complets du candidat)",
+    "email": "string | null (Adresse email valide)",
+    "telephone": "string | null (Numéro de téléphone)",
+    "ville": "string | null (Ville ou région de résidence)"
   },
-  "profil": "Bref résumé du profil professionnel ou null",
+  "profil": "string | null (Bref résumé du profil professionnel)",
   "competences": [
     {
-      "nom": "Nom de la compétence (ex: React.js, PHP, Gestion de projet)",
-      "niveau": "Niveau estimé: Débutant, Intermédiaire, Avancé ou Expert"
+      "nom": "string (Nom de la compétence ou outil, ex: React.js, PHP, Docker)",
+      "niveau": "string (Valeurs autorisées uniquement: 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Expert')"
     }
   ],
   "experiences": [
     {
-      "poste": "Intitulé du poste occupé",
-      "entreprise": "Nom de l'entreprise ou organisation",
-      "date_debut": "Date ou année de début (ex: 2021 ou Janvier 2021)",
-      "date_fin": "Date ou année de fin ou 'En cours' ou null",
-      "description": "Courte synthèse des missions réalisées ou null"
+      "poste": "string (Intitulé précis du poste occupé en entreprise)",
+      "entreprise": "string (Nom de l'entreprise ou structure employeur)",
+      "date_debut": "date | null (Date ISO: YYYY-MM-DD, ex: '2021-03-01' ou '2021-01-01')",
+      "date_fin": "date | null (Date ISO: YYYY-MM-DD ou null si en cours ou non précisé)",
+      "description": "string | null (Courte synthèse des missions réelles en entreprise)"
+    }
+  ],
+  "projets": [
+    {
+      "titre_projet": "string (Intitulé du projet ou de l'application)",
+      "role": "string | null (Rôle dans le projet: 'Lead Développeur', 'Concepteur', etc.)",
+      "technologies": "string | null (Technologies utilisées séparées par des virgules)",
+      "url_projet": "string | null (URL GitHub, site web ou démo en ligne)",
+      "date_debut": "date | null (Date ISO: YYYY-MM-DD ou null)",
+      "date_fin": "date | null (Date ISO: YYYY-MM-DD ou null)",
+      "description": "string | null (Description des fonctionnalités et finalités du projet)"
     }
   ],
   "formations": [
     {
-      "diplome": "Intitulé du diplôme ou certification",
-      "etablissement": "Nom de l'école ou université",
-      "annee_obtention": "Année d'obtention ou période",
-      "domaine_etude": "Filière ou domaine d'étude ou null"
+      "diplome": "string (Nom du diplôme ou certificat obtenu)",
+      "etablissement": "string (Nom de l'université, école ou institut)",
+      "date_obtention": "date | null (Date ISO: YYYY-MM-DD ou 'YYYY-01-01' si seule l'année est mentionnée, ou null)",
+      "domaine_etude": "string | null (Filière d'étude, ex: 'Génie Logiciel', 'Informatique')"
     }
   ]
 }
 
-RÈGLES IMPORTANTES :
-1. Réponds UNIQUEMENT avec l'objet JSON valide, sans texte d'introduction ni de conclusion.
-2. Si une information n'est pas présente dans le texte, mets null ou une liste vide [].
-3. N'invente AUCUNE information qui n'est pas dans le document.
-4. Corrige les coquilles évidentes de l'OCR dans les noms d'outils (ex: 'Phtyon' -> 'Python').
-5. Sois concis et synthétique dans les descriptions de missions (maximum 2 phrases par expérience).
-6. Si tu ne trouves rien par exemple dans experiences ou formations ou tous les autres ,n'essaie pas de rassembler des bout d'informations entre eux
+RÈGLES IMPORTANTES SUR LES TYPES ET LE CONTENU :
+1. TYPES STRICTS & DATES : Respecte scrupuleusement les types de données indiqués.
+   - Les champs marqués "date | null" doivent IMPÉRATIVEMENT être au format standard ISO "YYYY-MM-DD" (ex: "2023-09-01").
+   - Si seule une année est présente (ex: "2022"), convertis-la en premier jour de l'année (ex: "2022-01-01").
+   - Si une expérience est "En cours" ou "Présent", mets "date_fin": null. Ne mets JAMAIS de texte arbitraire dans un champ date.
+2. Réponds UNIQUEMENT avec l'objet JSON valide, sans texte d'introduction ni de conclusion.
+3. DISSOCIATION OBLIGATOIRE : Si une section du CV s'intitule "Projets", "Réalisations", "Projets académiques", "Projets personnels" ou s'il s'agit d'une application/plateforme créée sans employeur contractuel, classe-la TOUJOURS dans le tableau "projets", JAMAIS dans "experiences".
+4. Si une information n'est pas présente dans le texte, mets null ou une liste vide [] selon le type attendu.
+5. N'invente AUCUNE information qui n'est pas dans le document.
+6. Corrige les coquilles évidentes de l'OCR dans les noms d'outils (ex: 'Phtyon' -> 'Python').
+7. Sois concis et synthétique dans les descriptions de missions (maximum 2 phrases par expérience ou projet).
+8. Si tu ne trouves rien par exemple dans experiences, projets ou formations, laisse la liste vide [] sans essayer de rassembler des fragments disparates.
+9. N'assembles pas des blocs d'informations entre eux : si ce n'est pas dans le même bloc, ne rassemble pas les données. Chaque section doit être extraite exclusivement de sa propre zone du document.
 """
 
 
@@ -93,6 +114,7 @@ def parse_cv_with_llm(
     - profil
     - competences
     - experiences
+    - projets
     - formations
     - texte_brut
     """
@@ -103,6 +125,7 @@ def parse_cv_with_llm(
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": [],
             "source_parsing": "aucun_texte"
         }
@@ -116,6 +139,7 @@ def parse_cv_with_llm(
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": [],
             "source_parsing": "fallback_ollama_offline"
         }
@@ -162,6 +186,7 @@ def parse_cv_with_llm(
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": [],
             "source_parsing": "fallback_timeout"
         }
@@ -173,6 +198,7 @@ def parse_cv_with_llm(
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": [],
             "source_parsing": f"fallback_erreur_{type(e).__name__}"
         }
@@ -247,6 +273,7 @@ def _repair_truncated_json(text: str) -> Dict[str, Any]:
             "profil": None,
             "competences": [],
             "experiences": [],
+            "projets": [],
             "formations": []
         }
 
@@ -269,11 +296,16 @@ if __name__ == "__main__":
     Développeur Junior - IT Solutions (2020 - 2022)
     Maintenance d'applications web et APIs REST.
     
+    PROJETS & RÉALISATIONS
+    Plateforme E-commerce B2B (2021)
+    Développement d'un portail de commandes en React et Laravel avec passerelle de paiement.
+    URL: https://github.com/example/ecommerce-b2b
+
     FORMATIONS
     Master 2 en Informatique - ITU (2020)
     Licence Informatique - Université d'Antananarivo (2018)
     """
 
-    print("Test d'extraction avec Ollama + Mistral...")
+    print("Test d'extraction avec Ollama + Llama 3.2...")
     res = parse_cv_with_llm(sample_cv)
     print(json.dumps(res, indent=2, ensure_ascii=False))

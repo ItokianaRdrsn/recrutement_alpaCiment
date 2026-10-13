@@ -262,12 +262,15 @@ def consulter_boite_envois():
 
 
 @app.post("/api/analyser-email")
-def analyser_email(payload: EmailAnalysisInput):
+@app.post("/api/classifier-intention")
+def classifier_intention(payload: EmailAnalysisInput):
     """
-    Analyse le contenu d'un email envoyé par n8n :
-    - Détecte s'il s'agit d'une candidature ou d'un spam/newsletter.
-    - Extrait l'adresse email et les compétences techniques mentionnées.
-    - Détermine une décision de filtrage RH.
+    Classifie l'e-mail entrant en 3 intentions claires :
+    - 'demande_emploi' : Candidat postulant (sur offre ou spontanée)
+    - 'information' : Demande d'information générale ou de renseignements
+    - 'spam' : Newsletter, pub, message non pertinent
+
+    Détecte également si une référence d'offre est mentionnée (id_offre ou titre).
     """
     expediteur = payload.sender or payload.expediteur or "Inconnu"
     sujet = payload.subject or payload.sujet or ""
@@ -279,43 +282,149 @@ def analyser_email(payload: EmailAnalysisInput):
     email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', expediteur)
     email_trouve = email_match.group(0) if email_match else expediteur
 
-    # Mots-clés de candidature RH
-    mots_cles_rh = [
-        "candidature", "cv", "recrutement", "postule", "poste", "stage",
-        "emploi", "développeur", "ingenieur", "profil", "motivation"
+    # 1. Détection de Spam / Pub / Démarchage
+    mots_cles_spam = [
+        "casino", "gagner de l'argent", "promo", "remise", "viagra", "crypto",
+        "bitcoin", "unsubscribe", "désabonner", "offre spéciale", "partenariat b2b",
+        "investissez", "seo ranking", "agrandir", "gratuit sans engagement"
     ]
-    score_pertinence = sum(15 for mot in mots_cles_rh if mot in texte_complet)
+    is_spam = any(sp in texte_complet for sp in mots_cles_spam)
 
-    # Détection des compétences techniques
-    competences_dispos = ["php", "laravel", "react", "python", "docker", "javascript", "vue", "sql", "git"]
+    # 2. Détection de Demande d'Information
+    mots_cles_info = [
+        "renseignement", "information", "horaires", "adresse usine", "visite",
+        "tarifs ciment", "catalogue produit", "devis", "question", "comment postuler",
+        "dates de concours", "qui contacter", "période de stage", "contact rh"
+    ]
+    score_info = sum(15 for mot in mots_cles_info if mot in texte_complet)
+
+    # 3. Détection de Candidature / Demande d'emploi
+    mots_cles_candidature = [
+        "candidature", "cv", "curriculum vitae", "postule", "postuler", "poste",
+        "emploi", "développeur", "ingénieur", "profil", "motivation", "rejoindre",
+        "opportunité", "recrutement", "embauche", "lettre de motivation"
+    ]
+    score_candidature = sum(15 for mot in mots_cles_candidature if mot in texte_complet)
+
+    # Compétences informatiques / techniques
+    competences_dispos = ["php", "laravel", "react", "python", "docker", "javascript", "vue", "sql", "git", "java", "ciment", "maintenance", "électromécanique", "comptabilité"]
     competences_trouvees = [comp.upper() for comp in competences_dispos if comp in texte_complet]
-    score_pertinence += len(competences_trouvees) * 10
-    score_pertinence = min(score_pertinence, 100)
+    score_candidature += len(competences_trouvees) * 10
 
-    # Est-ce une candidature ?
-    est_candidature = score_pertinence >= 30
+    # Détection d'offre spécifique (ex: REF-1, OFF-2, Offre #3, ou id_offre)
+    id_offre_detecte = None
+    match_ref = re.search(r'(?:offre|ref|poste)\s*(?:#|n°|numéro)?\s*(\d+)', texte_complet)
+    if match_ref:
+        try:
+            id_offre_detecte = int(match_ref.group(1))
+        except ValueError:
+            id_offre_detecte = None
 
-    if est_candidature:
-        decision = "CANDIDATURE_VALIDEE"
-        action_recommandee = "Transférer au parsing de CV et planifier l'entretien"
-        motif = f"Email qualifié comme candidature RH (Score: {score_pertinence}%). Compétences: {', '.join(competences_trouvees) if competences_trouvees else 'Non spécifiées'}."
+    # Détermination de l'intention finale
+    if is_spam and score_candidature < 30:
+        intention = "spam"
+        confiance = 0.90
+        motif = "Contenu publicitaire ou non pertinent détecté."
+    elif score_candidature >= 25 or "cv" in texte_complet or "candidature" in texte_complet:
+        intention = "demande_emploi"
+        confiance = min(0.60 + (score_candidature * 0.004), 0.98)
+        type_candidature = "sur_offre" if id_offre_detecte else "spontanee"
+        motif = f"E-mail qualifié comme candidature d'emploi ({type_candidature})."
+    elif score_info > 0 or "?" in texte_complet:
+        intention = "information"
+        confiance = 0.85
+        motif = "Demande d'information ou de renseignement."
     else:
-        decision = "IGNORE_NON_PERTINENT"
-        action_recommandee = "Classer sans suite (probablement une newsletter ou un email général)"
-        motif = f"Aucun élément probant de candidature RH détecté (Score: {score_pertinence}%)."
+        intention = "spam"
+        confiance = 0.70
+        motif = "Message sans pertinence RH claire."
 
-    logger.info(f"Analyse email de [{expediteur}] -> {decision} ({score_pertinence}%)")
+    logger.info(f"Classification email de [{expediteur}] -> Intention: {intention} (Offre: {id_offre_detecte})")
 
     return {
         "succes": True,
-        "est_candidature": est_candidature,
+        "intention": intention,
+        "score_confiance": round(confiance, 2),
+        "id_offre": id_offre_detecte,
+        "est_spontanee": id_offre_detecte is None,
         "email_expediteur": email_trouve,
-        "sujet_analyse": sujet,
-        "score_pertinence": score_pertinence,
+        "sujet": sujet,
         "competences_detectees": competences_trouvees,
-        "decision": decision,
-        "action_recommandee": action_recommandee,
-        "motif": motif
+        "motif": motif,
+    }
+
+
+@app.post("/api/extraire-cv-ocr")
+def extraire_cv_ocr(payload: dict):
+    """
+    Simulation du parsing OCR + LLM d'un CV en extrayant distinctement :
+    - contact (nom, prenom, email, telephone, ville)
+    - competences (liste avec niveau)
+    - experiences (postes en entreprise, contrats officiels)
+    - projets (réalisations pratiques, académiques, open-source - SÉPARATION EXPLICITE)
+    - formations (diplômes, établissements)
+    """
+    texte = payload.get("texte", "") or payload.get("content", "") or ""
+    nom_fichier = payload.get("nom_fichier", "CV_candidat.pdf")
+
+    logger.info(f"Extraction CV OCR & LLM sur {nom_fichier} (longueur texte: {len(texte)})")
+
+    # Modèle structuré standardisé renvoyé à n8n pour Laravel
+    return {
+        "succes": True,
+        "contact": {
+            "nom_complet": payload.get("nom_complet") or "Rakoto Jean",
+            "nom": payload.get("nom") or "Rakoto",
+            "prenom": payload.get("prenom") or "Jean",
+            "email": payload.get("email") or "jean.rakoto@example.local",
+            "telephone": payload.get("telephone") or "+261 34 12 345 67",
+            "ville": payload.get("ville") or "Antananarivo"
+        },
+        "competences": [
+            {"nom": "Laravel", "niveau": "Avancé"},
+            {"nom": "React", "niveau": "Avancé"},
+            {"nom": "PostgreSQL", "niveau": "Intermédiaire"},
+            {"nom": "Docker", "niveau": "Intermédiaire"}
+        ],
+        "experiences": [
+            {
+                "poste": "Développeur Web Fullstack",
+                "entreprise": "Tech Solutions Madagascar",
+                "date_debut": "2023-01-01",
+                "date_fin": "2024-06-30",
+                "description": "Développement et maintenance d'applications web d'entreprise avec Laravel et Vue.js."
+            }
+        ],
+        "projets": [
+            {
+                "titre_projet": "Plateforme Logistique AlpA Tracking",
+                "role": "Concepteur & Lead Développeur",
+                "technologies": "React, Node.js, PostgreSQL",
+                "url_projet": "https://github.com/example/alpa-tracking",
+                "date_debut": "2022-03-01",
+                "date_fin": "2022-09-30",
+                "description": "Projet académique de fin d'études : système IoT de traçabilité des camions de livraison de ciment."
+            },
+            {
+                "titre_projet": "Portfolio & Micro-services Docker",
+                "role": "Développeur Open Source",
+                "technologies": "Docker, FastAPI, Nginx",
+                "url_projet": "https://portfolio.example.local",
+                "date_debut": "2024-01-01",
+                "date_fin": None,
+                "description": "Déploiement de micro-services conteneurisés en environnement local."
+            }
+        ],
+        "formations": [
+            {
+                "diplome": "Master 2 en Ingénierie Logicielle",
+                "etablissement": "IT University (ITU)",
+                "domaine_etude": "Informatique & Systèmes Distribués",
+                "date_obtention": "2023-11-15",
+                "niveau": "Bac+5"
+            }
+        ],
+        "texte_brut_ocr": texte or f"Curriculum Vitae de Jean Rakoto. Ingénieur Logiciel. Projets : AlpA Tracking. Expérience : Tech Solutions."
     }
 
 

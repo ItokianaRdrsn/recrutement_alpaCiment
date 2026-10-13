@@ -26,6 +26,7 @@ class Candidature extends Model
         'message',
         'canal_depot',
         'id_utilisateur_depot',
+        'cle_idempotence',
         'created_at',
         'updated_at',
     ];
@@ -94,5 +95,10 @@ class Candidature extends Model
     public function historique(): HasMany
     {
         return $this->hasMany(HistoriqueStatut::class, 'id_candidature', 'id_candidature')->orderBy('created_at', 'desc');
+    }
+
+    public function rendezVous(): HasMany
+    {
+        return $this->hasMany(RendezVous::class, 'id_candidature', 'id_candidature')->orderBy('date_debut', 'asc');
     }
 }

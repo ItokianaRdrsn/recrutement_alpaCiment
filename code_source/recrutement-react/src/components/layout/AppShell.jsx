@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
+    Activity,
     BriefcaseBusiness,
     Building2,
+    CalendarDays,
     ChevronDown,
     ChevronUp,
+    Cpu,
     Layers,
     LayoutDashboard,
     LogOut,
+    Mail,
+    ShieldAlert,
     Sparkles,
     UserCheck,
 } from 'lucide-react';
@@ -40,6 +45,14 @@ export function AppShell({ children, user }) {
         ? 'candidatures'
         : activePath.startsWith('/vivier')
         ? 'vivier'
+        : activePath.startsWith('/agenda')
+        ? 'agenda'
+        : activePath.startsWith('/modeles-emails')
+        ? 'modeles-emails'
+        : activePath.startsWith('/audit-logs')
+        ? 'audit-logs'
+        : activePath.startsWith('/monitoring-pipeline')
+        ? 'monitoring-pipeline'
         : activePath.startsWith('/referentiels')
         ? 'referentiels'
         : 'dashboard';
@@ -145,6 +158,62 @@ export function AppShell({ children, user }) {
                         <span>Vivier</span>
                     </a>
 
+                    {/* AGENDA & RENDEZ-VOUS */}
+                    <a
+                        aria-current={activePath === '/agenda' ? 'page' : undefined}
+                        className={activePath === '/agenda' ? 'nav-link active' : 'nav-link'}
+                        href="/agenda"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/agenda');
+                        }}
+                    >
+                        <CalendarDays aria-hidden="true" size={18} />
+                        <span>Agenda & Tests</span>
+                    </a>
+
+                    {/* MODÈLES D'EMAILS */}
+                    <a
+                        aria-current={activePath === '/modeles-emails' ? 'page' : undefined}
+                        className={activePath === '/modeles-emails' ? 'nav-link active' : 'nav-link'}
+                        href="/modeles-emails"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/modeles-emails');
+                        }}
+                    >
+                        <Mail aria-hidden="true" size={18} />
+                        <span>Modèles d'e-mails</span>
+                    </a>
+
+                    {/* JOURNAL D'AUDIT */}
+                    <a
+                        aria-current={activePath === '/audit-logs' ? 'page' : undefined}
+                        className={activePath === '/audit-logs' ? 'nav-link active' : 'nav-link'}
+                        href="/audit-logs"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/audit-logs');
+                        }}
+                    >
+                        <Activity aria-hidden="true" size={18} />
+                        <span>Journal d'audit</span>
+                    </a>
+
+                    {/* MONITORING PIPELINE IA & N8N */}
+                    <a
+                        aria-current={activePath === '/monitoring-pipeline' ? 'page' : undefined}
+                        className={activePath === '/monitoring-pipeline' ? 'nav-link active' : 'nav-link'}
+                        href="/monitoring-pipeline"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/monitoring-pipeline');
+                        }}
+                    >
+                        <Cpu aria-hidden="true" size={18} />
+                        <span>Monitoring Pipeline</span>
+                    </a>
+
                     {/* RÉFÉRENTIELS (CLIC SUR LE HEADER AFFICHE / MASQUE UNIQUEMENT LE MENU DÉROULANT SANS REDIRECTION AUTOMATIQUE) */}
                     <div
                         className={activeView === 'referentiels' ? 'nav-link active' : 'nav-link'}
@@ -196,6 +265,12 @@ export function AppShell({ children, user }) {
                                 ? "Offres d'emploi"
                                 : activeView === 'vivier'
                                 ? 'Vivier'
+                                : activeView === 'agenda'
+                                ? 'Agenda des Entretiens & Tests'
+                                : activeView === 'audit-logs'
+                                ? "Journal d'audit & Traçabilité"
+                                : activeView === 'monitoring-pipeline'
+                                ? 'Monitoring Pipeline IA & n8n'
                                 : activeView === 'referentiels'
                                 ? 'Référentiels'
                                 : 'Tableau de bord'}

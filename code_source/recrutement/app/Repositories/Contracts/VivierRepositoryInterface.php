@@ -17,14 +17,16 @@ interface VivierRepositoryInterface
     public function updateOrCreate(array $matchAttributes, array $values): VivierCandidat;
     public function delete(VivierCandidat $vivier): bool;
     
-    // Candidature Profile relations (Competences, Experiences, Formations)
+    // Candidature Profile relations (Competences, Experiences, Formations, Projets)
     public function getExperiencesByCandidature(int $idCandidature): Collection;
     public function getFormationsByCandidature(int $idCandidature): Collection;
+    public function getProjetsByCandidature(int $idCandidature): Collection;
     public function getCompetencesByCandidature(int $idCandidature): SupportCollection;
     
     public function syncCandidatCompetence(int $idCandidature, int $idCompetence, array $data): void;
     public function createExperience(array $attributes): CandidatExperience;
     public function createFormation(array $attributes): CandidatFormation;
+    public function createProjet(array $attributes): \App\Models\CandidatProjet;
     
     // OCR
     public function getExtractionOcrByCandidature(int $idCandidature): ?CvExtractionOcr;
