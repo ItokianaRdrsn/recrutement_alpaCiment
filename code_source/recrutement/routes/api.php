@@ -46,6 +46,44 @@ Route::post('/public/offres/{id}/postuler', [CandidatureController::class, 'post
 Route::post('/public/candidature/spontanee', [CandidatureController::class, 'candidatureSpontanee'])->name('api.public.candidature.spontanee');
 Route::post('/public/candidature-spontanee', [CandidatureController::class, 'candidatureSpontanee']); // Alias
 Route::post('/public/import-candidature', [CandidatureController::class, 'importExternalCandidature'])->name('api.public.import-candidature');
+Route::post('/public/pipeline-metrics', [\App\Http\Controllers\Api\PipelineMetricController::class, 'storePublic'])->name('api.public.pipeline-metrics');
+Route::post('/public/pipeline-log-error', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Log::error('🚨 [PIPELINE N8N ERROR] ' . json_encode($request->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    try {
+        \App\Models\AuditLog::create([
+            'id_utilisateur' => null,
+            'action' => 'erreur_pipeline',
+            'entite' => 'n8n_pipeline',
+            'id_entite' => null,
+            'description' => substr($request->input('alerte') ?: ($request->input('message_erreur') ?: 'Erreur pipeline n8n'), 0, 255),
+            'nouvelles_valeurs' => $request->all(),
+            'ip_adresse' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+    } catch (\Throwable $e) {
+        // En cas d'erreur audit_log, le log applicatif a déjà capturé l'incident
+    }
+
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('pipeline_metrics')) {
+            \App\Models\PipelineMetric::create([
+                'id_candidature' => null,
+                'id_offre' => null,
+                'cle_idempotence' => $request->input('execution_id'),
+                'email_expediteur' => $request->input('sender_email'),
+                'sujet_email' => mb_substr((string) ($request->input('workflow_name') ?: 'Workflow n8n'), 0, 250),
+                'intention' => $request->input('intention', 'demande_emploi'),
+                'statut' => 'erreur',
+                'noeud_erreur' => mb_substr((string) ($request->input('noeud_fautif') ?: $request->input('failed_node') ?: 'Inconnu'), 0, 150),
+                'message_erreur' => $request->input('message_erreur') ?: $request->input('error_message') ?: json_encode($request->all(), JSON_UNESCAPED_UNICODE),
+            ]);
+        }
+    } catch (\Throwable $e) {
+        // Ignorer si table non migrée
+    }
+
+    return response()->json(['status' => 'logged', 'timestamp' => now()->toIso8601String()]);
+})->name('api.public.pipeline-log-error');
 
 // Protected Back-Office routes
 Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
@@ -151,6 +189,9 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::get('/vivier', [VivierController::class, 'index'])->name('api.vivier.index');
     Route::post('/vivier', [VivierController::class, 'store'])->name('api.vivier.store');
     Route::delete('/vivier/{id}', [VivierController::class, 'destroy'])->name('api.vivier.destroy');
+
+    // --- MONITORING PIPELINE N8N / OCR / NER (P2 & P3) ---
+    Route::get('/pipeline-metrics', [\App\Http\Controllers\Api\PipelineMetricController::class, 'index'])->name('api.pipeline-metrics.index');
 
     // --- JOURNAL D'AUDIT DES ACTIONS RH (Sprint 6) ---
     Route::get('/audit-logs', [App\Http\Controllers\Api\AuditLogController::class, 'index'])->name('api.audit-logs.index');

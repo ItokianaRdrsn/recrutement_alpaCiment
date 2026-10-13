@@ -26,6 +26,7 @@ class Candidature extends Model
         'message',
         'canal_depot',
         'id_utilisateur_depot',
+        'cle_idempotence',
         'created_at',
         'updated_at',
     ];

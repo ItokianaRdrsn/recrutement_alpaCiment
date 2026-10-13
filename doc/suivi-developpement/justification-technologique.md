@@ -206,4 +206,29 @@ Pour chaque choix, il présente les **motifs de sélection**, les **alternatives
 - [n8n Docker Setup Guide](https://docs.n8n.io/hosting/installation/docker/)
 - [Prompt Engineering Guide for Structured Outputs & NER](https://www.promptingguide.ai/)
 
+---
+
+## 🧠 10. Modèle LLM Local pour NER & Structuration JSON : Qwen 2.5 (7B) via Ollama
+
+### 📌 Pourquoi Qwen 2.5 (7B) ?
+- **Supériorité sur le JSON Structuré & Consignes Négatives** : Qwen 2.5 (7B) surpasse largement Llama 3.2 (3B) et Mistral (7B) dans les benchmarks d'extraction d'information structurée (Information Extraction / NER). Il respecte à la perfection les consignes négatives critiques (ex: *"ne jamais placer un projet d'école dans les expériences en entreprise"*).
+- **Compréhension Multilingue & Sémantique** : Excellente compréhension du vocabulaire académique et professionnel francophone (diplômes, contrats, intitulés de postes, technologies).
+- **Format JSON Garanti via Ollama** : L'utilisation conjointe avec l'option `format="json"` d'Ollama garantit une réponse parsable sans balises superflues de texte conversationnel.
+- **Souveraineté & Respect RGPD** : Le modèle s'exécute à 100% en local sur la machine ou le serveur d'AlpA Ciment sans transmettre les données personnelles des candidats à des tiers.
+
+### ⚖️ Comparatif & Alternatives Évaluées
+
+| Modèle LLM | Précision NER & JSON | Taille / Ressources | Confidentialité | Décision |
+| --- | --- | --- | --- | --- |
+| **Qwen 2.5 (7B Instruct)** | • Excellente précision sémantique<br>• Respect parfait des schémas JSON hiérarchisés<br>• Dissociation nette Projets vs Expériences | ~4.7 Go VRAM / RAM (Très accessible sur GPU standard ou 16 Go RAM) | 100% Local (Ollama) | **Retenu ✅** |
+| **Llama 3.2 (3B)** | • Très rapide | ~2.0 Go | 100% Local (Ollama) | **Remplacé (Manque de discernement sur les consignes négatives)** |
+| **Mistral (7B Instruct v0.3)** | • Bon en français | ~4.4 Go | 100% Local (Ollama) | **Alternative Solide** |
+| **OpenAI GPT-4o / Claude 3.5 Sonnet (API)** | • Précision maximale | Exige connexion Cloud | Données transmises à des tiers (Risque RGPD) | **Écarté (Non-souverain) ❌** |
+
+### 📚 Sources & Documentations
+- [Qwen 2.5 Technical Report & Benchmarks (Alibaba Cloud)](https://qwenlm.github.io/blog/qwen2.5/)
+- [Ollama Model Library - Qwen 2.5](https://ollama.com/library/qwen2.5)
+- [HuggingFace Open LLM Leaderboard (Structured Outputs)](https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard)
+
+
 

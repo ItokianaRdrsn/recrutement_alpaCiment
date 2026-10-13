@@ -549,7 +549,7 @@ td strong {
 }
 
 td span {
-    color: var(--muted);
+    /* color: var(--muted); */
     font-size: 13px;
     margin-top: 3px;
 }

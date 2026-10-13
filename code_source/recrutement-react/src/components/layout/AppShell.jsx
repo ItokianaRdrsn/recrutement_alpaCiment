@@ -7,6 +7,7 @@ import {
     CalendarDays,
     ChevronDown,
     ChevronUp,
+    Cpu,
     Layers,
     LayoutDashboard,
     LogOut,
@@ -50,6 +51,8 @@ export function AppShell({ children, user }) {
         ? 'modeles-emails'
         : activePath.startsWith('/audit-logs')
         ? 'audit-logs'
+        : activePath.startsWith('/monitoring-pipeline')
+        ? 'monitoring-pipeline'
         : activePath.startsWith('/referentiels')
         ? 'referentiels'
         : 'dashboard';
@@ -197,6 +200,20 @@ export function AppShell({ children, user }) {
                         <span>Journal d'audit</span>
                     </a>
 
+                    {/* MONITORING PIPELINE IA & N8N */}
+                    <a
+                        aria-current={activePath === '/monitoring-pipeline' ? 'page' : undefined}
+                        className={activePath === '/monitoring-pipeline' ? 'nav-link active' : 'nav-link'}
+                        href="/monitoring-pipeline"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/monitoring-pipeline');
+                        }}
+                    >
+                        <Cpu aria-hidden="true" size={18} />
+                        <span>Monitoring Pipeline</span>
+                    </a>
+
                     {/* RÉFÉRENTIELS (CLIC SUR LE HEADER AFFICHE / MASQUE UNIQUEMENT LE MENU DÉROULANT SANS REDIRECTION AUTOMATIQUE) */}
                     <div
                         className={activeView === 'referentiels' ? 'nav-link active' : 'nav-link'}
@@ -252,6 +269,8 @@ export function AppShell({ children, user }) {
                                 ? 'Agenda des Entretiens & Tests'
                                 : activeView === 'audit-logs'
                                 ? "Journal d'audit & Traçabilité"
+                                : activeView === 'monitoring-pipeline'
+                                ? 'Monitoring Pipeline IA & n8n'
                                 : activeView === 'referentiels'
                                 ? 'Référentiels'
                                 : 'Tableau de bord'}

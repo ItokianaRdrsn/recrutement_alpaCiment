@@ -54,6 +54,7 @@ class ImportCandidatureN8nTest extends TestCase
             $table->text('message')->nullable();
             $table->string('canal_depot', 50)->nullable();
             $table->unsignedBigInteger('id_utilisateur_depot')->nullable();
+            $table->string('cle_idempotence', 255)->nullable()->unique();
             $table->timestamps();
         });
 
@@ -192,6 +193,29 @@ class ImportCandidatureN8nTest extends TestCase
             $table->timestamp('created_at')->useCurrent();
         });
 
+        Schema::create('pipeline_metrics', function (Blueprint $table) {
+            $table->id('id_metric');
+            $table->string('cle_idempotence', 255)->nullable();
+            $table->string('email_expediteur', 255)->nullable();
+            $table->string('sujet_email', 255)->nullable();
+            $table->string('intention', 50)->nullable();
+            $table->unsignedBigInteger('id_offre')->nullable();
+            $table->unsignedBigInteger('id_candidature')->nullable();
+            $table->float('duree_classification_s')->default(0);
+            $table->float('duree_ocr_s')->default(0);
+            $table->float('duree_ner_s')->default(0);
+            $table->float('duree_totale_s')->default(0);
+            $table->integer('nb_caracteres_ocr')->default(0);
+            $table->integer('nb_competences')->default(0);
+            $table->integer('nb_experiences')->default(0);
+            $table->integer('nb_projets')->default(0);
+            $table->integer('nb_formations')->default(0);
+            $table->string('statut', 30)->default('succes');
+            $table->string('noeud_erreur', 150)->nullable();
+            $table->text('message_erreur')->nullable();
+            $table->timestamps();
+        });
+
         DB::table('type_demande')->insert([
             ['id_type_demande' => 1, 'libelle' => 'Offre'],
             ['id_type_demande' => 2, 'libelle' => 'Spontanee'],
@@ -221,6 +245,9 @@ class ImportCandidatureN8nTest extends TestCase
             'sujet_email' => 'Candidature Spontanée Développeur Web',
             'corps_email' => 'Bonjour, je souhaite postuler pour rejoindre AlpA Ciment.',
             'texte_brut_ocr' => 'Texte brut CV OCR',
+            'duree_ocr_s' => 1.45,
+            'duree_ner_s' => 12.80,
+            'duree_totale_s' => 14.25,
             'donnees_json' => [
                 'competences' => [
                     ['nom' => 'Laravel', 'niveau' => 'Avancé'],
@@ -282,5 +309,60 @@ class ImportCandidatureN8nTest extends TestCase
             'objet' => 'Candidature Spontanée Développeur Web',
             'mode_envoi' => 'auto',
         ]);
+
+        // 4. Vérification enregistrement métriques P2 dans pipeline_metrics
+        $this->assertDatabaseHas('pipeline_metrics', [
+            'id_candidature' => $candidatureId,
+            'email_expediteur' => 'rakoto.jean.test@alpaciment.local',
+            'statut' => 'succes',
+            'nb_competences' => 2,
+            'nb_experiences' => 1,
+            'nb_projets' => 1,
+            'nb_formations' => 1,
+        ]);
+    }
+
+    public function test_idempotence_import_candidature_meme_message_id_ne_cree_pas_de_doublon(): void
+    {
+        $messageId = '<20261012.alpa-test-idempotence-12345@domain.local>';
+
+        $payload = [
+            'email_message_id' => $messageId,
+            'nom' => 'Andria',
+            'prenom' => 'Haja',
+            'email' => 'andria.haja@alpaciment.local',
+            'telephone' => '+261340000099',
+            'ville' => 'Antananarivo',
+            'source' => 'email / n8n',
+            'sujet_email' => 'Candidature Test Idempotence',
+            'corps_email' => 'Premier envoi du message.',
+        ];
+
+        // 1er envoi
+        $response1 = $this->postJson('/api/public/import-candidature', $payload);
+        $response1->assertStatus(201);
+        $id1 = $response1->json('data.id_candidature');
+        $this->assertNotNull($id1);
+
+        $this->assertEquals(1, Candidature::where('cle_idempotence', $messageId)->count());
+
+        // 2ème envoi identique (rejeu réseau n8n)
+        $response2 = $this->postJson('/api/public/import-candidature', $payload);
+        $response2->assertStatus(201); // Retourne la candidature existante avec succès
+        $id2 = $response2->json('data.id_candidature');
+
+        // L'id retourné doit être le même, aucun doublon en base
+        $this->assertEquals($id1, $id2);
+        $this->assertEquals(1, Candidature::where('cle_idempotence', $messageId)->count());
+        $this->assertEquals(1, Candidature::where('id_candidature', $id1)->count());
+        // L'archivage de communication ne doit pas être dupliqué
+        $this->assertEquals(1, Communication::where('id_candidature', $id1)->count());
+        // La tentative de doublon est tracée dans pipeline_metrics avec statut = 'doublon_ignore'
+        $this->assertDatabaseHas('pipeline_metrics', [
+            'id_candidature' => $id1,
+            'cle_idempotence' => $messageId,
+            'statut' => 'doublon_ignore',
+        ]);
     }
 }
+

@@ -19,7 +19,7 @@ from typing import Dict, Any, List, Optional
 logger = logging.getLogger("AlpaCimentOCR.email_classifier")
 
 OLLAMA_API_URL = "http://127.0.0.1:11434/api/generate"
-DEFAULT_MODEL = "llama3.2"
+DEFAULT_MODEL = "qwen2.5:7b"
 LARAVEL_PUBLIC_OFFERS_URL = "http://127.0.0.1:8000/api/public/offres"
 
 

@@ -308,14 +308,16 @@ CREATE TABLE candidature (
     id_utilisateur_depot BIGINT REFERENCES utilisateur(id_utilisateur) ON DELETE
     SET NULL,
   
-        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT chk_candidature_canal CHECK (
-            canal_depot = 'site_externe'
-            OR id_utilisateur_depot IS NOT NULL
-        )
+    cle_idempotence VARCHAR(255) UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT chk_candidature_canal CHECK (
+        canal_depot = 'site_externe'
+        OR id_utilisateur_depot IS NOT NULL
+    )
 );
 CREATE INDEX idx_candidature_candidat ON candidature(id_candidat);
+CREATE INDEX idx_candidature_cle_idempotence ON candidature(cle_idempotence) WHERE cle_idempotence IS NOT NULL;
 CREATE INDEX idx_candidature_offre ON candidature(id_offre);
 CREATE INDEX idx_candidature_domaine ON candidature(id_domaine);
 CREATE INDEX idx_candidature_type_demande ON candidature(id_type_demande);
@@ -508,6 +510,37 @@ CREATE TABLE cv_extraction_ocr (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_cv_extraction_candidature ON cv_extraction_ocr(id_candidature);
+
+-- ============================================================
+-- 13septies. PIPELINE_METRICS (Monitoring & Temps d'exécution n8n / OCR / NER)
+-- ============================================================
+CREATE TABLE pipeline_metrics (
+    id_metric BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_candidature BIGINT REFERENCES candidature(id_candidature) ON DELETE SET NULL,
+    id_offre BIGINT REFERENCES offre(id_offre) ON DELETE SET NULL,
+    cle_idempotence VARCHAR(255),
+    email_expediteur VARCHAR(200),
+    sujet_email VARCHAR(255),
+    intention VARCHAR(50) NOT NULL DEFAULT 'demande_emploi',
+    statut VARCHAR(30) NOT NULL DEFAULT 'succes',
+    duree_classification_s NUMERIC(8, 3) NOT NULL DEFAULT 0,
+    duree_ocr_s NUMERIC(8, 3) NOT NULL DEFAULT 0,
+    duree_ner_s NUMERIC(8, 3) NOT NULL DEFAULT 0,
+    duree_totale_s NUMERIC(8, 3) NOT NULL DEFAULT 0,
+    nb_caracteres_ocr INTEGER NOT NULL DEFAULT 0,
+    nb_competences INTEGER NOT NULL DEFAULT 0,
+    nb_experiences INTEGER NOT NULL DEFAULT 0,
+    nb_projets INTEGER NOT NULL DEFAULT 0,
+    nb_formations INTEGER NOT NULL DEFAULT 0,
+    noeud_erreur VARCHAR(150),
+    message_erreur TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_pipeline_metrics_statut ON pipeline_metrics(statut);
+CREATE INDEX idx_pipeline_metrics_intention ON pipeline_metrics(intention);
+CREATE INDEX idx_pipeline_metrics_created_at ON pipeline_metrics(created_at DESC);
+
 -- ============================================================
 -- 14. RENDEZ-VOUS (test / entretien)
 -- ============================================================

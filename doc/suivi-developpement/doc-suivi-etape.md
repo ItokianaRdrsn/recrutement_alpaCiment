@@ -1374,5 +1374,171 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Compilation et validation de syntaxe Python (`py_compile`) : syntaxe 100% valide.
    - Test unitaire PHPUnit Laravel : **26/26 tests validés (103 assertions)**.
 
+---
 
+### Demande 106 : Évolution du Moteur LLM Local vers Qwen 2.5 (7B) sous Ollama pour le NER & la Classification d'Emails
+1. **Contexte & Spécification** :
+   - Remplacement du modèle par défaut `llama3.2` (3B) par **`qwen2.5:7b`** via Ollama pour une précision sémantique accrue, une élimination totale des hallucinations et une conformité stricte aux schémas JSON hiérarchisés complexes.
+   - Téléchargement et intégration du modèle `qwen2.5:7b` sous Ollama.
+   - Configuration transparente du microservice OCR/NER ([`cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py)) et du classificateur d'emails ([`email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/email_classifier.py)) pour cibler `DEFAULT_MODEL = "qwen2.5:7b"`.
+2. **Implémentation Réalisée** :
+   - Lancement en tâche de fond du téléchargement `ollama pull qwen2.5:7b` (taille 4.7 Go).
+   - Bascule de la variable `DEFAULT_MODEL = "qwen2.5:7b"` dans :
+     - `code_source/ocr/cv_llm_parser.py` (extraction sémantique NER CVs avec dissociation stricte des projets).
+     - `code_source/ocr/email_classifier.py` (classification des intentions d'e-mails).
+   - Rédaction de la section 10 dans le registre d'architecture [`justification-technologique.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/justification-technologique.md) explicitant le comparatif entre Qwen 2.5 (7B), Llama 3.2 (3B), Mistral et les modèles propriétaires Cloud.
+3. **Validation & Tests** :
+   - Validation syntaxique Python réussie.
+   - Tests PHPUnit Laravel : **26/26 tests passés**.
+
+---
+
+### Demande 107 : Typage Strict et Explicitation des Types de Données dans le System Prompt du LLM Parser (`cv_llm_parser.py`)
+1. **Contexte & Spécification** :
+   - Préciser le type exact de chaque champ dans le prompt du LLM (`string`, `string | null`, `array`, `enum`) pour garantir une intégrité absolue lors de la désérialisation JSON et éliminer toute ambiguïté de conversion (éviter qu'un objet, un entier ou un tableau inattendu ne soit retourné à la place d'une chaîne ou réciproquement).
+2. **Implémentation Réalisée** :
+   - Dans [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py) :
+     - Enrichissement du schéma JSON dans `SYSTEM_PROMPT` avec les types explicites pour chaque propriété :
+       - `contact.nom_complet` : `string | null`
+       - `contact.email` : `string | null`
+       - `contact.telephone` : `string | null`
+       - `contact.ville` : `string | null`
+       - `profil` : `string | null`
+       - `competences[].nom` : `string`
+       - `competences[].niveau` : `string ('Débutant' | 'Intermédiaire' | 'Avancé' | 'Expert')`
+       - `experiences[].poste` : `string`
+       - `experiences[].entreprise` : `string`
+       - `experiences[].date_debut` / `date_fin` : `string | null`
+       - `experiences[].description` : `string | null`
+       - `projets[].titre_projet` : `string`
+       - `projets[].role` : `string | null`
+       - `projets[].technologies` : `string | null`
+       - `projets[].url_projet` : `string | null`
+       - `projets[].date_debut` / `date_fin` : `string | null`
+       - `projets[].description` : `string | null`
+       - `formations[].diplome` : `string`
+       - `formations[].etablissement` : `string`
+       - `formations[].annee_obtention` : `string | null`
+       - `formations[].domaine_etude` : `string | null`
+     - Ajout de la règle d'or n°1 : respect strict des types de données sans substitution de type.
+3. **Validation & Tests** :
+   - Validation syntaxique Python réussie (`py_compile`).
+
+---
+
+### Demande 108 : Typage Strict des Dates (`date | null` au Format ISO YYYY-MM-DD) dans le Prompt LLM
+1. **Contexte & Spécification** :
+   - Normaliser tous les champs temporels en type `date | null` (format ISO `YYYY-MM-DD`).
+   - Éliminer les formats flous comme `'Mois AAAA'` ou les chaînes textuelles comme `'En cours'` qui provoquaient des erreurs de parsing ou d'insertion SQL dans PostgreSQL (`SQLSTATE[22007]: Invalid datetime format`).
+2. **Implémentation Réalisée** :
+   - Dans [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py) :
+     - Champs `date_debut` et `date_fin` des `experiences` typés en `date | null (Date ISO: YYYY-MM-DD)`.
+     - Champs `date_debut` et `date_fin` des `projets` typés en `date | null (Date ISO: YYYY-MM-DD)`.
+     - Champ `date_obtention` des `formations` typé en `date | null (Date ISO: YYYY-MM-DD)`.
+     - Règle explicite ajoutée au prompt : si une expérience est en cours, `date_fin` doit obligatoirement être `null` (aucun texte arbitraire autorisé) ; si seule l'année est mentionnée, la convertir automatiquement en premier jour de l'année (`YYYY-01-01`).
+3. **Validation & Tests** :
+   - Validation syntaxique Python réussie (`py_compile`).
+
+---
+
+### Demande 109 : Robustesse Industrielle de l'Automatisation n8n (Idempotence, Dead Letter Queue, Retries & Validation Défensive)
+1. **Contexte & Spécification** :
+   - Assurer la robustesse et la résilience de bout en bout du pipeline d'ingestion e-mail / n8n face aux pannes réseau, indisponibilités temporaires du LLM et rejeux de messages.
+   - **🔴 P0 - Idempotence Stricte** : Empêcher toute duplication de candidature, de profil ou d'accusé de réception si un même e-mail (`email_message_id`) est rejoué.
+   - **🔴 P0 - Error Workflow n8n (Dead Letter Queue)** : Capturer centralement toutes les anomalies sans interruption silencieuse du flux et consigner l'alerte technique dans Laravel.
+   - **🟡 P1 - Retries & Timeouts** : Configurer des politiques de retry avec backoff exponentiel et des timeouts stricts sur tous les nœuds HTTP.
+   - **🟡 P1 - Validation Défensive (Sanitization)** : Filtrer et normaliser dans le nœud Code JS toutes les dates au format ISO `YYYY-MM-DD` (ou `null`) et assainir les chaînes de caractères.
+   - **🟡 P1 - Timeout explicite FastAPI/Ollama** : Borner les appels de génération à 45 secondes pour éviter le blocage des workers FastAPI.
+2. **Implémentation Réalisée** :
+   - **Base de Données & Modèle Laravel** :
+     - Migration `2026_10_12_000000_add_cle_idempotence_to_candidature_table.php` ajoutant la colonne `cle_idempotence VARCHAR(255) UNIQUE` sur la table `candidature`.
+     - Mise à jour du schéma maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) avec index partiel `idx_candidature_cle_idempotence`.
+     - Modèle [`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Candidature.php) : ajout de `cle_idempotence` dans `$fillable`.
+     - Request [`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php) : support de `cle_idempotence` et alias `email_message_id` / `message_id`.
+     - Service [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php) : garde d'idempotence vérifiant si la clé existe déjà, retournant la candidature existante sans créer de doublon ni renvoyer d'accusé de réception dupliqué.
+     - Route [`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/routes/api.php) : ajout de `POST /api/public/pipeline-log-error` consignant les incidents dans les logs applicatifs et la table `audit_log`.
+   - **Workflows n8n** :
+     - Création de [`automatisation/workflow_error_handler_n8n.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_error_handler_n8n.json) (Error Trigger n8n $\rightarrow$ Dead Letter Queue $\rightarrow$ notification Laravel).
+     - Mise à jour de [`automatisation/workflow_candidature_email_final.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_email_final.json) :
+       - Retries (3 essais avec attente de 2 à 3s) et timeouts explicites (30s à 60s) sur les nœuds HTTP.
+       - Nœud 5A enrichi avec script défensif JS (`sanitizeIsoDate`, nettoyage des compétences/expériences/projets/formations, dérivation du `cle_idempotence` unique).
+   - **Microservice FastAPI (`code_source/ocr/main.py`)** :
+     - Ajout du paramètre `timeout: int = 45` dans la requête `/ner` pour borner les requêtes vers Ollama.
+3. **Validation & Tests** :
+   - Test unitaire d'idempotence [`ImportCandidatureN8nTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/ImportCandidatureN8nTest.php) (`test_idempotence_import_candidature_meme_message_id_ne_cree_pas_de_doublon`) : validé avec succès (**2/2 tests passés, 15 assertions**).
+   - Validation syntaxique Python réussie.
+
+---
+
+### Demande 110 : Pipeline Complet IMAP & Clic Manuel n8n (13 Nœuds) avec Classification d'Intention, OCR, NER Qwen 2.5 et Ingestion Idempotente Laravel
+> **User Prompt :** *"voici le pipeline complet: { ... json du workflow n8n ... }"*
+1. **Contexte & Spécification** :
+   - Intégration du pipeline d'ingestion complet n8n (`automatisation/workflow_candidature_imap_complet.json`) supportant à la fois le polling e-mail IMAP automatique (`n8n-nodes-base.emailReadImap`) et le déclencheur manuel par clic (`n8n-nodes-base.manualTrigger`).
+   - Traitement bout-en-bout :
+     - Étape 1 : Trigger IMAP ou déclenchement manuel.
+     - Étape 2 : Normalisation des métadonnées e-mail (`sender_email`, `subject`, `body`, `message_id`, `date_reception`, `has_attachment`).
+     - Étape 3 : Classification d'intention via FastAPI (`http://host.docker.internal:8001/api/classifier-intention` avec retry $\times 3$).
+     - Étape 4 : Aiguillage Switch 3 branches (`Demande Emploi`, `Information`, `Spam`).
+     - Étape 5 : Contrôle de présence de pièce jointe (si absent : réponse automatique e-mail CV manquant ; si info : réponse automatique 5b ; si spam : nœud 5c ignore).
+     - Étape 6 : Filtrage binaire de la pièce jointe (PDF, DOCX, PNG, JPG).
+     - Étape 7 : Extraction OCR pur vers FastAPI (`POST http://host.docker.internal:8001/ocr` avec retry $\times 3$).
+     - Étape 8 : Contrôle de qualité OCR (> 50 caractères, sinon alerte CV illisible).
+     - Étape 9 : Extraction sémantique NER pur vers FastAPI (`POST http://host.docker.internal:8001/ner` avec Qwen 2.5 7B et timeout 60s).
+     - Étape 10 : Validation défensive JavaScript (normalisation des dates ISO `YYYY-MM-DD`, sanitization des chaînes, calcul de `cle_idempotence`).
+     - Étape 11 : Import idempotent dans Laravel (`POST http://host.docker.internal:8000/api/public/import-candidature` avec retry $\times 3$).
+     - Étape 12 : Vérification du statut de réponse (alerte e-mail en cas d'erreur de validation métier).
+     - Étape 13 : Confirmation et journalisation du succès.
+2. **Implémentation Réalisée** :
+   - Création de [`automatisation/workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json) avec adressage réseau Docker `host.docker.internal` pour communiquer de manière transparente entre le conteneur n8n et les services de l'hôte (FastAPI port 8001 et Laravel port 8000).
+   - Configuration des politiques de retry et timeouts sur chaque nœud HTTP.
+   - Connexion documentée avec [`automatisation/workflow_error_handler_n8n.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_error_handler_n8n.json) pour la Dead Letter Queue.
+3. **Validation & Tests** :
+   - Structure JSON vérifiée et syntaxiquement valide.
+   - Tests de conformité des routes FastAPI (`/ocr`, `/ner`, `/api/classifier-intention`) et Laravel (`/api/public/import-candidature`, `/api/public/pipeline-log-error`).
+   - Suite de tests PHPUnit validée : **17/17 tests réussis (91 assertions)**.
+
+---
+
+### Demande 111 (Rectification) : Correction de l'Erreur 422 lors de l'Import Laravel depuis n8n & Alignement du Payload POST
+> **User Prompt :** *"erreur avec l import laravel ,je pense c'est a cause du payload envoyer en post qui est pareil a l'ancien"*
+1. **Diagnostic Technique (Logs Docker n8n & Laravel)** :
+   - **Cause 1 (Erreur 422 Laravel sur `email_sender`)** : Dans les logs du conteneur `n8n_alpaciment`, l'appel `POST /api/public/import-candidature` renvoyait `422 - {"message":"validation.max.string","errors":{"email_sender":["validation.max.string"]}}` car le nœud IMAP `$json.from` retournait un objet complet (incluant HTML et métadonnées > 150 caractères).
+   - **Cause 2 (Structure du Payload POST)** : Le nœud 10 (`10. Validation et Format`) du nouveau workflow envoyait `{ candidat: {...}, competences: [...] }` au lieu de la structure native attendue par Laravel (`donnees_json: { contact, profil, competences, experiences, projets, formations }`, `cv_base64`, `cv_nom`, `cv_mime`, `texte_brut_ocr`, `nom_complet`, `email`, `id_offre`, `cle_idempotence`).
+   - **Cause 3 (Erreur 422 FastAPI `int_parsing` sur `id_offre`)** : Lorsque l'e-mail était une candidature spontanée (`id_offre` vide ou `"undefined"`), le `FormData` multipart vers `/ocr` envoyait une chaîne non entière rejetée par FastAPI.
+2. **Implémentation Réalisée** :
+   - **FormRequest Laravel ([`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php))** :
+     - Ajout de `extractCleanEmail()` pour extraire proprement l'adresse e-mail depuis n'importe quel format IMAP (`"Nom <email@domaine.com>"` ou objet JSON).
+     - Suppression de la limite bloquante `max:150` sur `email_sender` et troncature défensive automatique des champs (`telephone`, `ville`, `nom_complet`, `sujet_email`, `cle_idempotence`).
+     - Validation défensive de `id_offre` : si `"undefined"`, `"null"`, `0` ou inexistant en base, conversion automatique en `null` (bascule en candidature spontanée sans rejet 422).
+     - Journalisation explicite dans `failedValidation()` pour tracer tout éventuel rejet dans `laravel.log`.
+   - **Microservice FastAPI ([`main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py))** :
+     - Ajout de `_parse_optional_int()` sur `/ocr`, `/ner` et `/extract-cv` pour accepter `Optional[Union[int, str]]` et convertir proprement `""`, `"undefined"` ou `"null"` en `None`.
+   - **Workflow n8n ([`workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json))** :
+     - Nœud 2 (`2. Normaliser Metadata`) : extraction directe de l'adresse e-mail propre depuis `$json.from`.
+     - Nœud 10 (`10. Validation et Format`) : restauration exacte de la structure du payload historique (`donnees_json`, `cv_base64`, `cv_nom`, `cv_mime`, `texte_brut_ocr`, `email`, `nom_complet`, `id_offre`, `cle_idempotence`).
+3. **Validation & Tests** :
+   - Tests PHPUnit (`ImportCandidatureN8nTest.php`) : **100% passés**.
+
+---
+
+### Demande 112 (Nouvelle Fonctionnalité) : Implémentation Complète des Jalons P2 (`pipeline_metrics` + Logging Temps) et P3 (Dashboard Monitoring Pipeline IA & n8n)
+> **User Prompt :** *"est ce qu'on a deja implementer tout cela et ou est ce que c'est : [...] 🟢 P2 Table pipeline_metrics + logging temps 1h / 🟢 P3 Dashboard monitoring (Grafana ou simple page Laravel) 2-3h — oui"*
+1. **Objectifs & Périmètre** :
+   - Finaliser à 100% la feuille de route de robustesse du pipeline d'automatisation n8n / FastAPI / Laravel en implémentant les jalons **P2** (traçabilité de performance et des volumes en base de données) et **P3** (tableau de bord de supervision Back-Office).
+2. **Implémentation Réalisée** :
+   - **Jalon P2 — Base de données, Modèle & Enregistrement automatique des métriques** :
+     - **Migration Laravel ([`2026_10_13_000000_create_pipeline_metrics_table.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_10_13_000000_create_pipeline_metrics_table.php))** et synchronisation dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) (section `13septies. PIPELINE_METRICS` + index sur `statut`, `intention`, `created_at`).
+     - **Modèle Eloquent ([`PipelineMetric.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/PipelineMetric.php))** : stocke `id_candidature`, `id_offre`, `cle_idempotence`, `email_expediteur`, `sujet_email`, `intention`, `statut` (`succes`, `doublon_ignore`, `erreur`), `duree_classification_s`, `duree_ocr_s`, `duree_ner_s`, `duree_totale_s`, `nb_caracteres_ocr`, `nb_competences`, `nb_experiences`, `nb_projets`, `nb_formations`, `noeud_erreur`, `message_erreur`.
+     - **Service Métier ([`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php))** : journalisation automatique dans `pipeline_metrics` lors de chaque import (`statut = 'succes'`) et lors du blocage d'un doublon par idempotence (`statut = 'doublon_ignore'`).
+     - **Contrôleur API ([`PipelineMetricController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/PipelineMetricController.php)) & Routes ([`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/routes/api.php))** :
+       - `GET /api/pipeline-metrics` : retourne les KPIs agrégés (total exécutions, taux de fiabilité, durées moyennes OCR / NER / totale, doublons évités, erreurs DLQ) et la liste paginée filtrable.
+       - `POST /api/public/pipeline-metrics` et `POST /api/public/pipeline-log-error` : enregistrement direct des métriques et des erreurs capturées par l'Error Workflow n8n (DLQ).
+     - **Workflow n8n ([`workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json))** : Nœud 10 enrichi avec `duree_ocr_s`, `duree_ner_s` et `duree_totale_s`.
+   - **Jalon P3 — Interface React de Supervision (`/monitoring-pipeline`)** :
+     - **Page React ([`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx))** : 7 cartes KPIs temps réel, barre de recherche et filtres (`statut`, `intention`), tableau paginé avec badges et modale d'inspection détaillée de chaque exécution.
+     - **Intégration Navigation & Routing** dans [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx).
+3. **Validation & Tests** :
+   - Migration PostgreSQL exécutée avec succès (`2026_10_13_000000_create_pipeline_metrics_table DONE`).
+   - Tests PHPUnit (`ImportCandidatureN8nTest.php`) : **2/2 tests passés (17 assertions)** incluant la vérification de `pipeline_metrics` (`succes` et `doublon_ignore`).
+   - Build de production React (`npm run build`) : **succès**.
 

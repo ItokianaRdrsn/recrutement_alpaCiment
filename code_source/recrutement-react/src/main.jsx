@@ -17,6 +17,7 @@ const VivierView = lazy(() => import('./pages/VivierView').then((m) => ({ defaul
 const AgendaView = lazy(() => import('./pages/AgendaView').then((m) => ({ default: m.AgendaView })));
 const ModelesEmailsView = lazy(() => import('./pages/ModelesEmailsView').then((m) => ({ default: m.ModelesEmailsView })));
 const AuditLogsView = lazy(() => import('./pages/AuditLogsView').then((m) => ({ default: m.AuditLogsView })));
+const PipelineMonitoringView = lazy(() => import('./pages/PipelineMonitoringView').then((m) => ({ default: m.PipelineMonitoringView })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
 
 const CandidatureSpontaneePage = lazy(() => import('./frontOffice/CandidatureSpontaneePage'));
@@ -263,6 +264,14 @@ function MainApp() {
                         </BackOfficeLayout>
                     }
                     path="/audit-logs"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <PipelineMonitoringView />
+                        </BackOfficeLayout>
+                    }
+                    path="/monitoring-pipeline"
                 />
                 <Route
                     element={

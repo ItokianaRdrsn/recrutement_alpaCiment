@@ -1,5 +1,5 @@
 {
-  "name": "AlpA Ciment - Scénario Ingestion Candidatures & Classification Emails",
+  "name": "AlpA Ciment - Scénario Ingestion Candidatures & Classification Emails (Résilient)",
   "nodes": [
     {
       "parameters": {
@@ -9,7 +9,7 @@
         "options": {}
       },
       "id": "node-trigger-webhook",
-      "name": "1. E-mail Entrant (Trigger Webhook)",
+      "name": "1. E-mail Entrant (Trigger Webhook / Clic)",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
@@ -24,7 +24,13 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={\n  \"sender\": \"{{ $json.body?.sender || $json.body?.from || $json.sender || 'candidat@example.com' }}\",\n  \"subject\": \"{{ $json.body?.subject || $json.subject || 'Candidature spontanée Développeur' }}\",\n  \"content\": \"{{ $json.body?.content || $json.body?.text || $json.content || 'Bonjour, je vous transmets mon CV ci-joint.' }}\"\n}",
-        "options": {}
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "retries": 3,
+            "waitBetweenTries": 2000
+          }
+        }
       },
       "id": "node-ia-classifier",
       "name": "2. Classifier Intention (IA / NLP)",
@@ -118,8 +124,14 @@
         "url": "http://host.docker.internal:8000/api/extraire-cv-ocr",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"texte\": \"{{ $('1. E-mail Entrant (Trigger Webhook)').item.json.body?.content || $('1. E-mail Entrant (Trigger Webhook)').item.json.content || '' }}\",\n  \"email\": \"{{ $json.email_expediteur }}\",\n  \"nom_fichier\": \"CV_entrant.pdf\"\n}",
-        "options": {}
+        "jsonBody": "={\n  \"texte\": \"{{ $('1. E-mail Entrant (Trigger Webhook / Clic)').item.json.body?.content || $('1. E-mail Entrant (Trigger Webhook / Clic)').item.json.content || '' }}\",\n  \"email\": \"{{ $json.email_expediteur }}\",\n  \"nom_fichier\": \"CV_entrant.pdf\"\n}",
+        "options": {
+          "timeout": 60000,
+          "retry": {
+            "retries": 3,
+            "waitBetweenTries": 3000
+          }
+        }
       },
       "id": "node-extract-ocr",
       "name": "4A. Extraire CV (OCR/LLM avec Projets)",
@@ -132,10 +144,10 @@
     },
     {
       "parameters": {
-        "jsCode": "const ocrResult = $input.item.json;\nconst classifierNode = $('2. Classifier Intention (IA / NLP)').item.json;\nconst emailNode = $('1. E-mail Entrant (Trigger Webhook)').item.json;\n\nconst idOffre = classifierNode.id_offre || null;\nconst emailSubject = classifierNode.sujet || emailNode.body?.subject || emailNode.subject || 'Candidature par email';\nconst emailBody = emailNode.body?.content || emailNode.body?.text || emailNode.content || 'Bonjour, je vous soumets ma candidature.';\n\nreturn {\n  json: {\n    nom: ocrResult.contact?.nom || 'Candidat',\n    prenom: ocrResult.contact?.prenom || '',\n    nom_complet: ocrResult.contact?.nom_complet || 'Candidat',\n    email: classifierNode.email_expediteur || ocrResult.contact?.email || 'candidat@example.local',\n    telephone: ocrResult.contact?.telephone || null,\n    ville: ocrResult.contact?.ville || null,\n    id_offre: idOffre,\n    source: 'email / n8n',\n    sujet_email: emailSubject,\n    corps_email: emailBody,\n    message_motivation: emailBody,\n    texte_brut_ocr: ocrResult.texte_brut_ocr || null,\n    donnees_json: {\n      contact: ocrResult.contact,\n      competences: ocrResult.competences || [],\n      experiences: ocrResult.experiences || [],\n      projets: ocrResult.projets || [],\n      formations: ocrResult.formations || []\n    }\n  }\n};"
+        "jsCode": "// VALIDATION DÉFENSIVE & ASSURANCE D'IDEMPOTENCE\nconst ocrResult = $input.item.json || {};\nconst classifierNode = $('2. Classifier Intention (IA / NLP)').item.json || {};\nconst emailNode = $('1. E-mail Entrant (Trigger Webhook / Clic)').item.json || {};\n\nconst body = emailNode.body || {};\nconst emailSender = (classifierNode.email_expediteur || ocrResult.contact?.email || body.sender || body.from || 'candidat@example.local').toLowerCase().trim();\nconst emailSubject = classifierNode.sujet || body.subject || emailNode.subject || 'Candidature par email';\nconst emailContent = body.content || body.text || emailNode.content || 'Bonjour, je vous soumets ma candidature.';\n\n// Dérivation d'un Message-ID universel pour garantir l'idempotence stricte (anti-doublon)\nconst emailMessageId = body.message_id || body.messageId || emailNode.headers?.['message-id'] || `<msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@alpaciment.local>`;\n\n// Fonction de normalisation des dates ISO (YYYY-MM-DD)\nfunction sanitizeIsoDate(val) {\n  if (!val) return null;\n  const str = String(val).trim();\n  // Vérifie si déjà au format YYYY-MM-DD\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(str)) return str;\n  // Si année seule (ex: 2023)\n  if (/^\\d{4}$/.test(str)) return `${str}-01-01`;\n  // Tentative parsing Date standard\n  const d = new Date(str);\n  if (!isNaN(d.getTime())) {\n    return d.toISOString().split('T')[0];\n  }\n  return null;\n}\n\n// Sanitization des listes\nconst sanitizedCompetences = (ocrResult.competences || []).filter(c => c && c.nom).map(c => ({\n  nom: String(c.nom).trim(),\n  niveau: c.niveau || 'Intermédiaire'\n}));\n\nconst sanitizedExperiences = (ocrResult.experiences || []).filter(e => e && e.poste).map(e => ({\n  poste: String(e.poste).trim(),\n  entreprise: String(e.entreprise || '').trim(),\n  date_debut: sanitizeIsoDate(e.date_debut),\n  date_fin: sanitizeIsoDate(e.date_fin),\n  description: e.description ? String(e.description).trim() : null\n}));\n\nconst sanitizedProjets = (ocrResult.projets || []).filter(p => p && p.titre_projet).map(p => ({\n  titre_projet: String(p.titre_projet).trim(),\n  role: p.role ? String(p.role).trim() : null,\n  technologies: p.technologies ? String(p.technologies).trim() : null,\n  url_projet: p.url_projet ? String(p.url_projet).trim() : null,\n  date_debut: sanitizeIsoDate(p.date_debut),\n  date_fin: sanitizeIsoDate(p.date_fin),\n  description: p.description ? String(p.description).trim() : null\n}));\n\nconst sanitizedFormations = (ocrResult.formations || []).filter(f => f && f.diplome).map(f => ({\n  diplome: String(f.diplome).trim(),\n  etablissement: String(f.etablissement || '').trim(),\n  date_obtention: sanitizeIsoDate(f.date_obtention || f.annee_obtention),\n  domaine_etude: f.domaine_etude ? String(f.domaine_etude).trim() : null\n}));\n\nreturn {\n  json: {\n    cle_idempotence: emailMessageId,\n    email_message_id: emailMessageId,\n    nom: (ocrResult.contact?.nom || 'Candidat').trim(),\n    prenom: (ocrResult.contact?.prenom || '').trim(),\n    nom_complet: (ocrResult.contact?.nom_complet || 'Candidat').trim(),\n    email: emailSender,\n    telephone: ocrResult.contact?.telephone || null,\n    ville: ocrResult.contact?.ville || null,\n    id_offre: classifierNode.id_offre || null,\n    source: 'email / n8n',\n    sujet_email: emailSubject,\n    corps_email: emailContent,\n    message_motivation: emailContent,\n    texte_brut_ocr: ocrResult.texte_brut_ocr || null,\n    donnees_json: {\n      contact: ocrResult.contact || {},\n      competences: sanitizedCompetences,\n      experiences: sanitizedExperiences,\n      projets: sanitizedProjets,\n      formations: sanitizedFormations\n    }\n  }\n};"
       },
       "id": "node-format-laravel",
-      "name": "5A. Formater Payload Laravel",
+      "name": "5A. Validation Défensive & Payload Laravel",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
@@ -150,7 +162,13 @@
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify($json) }}",
-        "options": {}
+        "options": {
+          "timeout": 30000,
+          "retry": {
+            "retries": 3,
+            "waitBetweenTries": 2000
+          }
+        }
       },
       "id": "node-send-laravel",
       "name": "6A. Synchroniser avec Laravel (Candidature + Comm)",
@@ -164,7 +182,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={\n  \"statut\": \"succes\",\n  \"intention\": \"demande_emploi\",\n  \"type\": \"{{ $('2. Classifier Intention (IA / NLP)').item.json.est_spontanee ? 'Spontanée (Vivier auto)' : 'Sur Offre #' + $('2. Classifier Intention (IA / NLP)').item.json.id_offre }}\",\n  \"candidature_id\": {{ $json.data?.id_candidature || 'null' }},\n  \"candidat\": {{ JSON.stringify($json.data?.candidat) }},\n  \"message\": \"Candidature et profil (projets/expériences) enregistrés avec accusé de réception automatique.\"\n}",
+        "responseBody": "={\n  \"statut\": \"succes\",\n  \"intention\": \"demande_emploi\",\n  \"type\": \"{{ $('2. Classifier Intention (IA / NLP)').item.json.est_spontanee ? 'Spontanée (Vivier auto)' : 'Sur Offre #' + $('2. Classifier Intention (IA / NLP)').item.json.id_offre }}\",\n  \"candidature_id\": {{ $json.data?.id_candidature || 'null' }},\n  \"candidat\": {{ JSON.stringify($json.data?.candidat) }},\n  \"cle_idempotence\": \"{{ $('5A. Validation Défensive & Payload Laravel').item.json.cle_idempotence }}\",\n  \"message\": \"Candidature enregistrée avec succès (idempotence garantie et accusé de réception émis).\"\n}",
         "options": {}
       },
       "id": "node-response-success",
@@ -208,7 +226,7 @@
     }
   ],
   "connections": {
-    "1. E-mail Entrant (Trigger Webhook)": {
+    "1. E-mail Entrant (Trigger Webhook / Clic)": {
       "main": [
         [
           {
@@ -259,14 +277,14 @@
       "main": [
         [
           {
-            "node": "5A. Formater Payload Laravel",
+            "node": "5A. Validation Défensive & Payload Laravel",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "5A. Formater Payload Laravel": {
+    "5A. Validation Défensive & Payload Laravel": {
       "main": [
         [
           {

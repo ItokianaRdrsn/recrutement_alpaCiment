@@ -1,0 +1,737 @@
+{
+  "name": "Pipeline Recrutement AlpA Ciment - IMAP & Clic",
+  "nodes": [
+    {
+      "parameters": {
+        "mailbox": "INBOX",
+        "postProcessAction": "read",
+        "downloadAttachments": true,
+        "options": {
+          "forceReconnect": true
+        }
+      },
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "1. Email Trigger IMAP",
+      "type": "n8n-nodes-base.emailReadImap",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "notesInFlow": true,
+      "notes": "Poll IMAP toutes les minutes. Configurer le credential IMAP (Gmail App Password ou IMAP classique)."
+    },
+    {
+      "parameters": {
+        "mode": "manual",
+        "duplicateItem": false,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assign-01",
+              "name": "sender_email",
+              "value": "={{ $json.from?.value?.[0]?.address || (typeof $json.from === 'string' ? ($json.from.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/)?.[0] || $json.from) : ($json.from?.text || '')) }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-02",
+              "name": "subject",
+              "value": "={{ $json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-03",
+              "name": "body",
+              "value": "={{ $json.text || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-04",
+              "name": "message_id",
+              "value": "={{ $json.messageId }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-05",
+              "name": "date_reception",
+              "value": "={{ $json.date }}",
+              "type": "string"
+            },
+            {
+              "id": "assign-06",
+              "name": "has_attachment",
+              "value": "={{ Object.keys($binary || {}).length > 0 }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "2. Normaliser Metadata",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8001/api/classifier-intention",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ sender: $json.sender_email, subject: $json.subject, content: $json.body }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "3. Classifier Intention",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        300
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "notesInFlow": true,
+      "notes": "Appelle FastAPI /api/classifier-intention. Retourne { type, id_offre, code_offre, confiance }."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": ""
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "demande_emploi",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Demande Emploi"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": ""
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "information",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Information"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": ""
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "spam",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Spam"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "name": "4. Aiguillage",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        960,
+        300
+      ],
+      "notesInFlow": true,
+      "notes": "3 branches: Emploi, Information, Spam. Fallback = autre."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond-attach-01",
+              "leftValue": "={{ Object.keys($binary || {}).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "name": "5. Verifier Piece Jointe",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "TRUE = CV present → pipeline OCR. FALSE = pas de PJ → email CV manquant."
+    },
+    {
+      "parameters": {
+        "fromEmail": "recrutement@alpacement.mg",
+        "toEmail": "={{ $('2. Normaliser Metadata').first().json.sender_email }}",
+        "subject": "RE: {{ $('2. Normaliser Metadata').first().json.subject }} - Information",
+        "emailType": "text",
+        "message": "Bonjour,\n\nMerci pour votre message. Nous l'avons bien recu et notre equipe reviendra vers vous dans les meilleurs delais.\n\nCordialement,\nService RH - AlpA Ciment",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "name": "5b. Reponse Info",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1240,
+        440
+      ],
+      "notesInFlow": true,
+      "notes": "Reponse automatique aux demandes d'information. Configurer credential SMTP."
+    },
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-0007-4000-8000-000000000007",
+      "name": "5c. Spam Ignore",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        660
+      ],
+      "notesInFlow": true,
+      "notes": "Spam detecte. Email ignore. Fin de branche."
+    },
+    {
+      "parameters": {
+        "fromEmail": "recrutement@alpacement.mg",
+        "toEmail": "={{ $('2. Normaliser Metadata').first().json.sender_email }}",
+        "subject": "RE: {{ $('2. Normaliser Metadata').first().json.subject }} - Piece jointe manquante",
+        "emailType": "text",
+        "message": "Bonjour,\n\nNous avons bien recu votre email de candidature, mais aucun CV n'etait joint a votre message.\n\nMerci de renvoyer votre candidature avec votre CV en piece jointe (format PDF de preference).\n\nCordialement,\nService Recrutement - AlpA Ciment",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0008-4000-8000-000000000008",
+      "name": "5d. Email CV Manquant",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1520,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\nconst item = items[0];\nconst binary = item.binary || {};\nconst binaryKeys = Object.keys(binary);\n\nif (binaryKeys.length === 0) {\n  throw new Error('Aucune piece jointe trouvee');\n}\n\nlet cvKey = null;\nlet photoKey = null;\n\n// 1. Détection prioritaire par nom et type MIME\nfor (const key of binaryKeys) {\n  const fn = (binary[key].fileName || '').toLowerCase();\n  const mime = (binary[key].mimeType || '').toLowerCase();\n\n  // Photo de profil\n  if (!photoKey && (mime.startsWith('image/') || fn.includes('photo') || fn.includes('portrait') || fn.includes('avatar') || fn.includes('profil'))) {\n    photoKey = key;\n    continue;\n  }\n\n  // CV explicite\n  if (!cvKey && (fn.includes('cv') || fn.includes('curriculum') || fn.includes('resume'))) {\n    cvKey = key;\n    continue;\n  }\n}\n\n// 2. Si aucun CV explicite, chercher le premier document PDF ou DOCX qui n'est pas la photo\nif (!cvKey) {\n  for (const key of binaryKeys) {\n    if (key === photoKey) continue;\n    const fn = (binary[key].fileName || '').toLowerCase();\n    if (fn.endsWith('.pdf') || fn.endsWith('.docx') || fn.endsWith('.doc')) {\n      cvKey = key;\n      break;\n    }\n  }\n}\n\n// 3. Fallback si toujours rien : premier fichier disponible\nif (!cvKey) {\n  cvKey = binaryKeys.find(k => k !== photoKey) || binaryKeys[0];\n}\n\n// 4. Extraire les autres pièces jointes (Lettre de motivation, diplômes, etc.)\nconst piecesJointes = [];\nfor (const key of binaryKeys) {\n  if (key === cvKey || key === photoKey) continue;\n  const fn = binary[key].fileName || 'document_joint.pdf';\n  const lower = fn.toLowerCase();\n  let typeDoc = 'Autre';\n  if (lower.includes('lettre') || lower.includes('motivation') || lower.includes('lm') || lower.includes('cover')) {\n    typeDoc = 'Lettre de motivation';\n  } else if (lower.includes('diplome') || lower.includes('certif') || lower.includes('attestation')) {\n    typeDoc = 'Diplôme';\n  }\n  piecesJointes.push({\n    nom_fichier: fn,\n    mime_type: binary[key].mimeType || 'application/pdf',\n    type_document: typeDoc,\n    base64: binary[key].data\n  });\n}\n\nreturn [{\n  json: {\n    cv_filename: binary[cvKey].fileName,\n    cv_mimetype: binary[cvKey].mimeType,\n    photo_base64: photoKey ? binary[photoKey].data : null,\n    photo_nom: photoKey ? binary[photoKey].fileName : null,\n    photo_mime: photoKey ? binary[photoKey].mimeType : null,\n    pieces_jointes: piecesJointes\n  },\n  binary: {\n    data: binary[cvKey]\n  }\n}];"
+      },
+      "id": "a1b2c3d4-0009-4000-8000-000000000009",
+      "name": "6. Filtrer Binaire CV",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "Filtre les PJ pour garder uniquement le CV (PDF, DOC, DOCX, images). Renomme le binaire en 'data'."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8001/ocr",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "parameterType": "formData",
+              "name": "id_offre",
+              "value": "={{ String($('3. Classifier Intention').first().json.id_offre || '') }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "a1b2c3d4-0010-4000-8000-000000000010",
+      "name": "7. OCR",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        180
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "notesInFlow": true,
+      "notes": "Envoie le CV binaire a FastAPI /ocr. Retourne { texte_brut_ocr, cv_base64, id_offre }."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond-ocr-01",
+              "leftValue": "={{ ($json.texte_brut_ocr || '').length }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0011-4000-8000-000000000011",
+      "name": "8. Qualite OCR",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2040,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "Verifie que le texte OCR fait au moins 50 caracteres. Sinon = CV illisible."
+    },
+    {
+      "parameters": {
+        "fromEmail": "recrutement@alpacement.mg",
+        "toEmail": "admin@alpacement.mg",
+        "subject": "⚠️ CV Illisible - {{ $('2. Normaliser Metadata').first().json.sender_email }}",
+        "emailType": "text",
+        "message": "Le CV de {{ $('2. Normaliser Metadata').first().json.sender_email }} n'a pas pu etre lu par l'OCR.\n\nSujet email: {{ $('2. Normaliser Metadata').first().json.subject }}\nTexte extrait ({{ ($json.texte_brut_ocr || '').length }} caracteres):\n{{ $json.texte_brut_ocr || 'AUCUN' }}\n\nAction requise: traitement manuel.",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0012-4000-8000-000000000012",
+      "name": "8b. Email CV Illisible",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2300,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8001/ner",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ texte_brut_ocr: $json.texte_brut_ocr, id_offre: $json.id_offre || $('3. Classifier Intention').first().json.id_offre || null, cv_base64: $json.cv_base64, cv_nom: $json.cv_nom || 'cv.pdf', cv_mime: $json.cv_mime || 'application/pdf' }) }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "a1b2c3d4-0013-4000-8000-000000000013",
+      "name": "9. NER",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2300,
+        180
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 5000,
+      "notesInFlow": true,
+      "notes": "Appelle FastAPI /ner avec le texte OCR. Retourne donnees_json (contact, competences, experiences, projets, formations)."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const ner = $input.first().json || {};\nconst meta = $('2. Normaliser Metadata').first().json || {};\nconst classif = $('3. Classifier Intention').first().json || {};\nconst ocr = $('7. OCR').first().json || {};\nconst extraFiles = $('6. Filtrer Binaire CV').first().json || {};\n\n// Fonction d'extraction propre d'email (gère \"Nom <email@domain.com>\" ou objet IMAP)\nfunction extractCleanEmail(raw) {\n  if (!raw) return null;\n  if (typeof raw === 'object') {\n    raw = raw.value?.[0]?.address || raw.address || raw.text || JSON.stringify(raw);\n  }\n  const str = String(raw).trim();\n  const angleMatch = str.match(/<([^>]+)>/);\n  const candidate = angleMatch ? angleMatch[1].trim() : str;\n  const emailMatch = candidate.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/);\n  return emailMatch ? emailMatch[0].toLowerCase() : null;\n}\n\n// Fonction de normalisation des dates ISO (YYYY-MM-DD)\nfunction sanitizeIsoDate(val) {\n  if (!val) return null;\n  const str = String(val).trim();\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(str)) return str;\n  if (/^\\d{4}$/.test(str)) return `${str}-01-01`;\n  const d = new Date(str);\n  if (!isNaN(d.getTime())) {\n    return d.toISOString().split('T')[0];\n  }\n  return null;\n}\n\nconst src = ner.donnees_json || ner;\nconst contact = src.contact || {};\n\nconst email = extractCleanEmail(contact.email) || extractCleanEmail(meta.sender_email);\nif (!email) {\n  throw new Error('Email candidat invalide ou introuvable');\n}\n\nlet telephone = contact.telephone ? String(contact.telephone).replace(/[^0-9+\\s-]/g, '').trim().substring(0, 50) : null;\nconst nomComplet = (contact.nom_complet || 'Candidat').trim().substring(0, 200);\nconst ville = contact.ville ? String(contact.ville).trim().substring(0, 100) : null;\n\nconst competences = Array.isArray(src.competences) ? src.competences.filter(c => c && c.nom).map(c => ({\n  nom: String(c.nom).trim().substring(0, 100),\n  niveau: c.niveau || 'Intermédiaire'\n})) : [];\n\nconst experiences = Array.isArray(src.experiences) ? src.experiences.filter(e => e && e.poste).map(e => ({\n  poste: String(e.poste).trim(),\n  entreprise: e.entreprise ? String(e.entreprise).trim() : 'Non spécifiée',\n  date_debut: sanitizeIsoDate(e.date_debut),\n  date_fin: sanitizeIsoDate(e.date_fin),\n  description: e.description || null\n})) : [];\n\nconst projets = Array.isArray(src.projets) ? src.projets.filter(p => p && p.titre_projet).map(p => ({\n  titre_projet: String(p.titre_projet).trim(),\n  role: p.role || null,\n  technologies: p.technologies || null,\n  url_projet: p.url_projet || null,\n  date_debut: sanitizeIsoDate(p.date_debut),\n  date_fin: sanitizeIsoDate(p.date_fin),\n  description: p.description || null\n})) : [];\n\nconst formations = Array.isArray(src.formations) ? src.formations.filter(f => f && f.diplome).map(f => ({\n  diplome: String(f.diplome).trim(),\n  etablissement: f.etablissement ? String(f.etablissement).trim() : 'Non spécifié',\n  date_obtention: sanitizeIsoDate(f.date_obtention || f.annee_obtention),\n  domaine_etude: f.domaine_etude || null\n})) : [];\n\nconst messageId = meta.message_id ? String(meta.message_id).trim().substring(0, 255) : `<msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}@alpaciment.local>`;\nconst rawIdOffre = ner.id_offre || ocr.id_offre || classif.id_offre || null;\nconst idOffre = (rawIdOffre && !isNaN(Number(rawIdOffre)) && Number(rawIdOffre) > 0) ? Number(rawIdOffre) : null;\n\nconst dureeOcr = Number(ocr.duree_secondes?.ocr || 0);\nconst dureeNer = Number(ner.duree_secondes?.llm || 0);\nconst dureeTotale = Number((dureeOcr + dureeNer).toFixed(2));\n\n// === PAYLOAD COMPLET MULTI-PIECES JOINTES + DONNEES_JSON + METRIQUES ===\nreturn [{\n  json: {\n    id_offre: idOffre,\n    cv_base64: ner.cv_base64 || ocr.cv_base64 || null,\n    cv_nom: ner.cv_nom || ocr.cv_nom || 'cv.pdf',\n    cv_mime: ner.cv_mime || ocr.cv_mime || 'application/pdf',\n    photo_base64: extraFiles.photo_base64 || null,\n    photo_nom: extraFiles.photo_nom || null,\n    photo_mime: extraFiles.photo_mime || null,\n    pieces_jointes: extraFiles.pieces_jointes || [],\n    texte_brut_ocr: ner.texte_brut_ocr || ocr.texte_brut_ocr || null,\n    nom_complet: nomComplet,\n    email: email,\n    telephone: telephone,\n    ville: ville,\n    source: 'email / n8n',\n    cle_idempotence: messageId,\n    sujet_email: meta.subject ? String(meta.subject).substring(0, 250) : 'Candidature par e-mail',\n    corps_email: meta.body || '',\n    duree_ocr_s: dureeOcr,\n    duree_ner_s: dureeNer,\n    duree_totale_s: dureeTotale,\n    donnees_json: {\n      contact: {\n        nom_complet: nomComplet,\n        email: email,\n        telephone: telephone,\n        ville: ville\n      },\n      profil: src.profil || null,\n      competences: competences,\n      experiences: experiences,\n      projets: projets,\n      formations: formations\n    }\n  }\n}];"
+      },
+      "id": "a1b2c3d4-0014-4000-8000-000000000014",
+      "name": "10. Validation et Format",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "Validation defensive: email, telephone, dates ISO, idempotence. Formate le payload exactement comme attendu par Laravel (donnees_json + cv_base64)."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/public/import-candidature",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "a1b2c3d4-0015-4000-8000-000000000015",
+      "name": "11. Import Laravel",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2820,
+        180
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "notesInFlow": true,
+      "notes": "POST vers Laravel /api/public/import-candidature. Envoie le payload complet valide."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": ""
+          },
+          "conditions": [
+            {
+              "id": "cond-laravel-01",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0016-4000-8000-000000000016",
+      "name": "12. Reponse Laravel OK",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3080,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "Verifie si Laravel repond { status: 'success' }."
+    },
+    {
+      "parameters": {
+        "fromEmail": "recrutement@alpacement.mg",
+        "toEmail": "admin@alpacement.mg",
+        "subject": "❌ Echec Import Candidature - {{ $('2. Normaliser Metadata').first().json.sender_email }}",
+        "emailType": "text",
+        "message": "L'import de candidature dans Laravel a echoue.\n\nCandidat: {{ $('2. Normaliser Metadata').first().json.sender_email }}\nSujet: {{ $('2. Normaliser Metadata').first().json.subject }}\n\nReponse Laravel:\n{{ JSON.stringify($json) }}\n\nAction requise: verifier les logs Laravel.",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0017-4000-8000-000000000017",
+      "name": "12b. Email Erreur Laravel",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        3340,
+        400
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-0018-4000-8000-000000000018",
+      "name": "13. Succes Pipeline",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3340,
+        180
+      ],
+      "notesInFlow": true,
+      "notes": "Pipeline termine avec succes. Candidature importee dans Laravel."
+    }
+  ],
+  "connections": {
+    "1. Email Trigger IMAP": {
+      "main": [
+        [
+          {
+            "node": "2. Normaliser Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2. Normaliser Metadata": {
+      "main": [
+        [
+          {
+            "node": "3. Classifier Intention",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "3. Classifier Intention": {
+      "main": [
+        [
+          {
+            "node": "4. Aiguillage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "4. Aiguillage": {
+      "main": [
+        [
+          {
+            "node": "5. Verifier Piece Jointe",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "5b. Reponse Info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "5c. Spam Ignore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5. Verifier Piece Jointe": {
+      "main": [
+        [
+          {
+            "node": "6. Filtrer Binaire CV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "5d. Email CV Manquant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "6. Filtrer Binaire CV": {
+      "main": [
+        [
+          {
+            "node": "7. OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "7. OCR": {
+      "main": [
+        [
+          {
+            "node": "8. Qualite OCR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "8. Qualite OCR": {
+      "main": [
+        [
+          {
+            "node": "9. NER",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "8b. Email CV Illisible",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "9. NER": {
+      "main": [
+        [
+          {
+            "node": "10. Validation et Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "10. Validation et Format": {
+      "main": [
+        [
+          {
+            "node": "11. Import Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "11. Import Laravel": {
+      "main": [
+        [
+          {
+            "node": "12. Reponse Laravel OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "12. Reponse Laravel OK": {
+      "main": [
+        [
+          {
+            "node": "13. Succes Pipeline",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "12b. Email Erreur Laravel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "versionId": "1",
+  "tags": [
+    {
+      "name": "recrutement"
+    },
+    {
+      "name": "production"
+    }
+  ],
+  "pinData": {},
+  "meta": {
+    "instanceId": "alpacement-recrutement"
+  }
+}

@@ -19,9 +19,9 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 | **Sprint 3** | Dépôt et réception des candidatures (Web, Saisie RH & Import) | 7,5 j | 11/09/2026 | 21/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 4** | Gestion RH des candidatures et fiche candidat | 7,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 11,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | 08/10/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 6** | Rendez-vous, communications, automatisation et modèles | 12,0 j | 16/10/2026 | 31/10/2026 | 07/10/2026 | *En cours* | **20.8%** (2,5/12,0j) | **[EN COURS]** |
+| **Sprint 6** | Rendez-vous, communications, automatisation et modèles | 12,0 j | 16/10/2026 | 31/10/2026 | 07/10/2026 | 13/10/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 7** | Dashboard, recherche avancée, matching, audit logs et finalisation | 11,0 j | 03/11/2026 | 17/11/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
-| **Total** | **Total Scope Général** | **71,0 j** | **12/08/2026** | **17/11/2026** | **12/08/2026** | *En cours* | **74.6%** (53,0/71,0j) | |
+| **Total** | **Total Scope Général** | **71,0 j** | **12/08/2026** | **17/11/2026** | **12/08/2026** | *En cours* | **84.5%** (60,0/71,0j) | |
 
 ---
 
@@ -124,23 +124,23 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 
 ---
 
-### Sprint 6 : Rendez-vous, communications, automatisation et modèles (12,0 j - 58.3% EN COURS)
+### Sprint 6 : Rendez-vous, communications, automatisation et modèles (12,0 j - 100.0% FAIT)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **16/10/2026** au **31/10/2026** (12,0 j)
-- ⏱️ **Dates Réelles** : Du **07/10/2026** au *En cours*
+- ⏱️ **Dates Réelles** : Du **07/10/2026** au **13/10/2026**
 - **BACK-OFFICE** :
   - CRUD des rendez-vous : test, entretien, statut, mode, responsable (2,0 j) - **[FAIT]**
   - Vue agenda par utilisateur, candidature et période (1,0 j) - **[FAIT]**
-  - Communication liée aux rendez-vous (1,0 j) - **[À FAIRE]**
-  - CRUD des modèles de communication (1,0 j) - **[À FAIRE]**
-  - Accusé de réception et première communication automatique (0,5 j) - **[À FAIRE]**
-  - Activation, désactivation et configuration de l'envoi automatique (1,0 j) - **[À FAIRE]**
+  - Communication liée aux rendez-vous (1,0 j) - **[FAIT]**
+  - CRUD des modèles de communication (1,0 j) - **[FAIT]**
+  - Accusé de réception et première communication automatique (0,5 j) - **[FAIT]**
+  - Activation, désactivation et configuration de l'envoi automatique (1,0 j) - **[FAIT]**
 - **API / SERVICES & AUTOMATISATION** :
   - Récupération et ingestion des candidatures par E-mail via n8n & FastAPI OCR/LLM (1,5 j) - **[FAIT]**
-  - Automatisation n8n : classification, routage, switch offre/spontanée et synchronisation (1,0 j) - **[EN COURS]**
-  - Envoi manuel, historique des communications et préparation des rappels (1,5 j) - **[À FAIRE]**
+  - Automatisation n8n : classification, routage, switch offre/spontanée et synchronisation (1,0 j) - **[FAIT]**
+  - Envoi manuel, historique des communications et préparation des rappels (1,5 j) - **[FAIT]**
   - Log et Journalisation des actions RH (Audit Log) (1,5 j) - **[FAIT]**
-  - Tests et debug (0,5 j) - **[À FAIRE]**
-- **Sous-total : 7,0 j / 12,0 j (58.3% EN COURS)**
+  - Tests et debug (0,5 j) - **[FAIT]**
+- **Sous-total : 12,0 j / 12,0 j (100.0% FAIT)**
 
 ---
 

@@ -2,10 +2,10 @@
 
 ## Avancement du Sprint
 
-- **[FAIT]** 10 tâches (11,0 j)
-- **[EN COURS]** 1 tâche (1,0 j)
+- **[FAIT]** 11 tâches (12,0 j)
+- **[EN COURS]** 0 tâche (0,0 j)
 - **[À FAIRE]** 0 tâche (0,0 j)
-- **Sous-total : 12,0 j (Avancement : 91.7% - 11,0 j / 12,0 j)**
+- **Sous-total : 12,0 j (Avancement : 100.0% - 12,0 j / 12,0 j)**
 
 ---
 
@@ -52,9 +52,9 @@
 - **Notes :** Pipeline n8n, microservice FastAPI OCR & NER local (Llama 3.2), auto-ingestion des compétences, expériences, formations, documents et vue RH côte à côte.
 - **Documentation :** [ingestion-email-ocr-llama-candidatures.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-6/2026-10-07/ingestion-email-ocr-llama-candidatures.md)
 
-#### **[EN COURS]** Automatisation n8n : classification, routage, switch offre/spontanée et synchronisation
+#### **[FAIT]** Automatisation n8n : classification, routage, switch offre/spontanée et synchronisation
 - **Estimation :** 1,0 j
-- **Notes :** Scénario n8n complet liant la boîte e-mail, la classification IA d'intention, l'extraction de profil et l'import direct.
+- **Notes :** Scénario n8n complet liant la boîte e-mail (IMAP), la classification IA d'intention, le switch d'aiguillage, l'extraction de profil défensive, l'import idempotent, la DLQ et le monitoring de pipeline.
 
 #### **[FAIT]** Log et Journalisation des actions RH (Audit Log)
 - **Estimation :** 1,5 j

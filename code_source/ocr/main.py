@@ -57,14 +57,30 @@ def health_check():
     }
 
 
+def _parse_optional_int(val: Any) -> Optional[int]:
+    """Convertit en toute sécurité une valeur issue de n8n ('', 'undefined', 'null', int) en Optional[int]."""
+    if val is None or isinstance(val, bool):
+        return None
+    if isinstance(val, int):
+        return val if val > 0 else None
+    s = str(val).strip().lower()
+    if not s or s in ("null", "none", "undefined", "nan", "0"):
+        return None
+    try:
+        v = int(float(s))
+        return v if v > 0 else None
+    except Exception:
+        return None
+
+
 # =====================================================================
 # 1. NOEUD 1 : OCR PUR (Extraction de texte brut + transport base64)
 # =====================================================================
 @app.post("/ocr")
 async def extract_ocr_only(
     file: UploadFile = File(...),
-    candidature_id: Optional[int] = Form(None),
-    id_offre: Optional[int] = Form(None)
+    candidature_id: Optional[Union[int, str]] = Form(None),
+    id_offre: Optional[Union[int, str]] = Form(None)
 ):
     """
     Étape 1 du pipeline :
@@ -73,7 +89,9 @@ async def extract_ocr_only(
     - Propage et retourne systématiquement l'id_offre reçu (ou null si spontanée)
     """
     try:
-        logger.info(f"[OCR] Traitement fichier : {file.filename} (id_offre: {id_offre})")
+        clean_id_offre = _parse_optional_int(id_offre)
+        clean_candidature_id = _parse_optional_int(candidature_id)
+        logger.info(f"[OCR] Traitement fichier : {file.filename} (id_offre: {clean_id_offre})")
         file_bytes = await file.read()
 
         if not file_bytes:
@@ -90,8 +108,8 @@ async def extract_ocr_only(
         return {
             "success": True,
             "message": f"Extraction OCR effectuée en {t_ocr}s.",
-            "candidature_id": candidature_id,
-            "id_offre": id_offre,
+            "candidature_id": clean_candidature_id,
+            "id_offre": clean_id_offre,
             "filename": file.filename,
             "cv_nom": file.filename or "cv.pdf",
             "cv_mime": mime_type,
@@ -111,11 +129,12 @@ async def extract_ocr_only(
 # =====================================================================
 class NerParseRequest(BaseModel):
     texte_brut_ocr: str
-    id_offre: Optional[int] = None
+    id_offre: Optional[Union[int, str]] = None
     cv_base64: Optional[str] = None
     cv_nom: Optional[str] = None
     cv_mime: Optional[str] = None
-    candidature_id: Optional[int] = None
+    candidature_id: Optional[Union[int, str]] = None
+    timeout: Optional[int] = 45
 
 
 @app.post("/ner")
@@ -123,20 +142,24 @@ def parse_ner_only(req: NerParseRequest):
     """
     Étape 2 du pipeline :
     - Prend le texte brut OCR en JSON
-    - Extrait les entités (contact, compétences, expériences, projets, formations) via Llama 3.2
+    - Extrait les entités (contact, compétences, expériences, projets, formations) via Qwen 2.5 (7B)
     - Propage et retourne systématiquement l'id_offre et cv_base64
+    - Timeout configurable pour éviter tout blocage indéfini
     """
     try:
-        logger.info(f"[NER] Structuration du texte (id_offre: {req.id_offre})")
+        clean_id_offre = _parse_optional_int(req.id_offre)
+        clean_candidature_id = _parse_optional_int(req.candidature_id)
+        logger.info(f"[NER] Structuration du texte (id_offre: {clean_id_offre}, timeout: {req.timeout}s)")
         t0 = time.time()
-        structured_data = parse_cv_with_llm(req.texte_brut_ocr)
+        timeout_val = req.timeout or 45
+        structured_data = parse_cv_with_llm(req.texte_brut_ocr, timeout=timeout_val)
         t_llm = round(time.time() - t0, 3)
 
         return {
             "success": True,
             "message": f"Structuration NER effectuée en {t_llm}s.",
-            "id_offre": req.id_offre,
-            "candidature_id": req.candidature_id,
+            "id_offre": clean_id_offre,
+            "candidature_id": clean_candidature_id,
             "cv_base64": req.cv_base64,
             "cv_nom": req.cv_nom,
             "cv_mime": req.cv_mime,
@@ -156,11 +179,13 @@ def parse_ner_only(req: NerParseRequest):
 @app.post("/extract")
 async def extract_cv(
     file: UploadFile = File(...),
-    candidature_id: Optional[int] = Form(None),
-    id_offre: Optional[int] = Form(None)
+    candidature_id: Optional[Union[int, str]] = Form(None),
+    id_offre: Optional[Union[int, str]] = Form(None)
 ):
     """Pipeline combiné OCR + NER en un seul appel."""
     try:
+        id_offre = _parse_optional_int(id_offre)
+        candidature_id = _parse_optional_int(candidature_id)
         logger.info(f"Traitement du CV combiné : {file.filename} (id_offre: {id_offre})")
         file_bytes = await file.read()
 
@@ -205,18 +230,25 @@ async def extract_cv(
 
 
 class EmailClassifyRequest(BaseModel):
-    subject: str
-    body: str
+    subject: Optional[str] = ""
+    body: Optional[str] = ""
+    content: Optional[str] = None
+    sender: Optional[str] = None
     active_offers: Optional[Union[List[Any], str]] = None
 
 
 @app.post("/classify-email")
+@app.post("/api/classifier-intention")
+@app.post("/classifier-intention")
 def classify_email(req: EmailClassifyRequest):
     """
-    Analyse l'intention d'un email (demande_offre, demande_spontanee, demande_information)
-    via le modèle local Llama 3.2.
+    Analyse l'intention d'un email (demande_emploi, information, spam)
+    via le modèle local Qwen 2.5 (7B).
+    Supporte à la fois { subject, body } et { sender, subject, content }.
     """
     try:
+        subject_val = req.subject or ""
+        body_val = req.body or req.content or ""
         offers = req.active_offers
         if isinstance(offers, str):
             try:
@@ -227,13 +259,33 @@ def classify_email(req: EmailClassifyRequest):
             offers = []
 
         classification = classify_email_intent(
-            subject=req.subject,
-            body=req.body,
+            subject=subject_val,
+            body=body_val,
             active_offers=offers
         )
+        
+        # Mapping et harmonisation pour n8n
+        raw_type = classification.get("type", "demande_information")
+        # Normalisation vers les 3 clés standardisées: demande_emploi, information, spam
+        if "offre" in raw_type or "spontan" in raw_type or raw_type == "demande_emploi":
+            intention_standard = "demande_emploi"
+        elif "info" in raw_type or raw_type == "information":
+            intention_standard = "information"
+        else:
+            intention_standard = "spam"
+
         return {
             "success": True,
-            "classification": classification
+            "type": intention_standard,
+            "intention": intention_standard,
+            "id_offre": classification.get("id_offre"),
+            "code_offre": classification.get("reference_offre"),
+            "reference_offre": classification.get("reference_offre"),
+            "offre_ciblee": classification.get("offre_ciblee"),
+            "confiance": classification.get("confiance", 0.9),
+            "email_expediteur": req.sender or classification.get("email_expediteur"),
+            "sujet": subject_val,
+            "details": classification
         }
     except Exception as e:
         logger.error(f"Erreur lors de la classification de l'email : {e}")

@@ -24,6 +24,7 @@ Ce document répertorie l'ensemble des règles de gestion métier appliquées su
   - `50` : Non retenue (statut final négatif)
 - **RG-CND-02 : Règle de Non-Retour Workflow** : Il est strictement interdit de faire régresser ou basculer une candidature vers un statut ayant un `ordre_workflow` inférieur ou égal (`<=`) à son statut actuel.
 - **RG-CND-03 : Déduplication des Candidats** : L'identification d'un candidat se fait sur son adresse e-mail unique (`candidat.email`). Plusieurs candidatures déposées avec la même adresse e-mail sont rattachées au même profil candidat.
+- **RG-CND-04 : Idempotence des Candidatures Externes (Anti-Doublon)** : Toute ingestion automatisée (n8n, webhook, import e-mail) transmettant une clé d'idempotence unique (`cle_idempotence` / `email_message_id`) ne peut créer qu'une seule candidature. Si la même clé est renvoyée (retry réseau, rejeu de message), le système renvoie la candidature existante sans dupliquer les compétences/expériences/projets, sans réinsérer dans `communication` et sans déclencher un second accusé de réception.
 
 ---
 
