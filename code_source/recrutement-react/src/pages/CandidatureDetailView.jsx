@@ -1419,9 +1419,9 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
             {/* TAB EXTRACTION CV */}
             {activeTab === 'extraction_cv' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '0.82fr 1.18fr', gap: '20px', alignItems: 'start' }}>
-                    {/* COLONNE GAUCHE : APERÇU DU FICHIER CV (FORMAT A4 EN HAUTEUR) */}
-                    <div className="data-section" style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                <div className="cv-split-grid">
+                    {/* COLONNE GAUCHE : APERÇU DU FICHIER CV (FORMAT A4 EN HAUTEUR) STICKY */}
+                    <div className="data-section cv-sticky-card" style={{ background: '#fff', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
                             <h3 style={{ margin: 0, color: 'var(--primary)', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                 <FileText size={18} />
@@ -1433,7 +1433,6 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                     href={backendPath(`/storage/${cvDoc.chemin_fichier}`)}
                                     target="_blank"
                                     rel="noreferrer"
-                                    style={{ fontSize: '12px', padding: '6px 12px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                                     title="Télécharger / Consulter"
                                 >
                                     <Download size={14} />
@@ -1446,7 +1445,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             cvDoc.mime_type === 'application/pdf' || cvDoc.chemin_fichier?.toLowerCase().endsWith('.pdf') ? (
                                 <iframe
                                     src={backendPath(`/storage/${cvDoc.chemin_fichier}`)}
-                                    style={{ width: '100%', height: '840px', border: '1px solid var(--border)', borderRadius: '8px', background: '#f8fafc' }}
+                                    style={{ width: '100%', height: 'calc(100vh / 0.8 - 140px)', minHeight: '650px', border: '1px solid var(--border)', borderRadius: '8px', background: '#f8fafc' }}
                                     title="Aperçu CV PDF A4"
                                 />
                             ) : cvDoc.mime_type?.startsWith('image/') || /\.(png|jpe?g|webp)$/i.test(cvDoc.chemin_fichier) ? (

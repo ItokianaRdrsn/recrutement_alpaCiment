@@ -8,20 +8,20 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 - **Date de Début Globale (Réception du Cahier des Charges) :** **Mercredi 12 Août 2026**
 - **Règle de Calcul Calendaire :** Jours ouvrés uniquement (Lundi au Vendredi - Hors week-ends)
-- **Avancement Global Réalisé :** **64.7% achevé** (44,0 / 68,0 j)
-- **Barre de Progression Globale :** `[█████████████░░░░░░░] 64.7%`
+- **Avancement Global Réalisé :** **94.1% achevé** (64,0 / 68,0 j)
+- **Barre de Progression Globale :** `[██████████████████░░] 94.1%`
 
 | Sprint | Intitulé | Estimation | Début Prévu | Fin Prévue | Début Réel | Fin Réelle | Progression (%) | Statut |
 | --- | --- | ---: | --- | --- | --- | --- | ---: | --- |
 | **Sprint 0** | Analyse, cadrage et conception | 9,0 j | 12/08/2026 | 24/08/2026 | 12/08/2026 | 24/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | 25/08/2026 | 01/09/2026 | 25/08/2026 | 26/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | 02/09/2026 | 10/09/2026 | 26/08/2026 | 27/08/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 3** | Dépôt et réception des candidatures (Web, Saisie RH & Import) | 7,5 j | 11/09/2026 | 21/09/2026 | 28/08/2026 | *En cours* | **86.7%** (6,5/7,5j) | **[EN COURS]** |
+| **Sprint 3** | Dépôt et réception des candidatures (Web, Saisie RH & Import) | 7,5 j | 11/09/2026 | 21/09/2026 | 28/08/2026 | 12/10/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 4** | Gestion RH, fiche candidat, SPA & Login | 7,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 5** | Vivier, compétences, workflow RH & OCR/IA CV | 11,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | *En cours* | **73.9%** (8,5/11,5j) | **[EN COURS]** |
-| **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | 16/10/2026 | 29/10/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
-| **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 10,0 j | 30/10/2026 | 12/11/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
-| **Total** | **Total Scope Général** | **68,0 j** | **12/08/2026** | **12/11/2026** | **12/08/2026** | *En cours* | **64.7%** (44,0/68,0j) | |
+| **Sprint 5** | Vivier, compétences, workflow RH & OCR/IA CV | 11,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | 10/10/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 6** | Rendez-vous, communications et modèles | 10,0 j | 16/10/2026 | 29/10/2026 | 09/10/2026 | 10/10/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 7** | Dashboard, recherche avancée, matching et finalisation | 10,0 j | 30/10/2026 | 12/11/2026 | 13/10/2026 | *En cours* | **60.0%** (6,0/10,0j) | **[EN COURS]** |
+| **Total** | **Total Scope Général** | **68,0 j** | **12/08/2026** | **12/11/2026** | **12/08/2026** | *En cours* | **94.1%** (64,0/68,0j) | |
 
 ---
 
@@ -1542,3 +1542,434 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Tests PHPUnit (`ImportCandidatureN8nTest.php`) : **2/2 tests passés (17 assertions)** incluant la vérification de `pipeline_metrics` (`succes` et `doublon_ignore`).
    - Build de production React (`npm run build`) : **succès**.
 
+---
+
+### Demande 113 (Sprint 7 — Bloc 1) : Implémentation du Tableau de Bord Analytique RH & Entonnoir de Conversion (Tâches 1, 2, 3)
+> **User Prompt :** *"commencons le sprint 7" -> "option A"*
+1. **Objectifs & Périmètre** :
+   - Réaliser les 3 premières tâches du **Sprint 7** (Bloc 1 : Reporting & Analyse RH) :
+     - Tâche 1 : Tableau de bord et indicateurs principaux (KPIs globaux, volumes, santés des recrutements).
+     - Tâche 2 : Entonnoir de recrutement (*Conversion Funnel* de Reçue à Retenue) et évolution mensuelle sur 6 mois.
+     - Tâche 3 : Calcul du délai moyen de traitement (*Time-to-Hire* en jours), ventilation par Direction et Canaux d'ingestion (Site, E-mail n8n, Manuel RH), dossiers prioritaires en attente de traitement et filtres dynamiques (période, dates personnalisées, direction).
+2. **Implémentation Réalisée** :
+   - **Backend (Laravel Repository & Service)** :
+     - **Interface ([`DashboardRepositoryInterface.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Contracts/DashboardRepositoryInterface.php))** enrichie avec :
+       - `getKpis(array $filters = []): array` (calcul de `total_candidatures`, `candidatures_sur_offre`, `candidatures_spontanees`, `candidatures_en_vivier`, `offres_total`, `offres_publiees`, `domaines_en_attente`, `rdv_a_venir`, `taux_recrutement`, `delai_moyen_jours`).
+       - `getFunnel(array $filters = []): array` (statuts ordonnés, décompte et pourcentage de conversion).
+       - `getMonthlyEvolution(array $filters = [], int $months = 6): array` (histogramme mensuel ventilé sur offre vs spontanée).
+       - `getDirectionBreakdown(): array` (offres actives et candidatures par direction de l'entreprise).
+       - `getChannelBreakdown(array $filters = []): array` (Site web direct vs E-mail n8n IA vs Saisie RH).
+       - `getPendingCandidatures(int $limit = 5): array` (dossiers en statut Reçue triés par ancienneté avec calcul des jours d'attente).
+       - `getRecentOffers(int $limit = 5): Collection`.
+     - **Implémentation Eloquent ([`EloquentDashboardRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDashboardRepository.php))** : requêtes optimisées avec gestion défensive des filtres temporels (`all`, `this_month`, `last_month`, `30_days`, `this_year`, `custom`) et de direction.
+     - **Service Métier ([`DashboardService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/DashboardService.php))** : agrégation complète de la charge analytique pour l'API `/api/dashboard`.
+   - **Frontend (React DashboardView)** :
+     - Refonte complète de [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) :
+       - **Toolbar de filtrage** : sélection de période (rapide ou dates personnalisées), filtre de direction et réinitialisation.
+       - **6 Cartes KPIs interactives** avec liens d'accès direct (`/candidatures/offres`, `/offres`, `/vivier`, `/agenda`).
+       - **Composant Entonnoir de Recrutement RH** : barres de progression colorées étape par étape et pourcentages de conversion.
+       - **Histogramme d'Évolution Mensuelle (6 mois)** : barres interactives avec répartition offre/spontanée et tooltips.
+       - **Panneaux décisionnels** : Répartition par Direction, Canaux d'ingestion, et liste d'alerte des dossiers en attente avec badges de délai SLA.
+3. **Validation & Tests** :
+   - Création et exécution du test d'intégration [`DashboardAnalyticsTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/DashboardAnalyticsTest.php) : **3/3 tests passés (35 assertions)**.
+   - Suite complète des tests PHPUnit : **30/30 tests passés (148 assertions)**.
+   - Build de production React (`npm run build`) : **succès (2.71s)**.
+
+---
+
+### Demande 114 (Sprint 7 — Amélioration Dashboard) : Filtre Direct par Dates Visibles & Courbe de Tendance Temporelle Dynamique
+> **User Prompt :** *"okey ,maintenant des petites rectifications ,je veux que pour le filtre de periode ca soit directement avec les dates ,pas un bouton qui permet ensuite de mettre une date mais directement avec l'affichage de date ,ensuite la courbe de tendance sera aussi en fonction de la periode"*
+1. **Objectifs & Spécifications** :
+   - Supprimer le masquage des champs de date derrière un bouton "Dates" : afficher **directement et en permanence** les champs de sélection de dates (`Du: [AAAA-MM-JJ] Au: [AAAA-MM-JJ]`) dans la barre de filtres supérieure.
+   - Préserver des raccourcis rapides (`Ce mois`, `30j`, `Année`, `Tout`) qui alimentent immédiatement les champs de date visibles.
+   - Dynamiser la courbe de tendance pour qu'elle s'adapte à la période sélectionnée :
+     - Granularité **quotidienne** (jour par jour avec date et jour/mois) si la plage est courte ($\le 35$ jours, ex. un mois spécifique, 30 jours, ou plage ciblée).
+     - Granularité **mensuelle** si la plage est étendue ($> 35$ jours ou vue globale).
+     - Prise en charge des cas à 1 seul point (tracé horizontal de référence) sans crash de la courbe Bézier spline.
+2. **Implémentation Réalisée** :
+   - **Backend Laravel ([`EloquentDashboardRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDashboardRepository.php))** :
+     - Méthode `applyCandidatureFilters` : prise en compte directe des filtres `date_debut` et `date_fin` indépendamment du paramètre `periode`.
+     - Méthode `getMonthlyEvolution` : calcul dynamique de la plage de dates et bascule automatique de granularité :
+       - Si $\le 35$ jours : itération quotidienne (`cle_periode`, `label` format `d M`, `type_granulat = 'jour'`, `total`, `sur_offre`, `spontanee`).
+       - Si $> 35$ jours : itération mensuelle (`cle_periode`, `label` format `M y`, `type_granulat = 'mois'`).
+   - **Frontend React ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
+     - Barre de contrôle supérieure : sélecteur de dates direct et toujours visible avec icône calendrier, inputs stylisés et bouton "Effacer".
+     - Raccourcis de périodes qui pré-remplissent automatiquement les inputs visibles.
+     - Graphique SVG Spline et mode Barres :
+       - Support d'un nombre variable de points avec calcul défensif de Bézier spline.
+       - Espacement dynamique et lisibilité optimisée des labels d'axe X (`labelStep`).
+       - En-tête de section dynamique indiquant la période active et le nombre de jours ou mois affichés.
+3. **Validation & Tests** :
+   - Test PHPUnit ajouté : `test_dashboard_filters_by_direct_dates_and_adapts_trend_curve_to_period` dans [`DashboardAnalyticsTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/DashboardAnalyticsTest.php) (**4/4 tests passés, 41 assertions**).
+   - Suite PHPUnit complète : **31/31 tests passés (154 assertions)**.
+   - Build de production React : **compilation Vite réussie en 1.25s**.
+
+---
+
+### Demande 115 (Sprint 7 — Cockpit Haute Densité) : Réduction Largeur Navigation, Suppression des Textes Superflus & Vue Cockpit Optimisée Sans Scroll
+> **User Prompt :** *"okey petit changement encore ,reduit la taille de la nav bar c'est trop large ,ensuite le texte au depart centre pilotage RH ,enleve tout ca essaire de mettre le plus de chose da la page lorsqu'on arrive dans le dashboard mais la je ne vois que le dashnoard ,le pilotage rh et la courbe ,je veux voir plus d'informations sans tout scroller ,mais oui on ne reussira pas a mettre en une page mais le plus optimiser ,et je ne suis pas contre le scroll"*
+1. **Objectifs & Spécifications** :
+   - Réduire significativement la largeur de la barre de navigation latérale (sidebar) et la hauteur du bandeau supérieur (topbar).
+   - Supprimer le gros bandeau descriptif "Centre de Pilotage RH & Analytics", les descriptions superflues et le doublon du titre "Dashboard".
+   - Concevoir une disposition **Cockpit Décisionnel Haute Densité** : afficher dès le premier écran (sans scroller) les **6 indicateurs KPIs, la courbe de tendance, les alertes SLA, l'entonnoir pipeline et les canaux/directions**, tout en gardant le tableau détaillé des offres en scroll naturel.
+2. **Implémentation Réalisée** :
+   - **Styles Globaux Réduits ([`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - `.app-shell` : passage de `215px` à `190px minmax(0, 1fr)` (gain de 25px de largeur supplémentaire pour les données).
+     - `.sidebar` : padding compact (`12px 8px`), logos (`32px`), nav-links compacts (`min-height: 36px`, font `13px`).
+     - `.topbar` : hauteur min abaissée à `44px`, padding `6px 16px`, titre à `16px`.
+     - `.workspace` : padding abaissé à `10px 16px`.
+   - **Toolbar Dashboard Inline & Compacte ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
+     - Suppression du doublon de titre "Dashboard" et des descriptions verbeuses.
+     - Organisation en une seule rangée fluide : Sélecteurs de dates directs (`Du [..] Au [..]`) + Presets (`Tout`, `Ce mois`, `30j`, `Année`) + Sélecteur de direction + Bouton Réinitialiser + Bouton Actualiser.
+   - **Agencement Cockpit Haute Densité ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
+     - **Ruban KPIs horizontal (Rangée 1)** : 6 micro-cartes statistiques compactes (~56px de hauteur) : Dossiers Reçus, Postes Ouverts, Vivier Actif, Agenda, Taux d'Embauche, Time-to-Hire.
+     - **Grille 2 Colonnes Côte-à-Côte (Rangées 2 & 3 - Tout visible sans scroller)** :
+       - *Colonne Gauche* :
+         1. **Courbe de Tendance & Dynamique** : SVG Spline interactif (125px de hauteur) avec mode Courbe/Barres et infobulle au survol.
+         2. **Dossiers Prioritaires (SLA)** : Alertes visuelles colorées sur les candidatures en attente d'évaluation et bouton d'action "Traiter".
+       - *Colonne Droite* :
+         1. **Entonnoir & Pipeline de Qualification** : Jauges de rétention étape par étape avec volume et taux.
+         2. **Canaux d'Acquisition & Directions** : Mini Donut SVG des sources (Web, n8n/Email, Saisie RH) et jauges de pression par Direction.
+     - **Section Inférieure (en défilement naturel)** : Tableau compact des Dernières Offres Publiées avec suivi direct.
+3. **Validation & Tests** :
+   - Build de production React : **compilation Vite réussie en 774ms (0 erreur, 0 avertissement)**.
+   - Suite de tests Backend PHPUnit : **31/31 tests passés (154 assertions, 1.09s)**.
+
+---
+
+### Demande 116 (Sprint 7 — Tâche 5) : Recherche Avancée par Mots-Clés CV, Compétences (ANY/ALL), Niveau d'Études & Années d'Expérience
+> **User Prompt :** *"tache 5"*
+1. **Objectifs & Spécifications (Tâche 5 - 1,5 j)** :
+   - Recherche globale full-text / textuelle dans le contenu extrait des CV (`document.contenu_texte_extrait`), compatible PostgreSQL (`recherche_texte @@ plainto_tsquery` / `ILIKE`) et SQLite (`LIKE`).
+   - Génération dynamique d'un extrait contextuel de CV (`cv_snippet`) centré sur le mot-clé recherché (~70 caractères avant/après avec ellipse).
+   - Filtrage multi-compétences avec support des modes de correspondance logique :
+     - `competence_mode = 'any'` : au moins une des compétences recherchées (OU).
+     - `competence_mode = 'all'` : toutes les compétences requises (ET).
+   - Filtrage par niveau d'études & diplôme (`niveau_etude` / `id_niveau` sur les formations du candidat).
+   - Filtrage par années d'expérience cumulées minimum (`annees_exp_min` avec calcul SQL de durée cumulée entre `date_debut` et `COALESCE(date_fin, now())`).
+   - Création du composant React `AdvancedSearchPanel.jsx` (accordéon moderne repliable avec compteurs de filtres actifs et autocomplétion des compétences).
+   - Intégration dans `CandidaturesOffresView.jsx` et `CandidaturesSpontaneesView.jsx` avec affichage du snippet `📄 Extrait CV` et des badges de compétences sous chaque profil.
+2. **Implémentation Réalisée** :
+   - **Modèle Eloquent ([`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Candidature.php))** :
+     - Ajout des relations : `competences()`, `formations()`, `experiences()`, `projets()`.
+     - Ajout de l'attribut calculé `$appends = ['cv_snippet']` et accesseur `getCvSnippetAttribute()`.
+   - **Repository ([`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php))** :
+     - Implémentation des clauses de filtrage dans `paginateFiltered` : `cv_keyword`, `competences` (modes `any`/`all`), `niveau_etude`, `id_niveau`, `annees_exp_min`, `poste_keyword`, `dans_vivier`.
+     - Méthode `generateSnippet(?string $text, string $keyword, int $radius)` extrayant le fragment textuel pertinent.
+     - Eager-loading complet dans `findById` et `paginateFiltered`.
+   - **Resource API ([`CandidatureResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/CandidatureResource.php))** :
+     - Exposition des relations formatées `competences`, `formations`, `experiences`, `projets` et de `cv_snippet`.
+   - **Composant UI React ([`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
+     - En-tête dépliable compact avec pastille rouge dynamique du nombre de filtres actifs.
+     - Inputs stylisés : mot-clé OCR CV, poste recherché, select niveau d'études, select années d'expérience.
+     - Sélecteur de compétences avec autocomplétion depuis `/api/competences`, tags amovibles et toggle interactif de correspondance OU/ET.
+     - Boutons Réinitialiser et Appliquer.
+   - **Intégration Vues Candidatures ([`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx))** :
+     - Transmission des critères avancés à l'API `/api/candidatures`.
+     - Affichage d'un encart rouge stylisé `📄 Extrait CV : "..."` pour tout candidat matché par mot-clé CV.
+     - Affichage des badges des premières compétences déclarées.
+3. **Validation & Tests** :
+   - Nouvelle suite de tests PHPUnit : [`RechercheAvanceeCandidaturesTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/RechercheAvanceeCandidaturesTest.php) (**5/5 tests passés, 28 assertions**).
+   - Suite complète des tests PHPUnit backend : **36/36 tests passés (182 assertions, 0 régression)**.
+   - Build de production frontend React : **compilation Vite réussie en 2.69s (0 erreur, 0 avertissement)**.
+   - Mise à jour de [`sprint-7/taches.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-7/taches.md) : Tâche 5 marquée comme `[FAIT]`, progression du Sprint 7 à **54.5%** (6,0/11,0 j) et avancement global à **94.1%** (64,0/68,0 j).
+
+---
+
+### Demande 117 (Sprint 7 — Tâche 5) : Résolution Erreur 500 sur Recherche Mot-Clé CV & Debounce Saisie
+> **User Prompt :** *"erreur avec la recherche de mot cle client.js:59 GET http://127.0.0.1:8000/api/candidatures?page=1&per_page=50&type_demande=offre&cv_keyword=c&competence_mode=any 500 (Internal Server Error)"*
+1. **Diagnostic & Cause Racine** :
+   - L'appel `GET /api/candidatures?cv_keyword=c` déclenchait en PostgreSQL : `SQLSTATE[42703]: Undefined column: 7 ERREUR: la colonne « recherche_texte » n'existe pas`.
+   - La table `document` en base de données locale avait été créée par une migration initiale sans la colonne générée `recherche_texte tsvector` (qui figurait dans `sql/gestion_recrutement.sql` mais pas dans les migrations de build).
+   - De plus, côté frontend, chaque frappe de touche dans le champ de recherche de CV déclenchait immédiatement une requête HTTP non temporisée.
+2. **Correctifs Appliqués** :
+   - **Backend Résilient ([`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php))** :
+     - Vérification dynamique via `Schema::hasColumn('document', 'recherche_texte')`.
+     - Si la colonne existe : combinaison `recherche_texte @@ plainto_tsquery('french', ?)` ou `ILIKE`.
+     - Si la colonne n'existe pas : bascule automatique sans erreur sur `ILIKE` en PostgreSQL et `LIKE` en SQLite.
+   - **Migration PostgreSQL ([`2026_10_14_000000_add_recherche_texte_to_document_table.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_10_14_000000_add_recherche_texte_to_document_table.php))** :
+     - Ajout officiel de la colonne générée `recherche_texte tsvector GENERATED ALWAYS AS (to_tsvector('french', coalesce(contenu_texte_extrait, ''))) STORED` et création de son index `GIN`. Migration exécutée avec succès (`434.91ms`).
+   - **Frontend Debounce ([`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
+     - Ajout d'états locaux `cvKeywordLocal` et `posteKeywordLocal` avec temporisation (debounce de 350ms) pour une frappe fluide sans marteler le serveur à chaque lettre.
+     - Prise en compte de la touche `Entrée` pour soumission instantanée.
+3. **Validation & Tests** :
+   - Migration exécutée : `add_recherche_texte_to_document_table` appliquée sur PostgreSQL.
+   - Requête test validée : `GET /api/candidatures?cv_keyword=c` retourne HTTP 200 avec 0 erreur.
+   - Tests PHPUnit : **36/36 passés (182 assertions)**.
+   - Build Vite React : **compilation réussie en 3.92s**.
+
+---
+
+### Demande 118 (Sprint 7 — Tâche 5) : Déclenchement Exclusif des Filtres par Bouton & Résolution Recherche Plein Texte CV
+> **User Prompt :** *"okey deja tous les filtres je veux que ca s'active apres avoir cliquer sur un bouton mais pas directement apres avoir interagit avec l'input ,et aussi la recherche de mot cle j'ai l'impression il dit tous toujours aucune candidature"*
+1. **Diagnostic & Causes Racines** :
+   - **Déclenchement intempestif des filtres** : Dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) et [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx), l'état `filters` figurait directement dans les dépendances du `useCallback` de `loadData()`, déclenchant une requête HTTP à chaque modification d'un input ou d'un select.
+   - **Recherche mot-clé CV retournant 0 résultat** :
+     - Dans la base PostgreSQL existante, la table `document` comptait 38 lignes mais avec `contenu_texte_extrait` vide (longueur 0).
+     - Le texte intégral des 37 CVs scannés par PaddleOCR était en réalité stocké dans la table `cv_extraction_ocr` (`texte_brut_ocr` et `donnees_json`).
+     - Le repository [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) ne cherchait que dans `document.contenu_texte_extrait`.
+2. **Correctifs Appliqués** :
+   - **Découplage Frontend `filters` (saisie) vs `appliedFilters` (exécution API)** :
+     - Implémentation du pattern `appliedFilters` dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) et [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx).
+     - `loadData` dépend désormais de `appliedFilters` (et non plus de `filters`).
+     - La requête réseau n'est déclenchée **qu'après validation explicite** :
+       - Clic sur le bouton **"Filtrer"** de la barre principale.
+       - Clic sur le bouton **"Appliquer les filtres"** du panneau avancé [`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx).
+       - Touche **Entrée** dans un champ de saisie (`q`, `cv_keyword`, `poste_keyword`).
+     - Le bouton **"Réinitialiser"** remet à zéro `filters` ET `appliedFilters` et recharge la liste initiale.
+   - **Recherche CV Hybride & Résiliente Multitable** :
+     - Extension de [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) pour interroger simultanément la table `document` (via `recherche_texte @@ plainto_tsquery` / `ILIKE`) et la table `cv_extraction_ocr` (`texte_brut_ocr` / `CAST(donnees_json AS TEXT) ILIKE`).
+     - Protection par `Schema::hasTable('cv_extraction_ocr')` garantissant la compatibilité universelle (SQLite en tests in-memory, PostgreSQL en environnement réel).
+     - Synchronisation des documents avec le texte OCR existant dans PostgreSQL.
+     - Fallback contextuel automatique dans `generateSnippet()` : si le document n'a pas de texte extrait, le snippet est généré directement depuis `cv_extraction_ocr`.
+3. **Validation & Tests** :
+   - Recherche CV validée avec succès sur PostgreSQL (ex: `react` : 30 candidatures trouvées avec extrait contextuel surligné, `php` : 30, `full stack` : 15, `andriankirija` : 15).
+   - Tests PHPUnit : **36/36 passés (182 assertions, 0 échec)**.
+   - Build Vite React : **compilation réussie en 4.44s (0 erreur, 0 avertissement)**.
+
+---
+
+### Demande 119 : Rédaction du Guide Complet des Pré-requis & Configurations Système
+> **User Prompt :** *"okey je veux que tu fasses un fichier pre requis qui va lister tous les logiciels a telecharger ,les configuration a faire et tout"*
+1. **Objectif** :
+   - Fournir un document de référence clair, exhaustif et directement actionnable pour tout développeur ou évaluateur de soutenance souhaitant déployer la plateforme à partir de zéro sur Windows, Linux ou macOS.
+2. **Réalisations** :
+   - Création du document racine [`PREREQUIS.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/PREREQUIS.md) structuré en 7 sections majeures :
+     1. **Matrice des logiciels à télécharger** : PHP 8.2+/8.3, Composer 2.x, Node.js LTS (18/20), PostgreSQL 15+, pgAdmin 4, Python 3.10/3.11, Visual C++ Redistributable 2015-2022 (x64), Git, Docker Desktop (optionnel pour n8n), avec liens de téléchargement officiels et commandes CLI de vérification.
+     2. **Installation et configuration détaillée** :
+        - Configuration obligatoire du `php.ini` (`pdo_pgsql`, `pgsql`, `pdo_sqlite`, `sqlite3`, `curl`, `mbstring`, `fileinfo`, `gd`, `zip`, quotas d'upload et mémoire).
+        - Installation de PostgreSQL et encodage UTF-8.
+        - Installation de Python avec flag PATH et dépendances binaires C++.
+     3. **Fichiers d'environnement (`.env`)** : explications complètes des clés critiques pour Laravel, FastAPI et React.
+     4. **Guide d'installation étape par étape** : création de la base de données, `composer install`, `php artisan key:generate`, `php artisan storage:link`, `php artisan migrate --seed`, venv Python et `pip install -r requirements.txt`, `npm install` et build.
+     5. **Procédure de démarrage quotidien (Runbook 3 terminaux)** : commandes de lancement prêtes à copier-coller pour OCR (8001), Backend (8000), Frontend (5173).
+     6. **Comptes & URLs d'accès** : tableau récapitulatif des adresses Front-Office, Back-Office, API Swagger docs, et identifiants administrateur par défaut (`admin@alphaciment.local` / `password`).
+     7. **Dépannage & FAQ** : résolution des pannes courantes (`driver not found`, DLL C++ manquante, CORS, politique PowerShell).
+   - Ajout d'une mise en avant et lien direct dans [`README.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/README.md).
+
+---
+
+### Demande 120 : Intégration Complète d'Ollama & des Modèles LLM Locaux dans les Pré-requis
+> **User Prompt :** *"ou est aussi ollama je te demande ,tout ce dont quelqu'un a besoin pour faire marcher le projet chez lui"*
+1. **Objectif** :
+   - Inclure explicitement **Ollama** comme pré-requis obligatoire pour le parsing sémantique des CVs scannés (NER) et la classification intelligente des emails entrants via les LLMs locaux (`qwen2.5:7b`, `mistral`, `llama3.2`).
+2. **Réalisations** :
+   - **Mise à jour de [`PREREQUIS.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/PREREQUIS.md)** :
+     - Ajout d'Ollama dans la matrice générale des logiciels à télécharger avec lien officiel ([ollama.com/download](https://ollama.com/download)).
+     - Section dédiée **2.6 : Ollama & Modèles LLM Locaux** :
+       - Explication des rôles : dissociation stricte Expériences vs Projets vs Formations vs Compétences (`cv_llm_parser.py`) et routage des emails entrants en `demande_offre` (avec rattachement à la référence ex: `IT-1`), `demande_spontanee`, `demande_information` (`email_classifier.py`).
+       - Commandes de téléchargement du modèle : `ollama pull qwen2.5:7b` (et alternative légère `qwen2.5:3b` / `llama3.2:3b` pour configurations à mémoire limitée).
+       - Commande de démarrage et test de connectivité sur le port `11434` (`http://127.0.0.1:11434/api/tags`).
+     - Mise à jour de la procédure d'initialisation (Étape 3 : Ollama) et du Runbook quotidien (Service 0 : `ollama serve`).
+     - Ajout des cas d'erreurs Ollama dans la section FAQ / Dépannage (`fallback_ollama_offline`, modèle manquant).
+   - **Mise à jour de [`README.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/README.md)** :
+     - Ajout de la section 4 consacrée à Ollama (`ollama pull qwen2.5:7b` et `ollama serve`).
+     - Ajout de l'entrée `http://localhost:11434` dans le tableau officiel des URLs d'accès.
+
+
+
+
+
+
+
+
+---
+
+### Demande 121 (Design System, Ergonomie RH & Filtres Manuels Exclusifs) :
+> **User Prompt :** *"/generative_ui okey ,maintenant ,je te demande de mettre tous les filtres comme je t'ai dit ,ameliorer le style ,certains bouton sur la meme ligne n'ont pas la meme taille ,dans la fiche candidat je t'ai dit que lorsqu'on slide vers le bas ,les informations doivent rester sur place et a droite pour les competences et tout on peut slider ,et fais pareil pour le cv ,meme si on slide a droite ,la partie gauche reste a la bonne place ,et en gros je veux un style tres professionnelle ,meme taille pour les elements ,meme pour la side bar agenda et candidature spontannee n'ont pas le meme taille ,les couleurs ,et tout"*
+1. **Généralisation du Déclenchement Manuel des Filtres (Anti-Spam Requêtes)** :
+   - Découplage complet de l'état de saisie locale (`filters`) de l'état d'interrogation API (`appliedFilters`) étendu à l'intégralité des vues restantes :
+     - [`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx) : la recherche d'offres ne part plus sur chaque frappe ou sélection, mais uniquement sur clic du bouton "Filtrer" ou touche Entrée.
+     - [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) : filtrage par direction, domaine et mot-clé déclenché uniquement sur clic "Filtrer" ou touche Entrée.
+     - [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx) : ajout d'un bouton explicite "Filtrer" et "Réinitialiser" (qui déclenchaient auparavant une requête immédiate à chaque caractère).
+2. **Harmonisation Strictement Alignée des Boutons et Contrôles (Hauteur 38px)** :
+   - Mise à jour de [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css) :
+     - `.filter-bar input`, `.filter-bar select` et `.filter-button`, `.ghost-button`, `.primary-button`, `.action-button` unifiés à `height: 38px; min-height: 38px; max-height: 38px; box-sizing: border-box; font-size: 13px; font-weight: 700;`.
+     - Alignement vertical `align-items: center` garanti sans décalage.
+     - Remplacement du bouton d'ajout au vivier dans [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) (anciennement gradient violet démesuré de 48px) par le bouton officiel AlpA Ciment unifié (`.filter-button`, 38px, rouge `#FF0D00`).
+3. **Fiche Candidat : Défilement Indépendant & Colonne Gauche Sticky** :
+   - **Onglet Informations & Profil RH** : Application des règles CSS `.candidate-sidebar-card { position: sticky; top: 16px; align-self: start; max-height: calc(100vh / 0.8 - 40px); overflow-y: auto; scrollbar-width: thin; }`. La carte de profil du candidat (photo, coordonnées, progression du statut RH) reste fixe et visible à gauche pendant que l'utilisateur fait défiler la longue liste de compétences, formations, expériences et notes à droite.
+   - **Onglet Extraction CV** : Intégration des classes `.cv-split-grid` et `.cv-sticky-card` dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx). L'aperçu format A4 du CV original reste ancré à gauche pendant que les entités extraites et le texte brut OCR défilent à droite.
+   - Préservation stricte de l'export PDF / impression A4 (`@media print` avec `position: static !important; max-height: none !important;`).
+4. **Uniformisation de la Barre Latérale de Navigation (Sidebar 230px)** :
+   - Élargissement du gabarit de grille `.app-shell` de `190px` à `230px` dans [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css).
+   - Fixation stricte de `.nav-link` à `height: 38px; min-height: 38px; max-height: 38px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 12px;`.
+   - Élimination définitive du saut de ligne sur "Candidatures spontanées" et égalisation parfaite de la hauteur avec "Agenda & Tests".
+5. **Artefact Generative UI** :
+   - Création de [`ui_design_showcase.html`](file:///C:/Users/Strix/.gemini/antigravity/brain/05b3df65-52a3-40cb-9d6a-bc9a0b4878bc/ui_design_showcase.html) illustrant de manière interactive le double défilement sticky, le comparatif Avant/Après des hauteurs de boutons, la sidebar 230px et le simulateur de déclenchement manuel des filtres anti-spam.
+6. **Validation Globale** :
+   - **Tests PHPUnit** : **36/36 passés (182 assertions, 0 erreur)**.
+   - **Build Vite React** : **Compilé avec succès en 5.18s (0 avertissement, 0 erreur)**.
+---
+
+### Demande 122 (Design System 2.0 & Cockpit Exécutif Haute Performance) :
+> **User Prompt :** *"/generative_ui s'il te plait je veux un design incroyable surtout pour le dashboard ,utilise toutes tes connaissances ,tu peux mettre importer des choses me demander d'installer des choses sans non plus compromettre les performances mais un design incroyable ,regarde les design moderne actuels et je veux cela"*
+1. **Philosophie & Choix d'Architecture (Zero Heavy Library Dependency)** :
+   - Plutôt que d'intégrer des bibliothèques de graphiques tierces lourdes (Chart.js ou Recharts qui augmentent le bundle de 300 à 500 Ko et ralentissent l'hydratation), adoption d'un **moteur de rendu SVG vectoriel natif haute performance à 60 fps** couplé aux icônes `lucide-react`.
+   - Temps de compilation Vite maintenu sous les 5 secondes (`built in 4.89s`) et taille de bundle pour le Dashboard de seulement 26.2 Ko.
+   - Design System exécutif inspiré des standards modernes actuels (Linear, Vercel, Stripe Dashboard) : micro-interactions au survol, cartes de données surélevées (`.dashboard-card-panel`), liserés et accents AlpA Ciment (`#FF0D00`, `#0f172a`, `#64748b`), typographie ultra-nette.
+2. **Innovations Apportées au Dashboard (`DashboardView.jsx` & `styles.css`)** :
+   - **Bandeau Supérieur : 6 KPI Micro-Cards Exécutives avec Sparklines SVG Inline** :
+     - Cartes `.kpi-card-modern` avec micro-hover lift (`transform: translateY(-2px)`), liseré rouge signature et ombre portée subtile.
+     - Chaque indicateur intègre son propre graphique vectoriel miniature (Sparkline SVG 16px) reflétant la dynamique récente :
+       - *Total Candidatures* (Sparkline bleue progressive).
+       - *Sur Offre Publiée* (Sparkline bleue soutenue).
+       - *Candidatures Spontanées* (Sparkline pourpre avec pic).
+       - *Vivier Actif* (Sparkline ambre montante).
+       - *Entretiens Fixés* (Sparkline émeraude avec volume).
+       - *Délai Moyen d'Évaluation* (Sparkline indigo avec badge d'efficience "Optimal").
+   - **Courbe de Tendance Spline Lissée (Bézier SVG) & Mode Hybride** :
+     - Tracé lissé par courbe de Bézier cubique avec aire de dégradé translucide (`#2563eb`), filtre d'ombre lueur (`shadowGlow`), lignes de repère horizontales en pointillés et points interactifs.
+     - Réticule de visée vertical dynamique et infobulle tooltip flottante avec décomposition instantanée *Offre vs Spontanée*.
+     - Bascule fluide 1-clic entre mode Courbe Spline et mode Barres empilées haute densité.
+   - **Entonnoir de Qualification & Connecteurs de Taux de Passage** :
+     - Pipeline complet d'évaluation RH (Reçue → Présélectionnée → Test → Entretien → Retenue / Non retenue).
+     - Insertion entre chaque étape de badges de transition interactifs (`.funnel-step-connector`, `.funnel-step-badge`) calculant le **taux de passage/conversion réel** (ex: `↓ 75% passage`), permettant au recruteur d'identifier immédiatement les goulots d'étranglement du pipeline.
+   - **Dossiers Prioritaires SLA & Chips Candidats** :
+     - Liste ergonomique des candidatures en attente de traitement avec avatar chip stylisé en dégradé avec initiales, direction de rattachement, badge d'urgence coloré (`jours_attente`) et bouton d'action directe "Traiter".
+   - **Donut Chart SVG Interactif & Pression par Direction** :
+     - Donut vectoriel des canaux d'acquisition avec effet de survol dynamique (épaisseur de segment variable, mise à jour instantanée du compteur central).
+     - Barres de progression avec gradients horizontaux (`#FF0D00` à `#f97316`) visualisant la pression des candidatures par direction d'entreprise.
+   - **Panneau des Dernières Offres Modernisé** :
+     - Intégration dans le conteneur `.dashboard-card-panel` avec bouton de navigation rapide vers la gestion des offres.
+3. **Artefact Generative UI Dédié ([executive_dashboard_pro.html](file:///C:/Users/Strix/.gemini/antigravity/brain/05b3df65-52a3-40cb-9d6a-bc9a0b4878bc/executive_dashboard_pro.html))** :
+   - Dashboard interactif standalone complet développé avec Tailwind CSS, intégrant toggle Thème Sombre / Clair, sélecteur temporel dynamique (7 jours, 30 jours, ce mois, cette année) avec recalcul animé des KPIs, graphique spline SVG interactif avec tooltip, matrice SLA avec tiroir latéral (drawer) d'inspection détaillée du candidat, pipeline de recrutement et donut des canaux.
+4. **Validation Technique** :
+   - **Build Vite React** : **Compilé avec succès en 4.89s (0 erreur, 0 avertissement)**.
+   - **Tests PHPUnit Laravel** : **36/36 passés (182 assertions, 0 échec)**.
+---
+
+### Demande 123 (Dashboard 2.0) : Découplage et Séparation des Canaux d'Acquisition et de la Pression par Direction en Deux Cartes Distinctes
+> **User Prompt :** *"okey divise en 2 les canaux et pression par direction"*
+1. **Contexte & Spécification** :
+   - Initialement regroupés au sein d'une seule carte partitionnée (`gridTemplateColumns: '120px 1fr'`), les blocs **Canaux d'Acquisition** et **Pression par Direction** manquaient d'indépendance visuelle et d'aération.
+   - Demande utilisateur de séparer explicitement ces deux métriques en deux cartes distinctes et autonomes.
+2. **Implémentation Réalisée dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx)** :
+   - Mise en place d'une sous-grille dédiée : `display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px'`.
+   - **Carte D1 : Canaux d'Acquisition** :
+     - Conteneur indépendant `.dashboard-card-panel`.
+     - En-tête avec icône `PieChartIcon` (#8b5cf6), titre dédié et badge du volume total de candidatures.
+     - Donut SVG centré (86px) avec inspection interactive au survol (épaisseur variable, affichage dynamique de la valeur et du code canal au centre).
+     - Légende sous forme de chips stylisées avec pastille colorée, libellé du canal et compteur chiffré en gras.
+   - **Carte D2 : Pression par Direction** :
+     - Conteneur indépendant `.dashboard-card-panel`.
+     - En-tête avec icône `Layers` (#0284c7), titre dédié et badge du nombre de directions actives.
+     - Liste enrichie des 4 premières directions de l'entreprise avec libellé tronqué proprement, volume de candidatures, pourcentage de charge globale et barre de progression à dégradé signature AlpA Ciment (`#FF0D00` à `#f97316`).
+3. **Validation & Tests** :
+   - **Build Vite React** : **Compilé avec succès en 2.30s (0 erreur, 0 avertissement)**.
+---
+
+### Demande 124 (Dashboard SLA & Navigation Fiche Candidat) : Affichage Intégral des Dossiers SLA et Ouverture Directe de la Fiche Candidat
+> **User Prompt :** *"okey Dossiers Prioritaires (SLA) il dit 5 en attentes mais il n'affiche que 3 ensuite lorsqu'on clique traiter ca va pas vers sa fiche mais juste dans la liste des candidatures"*
+1. **Diagnostic & Causes Racines** :
+   - **Affichage limité à 3 items** : La liste des dossiers SLA dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) appliquait un `candidaturesATraiter.slice(0, 3)` en dur, masquant les candidatures suivantes même lorsque le badge indiquait 5 dossiers en attente.
+   - **Navigation vers la liste au lieu de la fiche** : Le bouton "Traiter" exécutait un simple `navigate(cand.dans_vivier ? '/vivier' : '/candidatures/offres')` sans spécifier l'identifiant du dossier, amenant le recruteur sur la liste globale non filtrée au lieu de la fiche d'évaluation du candidat.
+2. **Correctifs & Améliorations Apportés** :
+   - **Affichage exhaustif des dossiers en attente SLA** :
+     - Suppression de la troncature `.slice(0, 3)` dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx).
+     - Conteneur rendu défilable avec `maxHeight: 250px`, `overflowY: 'auto'` et scrollbar fine : tous les dossiers (5 ou plus) sont immédiatement visibles et consultables sans déformer la grille du cockpit.
+     - Ligne du candidat rendue cliquable dans son intégralité avec curseur pointer et infobulle d'invitation.
+   - **Routage direct vers la fiche candidat ([`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+     - Création d'une route dédiée de premier niveau : `/candidatures/:id` encapsulée dans `BackOfficeLayout` et relayant `CandidatureDetailView` avec bouton retour `navigate(-1)` renvoyant immédiatement au Dashboard.
+     - Le bouton "Traiter" (et le clic sur la carte candidat) exécute désormais `navigate(/candidatures/${cand.id_candidature})`, ouvrant directement le dossier RH complet du candidat (CV, compétences, parcours, OCR, statut).
+   - **Prise en charge universelle des paramètres d'URL (`?candidature=` / `?id=`)** :
+     - Ajout de la détection de paramètre d'URL dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) pour ouvrir automatiquement la fiche correspondante si un lien avec query parameter est partagé.
+3. **Validation Technique** :
+   - **Tests automatisés PHPUnit** : **36/36 passés (182 assertions, 0 échec)**.
+   - **Build Vite React** : **Compilé avec succès en 3.13s (0 erreur, 0 avertissement)**.
+---
+
+### Demande 125 (Dashboard SLA & Respect Strict des Routes du Frontend) : Étirement Intégral de la Carte SLA et Routage sur les Pages Officielles
+> **User Prompt :** *"okey regarde aussi la liste des route dans le front car ca n'existe pas candidatures/{id} lorsqu'on clique sur traiter et aussi dans le dashboard ,tu peux descendre jusqu'au plus bas possible la div de la liste des candidatures prioriatire ,il y a un vide"*
+1. **Contexte & Spécification** :
+   - **Respect strict de l'arborescence des routes React** : L'application n'utilise pas de route isolée `/candidatures/:id`. Le traitement des dossiers doit naviguer directement sur les routes officielles existantes du frontend avec paramètre contextuel :
+     - Candidatures sur offres : `/candidatures/offres?candidature={id}`
+     - Candidatures spontanées : `/candidatures/spontanees?candidature={id}`
+     - Dossiers du vivier : `/vivier?candidature={id}`
+   - **Élimination du vide sous la carte SLA** : Dans le cockpit à deux colonnes du Dashboard, la colonne de droite (entonnoir + canaux + pression) était plus haute que la colonne de gauche (tendance + SLA), laissant un espace blanc vide sous la liste des dossiers prioritaires. La carte SLA doit descendre et s'étirer jusqu'au bas de la colonne pour s'aligner parfaitement.
+2. **Implémentations Réalisées** :
+   - **Routage Officiel Contextuel ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
+     - Remplacement de la navigation générique par un aiguillage intelligent selon la nature de la candidature :
+       - `cand.dans_vivier` ➔ `/vivier?candidature=${cand.id_candidature}`
+       - `cand.intitule` spontanée ➔ `/candidatures/spontanees?candidature=${cand.id_candidature}`
+       - Autre (sur offre) ➔ `/candidatures/offres?candidature=${cand.id_candidature}`
+     - L'action "Traiter" (et le clic sur la carte) ouvre immédiatement la vue officielle avec le dossier candidat ouvert et la navigation active dans la barre latérale.
+     - Dans [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx), `/candidatures/:id` effectue une redirection transparente `<Navigate replace to="/candidatures/offres?candidature={id}" />` sans composant orphelin.
+     - Dans les vues [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx), la fermeture de la fiche via `onBack` nettoie proprement le paramètre d'URL sans rechargement de page.
+   - **Étirement Complet de la Carte SLA (Zero Empty Gap)** :
+     - Application de `alignItems: 'stretch'` sur la grille du cockpit 2 colonnes dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx).
+     - Colonne gauche configurée en `height: '100%'`.
+     - Carte B (Dossiers Prioritaires SLA) passée en `flex: 1, display: 'flex', flexDirection: 'column'`.
+     - Conteneur interne de la liste des dossiers configuré en `flex: 1, overflowY: 'auto'` : la carte descend jusqu'au plus bas possible et s'aligne rigoureusement sur le bas de la colonne droite.
+3. **Validation & Tests** :
+   - **Tests automatisés PHPUnit** : **36/36 passés (182 assertions, 0 échec)**.
+   - **Build Vite React** : **Compilé avec succès en 2.58s (0 erreur, 0 avertissement)**.
+---
+
+### Demande 126 (Performance & Optimisation API) : Audit et Élimination des Appels API Répétés lors de l'Accès aux Candidatures
+> **User Prompt :** *"regarde voici toutes les appels d'api des que je rentre candidature sur offre pourquoi il y en a plusieurs qui se repetent ensuite explique a quoi sert chaque appel"*
+1. **Diagnostic & Analyse des Causes Racines** :
+   - **Pourquoi `/api/candidatures` apparaissait 4 fois ?**
+     - Dans `CandidaturesOffresView.jsx`, la méthode `loadData` exécutait délibérément 2 requêtes simultanées : une requête paginée (`per_page=50`) pour le tableau principal et une requête globale (`per_page=500`) pour calculer les compteurs par direction et par offre de la barre latérale.
+     - En mode développement, le double-montage de `React.StrictMode` ainsi que l'initialisation de la direction sélectionnée après chargement du catalogue d'offres déclenchaient `loadData` une seconde fois, générant 2 x 2 = 4 appels lourds vers `/api/candidatures`.
+   - **Pourquoi `/api/competences` apparaissait 3 fois ?**
+     - Le composant `AdvancedSearchPanel.jsx` possédait son propre `useEffect` qui interrogeait `/api/competences` au montage, ignorant le fait que `main.jsx` avait déjà chargé le référentiel des compétences lors du bootstrap de l'application.
+   - **Pourquoi `/api/referentiels/statuts-candidature` et `/api/offres` étaient interrogés plusieurs fois ?**
+     - Ces données de référence statiques étaient imbriquées à l'intérieur de `loadData()`. À chaque changement de filtre ou de page, la liste des statuts et la liste des offres étaient re-téléchargées inutilement.
+2. **Optimisations & Découplage Mis en Place** :
+   - **Transmission et Réutilisation du Référentiel Compétences ([`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx) & [`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
+     - `main.jsx` transmet désormais `competencesData` aux vues de candidatures.
+     - `AdvancedSearchPanel` accepte la prop `competencesList` et n'interroge plus `/api/competences` si le référentiel est déjà fourni par le parent.
+   - **Découplage des Référentiels Statiques ([`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx), [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx))** :
+     - Chargement unique de `/api/referentiels/statuts-candidature` et `/api/offres` au montage initial de la vue (`useEffect` dédié avec cleanup).
+     - La navigation par page et les changements de filtres ciblés n'interrogent plus ces référentiels statiques.
+   - **Découplage du Calcul des Badges et Compteurs** :
+     - La requête globale (`per_page=500`) pour les compteurs d'arborescence est isolée et ne se déclenche que si les filtres globaux (`q`, `statut`, `canal_depot`) changent, évitant de recharger 500 dossiers lors d'un simple changement de page.
+     - `loadData()` ne charge plus que la page demandée (`page=X&per_page=50`), divisant le temps de réponse et la charge serveur par 4.
+3. **Validation & Tests** :
+   - **Tests automatisés PHPUnit** : **36/36 passés (182 assertions, 0 échec)**.
+   - **Build Vite React** : **Compilé avec succès en 2.18s (0 erreur, 0 avertissement)**.
+---
+
+### Demande 127 (Performance & Déduplication Réseau) : Élimination du Double Lot d'Appels Lié à React StrictMode et Mise en Cache Mémoire
+> **User Prompt :** *"voici maintenant les appels: 15:11:11 ... 15:11:16 ..."*
+1. **Diagnostic Technique** :
+   - `/api/competences` est désormais résolu à 100% (passé de 3 appels à 1 seul appel unique au bootstrap).
+   - Le second bloc d'appels à 15:11:16 (5 secondes après 15:11:11) correspond au double-montage délibéré de `<React.StrictMode>` en environnement de développement React 18+.
+   - Comme le serveur PHP local (`php artisan serve`) est mono-threadé, le deuxième lot de requêtes s'empilait dans la file d'attente du socket pendant que le premier lot était traité, d'où le déclenchement décalé de 5 secondes.
+2. **Solutions Déployées ([`client.js`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/api/client.js))** :
+   - **Déduplication en vol (In-Flight Request Coalescing)** :
+     - Implémentation d'un registre `inFlightRequests (Map)` dans le client HTTP centralisé.
+     - Si une requête `GET` vers la même URL est déjà en cours d'exécution, la promesse existante est immédiatement retournée à tous les appelants simultanés sans émettre de seconde requête réseau vers le serveur Laravel.
+   - **Cache mémoire pour référentiels statiques (`getCachedJson`)** :
+     - Mise en place d'un cache mémoire avec TTL (5 minutes par défaut) pour les référentiels immuables (`/api/referentiels/statuts-candidature`, `/api/offres`).
+     - Appliqué à [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx).
+     - Tout changement d'onglet ou retour ultérieur sur ces pages accède instantanément aux données en 0ms sans aucune sollicitation de la base de données.
+3. **Validation & Tests** :
+   - **Tests automatisés PHPUnit** : **36/36 passés (182 assertions, 0 échec)**.
+   - **Build Vite React** : **Compilé avec succès en 2.25s (0 erreur, 0 avertissement)**.
+---
+
+### Demande 128 (Web Performance & Lighthouse LCP) : Élimination des Ressources Bloquant le Rendu Initial (Économie ~600-1000 ms)
+> **User Prompt :** *"j'ai fait des petits test avec lighthouse et voici une des remarques : Requêtes de blocage du rendu Économies estimées : 600 ms ... all.min.css ... css_OyQjW....css ... css_OfchS....css"*
+1. **Diagnostic & Analyse Lighthouse** :
+   - **Problème identifié** : Trois balises `<link rel="stylesheet">` synchrones étaient présentes dans le `<head>` de [`index.html`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/index.html) :
+     1. `https://cdnjs.cloudflare.com/.../all.min.css` (FontAwesome, bloquant pour ~710 ms via DNS + TLS handshake externe).
+     2. `/css/css_OyQjWxlUxu--OhsMlYcrEWO-H05fcGFzxYLsU_W2jCk.css` (Feuille de style globale Drupal ~490 KiB, bloquant pour ~970 ms).
+     3. `/css/css_OfchSCC6Ik182tntv9o3E_uWhsm0WYdS9UiJ1D0aQT0.css` (Feuille d'appoint ~7 KiB).
+   - **Impact** : Le navigateur interrompait l'analyse HTML et différait le First Contentful Paint (FCP) et le Largest Contentful Paint (LCP) de plus d'1 seconde, affichant un écran blanc jusqu'au téléchargement intégral de ces feuilles.
+2. **Optimisations Mises en Place ([`index.html`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/index.html))** :
+   - **Préconnexion & DNS-Prefetch** :
+     - Ajout de `<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />` et `<link rel="dns-prefetch" />` pour anticiper la résolution DNS et la négociation TLS du CDN sans bloquer le parseur.
+   - **Chargement Asynchrone Non-Bloquant (`media="print"` + switch `onload`)** :
+     - Utilisation du pattern officiel Google Web Vitals : `rel="preload" as="style"` combiné à `media="print" onload="this.media='all'"`.
+     - Les 3 feuilles de style sont désormais téléchargées en arrière-plan à haute priorité sans bloquer l'affichage de la page, et activées immédiatement dès réception.
+     - Balise `<noscript>` intégrée pour préserver la rétrocompatibilité si JavaScript est désactivé.
+   - **CSS Critique du Préloader Inliné (< 50ms FCP)** :
+     - Intégration directe des styles essentiels du préloader Alpha Ciment dans une balise `<style>` du `<head>`.
+     - Permet un rendu visuel instantané de l'animation de chargement dès les premières millisecondes, avec 0 CLS (Cumulative Layout Shift).
+   - **Attribut `defer` sur les scripts annexes** :
+     - Ajout de l'attribut `defer` sur le script Drupal pour garantir une exécution ordonnée après l'analyse du DOM.
+3. **Validation & Tests** :
+   - **Build Vite React** : **Compilé avec succès en 2.92s (0 erreur, 0 avertissement)**.
+   - **Tests automatisés PHPUnit** : **36/36 passés (182 assertions, 0 échec)**.

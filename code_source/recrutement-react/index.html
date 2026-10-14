@@ -5,9 +5,75 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="icon" type="image/png" href="/themes/custom/apiqa/images/logo-cut.png" />
         <title>Nos Offres d'Emploi | ALPHA CIMENT</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-        <link rel="stylesheet" href="/css/css_OfchSCC6Ik182tntv9o3E_uWhsm0WYdS9UiJ1D0aQT0.css" />
-        <link rel="stylesheet" href="/css/css_OyQjWxlUxu--OhsMlYcrEWO-H05fcGFzxYLsU_W2jCk.css" />
+        <!-- Préconnexion au CDN Cloudflare pour réduire la latence DNS/TLS -->
+        <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+        <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+
+        <!-- Chargement asynchrone non-bloquant des styles (Résolution du blocage LCP / FCP Lighthouse) -->
+        <link rel="preload" href="/css/css_OfchSCC6Ik182tntv9o3E_uWhsm0WYdS9UiJ1D0aQT0.css" as="style" />
+        <link rel="stylesheet" href="/css/css_OfchSCC6Ik182tntv9o3E_uWhsm0WYdS9UiJ1D0aQT0.css" media="print" onload="this.media='all'" />
+
+        <link rel="preload" href="/css/css_OyQjWxlUxu--OhsMlYcrEWO-H05fcGFzxYLsU_W2jCk.css" as="style" />
+        <link rel="stylesheet" href="/css/css_OyQjWxlUxu--OhsMlYcrEWO-H05fcGFzxYLsU_W2jCk.css" media="print" onload="this.media='all'" />
+
+        <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'" />
+
+        <noscript>
+            <link rel="stylesheet" href="/css/css_OfchSCC6Ik182tntv9o3E_uWhsm0WYdS9UiJ1D0aQT0.css" />
+            <link rel="stylesheet" href="/css/css_OyQjWxlUxu--OhsMlYcrEWO-H05fcGFzxYLsU_W2jCk.css" />
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+        </noscript>
+
+        <!-- CSS critique inliné pour un First Contentful Paint immédiat sans attente réseau -->
+        <style>
+            .preloader {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background: #FF0000 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: center !important;
+                z-index: 99999999 !important;
+                transition: opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.5s ease;
+            }
+            .preloader.fade-out {
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+            }
+            .loading-container {
+                position: relative;
+                width: 120px;
+                height: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .loading-container .loading {
+                position: absolute;
+                width: 112px;
+                height: 112px;
+                border-radius: 50%;
+                border: 3.5px solid transparent;
+                border-top-color: #ffffff;
+                animation: spinLoader 1s linear infinite;
+            }
+            #loading-icon img {
+                width: 60px;
+                height: auto;
+            }
+            @keyframes spinLoader {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        </style>
     </head>
     <body class="not-front path-node page-node-type-landing-page language-fr">
         <!-- Preloader Start -->
@@ -39,6 +105,6 @@
                 account: ''
             };
         </script>
-        <script src="/sites/default/files/js/js_ffcD9FB9b55EDTvf0v_CyEaKnYI-lMfzc1E0QUv5q34.js"></script>
+        <script defer src="/sites/default/files/js/js_ffcD9FB9b55EDTvf0v_CyEaKnYI-lMfzc1E0QUv5q34.js"></script>
     </body>
 </html>

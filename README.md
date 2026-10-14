@@ -1,5 +1,7 @@
 # 🏗️ Plateforme de Recrutement ALPHA CIMENT
 
+> 📘 **Guide Complet d'Installation & Pré-requis :** Consultez le fichier [**`PREREQUIS.md`**](PREREQUIS.md) pour la liste exhaustive des logiciels à télécharger, la configuration du `php.ini`, de PostgreSQL et du microservice Python PaddleOCR.
+
 ---
 
 ## 🗑️ Nettoyage avant partage (Dossiers à supprimer)
@@ -46,7 +48,7 @@ npm run dev
 
 ---
 
-## 3. 🐍 Service OCR (FastAPI)
+## 3. 🐍 Service OCR & IA (FastAPI & PaddleOCR)
 
 ```bash
 cd code_source/ocr
@@ -59,7 +61,20 @@ python -m venv venv
 # source venv/bin/activate
 
 pip install -r requirements.txt
+python -m uvicorn main:app --host 127.0.0.1 --port 8001 --reload
+```
 
+---
+
+## 4. 🦙 Moteur IA / LLM Local (Ollama)
+
+```bash
+# 1. Télécharger Ollama sur https://ollama.com
+# 2. Télécharger le modèle IA de parsing & classification de CV :
+ollama pull qwen2.5:7b
+
+# 3. Démarrer le serveur Ollama (port 11434) :
+ollama serve
 ```
 
 ---
@@ -72,6 +87,7 @@ pip install -r requirements.txt
 | **Espace Recruteur RH (Back-Office)** | http://localhost:5173/backoffice/dashboard |
 | **API Backend (Laravel)** | http://localhost:8000 |
 | **Documentation API OCR (FastAPI)** | http://localhost:8001/docs |
+| **Serveur LLM Local (Ollama)** | http://localhost:11434 |
 
 ---
 

@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import './styles.css';
 import { backendPath, getJson, getPublicJson, sendPublicFormData } from './api/client';
 import { ErrorState, LoadingState, PagePreloader } from './components/common/FeedbackStates';
@@ -19,6 +19,11 @@ const ModelesEmailsView = lazy(() => import('./pages/ModelesEmailsView').then((m
 const AuditLogsView = lazy(() => import('./pages/AuditLogsView').then((m) => ({ default: m.AuditLogsView })));
 const PipelineMonitoringView = lazy(() => import('./pages/PipelineMonitoringView').then((m) => ({ default: m.PipelineMonitoringView })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+
+function CandidatureRedirect() {
+    const { id } = useParams();
+    return <Navigate replace to={`/candidatures/offres?candidature=${id}`} />;
+}
 
 const CandidatureSpontaneePage = lazy(() => import('./frontOffice/CandidatureSpontaneePage'));
 const PostulerOffrePage = lazy(() => import('./frontOffice/PostulerOffrePage'));
@@ -218,9 +223,13 @@ function MainApp() {
                     path="/candidatures"
                 />
                 <Route
+                    element={<CandidatureRedirect />}
+                    path="/candidatures/:id"
+                />
+                <Route
                     element={
                         <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
-                            <CandidaturesOffresView referentiels={referentiels} />
+                            <CandidaturesOffresView competencesData={competencesData} referentiels={referentiels} />
                         </BackOfficeLayout>
                     }
                     path="/candidatures/offres"
@@ -228,7 +237,7 @@ function MainApp() {
                 <Route
                     element={
                         <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
-                            <CandidaturesSpontaneesView referentiels={referentiels} />
+                            <CandidaturesSpontaneesView competencesData={competencesData} referentiels={referentiels} />
                         </BackOfficeLayout>
                     }
                     path="/candidatures/spontanees"

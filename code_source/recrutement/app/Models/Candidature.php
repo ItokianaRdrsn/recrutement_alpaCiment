@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Candidature extends Model
@@ -35,6 +36,13 @@ class Candidature extends Model
         'dans_vivier' => 'boolean',
         'vue' => 'boolean',
     ];
+
+    protected $appends = ['cv_snippet'];
+
+    public function getCvSnippetAttribute()
+    {
+        return $this->attributes['cv_snippet'] ?? null;
+    }
 
     public function candidat(): BelongsTo
     {
@@ -100,5 +108,26 @@ class Candidature extends Model
     public function rendezVous(): HasMany
     {
         return $this->hasMany(RendezVous::class, 'id_candidature', 'id_candidature')->orderBy('date_debut', 'asc');
+    }
+
+    public function competences(): BelongsToMany
+    {
+        return $this->belongsToMany(Competence::class, 'candidat_competence', 'id_candidature', 'id_competence')
+            ->withPivot('niveau', 'valide', 'source', 'score_confiance');
+    }
+
+    public function formations(): HasMany
+    {
+        return $this->hasMany(CandidatFormation::class, 'id_candidature', 'id_candidature');
+    }
+
+    public function experiences(): HasMany
+    {
+        return $this->hasMany(CandidatExperience::class, 'id_candidature', 'id_candidature');
+    }
+
+    public function projets(): HasMany
+    {
+        return $this->hasMany(CandidatProjet::class, 'id_candidature', 'id_candidature');
     }
 }

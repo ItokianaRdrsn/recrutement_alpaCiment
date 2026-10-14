@@ -20,8 +20,8 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 | **Sprint 4** | Gestion RH des candidatures et fiche candidat | 7,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 11,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | 08/10/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 6** | Rendez-vous, communications, automatisation et modèles | 12,0 j | 16/10/2026 | 31/10/2026 | 07/10/2026 | 13/10/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 7** | Dashboard, recherche avancée, matching, audit logs et finalisation | 11,0 j | 03/11/2026 | 17/11/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
-| **Total** | **Total Scope Général** | **71,0 j** | **12/08/2026** | **17/11/2026** | **12/08/2026** | *En cours* | **84.5%** (60,0/71,0j) | |
+| **Sprint 7** | Dashboard, recherche avancée, matching, audit logs et finalisation | 11,0 j | 03/11/2026 | 17/11/2026 | 13/10/2026 | *En cours* | **54.5%** (6,0/11,0j) | **[EN COURS]** |
+| **Total** | **Total Scope Général** | **71,0 j** | **12/08/2026** | **17/11/2026** | **12/08/2026** | *En cours* | **93.0%** (66,0/71,0j) | |
 
 ---
 
@@ -144,20 +144,21 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 
 ---
 
-### Sprint 7 : Dashboard, recherche avancée, matching, audit logs et finalisation (11,0 j - 0.0% A FAIRE)
+### Sprint 7 : Dashboard, recherche avancée, matching, audit logs et finalisation (11,0 j - 54.5% EN COURS)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **03/11/2026** au **17/11/2026** (11,0 j)
-- ⏱️ **Dates Réelles** : *À venir*
+- ⏱️ **Dates Réelles** : Du **13/10/2026** au *En cours*
 - **BACK-OFFICE** :
-  - Tableau de bord et indicateurs principaux (1,0 j) - **[À FAIRE]**
-  - Statistiques mensuelles, répartition par statut et taux de transformation (1,5 j) - **[À FAIRE]**
-  - Délai moyen de traitement et filtres du dashboard (1,0 j) - **[À FAIRE]**
-  - Consultation et filtrage du Journal d'Audit des actions RH (1,0 j) - **[À FAIRE]**
-  - Recherche avancée par mots-clés CV et compétences (1,5 j) - **[À FAIRE]**
+  - Tableau de bord et indicateurs principaux (1,0 j) - **[FAIT]**
+  - Statistiques mensuelles, répartition par statut et taux de transformation (1,5 j) - **[FAIT]**
+  - Délai moyen de traitement et filtres du dashboard (1,0 j) - **[FAIT]**
+  - Consultation et filtrage du Journal d'Audit des actions RH (1,0 j) - **[FAIT]**
+  - Recherche avancée par mots-clés CV et compétences (1,5 j) - **[FAIT]** (Panneau de recherche multi-critères, PostgreSQL tsvector fulltext, OCR JSON, compétences mode any/all)
   - Matching candidat -> offre avec score simple (2,0 j) - **[À FAIRE]**
-  - Tests fonctionnels globaux, corrections et optimisation (1,5 j) - **[À FAIRE]**
-  - Documentation et préparation du déploiement (1,5 j) - **[À FAIRE]**
-- **Sous-total : 11,0 j (0.0% A FAIRE)**
+  - Tests fonctionnels globaux, corrections et optimisation (1,5 j) - **[EN COURS]** (Optimisation Lighthouse LCP, déduplication réseau, audit de sécurité)
+  - Documentation et préparation du déploiement (1,5 j) - **[EN COURS]** (Fichier prérequis, Docker, guide d'installation Ollama/PaddleOCR)
+- **Sous-total : 6,0 j / 11,0 j (54.5% EN COURS)**
 
 ---
 
-## 📈 **Total Scope Général : 71,0 j (Avancement global : 70.4% - 50,0 j / 71,0 j)**
+## 📈 **Total Scope Général : 71,0 j (Avancement global : 93.0% - 66,0 j / 71,0 j)**
+

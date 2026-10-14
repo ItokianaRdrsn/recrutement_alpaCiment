@@ -35,6 +35,13 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         type_contrat: '',
         page: 1,
     });
+    const [appliedFilters, setAppliedFilters] = useState({
+        q: '',
+        direction: '',
+        statut: '',
+        type_contrat: '',
+        page: 1,
+    });
     const [saisirRhOffreId, setSaisirRhOffreId] = useState(null);
     const [offersResponse, setOffersResponse] = useState({ data: [], meta: null });
     const [offerForm, setOfferForm] = useState(emptyOfferForm);
@@ -85,7 +92,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
     const queryString = useMemo(() => {
         const params = new URLSearchParams();
 
-        Object.entries(filters).forEach(([key, value]) => {
+        Object.entries(appliedFilters).forEach(([key, value]) => {
             if (value) {
                 params.set(key, value);
             }
@@ -94,7 +101,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         params.set('per_page', '10');
 
         return params.toString();
-    }, [filters]);
+    }, [appliedFilters]);
 
     const loadOffers = useCallback(async () => {
         setLoading(true);
@@ -140,8 +147,22 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         }));
     }
 
+    function handleApplyFilters() {
+        setAppliedFilters({ ...filters, page: 1 });
+    }
+
+    function handleResetFilters() {
+        const reset = { q: '', direction: '', statut: '', type_contrat: '', page: 1 };
+        setFilters(reset);
+        setAppliedFilters(reset);
+    }
+
     function changePage(page) {
         setFilters((current) => ({
+            ...current,
+            page,
+        }));
+        setAppliedFilters((current) => ({
             ...current,
             page,
         }));
@@ -950,6 +971,9 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                     <input
                         name="q"
                         onChange={(event) => updateFilter('q', event.target.value)}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter') handleApplyFilters();
+                        }}
                         placeholder="Rechercher un poste, un lieu..."
                         type="search"
                         value={filters.q}
@@ -993,13 +1017,13 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                 </label>
 
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <button className="filter-button" onClick={loadOffers} type="button">
+                    <button className="filter-button" onClick={handleApplyFilters} type="button">
                         <Filter aria-hidden="true" size={17} />
                         <span>Filtrer</span>
                     </button>
                     <button
                         className="ghost-button"
-                        onClick={() => setFilters({ q: '', direction: '', statut: '', type_contrat: '', page: 1 })}
+                        onClick={handleResetFilters}
                         title="Réinitialiser les filtres"
                         type="button"
                     >

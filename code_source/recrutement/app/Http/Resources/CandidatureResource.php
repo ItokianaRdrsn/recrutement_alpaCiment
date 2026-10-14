@@ -36,6 +36,21 @@ class CandidatureResource extends JsonResource
             'documents' => $this->whenLoaded('documents'),
             'cv_extraction_ocr' => $this->whenLoaded('cvExtractionOcr'),
             'historique' => $this->whenLoaded('historique'),
+            'cv_snippet' => $this->cv_snippet ?? null,
+            'competences' => $this->whenLoaded('competences', function () {
+                return $this->competences->map(function ($comp) {
+                    return [
+                        'id_competence' => $comp->id_competence,
+                        'nom_competence' => $comp->nom_competence,
+                        'niveau' => $comp->pivot->niveau ?? null,
+                        'valide' => (bool) ($comp->pivot->valide ?? false),
+                        'source' => $comp->pivot->source ?? null,
+                    ];
+                });
+            }),
+            'formations' => $this->whenLoaded('formations'),
+            'experiences' => $this->whenLoaded('experiences'),
+            'projets' => $this->whenLoaded('projets'),
         ];
     }
 }

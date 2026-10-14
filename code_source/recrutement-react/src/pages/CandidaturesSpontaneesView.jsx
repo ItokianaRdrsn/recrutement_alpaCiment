@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
     Eye,
     Filter,
@@ -8,14 +9,15 @@ import {
     Search,
     UserPlus,
 } from 'lucide-react';
-import { getJson, sendJson } from '../api/client';
+import { getCachedJson, getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { SaisirRhCandidatureModal } from '../components/modals/SaisirRhCandidatureModal';
 import { formatDate } from '../utils/formatters';
 import { CandidatureDetailView } from './CandidatureDetailView';
+import AdvancedSearchPanel from '../components/candidatures/AdvancedSearchPanel';
 
-export function CandidaturesSpontaneesView({ referentiels }) {
+export function CandidaturesSpontaneesView({ referentiels, competencesData }) {
     const [candidatures, setCandidatures] = useState([]);
     const [statutsList, setStatutsList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -23,16 +25,42 @@ export function CandidaturesSpontaneesView({ referentiels }) {
     const [selectedCandidatureId, setSelectedCandidatureId] = useState(null);
     const [showSaisirModal, setShowSaisirModal] = useState(false);
 
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlCandidatureId = searchParams.get('candidature') || searchParams.get('id');
+
+    useEffect(() => {
+        if (urlCandidatureId) {
+            setSelectedCandidatureId(Number(urlCandidatureId));
+        }
+    }, [urlCandidatureId]);
+
     const [page, setPage] = useState(1);
     const [perPage, setPerPage] = useState(50);
     const [paginationMeta, setPaginationMeta] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
 
-    const [filters, setFilters] = useState({
+    const initialFilters = {
         q: '',
         statut: '',
         canal_depot: '',
         direction: '',
-    });
+        cv_keyword: '',
+        competences: '',
+        competence_mode: 'any',
+        niveau_etude: '',
+        annees_exp_min: '',
+        poste_keyword: '',
+    };
+
+    const [filters, setFilters] = useState(initialFilters);
+    const [appliedFilters, setAppliedFilters] = useState(initialFilters);
+
+    const handleApplyFilters = useCallback((filtersOverride = null) => {
+        const toApply = filtersOverride && typeof filtersOverride === 'object' && !filtersOverride.nativeEvent
+            ? filtersOverride
+            : filters;
+        setAppliedFilters({ ...toApply });
+        setPage(1);
+    }, [filters]);
 
     const handleOpenDossier = useCallback(async (id) => {
         setSelectedCandidatureId(id);
@@ -46,10 +74,30 @@ export function CandidaturesSpontaneesView({ referentiels }) {
         }
     }, []);
 
-    const resetFilters = () => {
-        setFilters({ q: '', statut: '', canal_depot: '', direction: '' });
+    const resetFilters = useCallback(() => {
+        setFilters(initialFilters);
+        setAppliedFilters(initialFilters);
         setPage(1);
-    };
+    }, []);
+
+    // Charger les statuts une seule fois au montage
+    useEffect(() => {
+        let isMounted = true;
+        async function loadStatuts() {
+            try {
+                const statutsResponse = await getCachedJson('/api/referentiels/statuts-candidature');
+                if (isMounted) {
+                    setStatutsList(statutsResponse?.data ?? []);
+                }
+            } catch (err) {
+                console.error('Erreur chargement statuts:', err);
+            }
+        }
+        loadStatuts();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const loadData = useCallback(async () => {
         setLoading(true);
@@ -61,15 +109,18 @@ export function CandidaturesSpontaneesView({ referentiels }) {
             params.set('per_page', String(perPage));
             params.set('type_demande', 'spontanee');
 
-            if (filters.q) params.set('q', filters.q);
-            if (filters.statut) params.set('statut', filters.statut);
-            if (filters.canal_depot) params.set('canal_depot', filters.canal_depot);
-            if (filters.direction) params.set('direction', filters.direction);
+            if (appliedFilters.q) params.set('q', appliedFilters.q);
+            if (appliedFilters.statut) params.set('statut', appliedFilters.statut);
+            if (appliedFilters.canal_depot) params.set('canal_depot', appliedFilters.canal_depot);
+            if (appliedFilters.direction) params.set('direction', appliedFilters.direction);
+            if (appliedFilters.cv_keyword) params.set('cv_keyword', appliedFilters.cv_keyword);
+            if (appliedFilters.competences) params.set('competences', appliedFilters.competences);
+            if (appliedFilters.competence_mode) params.set('competence_mode', appliedFilters.competence_mode);
+            if (appliedFilters.niveau_etude) params.set('niveau_etude', appliedFilters.niveau_etude);
+            if (appliedFilters.annees_exp_min) params.set('annees_exp_min', appliedFilters.annees_exp_min);
+            if (appliedFilters.poste_keyword) params.set('poste_keyword', appliedFilters.poste_keyword);
 
-            const [candResponse, statutsResponse] = await Promise.all([
-                getJson(`/api/candidatures?${params.toString()}`),
-                getJson('/api/referentiels/statuts-candidature'),
-            ]);
+            const candResponse = await getJson(`/api/candidatures?${params.toString()}`);
 
             setCandidatures(candResponse?.data ?? []);
             setPaginationMeta({
@@ -79,13 +130,12 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                 from: candResponse?.from ?? 1,
                 to: candResponse?.to ?? (candResponse?.data?.length ?? 0),
             });
-            setStatutsList(statutsResponse?.data ?? []);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }, [filters, page, perPage]);
+    }, [appliedFilters, page, perPage]);
 
     useEffect(() => {
         loadData();
@@ -95,7 +145,15 @@ export function CandidaturesSpontaneesView({ referentiels }) {
         return (
             <CandidatureDetailView
                 idCandidature={selectedCandidatureId}
-                onBack={() => setSelectedCandidatureId(null)}
+                onBack={() => {
+                    setSelectedCandidatureId(null);
+                    setSearchParams((prev) => {
+                        const next = new URLSearchParams(prev);
+                        next.delete('candidature');
+                        next.delete('id');
+                        return next;
+                    });
+                }}
                 onRefreshList={loadData}
                 referentiels={referentiels}
                 statutsList={statutsList}
@@ -111,6 +169,12 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                     <Search size={18} />
                     <input
                         onChange={(e) => setFilters((curr) => ({ ...curr, q: e.target.value }))}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleApplyFilters();
+                            }
+                        }}
                         placeholder="Rechercher un candidat (nom, email)..."
                         type="search"
                         value={filters.q}
@@ -160,7 +224,7 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                 </label>
 
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <button className="filter-button" onClick={loadData} type="button">
+                    <button className="filter-button" onClick={() => handleApplyFilters()} type="button">
                         <Filter size={16} />
                         <span>Filtrer</span>
                     </button>
@@ -170,6 +234,15 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                     </button>
                 </div>
             </section>
+
+            {/* PANNEAU DE RECHERCHE AVANCÉE (CV, COMPÉTENCES, NIVEAU D'ÉTUDES, EXPÉRIENCE) */}
+            <AdvancedSearchPanel
+                competencesList={competencesData?.competences || []}
+                filters={filters}
+                onApply={handleApplyFilters}
+                onChange={(newFilters) => setFilters(newFilters)}
+                onReset={resetFilters}
+            />
 
             {/* CONTENU PRINCIPAL : VUE SPONTANÉES UNIQUE */}
             <div className="data-section" style={{ background: '#ffffff', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
@@ -257,6 +330,23 @@ export function CandidaturesSpontaneesView({ referentiels }) {
                                                         <strong style={{ color: '#0f172a' }}>{c.candidat?.prenom} {c.candidat?.nom}</strong>
                                                         <br />
                                                         <small style={{ color: '#64748b' }}>{c.candidat?.email}</small>
+                                                        {c.cv_snippet && (
+                                                            <div style={{ marginTop: '5px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fff1f0', border: '1px solid #fecaca', padding: '3px 8px', borderRadius: '5px', display: 'inline-block' }}>
+                                                                📄 <strong>Extrait CV :</strong> <em>{c.cv_snippet}</em>
+                                                            </div>
+                                                        )}
+                                                        {c.competences && c.competences.length > 0 && (
+                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginTop: '4px' }}>
+                                                                {c.competences.slice(0, 3).map((comp, idx) => (
+                                                                    <span key={comp.id_competence || idx} style={{ fontSize: '10px', backgroundColor: '#f1f5f9', color: '#475569', padding: '1px 5px', borderRadius: '3px', border: '1px solid #e2e8f0' }}>
+                                                                        {comp.nom_competence}
+                                                                    </span>
+                                                                ))}
+                                                                {c.competences.length > 3 && (
+                                                                    <span style={{ fontSize: '10px', color: '#94a3b8' }}>+{c.competences.length - 3}</span>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </td>

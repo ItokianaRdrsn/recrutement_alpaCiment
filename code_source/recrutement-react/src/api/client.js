@@ -54,25 +54,69 @@ export async function sendPublicFormData(url, formData, method = 'POST') {
     return payload;
 }
 
+const inFlightRequests = new Map();
+const staticDataCache = new Map();
+
+export function invalidateCache(prefix = null) {
+    if (!prefix) {
+        staticDataCache.clear();
+        return;
+    }
+    for (const key of staticDataCache.keys()) {
+        if (key.includes(prefix)) {
+            staticDataCache.delete(key);
+        }
+    }
+}
+
+export async function getCachedJson(url, ttlMs = 300000) {
+    const fullUrl = url.startsWith('http') ? url : backendPath(url);
+    const now = Date.now();
+    const entry = staticDataCache.get(fullUrl);
+    if (entry && now - entry.timestamp < ttlMs) {
+        return entry.data;
+    }
+    const data = await getJson(url);
+    if (data) {
+        staticDataCache.set(fullUrl, { timestamp: now, data });
+    }
+    return data;
+}
+
 export async function getJson(url) {
     const fullUrl = url.startsWith('http') ? url : backendPath(url);
-    const response = await fetch(fullUrl, {
-        credentials: 'include',
-        headers: {
-            Accept: 'application/json',
-        },
-    });
 
-    if (response.status === 401) {
-        redirectToLogin();
-        return null;
+    // Déduplication des requêtes GET simultanées en vol (résout le double appel de React StrictMode)
+    if (inFlightRequests.has(fullUrl)) {
+        return inFlightRequests.get(fullUrl);
     }
 
-    if (!response.ok) {
-        throw new Error(`Erreur HTTP ${response.status}`);
-    }
+    const requestPromise = (async () => {
+        try {
+            const response = await fetch(fullUrl, {
+                credentials: 'include',
+                headers: {
+                    Accept: 'application/json',
+                },
+            });
 
-    return response.json();
+            if (response.status === 401) {
+                redirectToLogin();
+                return null;
+            }
+
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP ${response.status}`);
+            }
+
+            return await response.json();
+        } finally {
+            inFlightRequests.delete(fullUrl);
+        }
+    })();
+
+    inFlightRequests.set(fullUrl, requestPromise);
+    return requestPromise;
 }
 
 let csrfToken = null;

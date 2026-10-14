@@ -29,6 +29,14 @@ export function AuditLogsView() {
     const [dateFin, setDateFin] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
+    const [appliedFilters, setAppliedFilters] = useState({
+        action: '',
+        entite: '',
+        q: '',
+        date_debut: '',
+        date_fin: '',
+    });
+
     // Selected log for detailed diff modal
     const [selectedLog, setSelectedLog] = useState(null);
 
@@ -38,11 +46,11 @@ export function AuditLogsView() {
         try {
             const params = new URLSearchParams();
             params.set('page', page.toString());
-            if (actionFilter) params.set('action', actionFilter);
-            if (entityFilter) params.set('entite', entityFilter);
-            if (searchQuery) params.set('q', searchQuery);
-            if (dateDebut) params.set('date_debut', dateDebut);
-            if (dateFin) params.set('date_fin', dateFin);
+            if (appliedFilters.action) params.set('action', appliedFilters.action);
+            if (appliedFilters.entite) params.set('entite', appliedFilters.entite);
+            if (appliedFilters.q) params.set('q', appliedFilters.q);
+            if (appliedFilters.date_debut) params.set('date_debut', appliedFilters.date_debut);
+            if (appliedFilters.date_fin) params.set('date_fin', appliedFilters.date_fin);
 
             const response = await getJson(`/api/audit-logs?${params.toString()}`);
             if (response?.data) {
@@ -55,11 +63,22 @@ export function AuditLogsView() {
         } finally {
             setLoading(false);
         }
-    }, [actionFilter, entityFilter, searchQuery, dateDebut, dateFin]);
+    }, [appliedFilters]);
 
     useEffect(() => {
         loadLogs(1);
     }, [loadLogs]);
+
+    const handleApplyFilters = () => {
+        setAppliedFilters({
+            action: actionFilter,
+            entite: entityFilter,
+            q: searchQuery,
+            date_debut: dateDebut,
+            date_fin: dateFin,
+        });
+        setCurrentPage(1);
+    };
 
     const handleResetFilters = () => {
         setActionFilter('');
@@ -67,6 +86,14 @@ export function AuditLogsView() {
         setSearchQuery('');
         setDateDebut('');
         setDateFin('');
+        setAppliedFilters({
+            action: '',
+            entite: '',
+            q: '',
+            date_debut: '',
+            date_fin: '',
+        });
+        setCurrentPage(1);
     };
 
     const getActionBadgeClass = (action) => {
@@ -135,12 +162,17 @@ export function AuditLogsView() {
                         placeholder="Recherche dans la description..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleApplyFilters();
+                        }}
                         style={{
                             width: '100%',
-                            padding: '8px 12px',
+                            height: '38px',
+                            padding: '0 12px',
                             border: '1px solid #cbd5e1',
-                            borderRadius: '6px',
+                            borderRadius: '8px',
                             fontSize: '0.875rem',
+                            boxSizing: 'border-box',
                         }}
                     />
                 </div>
@@ -151,10 +183,12 @@ export function AuditLogsView() {
                         onChange={(e) => setActionFilter(e.target.value)}
                         style={{
                             width: '100%',
-                            padding: '8px 12px',
+                            height: '38px',
+                            padding: '0 12px',
                             border: '1px solid #cbd5e1',
-                            borderRadius: '6px',
+                            borderRadius: '8px',
                             fontSize: '0.875rem',
+                            boxSizing: 'border-box',
                         }}
                     >
                         <option value="">Toutes les actions</option>
@@ -176,10 +210,12 @@ export function AuditLogsView() {
                         onChange={(e) => setEntityFilter(e.target.value)}
                         style={{
                             width: '100%',
-                            padding: '8px 12px',
+                            height: '38px',
+                            padding: '0 12px',
                             border: '1px solid #cbd5e1',
-                            borderRadius: '6px',
+                            borderRadius: '8px',
                             fontSize: '0.875rem',
+                            boxSizing: 'border-box',
                         }}
                     >
                         <option value="">Toutes les entités</option>
@@ -197,10 +233,12 @@ export function AuditLogsView() {
                         onChange={(e) => setDateDebut(e.target.value)}
                         title="Date de début"
                         style={{
-                            padding: '8px 10px',
+                            height: '38px',
+                            padding: '0 10px',
                             border: '1px solid #cbd5e1',
-                            borderRadius: '6px',
+                            borderRadius: '8px',
                             fontSize: '0.875rem',
+                            boxSizing: 'border-box',
                         }}
                     />
                     <span style={{ color: '#94a3b8' }}>-</span>
@@ -210,23 +248,31 @@ export function AuditLogsView() {
                         onChange={(e) => setDateFin(e.target.value)}
                         title="Date de fin"
                         style={{
-                            padding: '8px 10px',
+                            height: '38px',
+                            padding: '0 10px',
                             border: '1px solid #cbd5e1',
-                            borderRadius: '6px',
+                            borderRadius: '8px',
                             fontSize: '0.875rem',
+                            boxSizing: 'border-box',
                         }}
                     />
                 </div>
 
-                {(actionFilter || entityFilter || searchQuery || dateDebut || dateFin) && (
-                    <button
-                        className="action-button text"
-                        onClick={handleResetFilters}
-                        style={{ fontSize: '0.85rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}
-                    >
-                        <X size={14} /> Réinitialiser
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button className="filter-button" onClick={handleApplyFilters} type="button">
+                        <Filter size={16} />
+                        <span>Filtrer</span>
                     </button>
-                )}
+                    <button
+                        className="ghost-button"
+                        onClick={handleResetFilters}
+                        title="Réinitialiser les filtres"
+                        type="button"
+                    >
+                        <X size={15} />
+                        <span>Réinitialiser</span>
+                    </button>
+                </div>
             </div>
 
             {/* Error & Loading */}
