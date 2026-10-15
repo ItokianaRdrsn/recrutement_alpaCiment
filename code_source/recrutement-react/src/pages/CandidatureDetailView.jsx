@@ -25,11 +25,12 @@ import {
     X,
 } from 'lucide-react';
 import { backendPath, getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { CandidatureDetailSkeleton, ErrorState, LoadingState } from '../components/common/FeedbackStates';
 import { CompetenceModal } from '../components/modals/CompetenceModal';
 import { RendezVousModal } from '../components/modals/RendezVousModal';
 import { EnvoyerMessageModal } from '../components/modals/EnvoyerMessageModal';
-import { formatDate } from '../utils/formatters';
+import { CandidaturePrintDossier } from '../components/candidatures/CandidaturePrintDossier';
+import { formatDate, formatTime } from '../utils/formatters';
 
 export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsList, referentiels }) {
     const [details, setDetails] = useState(null);
@@ -113,8 +114,12 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         setError('');
 
         try {
-            const res = await getJson(`/api/candidature/${idCandidature}`);
-            const data = res?.data ?? null;
+            const [candRes, profileRes, compRes] = await Promise.all([
+                getJson(`/api/candidature/${idCandidature}`),
+                getJson(`/api/candidature/${idCandidature}/profile`),
+                getJson('/api/competences'),
+            ]);
+            const data = candRes?.data ?? null;
             setDetails(data);
             if (data?.statut?.id_statut_candidature) {
                 setTargetStatusId(data.statut.id_statut_candidature);
@@ -134,10 +139,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                 });
                 setOcrCommentaireRh(data.cv_extraction_ocr.commentaire_rh ?? '');
             }
+            setProfileData(profileRes?.data ?? null);
+            const compList = compRes?.data?.competences ?? (Array.isArray(compRes?.data) ? compRes.data : (Array.isArray(compRes) ? compRes : []));
+            setAllCompetences(Array.isArray(compList) ? compList : []);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
+            setLoadingProfile(false);
         }
     }, [idCandidature]);
 
@@ -415,18 +424,11 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     }
 
     const handlePrintPdf = () => {
-        if (activeTab !== 'informations') {
-            setActiveTab('informations');
-            setTimeout(() => {
-                window.print();
-            }, 150);
-        } else {
-            window.print();
-        }
+        window.print();
     };
 
-    if (loading) {
-        return <LoadingState />;
+    if (loading || !details || (loadingProfile && !profileData)) {
+        return <CandidatureDetailSkeleton />;
     }
 
     if (error) {
@@ -450,32 +452,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
     return (
         <div className="view-stack">
-            {/* EN-TÊTE IMPRESSION PAPIER / PDF OFFICIEL */}
-            <div className="print-only-header">
-                <div className="print-brand">
-                    <img
-                        src="/themes/custom/apiqa/images/logo-cut.png"
-                        alt="AlpA Ciment"
-                        style={{ height: '42px', width: 'auto' }}
-                    />
-                    <div>
-                        <strong style={{ fontSize: '18pt', display: 'block', color: '#0f172a' }}>AlpA Ciment</strong>
-                        <span style={{ fontSize: '10pt', color: '#64748b' }}>Direction des Ressources Humaines • Dossier de Candidature</span>
-                    </div>
-                </div>
-                <div className="print-header-meta">
-                    <div><strong>Dossier N° :</strong> #{details.id_candidature}</div>
-                    <div><strong>Date d'édition :</strong> {new Date().toLocaleDateString('fr-FR')}</div>
-                    <div><strong>Statut actuel :</strong> {currentStatus?.libelle ?? 'Reçue'}</div>
-                </div>
-            </div>
-
-            {/* EN-TÊTE FICHE CANDIDATURE ÉCRAN */}
-            <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <button className="ghost-button" onClick={onBack} type="button">
-                    <ArrowLeft size={18} />
-                    <span>Retour aux candidatures</span>
-                </button>
+            {/* VUE INTERACTIVE ÉCRAN (MASQUÉE TOTALEMENT À L'IMPRESSION) */}
+            <div className="candidature-screen-view">
+                {/* EN-TÊTE FICHE CANDIDATURE ÉCRAN */}
+                <div className="no-print" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <button className="ghost-button" onClick={onBack} type="button">
+                        <ArrowLeft size={18} />
+                        <span>Retour aux candidatures</span>
+                    </button>
                 <div className="section-heading-actions" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                     <button className="filter-button" onClick={handlePrintPdf} style={{ gap: '6px', fontSize: '13px' }} type="button">
                         <Printer size={16} />
@@ -632,7 +616,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 Progression du Statut RH
                             </strong>
                             
-                            {details.dans_vivier ? (
+                            {/* {details.dans_vivier ? (
                                 <div style={{ background: '#fef3c7', border: '1px solid #fde047', color: '#92400e', padding: '8px 10px', borderRadius: '8px', fontSize: '12px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                                     <Lock size={14} />
                                     <span>Règle de gestion : statut verrouillé car la candidature est en vivier RH. Retirez-la du vivier pour modifier son statut.</span>
@@ -641,7 +625,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 <p style={{ margin: '0 0 12px 0', fontSize: '12px', color: '#64748b' }}>
                                     Règle de gestion : impossible de revenir à un statut d'ordre workflow inférieur ou égal ({currentWorkflowOrder}).
                                 </p>
-                            )}
+                            )} */}
 
                             <form onSubmit={handleStatusSubmit} style={{ display: 'grid', gap: '12px' }}>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -1345,7 +1329,18 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     </div>
 
                     {loadingCommunications ? (
-                        <LoadingState message="Chargement de l'historique des échanges..." />
+                        <div style={{ display: 'grid', gap: '12px' }}>
+                            {[1, 2].map((i) => (
+                                <div key={i} className="card-skeleton" style={{ padding: '16px' }}>
+                                    <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                                        <div className="skeleton-box" style={{ width: '80px', height: '20px', borderRadius: '4px' }} />
+                                        <div className="skeleton-box" style={{ width: '120px', height: '20px', borderRadius: '4px' }} />
+                                    </div>
+                                    <div className="skeleton-box" style={{ width: '60%', height: '18px', marginBottom: '8px' }} />
+                                    <div className="skeleton-box" style={{ width: '100%', height: '36px' }} />
+                                </div>
+                            ))}
+                        </div>
                     ) : !communicationsList.length ? (
                         <div className="empty-state" style={{ textAlign: 'left', padding: '20px', background: '#f8fafc', borderRadius: '8px', border: '1px solid var(--border)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
@@ -1782,7 +1777,18 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     </div>
 
                     {loadingRdv ? (
-                        <LoadingState message="Chargement des rendez-vous..." />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {[1, 2].map((i) => (
+                                <div key={i} className="card-skeleton" style={{ padding: '16px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+                                        <div className="skeleton-box" style={{ width: '180px', height: '20px' }} />
+                                        <div className="skeleton-box" style={{ width: '90px', height: '20px', borderRadius: '12px' }} />
+                                    </div>
+                                    <div className="skeleton-box" style={{ width: '40%', height: '16px', marginBottom: '6px' }} />
+                                    <div className="skeleton-box" style={{ width: '80%', height: '14px' }} />
+                                </div>
+                            ))}
+                        </div>
                     ) : rendezVousList.length === 0 ? (
                         <div className="empty-state" style={{ padding: '48px 16px', textAlign: 'center', background: '#f8fafc', borderRadius: '8px', border: '1px dashed var(--border)' }}>
                             <CalendarDays size={36} color="var(--muted)" style={{ margin: '0 auto 8px auto', display: 'block' }} />
@@ -1835,7 +1841,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
 
                                             <div style={{ fontSize: '0.85rem', color: '#475569', display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                                                 <span>
-                                                    📅 Du <strong>{formatDate(rdv.date_debut)}</strong> au <strong>{formatDate(rdv.date_fin)}</strong>
+                                                    📅 Le <strong>{formatDate(rdv.date_debut)}</strong> de <strong>{formatTime(rdv.date_debut)}</strong> à <strong>{formatTime(rdv.date_fin)}</strong>
                                                 </span>
                                                 {rdv.details_lieu && <span>📍 {rdv.details_lieu}</span>}
                                                 {rdv.responsable && <span>👤 Responsable : {rdv.responsable.nom}</span>}
@@ -1898,6 +1904,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     onSuccess={handleCompetenceCreated}
                 />
             )}
+            </div>
+
+            {/* DOCUMENT OFFICIEL A4 POUR EXPORT PDF & IMPRESSION (VISIBLE UNIQUEMENT À L'IMPRESSION) */}
+            <CandidaturePrintDossier
+                details={details}
+                profileData={profileData}
+                rendezVousList={rendezVousList}
+            />
         </div>
     );
 }

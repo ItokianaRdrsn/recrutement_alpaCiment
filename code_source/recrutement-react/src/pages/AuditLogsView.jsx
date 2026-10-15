@@ -13,7 +13,7 @@ import {
     X,
 } from 'lucide-react';
 import { getJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
 
 export function AuditLogsView() {
     const [logs, setLogs] = useState([]);
@@ -289,9 +289,7 @@ export function AuditLogsView() {
                 }}
             >
                 {loading && logs.length === 0 ? (
-                    <div style={{ padding: '40px' }}>
-                        <LoadingState message="Chargement des journaux d’audit..." />
-                    </div>
+                    <TableSkeleton rows={8} cols={6} />
                 ) : logs.length === 0 ? (
                     <div style={{ padding: '48px', textAlign: 'center', color: '#64748b' }}>
                         <ShieldAlert size={36} color="#94a3b8" style={{ margin: '0 auto 12px' }} />

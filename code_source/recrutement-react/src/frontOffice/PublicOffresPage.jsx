@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { LoadingState, ErrorState } from '../components/common/FeedbackStates';
+import { LoadingState, ErrorState, PublicOffersSkeleton } from '../components/common/FeedbackStates';
 
 export default function PublicOffresPage({ getJson, onNavigate }) {
     const [offres, setOffres] = useState([]);
@@ -96,7 +96,7 @@ export default function PublicOffresPage({ getJson, onNavigate }) {
                     <div className="row row-grid justify-content-center annonces">
                         <div className="col-12">
                             {loading ? (
-                                <LoadingState message="Chargement des offres Alpha Ciment..." subtitle="Recherche des postes ouverts en cours" />
+                                <PublicOffersSkeleton count={3} />
                             ) : error ? (
                                 <ErrorState message={error} onRetry={fetchOffres} />
                             ) : (

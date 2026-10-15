@@ -17,7 +17,7 @@ import {
     Users,
 } from 'lucide-react';
 import { getCachedJson, getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, TableSkeleton, CandidaturesOffresSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { SaisirRhCandidatureModal } from '../components/modals/SaisirRhCandidatureModal';
 import { formatDate } from '../utils/formatters';
@@ -321,6 +321,10 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
         );
     }
 
+    if (loading && candidatures.length === 0) {
+        return <CandidaturesOffresSkeleton />;
+    }
+
     return (
         <div className="view-stack">
             {/* BARRE DE FILTRES GLOBALE */}
@@ -618,10 +622,7 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
                             </div>
 
                             {loading ? (
-                                <LoadingState
-                                    message="Chargement des offres..."
-                                    subtitle="Préparation des dossiers par offre"
-                                />
+                                <TableSkeleton rows={4} cols={4} />
                             ) : error ? (
                                 <ErrorState message={error} onRetry={loadData} />
                             ) : !filteredOffresForRightCol.length ? (
@@ -849,10 +850,7 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
                                                                 </div>
 
                                                                 {loadingVivierByDir[currentDirId] ? (
-                                                                    <LoadingState
-                                                                        message="Chargement des candidatures en vivier..."
-                                                                        subtitle="Filtrage des talents par domaine rattaché à cette direction"
-                                                                    />
+                                                                    <TableSkeleton rows={3} cols={6} />
                                                                 ) : !filteredVivierCands.length ? (
                                                                     <div className="empty-state" style={{ padding: '24px' }}>
                                                                         Aucune candidature en vivier n'a été trouvée pour les domaines rattachés à cette direction.
@@ -1050,10 +1048,7 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
                             </div>
 
                             {loading ? (
-                                <LoadingState
-                                    message="Chargement des candidatures sur offre..."
-                                    subtitle="Extraction des dossiers par direction et statut"
-                                />
+                                <TableSkeleton rows={6} cols={5} />
                             ) : error ? (
                                 <ErrorState message={error} onRetry={loadData} />
                             ) : !candidatures.length ? (

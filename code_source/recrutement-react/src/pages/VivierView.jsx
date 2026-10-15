@@ -20,7 +20,7 @@ import {
     X,
 } from 'lucide-react';
 import { getCachedJson, getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { formatDate } from '../utils/formatters';
 import { CandidatureDetailView } from './CandidatureDetailView';
@@ -265,10 +265,7 @@ export function VivierView({ referentiels }) {
                 </div>
 
                 {loading ? (
-                    <LoadingState
-                        message="Chargement du vivier de talents..."
-                        subtitle="Agrégation des candidatures et profils RH qualifiés"
-                    />
+                    <TableSkeleton rows={6} cols={6} />
                 ) : error ? (
                     <ErrorState message={error} onRetry={loadVivier} />
                 ) : !vivierList.length ? (
@@ -413,7 +410,11 @@ export function VivierView({ referentiels }) {
                         {/* LISTE DES CANDIDATURES TROUVÉES */}
                         <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
                             {searchingCands ? (
-                                <LoadingState />
+                                <div style={{ display: 'grid', gap: '8px', padding: '8px 0' }}>
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="skeleton-box" style={{ height: '56px', borderRadius: '8px' }} />
+                                    ))}
+                                </div>
                             ) : !candSearchResults.length ? (
                                 <div className="empty-state" style={{ padding: '30px 20px' }}>
                                     Aucune candidature trouvée avec ce critère de recherche.

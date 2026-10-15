@@ -18,7 +18,7 @@ import {
     X,
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { RowActions } from '../components/common/RowActions';
 import { CompetenceModal } from '../components/modals/CompetenceModal';
@@ -1056,10 +1056,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                 {error ? (
                     <ErrorState message={error} onRetry={loadOffers} />
                 ) : loading ? (
-                    <LoadingState
-                        message="Chargement des offres d'emploi..."
-                        subtitle="Récupération du catalogue et des critères de recrutement"
-                    />
+                    <TableSkeleton rows={6} cols={6} />
                 ) : (
                     <OffersTable
                         offers={offersResponse.data}

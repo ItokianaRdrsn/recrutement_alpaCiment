@@ -6,6 +6,30 @@ export function formatDate(value) {
     return new Intl.DateTimeFormat('fr-FR').format(new Date(value));
 }
 
+export function formatTime(value) {
+    if (!value) {
+        return '-';
+    }
+
+    const match = String(value).match(/(\d{2}):(\d{2})/);
+    if (match) {
+        return `${match[1]}:${match[2]}`;
+    }
+
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return '-';
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+export function formatDateTime(value) {
+    if (!value) {
+        return '-';
+    }
+
+    return `${formatDate(value)} à ${formatTime(value)}`;
+}
+
 export const emptyOfferForm = {
     id: null,
     titre_poste: '',

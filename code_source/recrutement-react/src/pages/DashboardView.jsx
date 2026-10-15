@@ -32,7 +32,7 @@ import {
     Zap,
 } from 'lucide-react';
 import { getJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { DashboardSkeleton, ErrorState, LoadingState } from '../components/common/FeedbackStates';
 import { OffersTable } from './OffersTable';
 
 export function DashboardView({ onSelectOffer }) {
@@ -197,6 +197,10 @@ export function DashboardView({ onSelectOffer }) {
             };
         });
     }, [repartitionCanaux, totalCanaux]);
+
+    if (loading && !dashboard) {
+        return <DashboardSkeleton />;
+    }
 
     if (error && !dashboard) {
         return <ErrorState message={error} onRetry={loadDashboard} />;
@@ -410,16 +414,9 @@ export function DashboardView({ onSelectOffer }) {
                 </div>
             </header>
 
-            {loading && !dashboard ? (
-                <LoadingState message="Génération en direct des indicateurs décisionnels..." />
-            ) : (
-                <>
-                    {/* ================================================================= */}
-                    {/* 1. RUBAN KPI HAUTE DENSITÉ (6 MICRO-INDICATEURS EN UNE SEULE LIGNE) */}
-                    {/* ================================================================= */}
-                    {/* ================================================================= */}
-                    {/* 1. RUBAN KPI HAUTE DENSITÉ (6 MICRO-INDICATEURS AVEC SPARKLINES) */}
-                    {/* ================================================================= */}
+            {/* ================================================================= */}
+            {/* 1. RUBAN KPI HAUTE DENSITÉ (6 MICRO-INDICATEURS AVEC SPARKLINES) */}
+            {/* ================================================================= */}
                     <section
                         style={{
                             display: 'grid',
@@ -1192,8 +1189,6 @@ export function DashboardView({ onSelectOffer }) {
 
                         <OffersTable compact offers={offresRecentes} onSelectOffer={onSelectOffer} />
                     </section>
-                </>
-            )}
         </div>
     );
 }

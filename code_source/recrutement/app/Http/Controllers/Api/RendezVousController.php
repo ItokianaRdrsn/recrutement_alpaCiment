@@ -80,11 +80,25 @@ class RendezVousController extends Controller
     }
 
     /**
+     * Résoudre l'instance RendezVous de manière défensive (Model Binding ou ID).
+     */
+    protected function resolveRendezVous($rendezVous): RendezVous
+    {
+        if ($rendezVous instanceof RendezVous && $rendezVous->exists) {
+            return $rendezVous;
+        }
+
+        $id = is_object($rendezVous) ? ($rendezVous->id_rendez_vous ?? null) : $rendezVous;
+        return RendezVous::findOrFail($id);
+    }
+
+    /**
      * Détails d'un rendez-vous.
      */
-    public function show(RendezVous $rendezVous): JsonResponse
+    public function show($rendezVous): JsonResponse
     {
-        $rendezVous->load([
+        $rdv = $this->resolveRendezVous($rendezVous);
+        $rdv->load([
             'candidature.candidat',
             'candidature.offre',
             'utilisateur',
@@ -94,16 +108,19 @@ class RendezVousController extends Controller
         ]);
 
         return response()->json([
-            'data' => new RendezVousResource($rendezVous),
+            'data' => new RendezVousResource($rdv),
         ]);
     }
 
     /**
      * Modifier un rendez-vous (reprogrammation date/heure, statut, lieu).
      */
-    public function update(Request $request, RendezVous $rendezVous): JsonResponse
+    public function update(Request $request, $rendezVous): JsonResponse
     {
+        $rdvInstance = $this->resolveRendezVous($rendezVous);
+
         $validated = $request->validate([
+            'id_candidature' => 'nullable|integer|exists:candidature,id_candidature',
             'id_utilisateur' => 'nullable|integer|exists:utilisateur,id_utilisateur',
             'id_type_rendez_vous' => 'nullable|integer|exists:type_rendez_vous,id_type_rendez_vous',
             'id_statut_rendez_vous' => 'nullable|integer|exists:statut_rendez_vous,id_statut_rendez_vous',
@@ -112,10 +129,12 @@ class RendezVousController extends Controller
             'date_fin' => 'nullable|date',
             'details_lieu' => 'nullable|string|max:500',
             'commentaire' => 'nullable|string|max:2000',
+            'id_statut_candidature_cible' => 'nullable|integer|exists:statut_candidature,id_statut_candidature',
+            'envoyer_notification_email' => 'nullable|boolean',
         ]);
 
         try {
-            $rdv = $this->rendezVousService->modifier($rendezVous, $validated);
+            $rdv = $this->rendezVousService->modifier($rdvInstance, $validated);
 
             return response()->json([
                 'message' => 'Rendez-vous mis à jour avec succès.',
@@ -129,10 +148,11 @@ class RendezVousController extends Controller
     /**
      * Annuler un rendez-vous (changement statut vers Annulé).
      */
-    public function cancel(Request $request, RendezVous $rendezVous): JsonResponse
+    public function cancel(Request $request, $rendezVous): JsonResponse
     {
+        $rdvInstance = $this->resolveRendezVous($rendezVous);
         $motif = $request->input('motif');
-        $rdv = $this->rendezVousService->annuler($rendezVous, $motif);
+        $rdv = $this->rendezVousService->annuler($rdvInstance, $motif);
 
         return response()->json([
             'message' => 'Rendez-vous annulé.',
@@ -143,9 +163,10 @@ class RendezVousController extends Controller
     /**
      * Suppression définitive.
      */
-    public function destroy(RendezVous $rendezVous): JsonResponse
+    public function destroy($rendezVous): JsonResponse
     {
-        $this->rendezVousService->supprimer($rendezVous);
+        $rdvInstance = $this->resolveRendezVous($rendezVous);
+        $this->rendezVousService->supprimer($rdvInstance);
 
         return response()->json([
             'message' => 'Rendez-vous supprimé avec succès.',

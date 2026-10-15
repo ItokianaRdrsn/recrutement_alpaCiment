@@ -15,7 +15,7 @@ import {
     Zap,
 } from 'lucide-react';
 import { getJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
 
 export function PipelineMonitoringView() {
     const [metrics, setMetrics] = useState([]);
@@ -506,7 +506,7 @@ export function PipelineMonitoringView() {
             {error ? (
                 <ErrorState message={error} />
             ) : loading ? (
-                <LoadingState message="Chargement des métriques du pipeline..." />
+                <TableSkeleton rows={6} cols={7} />
             ) : metrics.length === 0 ? (
                 <div
                     style={{

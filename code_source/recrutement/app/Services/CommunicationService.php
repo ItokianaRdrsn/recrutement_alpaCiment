@@ -45,6 +45,14 @@ class CommunicationService
         $modeRdv = '';
         $lieuRdv = '';
 
+        if (!$rdv && $candidature->exists) {
+            try {
+                $rdv = $candidature->rendezVous()->with('modeRealisation')->latest('date_debut')->first();
+            } catch (\Throwable) {
+                $rdv = null;
+            }
+        }
+
         if ($rdv) {
             $dateDebut = Carbon::parse($rdv->date_debut);
             $dateFin = Carbon::parse($rdv->date_fin);

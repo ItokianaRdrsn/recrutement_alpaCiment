@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { CheckCircle2, Plus, RefreshCw } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, ReferentialsSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { RowActions } from '../components/common/RowActions';
 import { SimpleTable } from '../components/common/SimpleTable';
@@ -88,7 +88,7 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
     }
 
     if (loading) {
-        return <LoadingState />;
+        return <ReferentialsSkeleton />;
     }
 
     return (

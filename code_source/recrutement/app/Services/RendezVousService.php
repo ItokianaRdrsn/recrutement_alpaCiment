@@ -187,31 +187,79 @@ class RendezVousService
     {
         $idUtilisateurConnecte = $idUtilisateurConnecte ?? Auth::id() ?? 1;
 
-        if (!empty($data['date_debut']) && !empty($data['date_fin'])) {
-            $dateDebut = Carbon::parse($data['date_debut']);
-            $dateFin = Carbon::parse($data['date_fin']);
+        $debut = isset($data['date_debut']) ? Carbon::parse($data['date_debut']) : $rendezVous->date_debut;
+        $fin = isset($data['date_fin']) ? Carbon::parse($data['date_fin']) : $rendezVous->date_fin;
 
-            if ($dateFin->lte($dateDebut)) {
-                throw new InvalidArgumentException('La date de fin doit être strictement supérieure à la date de début.');
-            }
-            $data['date_debut'] = $dateDebut;
-            $data['date_fin'] = $dateFin;
+        if ($debut && $fin && $fin->lte($debut)) {
+            throw new InvalidArgumentException('La date de fin doit être strictement supérieure à la date de début.');
         }
+
+        if (isset($data['date_debut'])) {
+            $data['date_debut'] = $debut;
+        }
+        if (isset($data['date_fin'])) {
+            $data['date_fin'] = $fin;
+        }
+
+        // Extraire et nettoyer les données hors modèle RendezVous
+        $idStatutCandidatureCible = $data['id_statut_candidature_cible'] ?? null;
+        unset($data['id_statut_candidature_cible']);
+
+        $envoyerNotificationEmail = $data['envoyer_notification_email'] ?? false;
+        unset($data['envoyer_notification_email']);
 
         $anciennesValeurs = $rendezVous->toArray();
         $rendezVous->update($data);
 
+        // Optionnel : synchronisation du statut de la candidature
+        if ($idStatutCandidatureCible && $rendezVous->candidature) {
+            $nouveauStatut = StatutCandidature::find($idStatutCandidatureCible);
+            if ($nouveauStatut && $rendezVous->candidature->id_statut_candidature !== $nouveauStatut->id_statut_candidature) {
+                $candidature = $rendezVous->candidature;
+                $ancienStatutId = $candidature->id_statut_candidature;
+                $candidature->update(['id_statut_candidature' => $nouveauStatut->id_statut_candidature]);
+
+                HistoriqueStatut::create([
+                    'id_candidature' => $candidature->id_candidature,
+                    'id_statut_candidature' => $nouveauStatut->id_statut_candidature,
+                    'commentaire' => 'Mise à jour suite modification du RDV #' . $rendezVous->id_rendez_vous,
+                    'id_utilisateur' => $idUtilisateurConnecte,
+                    'date_changement' => now(),
+                ]);
+
+                $this->auditLogService->log(
+                    action: 'CHANGEMENT_STATUT_CANDIDAT',
+                    entite: 'Candidature',
+                    idEntite: $candidature->id_candidature,
+                    description: "Statut changé vers {$nouveauStatut->libelle} lors de la modification du RDV #{$rendezVous->id_rendez_vous}",
+                    anciennesValeurs: ['id_statut_candidature' => $ancienStatutId],
+                    nouvellesValeurs: ['id_statut_candidature' => $nouveauStatut->id_statut_candidature],
+                    idUtilisateur: $idUtilisateurConnecte
+                );
+            }
+        }
+
+        // Notification email si demandée explicitement
+        if ($envoyerNotificationEmail) {
+            try {
+                $this->communicationService->envoyerConvocation($rendezVous, null, $idUtilisateurConnecte);
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Erreur renvoi email RDV #{$rendezVous->id_rendez_vous}: " . $e->getMessage());
+            }
+        }
+
+        $fresh = $rendezVous->fresh();
         $this->auditLogService->log(
             action: 'MODIFICATION_RDV',
             entite: 'RendezVous',
             idEntite: $rendezVous->id_rendez_vous,
             description: "Modification du rendez-vous #{$rendezVous->id_rendez_vous}",
             anciennesValeurs: $anciennesValeurs,
-            nouvellesValeurs: $rendezVous->fresh()->toArray(),
+            nouvellesValeurs: $fresh ? $fresh->toArray() : [],
             idUtilisateur: $idUtilisateurConnecte
         );
 
-        return $rendezVous->fresh()->load([
+        return ($fresh ?? $rendezVous)->load([
             'candidature.candidat',
             'candidature.offre',
             'utilisateur',

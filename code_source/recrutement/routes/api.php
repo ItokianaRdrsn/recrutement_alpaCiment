@@ -200,7 +200,7 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     // --- GESTION DES RENDEZ-VOUS & AGENDA RH (Sprint 6) ---
     Route::get('/rendez-vous/referentiels', [\App\Http\Controllers\Api\RendezVousController::class, 'referentiels'])->name('api.rendez-vous.referentiels');
     Route::post('/rendez-vous/{rendezVous}/annuler', [\App\Http\Controllers\Api\RendezVousController::class, 'cancel'])->name('api.rendez-vous.cancel');
-    Route::apiResource('rendez-vous', \App\Http\Controllers\Api\RendezVousController::class);
+    Route::apiResource('rendez-vous', \App\Http\Controllers\Api\RendezVousController::class)->parameters(['rendez-vous' => 'rendezVous']);
 
     // --- MODULE DE COMMUNICATION & MODÈLES D'EMAILS (Sprint 6) ---
     Route::get('/modeles-messages/referentiels', [\App\Http\Controllers\Api\ModeleMessageController::class, 'referentiels'])->name('api.modeles-messages.referentiels');

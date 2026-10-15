@@ -65,11 +65,20 @@ export function RendezVousModal({
     const [error, setError] = useState('');
 
     // Format local datetime for input (YYYY-MM-DDTHH:mm)
-    const toLocalInputString = (isoString) => {
-        if (!isoString) return '';
-        const d = new Date(isoString);
+    const toLocalInputString = (dateVal) => {
+        if (!dateVal) return '';
+        if (typeof dateVal === 'string' && /^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}/.test(dateVal)) {
+            return dateVal.replace(' ', 'T').slice(0, 16);
+        }
+        const d = new Date(dateVal);
+        if (isNaN(d.getTime())) return '';
         const pad = (n) => String(n).padStart(2, '0');
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    };
+
+    const formatDateTimePayload = (str) => {
+        if (!str) return null;
+        return str.replace('T', ' ') + (str.length === 16 ? ':00' : '');
     };
 
     useEffect(() => {
@@ -92,14 +101,13 @@ export function RendezVousModal({
             setIdStatutRendezVous('1');
             setIdModeRealisation('1');
             setIdUtilisateur('');
-            // Par défaut créneau de 1 heure demain à 09:00
+            // Par défaut créneau de 1 heure demain à 09:00 (heure locale)
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(9, 0, 0, 0);
-            const endTomorrow = new Date(tomorrow);
-            endTomorrow.setHours(10, 0, 0, 0);
-            setDateDebut(toLocalInputString(tomorrow.toISOString()));
-            setDateFin(toLocalInputString(endTomorrow.toISOString()));
+            const pad = (n) => String(n).padStart(2, '0');
+            const tomorrowStr = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
+            setDateDebut(`${tomorrowStr}T09:00`);
+            setDateFin(`${tomorrowStr}T10:00`);
             setDetailsLieu('');
             setCommentaire('');
             setUpdateCandidatureStatut(false);
@@ -170,8 +178,8 @@ export function RendezVousModal({
                 id_statut_rendez_vous: parseInt(idStatutRendezVous, 10),
                 id_mode_realisation: parseInt(idModeRealisation, 10),
                 id_utilisateur: idUtilisateur ? parseInt(idUtilisateur, 10) : null,
-                date_debut: new Date(dateDebut).toISOString(),
-                date_fin: new Date(dateFin).toISOString(),
+                date_debut: formatDateTimePayload(dateDebut),
+                date_fin: formatDateTimePayload(dateFin),
                 details_lieu: detailsLieu.trim() || null,
                 commentaire: commentaire.trim() || null,
                 envoyer_notification_email: envoyerNotificationEmail,

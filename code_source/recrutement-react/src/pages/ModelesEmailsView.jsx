@@ -16,7 +16,7 @@ import {
     X,
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { CardsGridSkeleton, ErrorState, LoadingState } from '../components/common/FeedbackStates';
 
 export function ModelesEmailsView() {
     const [modeles, setModeles] = useState([]);
@@ -206,7 +206,7 @@ export function ModelesEmailsView() {
         return true;
     });
 
-    if (loading) return <LoadingState message="Chargement des modèles d'e-mails..." />;
+    if (loading) return <CardsGridSkeleton count={6} />;
     if (error) return <ErrorState message={error} onRetry={loadData} />;
 
     return (
@@ -607,7 +607,10 @@ export function ModelesEmailsView() {
                         </div>
 
                         {previewLoading ? (
-                            <LoadingState message="Génération de l'aperçu..." />
+                            <div style={{ display: 'grid', gap: '14px', padding: '16px 0' }}>
+                                <div className="skeleton-box" style={{ width: '100%', height: '52px', borderRadius: '8px' }} />
+                                <div className="skeleton-box" style={{ width: '100%', height: '220px', borderRadius: '8px' }} />
+                            </div>
                         ) : previewData ? (
                             <div style={{ display: 'grid', gap: '12px' }}>
                                 <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '13.5px' }}>

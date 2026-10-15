@@ -10,7 +10,7 @@ import {
     UserPlus,
 } from 'lucide-react';
 import { getCachedJson, getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, TableSkeleton, CandidaturesSpontaneesSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { SaisirRhCandidatureModal } from '../components/modals/SaisirRhCandidatureModal';
 import { formatDate } from '../utils/formatters';
@@ -161,6 +161,10 @@ export function CandidaturesSpontaneesView({ referentiels, competencesData }) {
         );
     }
 
+    if (loading && candidatures.length === 0) {
+        return <CandidaturesSpontaneesSkeleton />;
+    }
+
     return (
         <div className="view-stack">
             {/* BARRE DE FILTRES GLOBALE */}
@@ -284,10 +288,7 @@ export function CandidaturesSpontaneesView({ referentiels, competencesData }) {
                 </div>
 
                 {loading ? (
-                    <LoadingState
-                        message="Chargement des candidatures spontanées..."
-                        subtitle="Récupération des profils et compétences déclarées"
-                    />
+                    <TableSkeleton rows={6} cols={5} />
                 ) : error ? (
                     <ErrorState message={error} onRetry={loadData} />
                 ) : !candidatures.length ? (

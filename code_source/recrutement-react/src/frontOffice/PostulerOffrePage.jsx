@@ -64,8 +64,25 @@ export default function PostulerOffrePage({ backendPath, getJson, idOffre, onNav
 
     if (loading) {
         return (
-            <div className="portal-container" style={{ padding: '40px', textAlign: 'center' }}>
-                <p>Chargement de l'offre d'emploi...</p>
+            <div className="portal-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '30px 20px' }}>
+                <div className="skeleton-box" style={{ width: '160px', height: '36px', marginBottom: '20px', borderRadius: '8px' }} />
+                <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+                    <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '16px', marginBottom: '20px' }}>
+                        <div className="skeleton-box" style={{ width: '220px', height: '16px', marginBottom: '8px' }} />
+                        <div className="skeleton-box" style={{ width: '60%', height: '28px', marginBottom: '8px' }} />
+                        <div className="skeleton-box" style={{ width: '40%', height: '16px' }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                        <div className="skeleton-box" style={{ height: '42px', borderRadius: '8px' }} />
+                        <div className="skeleton-box" style={{ height: '42px', borderRadius: '8px' }} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                        <div className="skeleton-box" style={{ height: '42px', borderRadius: '8px' }} />
+                        <div className="skeleton-box" style={{ height: '42px', borderRadius: '8px' }} />
+                    </div>
+                    <div className="skeleton-box" style={{ height: '90px', borderRadius: '8px', marginBottom: '16px' }} />
+                    <div className="skeleton-box" style={{ width: '180px', height: '44px', borderRadius: '8px' }} />
+                </div>
             </div>
         );
     }
