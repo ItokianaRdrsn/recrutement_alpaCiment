@@ -20,7 +20,7 @@ import {
     X,
 } from 'lucide-react';
 import { getCachedJson, getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, TableSkeleton, VivierSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { formatDate } from '../utils/formatters';
 import { CandidatureDetailView } from './CandidatureDetailView';
@@ -32,7 +32,7 @@ export function VivierView({ referentiels }) {
     const [error, setError] = useState('');
     const [selectedCandidatureId, setSelectedCandidatureId] = useState(null);
     const [page, setPage] = useState(1);
-    const perPage = 10;
+    const [perPage, setPerPage] = useState(10);
 
     const [searchParams, setSearchParams] = useSearchParams();
     const urlCandidatureId = searchParams.get('candidature') || searchParams.get('id');
@@ -179,6 +179,10 @@ export function VivierView({ referentiels }) {
                 statutsList={statutsList}
             />
         );
+    }
+
+    if (loading && vivierList.length === 0) {
+        return <VivierSkeleton />;
     }
 
     return (
@@ -334,8 +338,14 @@ export function VivierView({ referentiels }) {
                         current_page: page,
                         last_page: Math.ceil(vivierList.length / perPage) || 1,
                         total: vivierList.length,
+                        from: vivierList.length > 0 ? (page - 1) * perPage + 1 : 0,
+                        to: Math.min(page * perPage, vivierList.length),
                     }}
                     onChangePage={(p) => setPage(p)}
+                    onChangePerPage={(n) => {
+                        setPerPage(n);
+                        setPage(1);
+                    }}
                     perPage={perPage}
                 />
             </section>

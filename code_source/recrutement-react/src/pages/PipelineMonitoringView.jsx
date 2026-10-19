@@ -15,7 +15,8 @@ import {
     Zap,
 } from 'lucide-react';
 import { getJson } from '../api/client';
-import { ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, PipelineMonitoringSkeleton, TableSkeleton } from '../components/common/FeedbackStates';
+import { Pagination } from '../components/common/Pagination';
 
 export function PipelineMonitoringView() {
     const [metrics, setMetrics] = useState([]);
@@ -39,17 +40,20 @@ export function PipelineMonitoringView() {
     const [intentionFilter, setIntentionFilter] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [perPage, setPerPage] = useState(10);
 
     // Modale de détail d'une exécution
     const [selectedMetric, setSelectedMetric] = useState(null);
 
     const loadMetrics = useCallback(
-        async (page = 1) => {
+        async (page = 1, customPerPage = null) => {
             setLoading(true);
             setError('');
             try {
+                const currentLimit = customPerPage || perPage;
                 const params = new URLSearchParams();
                 params.set('page', page.toString());
+                params.set('per_page', currentLimit.toString());
                 if (statutFilter) params.set('statut', statutFilter);
                 if (intentionFilter) params.set('intention', intentionFilter);
                 if (searchQuery) params.set('q', searchQuery);
@@ -69,7 +73,7 @@ export function PipelineMonitoringView() {
                 setLoading(false);
             }
         },
-        [statutFilter, intentionFilter, searchQuery]
+        [statutFilter, intentionFilter, searchQuery, perPage]
     );
 
     useEffect(() => {
@@ -227,6 +231,10 @@ export function PipelineMonitoringView() {
     };
 
     const hasFilters = Boolean(statutFilter || intentionFilter || searchQuery);
+
+    if (loading && metrics.length === 0) {
+        return <PipelineMonitoringSkeleton />;
+    }
 
     return (
         <div className="pipeline-monitoring-page" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -645,40 +653,17 @@ export function PipelineMonitoringView() {
                     </div>
 
                     {/* Pagination */}
-                    {meta.last_page > 1 && (
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                padding: '12px 16px',
-                                borderTop: '1px solid #e2e8f0',
-                                background: '#f8fafc',
+                    <div style={{ padding: '0 16px' }}>
+                        <Pagination
+                            meta={meta}
+                            onChangePage={(p) => loadMetrics(p, perPage)}
+                            onChangePerPage={(n) => {
+                                setPerPage(n);
+                                loadMetrics(1, n);
                             }}
-                        >
-                            <span style={{ fontSize: '0.82rem', color: '#64748b' }}>
-                                Page {meta.current_page} sur {meta.last_page} ({meta.total} exécutions)
-                            </span>
-                            <div style={{ display: 'flex', gap: '8px' }}>
-                                <button
-                                    className="action-button secondary"
-                                    disabled={meta.current_page <= 1}
-                                    onClick={() => loadMetrics(meta.current_page - 1)}
-                                    type="button"
-                                >
-                                    Précédent
-                                </button>
-                                <button
-                                    className="action-button secondary"
-                                    disabled={meta.current_page >= meta.last_page}
-                                    onClick={() => loadMetrics(meta.current_page + 1)}
-                                    type="button"
-                                >
-                                    Suivant
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                            perPage={perPage}
+                        />
+                    </div>
                 </div>
             )}
 

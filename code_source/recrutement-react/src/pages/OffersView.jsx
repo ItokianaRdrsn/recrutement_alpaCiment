@@ -18,7 +18,7 @@ import {
     X,
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, OffersSkeleton, TableSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { RowActions } from '../components/common/RowActions';
 import { CompetenceModal } from '../components/modals/CompetenceModal';
@@ -34,6 +34,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         statut: '',
         type_contrat: '',
         page: 1,
+        per_page: 10,
     });
     const [appliedFilters, setAppliedFilters] = useState({
         q: '',
@@ -41,6 +42,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         statut: '',
         type_contrat: '',
         page: 1,
+        per_page: 10,
     });
     const [saisirRhOffreId, setSaisirRhOffreId] = useState(null);
     const [offersResponse, setOffersResponse] = useState({ data: [], meta: null });
@@ -98,7 +100,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
             }
         });
 
-        params.set('per_page', '10');
+        params.set('per_page', String(appliedFilters.per_page || 10));
 
         return params.toString();
     }, [appliedFilters]);
@@ -152,7 +154,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
     }
 
     function handleResetFilters() {
-        const reset = { q: '', direction: '', statut: '', type_contrat: '', page: 1 };
+        const reset = { q: '', direction: '', statut: '', type_contrat: '', page: 1, per_page: 10 };
         setFilters(reset);
         setAppliedFilters(reset);
     }
@@ -165,6 +167,19 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         setAppliedFilters((current) => ({
             ...current,
             page,
+        }));
+    }
+
+    function changePerPage(perPage) {
+        setFilters((current) => ({
+            ...current,
+            per_page: perPage,
+            page: 1,
+        }));
+        setAppliedFilters((current) => ({
+            ...current,
+            per_page: perPage,
+            page: 1,
         }));
     }
 
@@ -963,6 +978,10 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         );
     }
 
+    if (loading && offersResponse.data.length === 0) {
+        return <OffersSkeleton />;
+    }
+
     return (
         <div className="view-stack">
             <section className="filter-bar" aria-label="Filtres des offres">
@@ -1067,7 +1086,14 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                     />
                 )}
 
-                {meta ? <Pagination meta={meta} onChangePage={changePage} /> : null}
+                {meta ? (
+                    <Pagination
+                        meta={meta}
+                        onChangePage={changePage}
+                        onChangePerPage={changePerPage}
+                        perPage={appliedFilters.per_page || 10}
+                    />
+                ) : null}
             </section>
 
             {saisirRhOffreId ? (

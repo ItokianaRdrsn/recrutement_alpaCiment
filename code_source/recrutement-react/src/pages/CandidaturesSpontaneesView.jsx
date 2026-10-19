@@ -35,7 +35,7 @@ export function CandidaturesSpontaneesView({ referentiels, competencesData }) {
     }, [urlCandidatureId]);
 
     const [page, setPage] = useState(1);
-    const [perPage, setPerPage] = useState(50);
+    const [perPage, setPerPage] = useState(10);
     const [paginationMeta, setPaginationMeta] = useState({ current_page: 1, last_page: 1, total: 0, from: 0, to: 0 });
 
     const initialFilters = {
@@ -374,7 +374,15 @@ export function CandidaturesSpontaneesView({ referentiels, competencesData }) {
                     </div>
                 )}
 
-                <Pagination meta={paginationMeta} onChangePage={(p) => setPage(p)} perPage={perPage} />
+                <Pagination
+                    meta={paginationMeta}
+                    onChangePage={(p) => setPage(p)}
+                    onChangePerPage={(n) => {
+                        setPerPage(n);
+                        setPage(1);
+                    }}
+                    perPage={perPage}
+                />
             </div>
 
             {/* MODAL SAISIR MANUELLE RH */}

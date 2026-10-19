@@ -2188,6 +2188,77 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **Compilation Vite React** : **Compilé avec succès en 1.17s (0 erreur, 0 avertissement)**.
    - **Cohérence Visuelle Absolue** : Aucun pop-in de contenu, aucune disparition prématurée du skeleton.
 
+---
+
+### Demande 136 (Universal 1:1 Full-Page Skeleton Loaders across all Remaining Views) : Généralisation des Squelettes Pleine Page Structurels 1:1 à Toutes les Vues de l'Application
+> **User Prompt :** *"okey fais pareil avec les pages qui ne sont pas encore parfaites"*
+1. **Audit Global et Normalisation des Vues Restantes** :
+   - Analyse exhaustive de l'ensemble des pages de l'application pour garantir que chaque vue dispose d'un squelette structurel pleine page 1:1 reprenant exactement ses balises DOM réelles, ses classes CSS de conteneur, ses espacements et ses dimensions sans Cumulative Layout Shift (CLS = 0).
+2. **Nouveaux Squelettes Pleine Page Implémentés ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
+   - **`OffersSkeleton`** (pour [`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx)) :
+     - Conteneur `.view-stack`.
+     - Barre de filtres `.filter-bar` complète : champ de recherche avec icône, selects Direction, Statut, Contrat, et boutons Filtrer / Réinitialiser.
+     - Section de données `.data-section` : en-tête avec titre "Liste des offres", compteur et boutons d'action (Nouvelle offre, Actualiser), tableau des offres avec chevrons d'expansion, références, titres, direction, contrat, badge candidatures, dates et boutons d'actions contextuelles.
+   - **`VivierSkeleton`** (pour [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx)) :
+     - Conteneur `.view-stack`.
+     - Barre de filtres complète avec recherche, sélection de direction, sélection de domaine d'expertise validé, boutons de filtrage et bouton "+ Ajouter au vivier RH".
+     - Section `.data-section` avec en-tête et tableau à 6 colonnes (Candidat, Candidature / Direction & Domaine, Motif, Date, Statut, Actions de consultation et suppression).
+   - **`ModelesEmailsSkeleton`** (pour [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx)) :
+     - Conteneur `.view-container` (padding: 24px).
+     - En-tête de la page avec titre "Modèles d'E-mails RH", sous-titre explicatif et boutons "Actualiser" et "+ Nouveau modèle".
+     - Barre de filtres avec recherche plein texte, sélection des types de messages et filtre d'activation.
+     - Grille responsive (`grid-template-columns: repeat(auto-fill, minmax(340px, 1fr))`) de 6 cartes de templates d'e-mails complètes (badges de type, statut auto/manuel, titre, objet, déclencheur de statut, extrait de corps et barre d'actions avec switch et boutons de copie/modification/suppression).
+   - **`AuditLogsSkeleton`** (pour [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx)) :
+     - Conteneur `.audit-logs-page` (padding: 24px).
+     - En-tête avec titre "Journal d’Audit & Traçabilité RH", descriptif et bouton Actualiser.
+     - Barre d'outils multi-filtres (champ de recherche dans description, selects Action et Entité, dates début et fin, boutons Filtrer et Réinitialiser).
+     - Table d'audit de 8 lignes complètes (Date & Heure, Utilisateur et rôle, badge d'Action coloré, Entité/ID, Description, et bouton de modal de détails).
+   - **`PipelineMonitoringSkeleton`** (pour [`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx)) :
+     - Conteneur `.pipeline-monitoring-page` (padding: 24px).
+     - En-tête avec titre "Monitoring du Pipeline IA & n8n" et bouton d'actualisation.
+     - Grille des 7 cartes KPIs (Exécutions Pipeline, Taux de Fiabilité, Durée Moy. OCR, Durée Moy. NER, Temps Total, Doublons Évités, Erreurs DLQ).
+     - Barre de filtres (recherche, statut et intention).
+     - Table de supervision du pipeline de 6 lignes avec badges de statut, intentions, durées et actions.
+   - **`ReferentialsSkeleton` (Perfectionné)** (pour [`ReferentialsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ReferentialsView.jsx)) :
+     - Réaligné sur les vraies classes CSS : `.view-stack`, `.sub-nav-tabs` (4 onglets de sous-navigation), `.management-grid` avec 2 cartes `.data-section` pour Directions et Domaines avec tables, boutons d'ajout et pagination.
+   - **`PublicOffersSkeleton` (Perfectionné)** (pour [`PublicOffresPage.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx)) :
+     - Réaligné fidèlement sur les cartes d'annonces Bootstrap du front-office (`.card.p-0.mb-3.border-1.shadow-sm`) avec badge de contrat, titre d'annonce, date limite avec icône horloge, localisation avec marqueur, et chevron de consultation.
+---
+
+### Demande 137 (Pagination Enhancement : Sélecteur d'Éléments par Page (10 par défaut) & Remontée Automatique en Haut de Liste) : Amélioration Globale du Composant Pagination et des Vues
+> **User Prompt :** *"pour les pagination aussi fais en sorte que je puisse choisir le nombre d'elements et fais 10 de base et lorsque je clique sur suivant je veux que ca revienne en haut de la liste"*
+1. **Évolution du Composant Central [`Pagination.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/Pagination.jsx)** :
+   - **Sélecteur du nombre d'éléments par page** : Ajout d'une liste déroulante ergonomique proposant les paliers standards `[10, 20, 50, 100]` par page, avec **10 comme valeur par défaut stricte**.
+   - **Remontée automatique en haut de liste (Auto-Scroll)** :
+     - Implémentation de la fonction `scrollToTop()` déclenchée à chaque clic de pagination ("Suivant", "Précédent", ou modification du nombre d'éléments par page).
+     - Détection dynamique du conteneur de liste/tableau parent le plus proche (`.data-section`, `.table-wrap`, `.candidatures-right-column`, `.audit-logs-page`, `.pipeline-monitoring-page`, `.view-stack`) avec appel `scrollIntoView({ behavior: 'smooth', block: 'start' })` et repli fluide vers le haut de fenêtre (`window.scrollTo({ top: 0, behavior: 'smooth' })`).
+2. **Harmonisation et Intégration sur l'Ensemble des Vues** :
+   - **[`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx)** :
+     - Remplacement de la limite initiale fixe de 50 par `perPage = 10` de base.
+     - Connexion du sélecteur `onChangePerPage` et mise à jour dynamique de la requête backend `/api/candidatures?per_page=...`.
+   - **[`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx)** :
+     - Remplacement de la limite initiale fixe de 50 par `perPage = 10` de base.
+     - Connexion de `onChangePerPage` avec réinitialisation à la page 1 et scroll en haut.
+   - **[`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx)** :
+     - Dé-durcissement du paramètre `per_page: '10'` en state réactif `filters.per_page` et `appliedFilters.per_page`.
+     - Intégration de `changePerPage(n)` et transmission à `<Pagination />`.
+   - **[`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx)** :
+     - Transformation de la constante `perPage = 10` en variable d'état `[perPage, setPerPage] = useState(10)`.
+     - Calcul dynamique des index `from` et `to` et transmission de `onChangePerPage`.
+   - **[`ReferentialsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ReferentialsView.jsx)** :
+     - Transformation de `perPage` en état dynamique réactif pour les 3 sous-onglets (Directions, Domaines, Compétences) avec reset de page associé.
+   - **[`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx)** :
+     - Remplacement de l'ancien bandeau personnalisé par le composant central `<Pagination />`.
+     - Support du paramètre d'API `/api/audit-logs?per_page=...` avec 10 entrées par défaut et sélection dynamique.
+   - **[`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx)** :
+     - Remplacement de l'ancien bandeau personnalisé par `<Pagination />`.
+     - Paramètre `per_page` dynamique dans `/api/pipeline-metrics?per_page=...` avec auto-scroll.
+3. **Validation & Contrôle** :
+   - **Compilation Vite React** : **Compilé avec succès en 2.67s (0 erreur, 0 avertissement)**.
+   - **Fluidité de navigation** : Chaque transition de page ou de calibrage d'éléments remonte automatiquement l'affichage vers le haut de la liste de manière fluide.
+
+
+
 
 
 

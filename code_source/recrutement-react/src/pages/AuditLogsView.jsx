@@ -13,7 +13,8 @@ import {
     X,
 } from 'lucide-react';
 import { getJson } from '../api/client';
-import { ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
+import { AuditLogsSkeleton, ErrorState, LoadingState, TableSkeleton } from '../components/common/FeedbackStates';
+import { Pagination } from '../components/common/Pagination';
 
 export function AuditLogsView() {
     const [logs, setLogs] = useState([]);
@@ -28,6 +29,7 @@ export function AuditLogsView() {
     const [dateDebut, setDateDebut] = useState('');
     const [dateFin, setDateFin] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [perPage, setPerPage] = useState(10);
 
     const [appliedFilters, setAppliedFilters] = useState({
         action: '',
@@ -40,12 +42,14 @@ export function AuditLogsView() {
     // Selected log for detailed diff modal
     const [selectedLog, setSelectedLog] = useState(null);
 
-    const loadLogs = useCallback(async (page = 1) => {
+    const loadLogs = useCallback(async (page = 1, customPerPage = null) => {
         setLoading(true);
         setError('');
         try {
+            const currentLimit = customPerPage || perPage;
             const params = new URLSearchParams();
             params.set('page', page.toString());
+            params.set('per_page', currentLimit.toString());
             if (appliedFilters.action) params.set('action', appliedFilters.action);
             if (appliedFilters.entite) params.set('entite', appliedFilters.entite);
             if (appliedFilters.q) params.set('q', appliedFilters.q);
@@ -63,7 +67,7 @@ export function AuditLogsView() {
         } finally {
             setLoading(false);
         }
-    }, [appliedFilters]);
+    }, [appliedFilters, perPage]);
 
     useEffect(() => {
         loadLogs(1);
@@ -116,6 +120,10 @@ export function AuditLogsView() {
             return isoString;
         }
     };
+
+    if (loading && logs.length === 0) {
+        return <AuditLogsSkeleton />;
+    }
 
     return (
         <div className="audit-logs-page" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -381,40 +389,17 @@ export function AuditLogsView() {
                 )}
 
                 {/* Pagination */}
-                {meta.last_page > 1 && (
-                    <div
-                        style={{
-                            padding: '12px 16px',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            borderTop: '1px solid #e2e8f0',
-                            background: '#f8fafc',
+                <div style={{ padding: '0 16px' }}>
+                    <Pagination
+                        meta={meta}
+                        onChangePage={(p) => loadLogs(p, perPage)}
+                        onChangePerPage={(n) => {
+                            setPerPage(n);
+                            loadLogs(1, n);
                         }}
-                    >
-                        <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
-                            Total : <strong>{meta.total}</strong> entrées (Page {meta.current_page} sur {meta.last_page})
-                        </span>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                                className="action-button secondary"
-                                disabled={currentPage <= 1 || loading}
-                                onClick={() => loadLogs(currentPage - 1)}
-                                style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-                            >
-                                Précédent
-                            </button>
-                            <button
-                                className="action-button secondary"
-                                disabled={currentPage >= meta.last_page || loading}
-                                onClick={() => loadLogs(currentPage + 1)}
-                                style={{ padding: '4px 10px', fontSize: '0.8rem' }}
-                            >
-                                Suivant
-                            </button>
-                        </div>
-                    </div>
-                )}
+                        perPage={perPage}
+                    />
+                </div>
             </div>
 
             {/* Modal Diff Viewer */}

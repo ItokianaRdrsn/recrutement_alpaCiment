@@ -22,7 +22,7 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
     const [dirPage, setDirPage] = useState(1);
     const [domPage, setDomPage] = useState(1);
     const [compPage, setCompPage] = useState(1);
-    const perPage = 10;
+    const [perPage, setPerPage] = useState(10);
 
     useEffect(() => {
         setSubTab(initialSubTab);
@@ -185,8 +185,18 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
                                 ])}
                             />
                             <Pagination
-                                meta={{ current_page: dirPage, last_page: Math.ceil(directions.length / perPage) || 1, total: directions.length }}
+                                meta={{
+                                    current_page: dirPage,
+                                    last_page: Math.ceil(directions.length / perPage) || 1,
+                                    total: directions.length,
+                                    from: directions.length > 0 ? (dirPage - 1) * perPage + 1 : 0,
+                                    to: Math.min(dirPage * perPage, directions.length),
+                                }}
                                 onChangePage={(p) => setDirPage(p)}
+                                onChangePerPage={(n) => {
+                                    setPerPage(n);
+                                    setDirPage(1);
+                                }}
                                 perPage={perPage}
                             />
                         </div>
@@ -251,8 +261,18 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
                                 ])}
                             />
                             <Pagination
-                                meta={{ current_page: domPage, last_page: Math.ceil(domaines.length / perPage) || 1, total: domaines.length }}
+                                meta={{
+                                    current_page: domPage,
+                                    last_page: Math.ceil(domaines.length / perPage) || 1,
+                                    total: domaines.length,
+                                    from: domaines.length > 0 ? (domPage - 1) * perPage + 1 : 0,
+                                    to: Math.min(domPage * perPage, domaines.length),
+                                }}
                                 onChangePage={(p) => setDomPage(p)}
+                                onChangePerPage={(n) => {
+                                    setPerPage(n);
+                                    setDomPage(1);
+                                }}
                                 perPage={perPage}
                             />
                         </div>
@@ -306,8 +326,14 @@ export function ReferentialsView({ canManage, competencesData, initialSubTab = '
                             current_page: compPage,
                             last_page: Math.ceil((competencesData.competences?.length ?? 0) / perPage) || 1,
                             total: competencesData.competences?.length ?? 0,
+                            from: (competencesData.competences?.length ?? 0) > 0 ? (compPage - 1) * perPage + 1 : 0,
+                            to: Math.min(compPage * perPage, competencesData.competences?.length ?? 0),
                         }}
                         onChangePage={(p) => setCompPage(p)}
+                        onChangePerPage={(n) => {
+                            setPerPage(n);
+                            setCompPage(1);
+                        }}
                         perPage={perPage}
                     />
                 </section>

@@ -795,24 +795,558 @@ export function CardsGridSkeleton({ count = 6 }) {
     );
 }
 
+export function OffersSkeleton() {
+    return (
+        <div className="view-stack" aria-busy="true" aria-label="Chargement des offres">
+            {/* Filter bar */}
+            <section className="filter-bar" aria-label="Filtres des offres">
+                <div className="search-field" style={{ minWidth: '220px', flex: '1 1 240px' }}>
+                    <div className="skeleton-line" style={{ width: '100%', height: '38px', borderRadius: '8px' }} />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div className="skeleton-line" style={{ width: '55px', height: '14px' }} />
+                    <div className="skeleton-line" style={{ width: '160px', height: '38px', borderRadius: '8px' }} />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div className="skeleton-line" style={{ width: '45px', height: '14px' }} />
+                    <div className="skeleton-line" style={{ width: '140px', height: '38px', borderRadius: '8px' }} />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div className="skeleton-line" style={{ width: '50px', height: '14px' }} />
+                    <div className="skeleton-line" style={{ width: '140px', height: '38px', borderRadius: '8px' }} />
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: 'auto' }}>
+                    <div className="skeleton-line" style={{ width: '85px', height: '38px', borderRadius: '8px' }} />
+                    <div className="skeleton-line" style={{ width: '110px', height: '38px', borderRadius: '8px' }} />
+                </div>
+            </section>
+
+            {/* Data section */}
+            <section className="data-section">
+                <div className="section-heading">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div className="skeleton-line skeleton-head" style={{ width: '180px', height: '22px' }} />
+                        <div className="skeleton-line" style={{ width: '120px', height: '14px' }} />
+                    </div>
+                    <div className="section-heading-actions" style={{ display: 'flex', gap: '8px' }}>
+                        <div className="skeleton-line" style={{ width: '140px', height: '36px', borderRadius: '8px' }} />
+                        <div className="skeleton-line" style={{ width: '105px', height: '36px', borderRadius: '8px' }} />
+                    </div>
+                </div>
+
+                <div className="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style={{ width: '32px' }}></th>
+                                <th>Poste</th>
+                                <th>Direction</th>
+                                <th>Contrat</th>
+                                <th style={{ textAlign: 'center' }}>Candidatures</th>
+                                <th>Publication</th>
+                                <th>Limite</th>
+                                <th>Statut</th>
+                                <th style={{ whiteSpace: 'nowrap', width: '1%' }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <tr key={i}>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: '22px', height: '22px', borderRadius: '4px' }} />
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div className="skeleton-line" style={{ width: '65px', height: '18px', borderRadius: '4px' }} />
+                                            <div className="skeleton-line" style={{ width: i % 2 === 0 ? '220px' : '160px', height: '16px' }} />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: '130px', height: '15px' }} />
+                                    </td>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: '65px', height: '15px' }} />
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                            <div className="skeleton-line" style={{ width: '36px', height: '22px', borderRadius: '12px' }} />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: '85px', height: '15px' }} />
+                                    </td>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: '85px', height: '15px' }} />
+                                    </td>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: '75px', height: '22px', borderRadius: '999px' }} />
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', gap: '6px' }}>
+                                            {[1, 2, 3, 4].map((a) => (
+                                                <div key={a} className="skeleton-line" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+                                            ))}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #f1f5f9' }}>
+                    <div className="skeleton-line" style={{ width: '130px', height: '14px' }} />
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+}
+
+export function VivierSkeleton() {
+    return (
+        <div className="view-stack" aria-busy="true" aria-label="Chargement du vivier">
+            {/* Filter bar */}
+            <section className="filter-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', flexWrap: 'wrap', flex: '1 1 auto' }}>
+                    <div className="search-field" style={{ minWidth: '220px', flex: '1 1 200px' }}>
+                        <div className="skeleton-line" style={{ width: '100%', height: '38px', borderRadius: '8px' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '180px' }}>
+                        <div className="skeleton-line" style={{ width: '60px', height: '14px' }} />
+                        <div className="skeleton-line" style={{ width: '100%', height: '38px', borderRadius: '8px' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: '180px' }}>
+                        <div className="skeleton-line" style={{ width: '110px', height: '14px' }} />
+                        <div className="skeleton-line" style={{ width: '100%', height: '38px', borderRadius: '8px' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <div className="skeleton-line" style={{ width: '85px', height: '38px', borderRadius: '8px' }} />
+                        <div className="skeleton-line" style={{ width: '110px', height: '38px', borderRadius: '8px' }} />
+                    </div>
+                </div>
+
+                <div className="skeleton-line" style={{ width: '170px', height: '38px', borderRadius: '8px' }} />
+            </section>
+
+            {/* Data section */}
+            <section className="data-section">
+                <div className="section-heading">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div className="skeleton-line skeleton-head" style={{ width: '380px', height: '22px' }} />
+                        <div className="skeleton-line" style={{ width: '480px', height: '14px' }} />
+                    </div>
+                    <div className="skeleton-line" style={{ width: '110px', height: '36px', borderRadius: '8px' }} />
+                </div>
+
+                <div className="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Candidat</th>
+                                <th>Candidature / Direction & Domaine</th>
+                                <th>Motif / Contexte d'ajout</th>
+                                <th>Date d'ajout</th>
+                                <th>Statut Vivier</th>
+                                <th>Actions RH</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <tr key={i}>
+                                    <td>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <div className="skeleton-line" style={{ width: '130px', height: '15px' }} />
+                                            <div className="skeleton-line" style={{ width: '170px', height: '12px' }} />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <div className="skeleton-line" style={{ width: '140px', height: '15px' }} />
+                                            <div className="skeleton-line" style={{ width: '120px', height: '12px' }} />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: i % 2 === 0 ? '140px' : '90px', height: '14px' }} />
+                                    </td>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: '90px', height: '14px' }} />
+                                    </td>
+                                    <td>
+                                        <div className="skeleton-line" style={{ width: '60px', height: '22px', borderRadius: '999px' }} />
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', gap: '6px' }}>
+                                            <div className="skeleton-line" style={{ width: '140px', height: '30px', borderRadius: '6px' }} />
+                                            <div className="skeleton-line" style={{ width: '30px', height: '30px', borderRadius: '6px' }} />
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #f1f5f9' }}>
+                    <div className="skeleton-line" style={{ width: '130px', height: '14px' }} />
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                    </div>
+                </div>
+            </section>
+        </div>
+    );
+}
+
+export function ModelesEmailsSkeleton() {
+    return (
+        <div className="view-container" style={{ padding: '24px' }} aria-busy="true" aria-label="Chargement des modèles d'e-mails">
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="skeleton-line skeleton-head" style={{ width: '280px', height: '28px' }} />
+                    <div className="skeleton-line" style={{ width: '460px', height: '15px' }} />
+                </div>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <div className="skeleton-line" style={{ width: '105px', height: '38px', borderRadius: '8px' }} />
+                    <div className="skeleton-line" style={{ width: '145px', height: '38px', borderRadius: '8px' }} />
+                </div>
+            </div>
+
+            {/* Filter toolbar */}
+            <div style={{ background: '#ffffff', padding: '16px 20px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px', display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <div className="skeleton-line" style={{ flex: '1 1 280px', height: '40px', borderRadius: '8px' }} />
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                    <div className="skeleton-line" style={{ width: '190px', height: '40px', borderRadius: '8px' }} />
+                    <div className="skeleton-line" style={{ width: '140px', height: '40px', borderRadius: '8px' }} />
+                </div>
+            </div>
+
+            {/* Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '20px' }}>
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div
+                        key={i}
+                        style={{
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '12px',
+                            padding: '20px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            minHeight: '260px',
+                            boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+                        }}
+                    >
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                                <div className="skeleton-line" style={{ width: '80px', height: '22px', borderRadius: '4px' }} />
+                                <div className="skeleton-line" style={{ width: '70px', height: '22px', borderRadius: '4px' }} />
+                            </div>
+
+                            <div className="skeleton-line skeleton-head" style={{ width: '75%', height: '20px', marginBottom: '10px' }} />
+
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginBottom: '12px' }}>
+                                <div className="skeleton-line" style={{ width: '50px', height: '14px' }} />
+                                <div className="skeleton-line" style={{ width: '160px', height: '14px' }} />
+                            </div>
+
+                            <div className="skeleton-line" style={{ width: '80%', height: '26px', borderRadius: '6px', marginBottom: '14px' }} />
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+                                <div className="skeleton-line" style={{ width: '100%', height: '12px' }} />
+                                <div className="skeleton-line" style={{ width: '88%', height: '12px' }} />
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', borderTop: '1px solid #f1f5f9' }}>
+                            <div className="skeleton-line" style={{ width: '45px', height: '24px', borderRadius: '12px' }} />
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                                <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                                <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                                <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+export function AuditLogsSkeleton() {
+    return (
+        <div className="audit-logs-page" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }} aria-busy="true" aria-label="Chargement du journal d'audit">
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="skeleton-line skeleton-head" style={{ width: '320px', height: '24px' }} />
+                    <div className="skeleton-line" style={{ width: '460px', height: '14px' }} />
+                </div>
+                <div className="skeleton-line" style={{ width: '110px', height: '36px', borderRadius: '8px' }} />
+            </div>
+
+            {/* Filter toolbar */}
+            <div
+                style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '10px',
+                    padding: '16px',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '12px',
+                    alignItems: 'center',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                }}
+            >
+                <div className="skeleton-line" style={{ flex: '1', minWidth: '220px', height: '38px', borderRadius: '8px' }} />
+                <div className="skeleton-line" style={{ width: '160px', height: '38px', borderRadius: '8px' }} />
+                <div className="skeleton-line" style={{ width: '140px', height: '38px', borderRadius: '8px' }} />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <div className="skeleton-line" style={{ width: '120px', height: '38px', borderRadius: '8px' }} />
+                    <div className="skeleton-line" style={{ width: '120px', height: '38px', borderRadius: '8px' }} />
+                </div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <div className="skeleton-line" style={{ width: '85px', height: '38px', borderRadius: '8px' }} />
+                    <div className="skeleton-line" style={{ width: '105px', height: '38px', borderRadius: '8px' }} />
+                </div>
+            </div>
+
+            {/* Table */}
+            <div
+                style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '10px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    overflow: 'hidden',
+                }}
+            >
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+                        <thead>
+                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569' }}>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Date & Heure</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Utilisateur</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Action</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Entité / ID</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Description</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Détails</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                <tr key={i} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '110px', height: '14px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <div className="skeleton-line" style={{ width: '100px', height: '14px' }} />
+                                            <div className="skeleton-line" style={{ width: '60px', height: '11px' }} />
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '120px', height: '22px', borderRadius: '4px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '90px', height: '14px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: i % 2 === 0 ? '260px' : '180px', height: '14px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '30px', height: '30px', borderRadius: '6px' }} />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderTop: '1px solid #f1f5f9' }}>
+                    <div className="skeleton-line" style={{ width: '130px', height: '14px' }} />
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export function PipelineMonitoringSkeleton() {
+    return (
+        <div className="pipeline-monitoring-page" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }} aria-busy="true" aria-label="Chargement du monitoring IA">
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div className="skeleton-line skeleton-head" style={{ width: '340px', height: '24px' }} />
+                    <div className="skeleton-line" style={{ width: '520px', height: '14px' }} />
+                </div>
+                <div className="skeleton-line" style={{ width: '110px', height: '36px', borderRadius: '8px' }} />
+            </div>
+
+            {/* 7 KPI cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
+                {[1, 2, 3, 4, 5, 6, 7].map((k) => (
+                    <div
+                        key={k}
+                        style={{
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '10px',
+                            padding: '16px',
+                            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                        }}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <div className="skeleton-line" style={{ width: '110px', height: '12px' }} />
+                            <div className="skeleton-line" style={{ width: '18px', height: '18px', borderRadius: '4px' }} />
+                        </div>
+                        <div className="skeleton-line skeleton-head" style={{ width: '65px', height: '28px', margin: '8px 0 6px 0' }} />
+                        <div className="skeleton-line" style={{ width: '120px', height: '12px' }} />
+                    </div>
+                ))}
+            </div>
+
+            {/* Filter toolbar */}
+            <div
+                style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '10px',
+                    padding: '16px',
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '12px',
+                    alignItems: 'center',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                }}
+            >
+                <div className="skeleton-line" style={{ flex: '1', minWidth: '240px', height: '38px', borderRadius: '6px' }} />
+                <div className="skeleton-line" style={{ width: '170px', height: '38px', borderRadius: '6px' }} />
+                <div className="skeleton-line" style={{ width: '170px', height: '38px', borderRadius: '6px' }} />
+            </div>
+
+            {/* Table */}
+            <div
+                style={{
+                    background: '#ffffff',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '10px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    overflow: 'hidden',
+                }}
+            >
+                <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.875rem' }}>
+                        <thead>
+                            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569' }}>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Date & Heure</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Statut</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Intention</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Expéditeur & Sujet</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Temps Traitement</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Doublon</th>
+                                <th style={{ padding: '12px 16px', fontWeight: 600 }}>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <tr key={i} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '130px', height: '14px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '80px', height: '22px', borderRadius: '999px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '110px', height: '22px', borderRadius: '6px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                            <div className="skeleton-line" style={{ width: '160px', height: '14px' }} />
+                                            <div className="skeleton-line" style={{ width: '220px', height: '12px' }} />
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '90px', height: '14px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '60px', height: '14px' }} />
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 16px', borderTop: '1px solid #f1f5f9' }}>
+                    <div className="skeleton-line" style={{ width: '130px', height: '14px' }} />
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                        <div className="skeleton-line" style={{ width: '32px', height: '32px', borderRadius: '6px' }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export function PublicOffersSkeleton({ count = 3 }) {
     return (
         <div className="public-offers-skeleton" aria-busy="true" aria-label="Chargement des offres">
             {Array.from({ length: count }).map((_, i) => (
-                <div key={i} className="public-offer-card-skeleton">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '70%' }}>
-                            <div className="skeleton-line" style={{ width: '110px', height: '22px', borderRadius: '4px' }} />
-                            <div className="skeleton-line skeleton-head" style={{ width: '90%', height: '22px' }} />
+                <div
+                    key={i}
+                    className="card p-0 mb-3 border-1 shadow-sm"
+                    style={{
+                        background: '#ffffff',
+                        border: '1px solid #dee2e6',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <div className="card-body" style={{ padding: '16px 20px' }}>
+                        <div className="row justify-content-between align-items-center" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                            <div className="col-md-5" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <div className="skeleton-line" style={{ width: '50px', height: '26px', borderRadius: '4px', flexShrink: 0 }} />
+                                <div className="skeleton-line skeleton-head" style={{ width: i % 2 === 0 ? '240px' : '180px', height: '18px' }} />
+                            </div>
+
+                            <div className="col-5 col-md-3" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div className="skeleton-line" style={{ width: '14px', height: '14px', borderRadius: '50%', flexShrink: 0 }} />
+                                <div className="skeleton-line" style={{ width: '130px', height: '14px' }} />
+                            </div>
+
+                            <div className="col-7 col-md-3" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <div className="skeleton-line" style={{ width: '14px', height: '14px', borderRadius: '50%', flexShrink: 0 }} />
+                                <div className="skeleton-line" style={{ width: '160px', height: '14px' }} />
+                            </div>
+
+                            <div className="col-1 text-center" style={{ display: 'flex', justifyContent: 'center' }}>
+                                <div className="skeleton-line" style={{ width: '16px', height: '16px', borderRadius: '4px' }} />
+                            </div>
                         </div>
-                        <div className="skeleton-line" style={{ width: '100px', height: '36px', borderRadius: '6px' }} />
-                    </div>
-                    <div className="skeleton-line" style={{ width: '100%', height: '14px', marginBottom: '6px' }} />
-                    <div className="skeleton-line" style={{ width: '85%', height: '14px', marginBottom: '14px' }} />
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                        <div className="skeleton-line" style={{ width: '90px', height: '13px' }} />
-                        <div className="skeleton-line" style={{ width: '110px', height: '13px' }} />
-                        <div className="skeleton-line" style={{ width: '130px', height: '13px' }} />
                     </div>
                 </div>
             ))}
@@ -822,34 +1356,76 @@ export function PublicOffersSkeleton({ count = 3 }) {
 
 export function ReferentialsSkeleton() {
     return (
-        <div className="referentials-skeleton-container" aria-busy="true" aria-label="Chargement des référentiels">
-            {/* Tabs Header */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+        <div className="view-stack" aria-busy="true" aria-label="Chargement des référentiels">
+            {/* Sub-menu navigation tabs */}
+            <div className="sub-nav-tabs">
+                <div className="skeleton-line" style={{ width: '160px', height: '36px', borderRadius: '8px' }} />
+                <div className="skeleton-line" style={{ width: '130px', height: '36px', borderRadius: '8px' }} />
+                <div className="skeleton-line" style={{ width: '130px', height: '36px', borderRadius: '8px' }} />
                 <div className="skeleton-line" style={{ width: '150px', height: '36px', borderRadius: '8px' }} />
-                <div className="skeleton-line" style={{ width: '130px', height: '36px', borderRadius: '8px' }} />
-                <div className="skeleton-line" style={{ width: '130px', height: '36px', borderRadius: '8px' }} />
-                <div className="skeleton-line" style={{ width: '140px', height: '36px', borderRadius: '8px' }} />
             </div>
 
-            {/* 2-Column Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '20px' }}>
-                {[1, 2].map((col) => (
-                    <div key={col} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '20px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                            <div className="skeleton-line skeleton-head" style={{ width: '140px', height: '18px' }} />
-                            <div className="skeleton-line" style={{ width: '110px', height: '30px', borderRadius: '6px' }} />
+            {/* Management Grid (2 cards: Directions and Domaines) */}
+            <section className="management-grid">
+                {[
+                    { title: 'Directions', btnWidth: '150px', cols: ['Direction', 'Domaines', 'Offres', 'Actions'] },
+                    { title: 'Domaines', btnWidth: '140px', cols: ['Domaine', 'Direction', 'Validation', 'Actions'] },
+                ].map((sec, idx) => (
+                    <div key={idx} className="data-section">
+                        <div className="section-heading">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <div className="skeleton-line skeleton-head" style={{ width: '140px', height: '20px' }} />
+                                <div className="skeleton-line" style={{ width: '90px', height: '14px' }} />
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <div className="skeleton-line" style={{ width: sec.btnWidth, height: '34px', borderRadius: '8px' }} />
+                                <div className="skeleton-line" style={{ width: '90px', height: '34px', borderRadius: '8px' }} />
+                            </div>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {[1, 2, 3, 4, 5].map((row) => (
-                                <div key={row} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f8fafc' }}>
-                                    <div className="skeleton-line" style={{ width: '55%', height: '14px' }} />
-                                    <div className="skeleton-line" style={{ width: '25%', height: '14px' }} />
-                                </div>
-                            ))}
+
+                        <div className="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        {sec.cols.map((col, cIdx) => (
+                                            <th key={cIdx}>{col}</th>
+                                        ))}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[1, 2, 3, 4, 5].map((r) => (
+                                        <tr key={r}>
+                                            <td>
+                                                <div className="skeleton-line" style={{ width: '120px', height: '15px' }} />
+                                            </td>
+                                            <td>
+                                                <div className="skeleton-line" style={{ width: '70px', height: '15px' }} />
+                                            </td>
+                                            <td>
+                                                <div className="skeleton-line" style={{ width: '60px', height: '22px', borderRadius: '999px' }} />
+                                            </td>
+                                            <td>
+                                                <div style={{ display: 'flex', gap: '6px' }}>
+                                                    <div className="skeleton-line" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+                                                    <div className="skeleton-line" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '14px', paddingTop: '10px', borderTop: '1px solid #f1f5f9' }}>
+                            <div className="skeleton-line" style={{ width: '110px', height: '14px' }} />
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                                <div className="skeleton-line" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+                                <div className="skeleton-line" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+                            </div>
                         </div>
                     </div>
                 ))}
-            </div>
+            </section>
         </div>
     );
 }

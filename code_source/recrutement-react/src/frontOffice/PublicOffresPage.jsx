@@ -96,7 +96,7 @@ export default function PublicOffresPage({ getJson, onNavigate }) {
                     <div className="row row-grid justify-content-center annonces">
                         <div className="col-12">
                             {loading ? (
-                                <PublicOffersSkeleton count={3} />
+                                <PublicOffersSkeleton count={4} />
                             ) : error ? (
                                 <ErrorState message={error} onRetry={fetchOffres} />
                             ) : (

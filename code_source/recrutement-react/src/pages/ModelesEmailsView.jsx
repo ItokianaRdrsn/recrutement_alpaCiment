@@ -16,7 +16,7 @@ import {
     X,
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
-import { CardsGridSkeleton, ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { CardsGridSkeleton, ErrorState, LoadingState, ModelesEmailsSkeleton } from '../components/common/FeedbackStates';
 
 export function ModelesEmailsView() {
     const [modeles, setModeles] = useState([]);
@@ -206,7 +206,7 @@ export function ModelesEmailsView() {
         return true;
     });
 
-    if (loading) return <CardsGridSkeleton count={6} />;
+    if (loading) return <ModelesEmailsSkeleton />;
     if (error) return <ErrorState message={error} onRetry={loadData} />;
 
     return (
