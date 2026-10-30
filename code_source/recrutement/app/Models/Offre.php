@@ -25,6 +25,7 @@ class Offre extends Model
         'id_lieu',
         'lieu',
         'id_type_contrat',
+        'duree_contrat',
         'date_publication',
         'date_limite',
         'id_statut_offre',

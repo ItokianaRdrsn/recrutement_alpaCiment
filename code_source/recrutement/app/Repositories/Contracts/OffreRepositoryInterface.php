@@ -15,5 +15,7 @@ interface OffreRepositoryInterface
     public function update(Offre $offre, array $attributes): bool;
     public function delete(Offre $offre): bool;
     public function syncNestedRelations(Offre $offre, array $relationsData): void;
-    public function getStatusId(string $libelle): ?int;
+    public function getStatusId(string|\App\Enums\StatutOffreEnum $libelle): ?int;
+    public function findStatutById(int $id): ?\App\Models\StatutOffre;
+    public function getActiveOffersSummary(): array;
 }

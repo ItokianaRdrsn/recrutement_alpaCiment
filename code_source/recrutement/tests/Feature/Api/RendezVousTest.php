@@ -146,7 +146,7 @@ class RendezVousTest extends TestCase
             'poste_souhaite' => 'Ingénieur Béton',
         ]);
 
-        $service = new RendezVousService(new AuditLogService());
+        $service = app(RendezVousService::class);
 
         $rdv = $service->planifier([
             'id_candidature' => $candidature->id_candidature,
@@ -182,7 +182,7 @@ class RendezVousTest extends TestCase
             'id_statut_candidature' => 1,
         ]);
 
-        $service = new RendezVousService(new AuditLogService());
+        $service = app(RendezVousService::class);
 
         $this->expectException(InvalidArgumentException::class);
 
@@ -201,7 +201,7 @@ class RendezVousTest extends TestCase
             'id_statut_candidature' => 1,
         ]);
 
-        $service = new RendezVousService(new AuditLogService());
+        $service = app(RendezVousService::class);
 
         $rdv = $service->planifier([
             'id_candidature' => $candidature->id_candidature,

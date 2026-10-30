@@ -48,6 +48,14 @@ Lors de la première connexion, créez votre compte propriétaire/administrateur
 
 ---
 
+## 🌐 Déploiement en Production sur Serveur Linux Ubuntu (SSH)
+
+Pour déployer n8n sur un serveur distant VPS Linux Ubuntu accessible par SSH (avec Docker, Nginx et SSL) :
+👉 Consultez le guide complet : [`DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md`](DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md)
+Un script d'installation rapide en une seule commande est également disponible : `setup_ubuntu_n8n.sh`.
+
+---
+
 ## 💾 Persistance des données
 
 Les workflows, identifiants et configurations n8n sont stockés dans le volume persistant Docker `n8n_data`.

@@ -265,29 +265,131 @@ button,
     box-shadow: 0 4px 12px rgba(255, 13, 0, 0.3);
 }
 
+.topbar-user-profile,
 .user-chip {
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    display: grid;
-    gap: 1px;
-    min-width: 120px;
-    padding: 4px 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 30px;
+    padding: 4px 14px 4px 6px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    transition: all 0.2s ease;
 }
 
-.user-chip span,
-.user-chip small {
+.topbar-user-profile:hover,
+.user-chip:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
+}
+
+.topbar-user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFF0EF 0%, #fee2e2 100%);
+    color: #D40B00;
+    font-weight: 700;
+    font-size: 11.5px;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 0 0 1px #fecaca;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.topbar-status-dot {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 1.5px solid #ffffff;
+}
+
+.topbar-user-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.topbar-user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.25;
+    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: 160px;
 }
 
-.user-chip span {
-    font-weight: 700;
+.topbar-user-role-wrap {
+    display: flex;
+    align-items: center;
 }
 
-.user-chip small {
-    color: var(--muted);
+.topbar-role-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    line-height: 1.2;
+}
+
+.topbar-role-pill.is-admin {
+    background: #FFF0EF;
+    color: #D40B00;
+    border-color: rgba(212, 11, 0, 0.2);
+}
+
+.topbar-logout-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #ffffff;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(220, 38, 38, 0.04);
+    transition: all 0.2s ease;
+}
+
+.topbar-logout-btn:hover {
+    background: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    transform: translateY(-1px);
+}
+
+.topbar-logout-btn:active {
+    transform: translateY(0);
+}
+
+.topbar-logout-btn svg {
+    transition: transform 0.2s ease;
+}
+
+.topbar-logout-btn:hover svg {
+    transform: translateX(2px);
 }
 
 .workspace {
@@ -2515,6 +2617,11 @@ body:has(.app-shell) .cb-cursor {
     }
 
     /* 4. Affichage et mise en page du Document Dossier Imprimable A4 */
+    .print-candidat-dossier,
+    .print-candidat-dossier * {
+        visibility: visible !important;
+    }
+
     .print-candidat-dossier {
         display: block !important;
         width: 100% !important;
@@ -3469,6 +3576,809 @@ body:has(.app-shell) .cb-cursor {
     font-weight: 700 !important;
     border-bottom: 1px solid #e2e8f0 !important;
 }
+
+/* ============================================================
+   VARIABLE CHIP EDITOR (Blocs de variables dynamiques d'e-mails)
+   ============================================================ */
+.variable-chip-container {
+    position: relative;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    overflow: hidden;
+}
+
+.variable-chip-container:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.variable-chip-editor {
+    min-height: 190px;
+    max-height: 380px;
+    overflow-y: auto;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #0f172a;
+    outline: none;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.variable-chip-editor:empty:before {
+    content: attr(data-placeholder);
+    color: #94a3b8;
+    pointer-events: none;
+    display: block;
+}
+
+.variable-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #e0f2fe;
+    border: 1.5px solid #7dd3fc;
+    color: #0369a1;
+    border-radius: 6px;
+    padding: 2px 8px;
+    margin: 0 3px;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.25;
+    vertical-align: baseline;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(2, 132, 199, 0.08);
+    transition: all 0.15s ease;
+}
+
+.variable-chip:hover {
+    background: #bae6fd;
+    border-color: #38bdf8;
+    box-shadow: 0 2px 4px rgba(2, 132, 199, 0.15);
+}
+
+.variable-chip-icon {
+    font-size: 11px;
+    opacity: 0.85;
+    line-height: 1;
+}
+
+.variable-chip-text {
+    letter-spacing: 0.2px;
+}
+
+.variable-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(3, 105, 161, 0.15);
+    color: #0369a1;
+    font-size: 13px;
+    font-weight: bold;
+    line-height: 1;
+    margin-left: 2px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.variable-chip-remove:hover {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    transform: scale(1.15);
+}
+
+.variable-chip-editor-footer {
+    padding: 6px 12px;
+    background: #f8fafc;
+    border-top: 1px solid #f1f5f9;
+    font-size: 11.5px;
+    color: #64748b;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ==========================================================================
+   AFFICHE OFFICIELLE DE RECRUTEMENT ALPHA CIMENT (FORMAT A4)
+   ========================================================================== */
+
+.affiche-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999;
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.affiche-toolbar-bar {
+    height: 56px;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+    z-index: 100;
+}
+
+.affiche-toolbar-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.affiche-toolbar-title {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.affiche-toolbar-subtitle {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.affiche-toolbar-center {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-toggle-group,
+.zoom-toggle-group {
+    display: flex;
+    background: #f1f5f9;
+    padding: 3px;
+    border-radius: 8px;
+    gap: 2px;
+}
+
+.theme-btn {
+    border: none;
+    background: transparent;
+    padding: 5px 11px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+}
+
+.theme-btn.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn-ghost {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #334155;
+    padding: 5px 12px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s ease;
+}
+
+.action-btn-ghost:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.action-btn-ghost.active {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #e61e24;
+}
+
+.affiche-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.action-btn-primary {
+    background: #e61e24;
+    color: #ffffff;
+    border: none;
+    padding: 7px 16px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(230, 30, 36, 0.3);
+    transition: all 0.15s ease;
+}
+
+.action-btn-primary:hover {
+    background: #cc181d;
+    transform: translateY(-1px);
+}
+
+.action-btn-close {
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.action-btn-close:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+
+/* Zone scrollable / centrée */
+.affiche-scroll-container {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px 16px 40px 16px;
+    background: #0b1120;
+    box-sizing: border-box;
+}
+
+/* Wrapper mis à l'échelle */
+.affiche-page-scale-wrapper {
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85);
+    border-radius: 4px;
+    overflow: hidden;
+    background: #ffffff;
+    position: relative;
+    flex-shrink: 0;
+    margin: auto;
+}
+
+/* Le Canvas A4 officiel (794 x 1146 px - Ratio 1:1.444 identique au template PDF) */
+.affiche-a4-canvas {
+    width: 794px;
+    height: 1146px;
+    position: relative;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    box-sizing: border-box;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+}
+
+/* 1. Zone Hero Carte Flottante (100% transparente directement sur la carte translucide du poster) */
+.affiche-hero-content-box {
+    position: absolute;
+    top: 11.8%;
+    left: 25%;
+    width: 50%;
+    height: 8.8%;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    border: none !important;
+    border-radius: 0;
+    padding: 0;
+    text-align: center;
+    box-shadow: none !important;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.affiche-hero-prefix {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #1e293b;
+    text-transform: uppercase;
+    line-height: 1.15;
+}
+
+.affiche-hero-title {
+    font-size: 18.5px;
+    font-weight: 800;
+    color: #000000;
+    text-transform: uppercase;
+    letter-spacing: -0.2px;
+    line-height: 1.15;
+    margin: 2px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.affiche-hero-title-lines {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+}
+
+.affiche-hero-title-line {
+    font-size: 18px;
+    font-weight: 800;
+    color: #000000;
+    text-transform: uppercase;
+    line-height: 1.15;
+    letter-spacing: -0.2px;
+}
+
+.affiche-hero-lieu {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    line-height: 1.2;
+}
+
+.affiche-hero-contrat {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #000000;
+    text-transform: uppercase;
+    line-height: 1.15;
+    margin-top: 1px;
+}
+
+/* 2. Zone Phrase d'Accroche */
+.affiche-accroche-content-box {
+    position: absolute;
+    top: 31.6%;
+    left: 10%;
+    width: 80%;
+    z-index: 5;
+    font-size: 13px;
+    line-height: 1.45;
+    font-weight: 500;
+    color: #111827;
+}
+
+.affiche-accroche-content-box p {
+    margin: 0;
+}
+
+/* 3. Zone Liste des Missions */
+.affiche-missions-content-box {
+    position: absolute;
+    top: 42.6%;
+    left: 11.2%;
+    width: 78%;
+    max-height: 17%;
+    z-index: 5;
+    overflow: hidden;
+}
+
+/* 4. Zone Liste du Profil */
+.affiche-profil-content-box {
+    position: absolute;
+    top: 66.2%;
+    left: 11.2%;
+    width: 78%;
+    max-height: 18.5%;
+    z-index: 5;
+    overflow: hidden;
+}
+
+/* Puces épurées alignées avec la barre rouge du poster */
+.affiche-bullets-clean {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 11.5px;
+    line-height: 1.42;
+    color: #111827;
+    font-weight: 500;
+}
+
+.affiche-bullets-clean li {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    margin-bottom: 3.5px;
+}
+
+.bullet-sym {
+    color: #111827;
+    font-size: 13px;
+    line-height: 1.2;
+    flex-shrink: 0;
+    margin-top: -1px;
+}
+
+.bullet-text {
+    word-break: break-word;
+}
+
+/* 5. Zone Appel à Candidature */
+.affiche-candidature-content-box {
+    position: absolute;
+    top: 86.1%;
+    left: 9.8%;
+    width: 80.4%;
+    z-index: 5;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #111827;
+}
+
+.affiche-candidature-content-box p {
+    margin: 0;
+}
+
+.candidature-email {
+    color: #0070ba;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+/* Styles inputs mode édition */
+.edit-hero-title-input {
+    width: 90%;
+    font-size: 16px;
+    font-weight: 800;
+    text-align: center;
+    border: 1px dashed #e61e24;
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.edit-hero-prefix-input {
+    width: 60%;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
+    padding: 1px;
+}
+
+.edit-hero-lieu-input {
+    width: 80%;
+    font-size: 12px;
+    text-align: center;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
+    padding: 1px;
+}
+
+.edit-hero-contrat-input {
+    width: 60%;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
+    padding: 1px;
+}
+
+.edit-textarea {
+    width: 100%;
+    font-size: 12px;
+    font-family: inherit;
+    border: 1px dashed #e61e24;
+    border-radius: 4px;
+    padding: 4px 6px;
+    background: rgba(254, 242, 242, 0.85);
+    color: #0f172a;
+    resize: vertical;
+}
+
+.edit-bullet-input {
+    width: 95%;
+    font-size: 11px;
+    font-family: inherit;
+    border: 1px dashed #cbd5e1;
+    border-radius: 4px;
+    padding: 2px 5px;
+    background: rgba(248, 250, 252, 0.95);
+    color: #0f172a;
+}
+
+/* ==========================================================================
+   Boutons Rédaction IA sur l'Affiche de Recrutement
+   ========================================================================== */
+.edit-input-with-ai-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.edit-bullet-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.edit-textarea-with-ai-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.btn-bullet-del {
+    background: transparent;
+    border: 1px solid #fee2e2;
+    color: #ef4444;
+    border-radius: 4px;
+    padding: 2px 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-bullet-del:hover {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+
+.btn-add-bullet-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-add-bullet-inline:hover {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    color: #1d4ed8;
+}
+
+/* ==========================================================================
+   DÉPLACEMENT DES DIVS ET TEXTES SUR L'AFFICHE (DRAG & DROP)
+   ========================================================================== */
+.affiche-move-helper-banner {
+    background: linear-gradient(90deg, #1d4ed8, #2563eb);
+    color: #ffffff;
+    font-size: 11.5px;
+    padding: 6px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.25);
+    z-index: 100;
+}
+
+/* Par défaut, absolument AUCUN cadrillage bleu, AUCUN contour, AUCUN fond */
+.draggable-block {
+    position: absolute;
+    box-sizing: border-box;
+    transition: outline 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    cursor: default;
+    outline: none !important;
+}
+
+/* UNIQUEMENT quand le mode déplacement est activé par le bouton */
+.canvas-move-mode .draggable-block.is-movable {
+    cursor: grab !important;
+    outline: 1.5px dashed #3b82f6 !important;
+    outline-offset: 4px;
+    border-radius: 4px;
+    background: rgba(239, 246, 255, 0.35) !important;
+}
+
+.canvas-move-mode .draggable-block.is-movable:hover {
+    outline-color: #1d4ed8 !important;
+    background: rgba(219, 234, 254, 0.55) !important;
+}
+
+/* Bloc sélectionné pour ajustement aux flèches du clavier */
+.canvas-move-mode .draggable-block.is-selected {
+    outline: 2px solid #2563eb !important;
+    outline-offset: 4px;
+    background: rgba(219, 234, 254, 0.6) !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* Bloc en cours de déplacement (glisser à la souris) */
+.canvas-move-mode .draggable-block.is-dragging {
+    cursor: grabbing !important;
+    outline: 2.5px solid #1d4ed8 !important;
+    background: rgba(191, 219, 254, 0.75) !important;
+    box-shadow: 0 8px 24px -4px rgba(29, 78, 216, 0.35) !important;
+    z-index: 50 !important;
+    user-select: none !important;
+}
+
+/* Wrapper pour retour à la ligne strict de la phrase d'accroche / description */
+.affiche-accroche-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.affiche-accroche-p {
+    margin: 0;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+/* Badge poignée de saisie flottante */
+.drag-handle-badge {
+    position: absolute;
+    top: -24px;
+    left: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #1d4ed8;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+    pointer-events: auto;
+    cursor: grab;
+    z-index: 60;
+    line-height: 1.4;
+    user-select: none;
+}
+
+.drag-handle-badge:active {
+    cursor: grabbing;
+    background: #1e40af;
+}
+
+.drag-handle-badge .coord-indicator {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+}
+
+/* ==========================================================================
+   IMPRESSION NATIVE A4 DE L'AFFICHE (UNIQUEMENT QUAND LA MODALE EST OUVERTE)
+   ========================================================================== */
+@media print {
+    body.affiche-modal-open,
+    body:has(.affiche-modal-overlay) {
+        width: 210mm !important;
+        height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        overflow: hidden !important;
+    }
+
+    /* Masquer l'arrière-plan UNIQUEMENT pendant l'impression de l'affiche */
+    body.affiche-modal-open > *:not(.affiche-modal-overlay):not(:has(.affiche-modal-overlay)),
+    body:has(.affiche-modal-overlay) > *:not(.affiche-modal-overlay):not(:has(.affiche-modal-overlay)) {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    .affiche-modal-overlay,
+    .affiche-modal-overlay * {
+        visibility: visible !important;
+    }
+
+    .affiche-modal-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        z-index: 99999999 !important;
+        overflow: hidden !important;
+    }
+
+    .no-print,
+    .affiche-toolbar-bar {
+        display: none !important;
+    }
+
+    .affiche-scroll-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+        overflow: hidden !important;
+        display: block !important;
+        width: 210mm !important;
+        height: 297mm !important;
+    }
+
+    .affiche-page-scale-wrapper {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        transform: none !important;
+    }
+
+    .affiche-a4-canvas {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        max-width: 210mm !important;
+        max-height: 297mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
+        background-size: 100% 100% !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .draggable-block {
+        outline: none !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        cursor: default !important;
+    }
+
+    .drag-handle-badge,
+    .affiche-move-helper-banner {
+        display: none !important;
+    }
+}
+
+
+
 
 
 

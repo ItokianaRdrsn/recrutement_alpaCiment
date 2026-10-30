@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ModeEnvoiCommunication;
 use App\Mail\CandidatureCommunicationMail;
 use App\Models\AuditLog;
 use App\Models\Candidature;
@@ -9,6 +10,8 @@ use App\Models\Communication;
 use App\Models\ModeleMessage;
 use App\Models\RendezVous;
 use App\Models\TypeMessage;
+use App\Repositories\Contracts\CandidatureRepositoryInterface;
+use App\Repositories\Contracts\CommunicationRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -18,6 +21,8 @@ use InvalidArgumentException;
 class CommunicationService
 {
     public function __construct(
+        protected CommunicationRepositoryInterface $communicationRepository,
+        protected CandidatureRepositoryInterface $candidatureRepository,
         protected AuditLogService $auditLogService
     ) {}
 
@@ -25,29 +30,32 @@ class CommunicationService
      * Moteur de remplacement des variables dans un template.
      * Supporte à la fois {cle} et {{cle}}.
      */
-    public function remplacerVariables(string $texte, Candidature $candidature, ?RendezVous $rdv = null): string
+    public function remplacerVariables(string $texte, Candidature $candidature, ?RendezVous $rdv = null, array $extraVariables = []): string
     {
         $candidat = $candidature->candidat;
         $offre = $candidature->offre;
         $domaine = $candidature->domaine;
 
-        $poste = $offre?->titre_poste 
+        $poste = $extraVariables['poste']
+            ?? $offre?->titre_poste 
             ?? $offre?->titre 
             ?? $candidature->poste_souhaite 
             ?? 'Poste chez AlpA Ciment';
 
-        $direction = $offre?->direction?->nom_direction 
+        $direction = $extraVariables['direction']
+            ?? $offre?->direction?->nom_direction 
             ?? $domaine?->direction?->nom_direction 
             ?? 'Ressources Humaines';
 
-        $dateRdv = '';
-        $heureRdv = '';
-        $modeRdv = '';
-        $lieuRdv = '';
+        $dateRdv = $extraVariables['date_rdv'] ?? '';
+        $heureRdv = $extraVariables['heure_rdv'] ?? '';
+        $modeRdv = $extraVariables['mode_rdv'] ?? '';
+        $lieuRdv = $extraVariables['lieu_rdv'] ?? '';
+        $responsable = $extraVariables['responsable'] ?? '';
 
         if (!$rdv && $candidature->exists) {
             try {
-                $rdv = $candidature->rendezVous()->with('modeRealisation')->latest('date_debut')->first();
+                $rdv = $candidature->rendezVous()->with(['modeRealisation', 'utilisateur'])->latest('date_debut')->first();
             } catch (\Throwable) {
                 $rdv = null;
             }
@@ -56,10 +64,21 @@ class CommunicationService
         if ($rdv) {
             $dateDebut = Carbon::parse($rdv->date_debut);
             $dateFin = Carbon::parse($rdv->date_fin);
-            $dateRdv = $dateDebut->locale('fr')->isoFormat('dddd D MMMM YYYY');
-            $heureRdv = $dateDebut->format('H:i') . ' à ' . $dateFin->format('H:i');
-            $modeRdv = $rdv->modeRealisation?->libelle ?? 'Présentiel';
-            $lieuRdv = $rdv->details_lieu ?? ($modeRdv === 'Visioconference' ? 'Lien communiqué ultérieurement' : 'Siège AlpA Ciment');
+            if (empty($dateRdv)) {
+                $dateRdv = $dateDebut->locale('fr')->isoFormat('dddd D MMMM YYYY');
+            }
+            if (empty($heureRdv)) {
+                $heureRdv = $dateDebut->format('H:i') . ' à ' . $dateFin->format('H:i');
+            }
+            if (empty($modeRdv)) {
+                $modeRdv = $rdv->modeRealisation?->libelle ?? 'Présentiel';
+            }
+            if (empty($lieuRdv)) {
+                $lieuRdv = $rdv->details_lieu ?? ($modeRdv === 'Visioconference' ? 'Lien communiqué ultérieurement' : 'Siège AlpA Ciment');
+            }
+            if (empty($responsable) && $rdv->utilisateur) {
+                $responsable = $rdv->utilisateur->nom;
+            }
         }
 
         $variables = [
@@ -74,8 +93,17 @@ class CommunicationService
             'heure_rdv' => $heureRdv,
             'mode_rdv' => $modeRdv,
             'lieu_rdv' => $lieuRdv,
+            'responsable' => $responsable,
+            'nom_responsable' => $responsable,
             'date_jour' => now()->locale('fr')->isoFormat('D MMMM YYYY'),
         ];
+
+        // Fusion des variables supplémentaires éventuelles
+        foreach ($extraVariables as $cle => $valeur) {
+            if (!empty($valeur) && is_scalar($valeur)) {
+                $variables[$cle] = (string) $valeur;
+            }
+        }
 
         $resultat = $texte;
         foreach ($variables as $cle => $valeur) {
@@ -92,30 +120,32 @@ class CommunicationService
      */
     public function envoyerMessage(int $idCandidature, array $data, ?int $idUtilisateur = null): Communication
     {
-        $candidature = Candidature::with(['candidat', 'offre.direction', 'domaine.direction'])->findOrFail($idCandidature);
+        $candidature = $this->candidatureRepository->findById($idCandidature, ['candidat', 'offre.direction', 'domaine.direction']);
 
         if (!$candidature->candidat?->email) {
             throw new InvalidArgumentException("Le candidat n'a pas d'adresse e-mail valide enregistrée.");
         }
 
         $idModele = $data['id_modele_message'] ?? null;
-        $modele = $idModele ? ModeleMessage::find($idModele) : null;
+        $modele = $idModele ? $this->communicationRepository->findModeleById($idModele) : null;
 
         $idTypeMessage = $data['id_type_message'] 
             ?? $modele?->id_type_message 
             ?? 6; // 6 = Autre par défaut
 
-        $modeEnvoi = $data['mode_envoi'] ?? 'manuel';
+        $modeEnvoi = $data['mode_envoi'] ?? ModeEnvoiCommunication::Manuel->value;
         $sujetBrut = $data['objet'] ?? $modele?->objet ?? 'Communication AlpA Ciment';
         $contenuBrut = $data['contenu'] ?? $modele?->contenu ?? '';
 
-        // Si le contenu n'a pas déjà été substitué côté front, on applique la substitution
-        $sujet = $this->remplacerVariables($sujetBrut, $candidature);
-        $contenu = $this->remplacerVariables($contenuBrut, $candidature);
+        $extraVars = $data['variables'] ?? [];
+
+        // Substitution des variables dans le sujet et le contenu (candidature, rdv, extraVars)
+        $sujet = $this->remplacerVariables($sujetBrut, $candidature, null, $extraVars);
+        $contenu = $this->remplacerVariables($contenuBrut, $candidature, null, $extraVars);
 
         return DB::transaction(function () use ($candidature, $idModele, $idTypeMessage, $sujet, $contenu, $modeEnvoi, $idUtilisateur) {
-            // 1. Enregistrement en base de la communication
-            $communication = Communication::create([
+            // 1. Enregistrement en base de la communication via repository
+            $communication = $this->communicationRepository->create([
                 'id_candidature' => $candidature->id_candidature,
                 'id_modele_message' => $idModele,
                 'id_type_message' => $idTypeMessage,
@@ -171,23 +201,13 @@ class CommunicationService
             return null;
         }
 
-        // Trouver le modèle approprié si non précisé : soit Test (id_type_rendez_vous=1), soit Entretien (id_type_rendez_vous=2)
+        // Trouver le modèle approprié si non précisé via repository
         if (!$idModele) {
             $isEntretien = (int) $rdv->id_type_rendez_vous === 2;
             $statutCible = $isEntretien ? 4 : 3; // 4 = Entretien, 3 = Test
-            
-            $modele = ModeleMessage::where('id_type_message', 2)
-                ->where('id_statut_candidature', $statutCible)
-                ->where('actif', true)
-                ->first();
-
-            if (!$modele) {
-                $modele = ModeleMessage::where('id_type_message', 2)
-                    ->where('actif', true)
-                    ->first();
-            }
+            $modele = $this->communicationRepository->findModeleConvocation($statutCible);
         } else {
-            $modele = ModeleMessage::find($idModele);
+            $modele = $this->communicationRepository->findModeleById($idModele);
         }
 
         if (!$modele) {
@@ -207,7 +227,7 @@ class CommunicationService
             'id_type_message' => 2, // 2 = Convocation
             'objet' => $sujet,
             'contenu' => $contenu,
-            'mode_envoi' => 'auto',
+            'mode_envoi' => ModeEnvoiCommunication::Auto->value,
         ], $idUtilisateur);
     }
 
@@ -222,10 +242,7 @@ class CommunicationService
             return null;
         }
 
-        $modele = ModeleMessage::where('envoi_automatique', true)
-            ->where('id_statut_candidature', 1) // 1 = Recue
-            ->where('actif', true)
-            ->first();
+        $modele = $this->communicationRepository->findModeleAccuseReception();
 
         if (!$modele) {
             return null;
@@ -239,7 +256,7 @@ class CommunicationService
             'id_type_message' => $modele->id_type_message,
             'objet' => $sujet,
             'contenu' => $contenu,
-            'mode_envoi' => 'auto',
+            'mode_envoi' => ModeEnvoiCommunication::Auto->value,
         ], null);
     }
 }

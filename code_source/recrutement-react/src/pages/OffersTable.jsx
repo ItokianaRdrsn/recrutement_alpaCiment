@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, ChevronDown, ChevronUp, Edit3, Share2, UserPlus, Users } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, ChevronUp, Edit3, FileText, Share2, UserPlus, Users } from 'lucide-react';
 import { formatDate } from '../utils/formatters';
 
-export function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = null, onSelectOffer = null, renderActions = null }) {
+export function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = null, onSelectOffer = null, onShowAffiche = null, renderActions = null }) {
     const navigate = useNavigate();
     const [expandedRow, setExpandedRow] = useState(null);
 
@@ -162,6 +162,7 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                         <Share2 size={15} />
                                                     </button>
                                                 ) : null}
+                                             
                                                 {!compact ? (
                                                     <button
                                                         disabled={!isPublished}
@@ -254,7 +255,32 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                     </div>
                                                 ) : null}
 
-                                                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                                                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                                                    {onShowAffiche ? (
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onShowAffiche(offre);
+                                                            }}
+                                                            style={{
+                                                                background: '#fef2f2',
+                                                                color: '#e61e24',
+                                                                border: '1px solid #fca5a5',
+                                                                borderRadius: '6px',
+                                                                padding: '7px 14px',
+                                                                fontSize: '12px',
+                                                                fontWeight: '600',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px',
+                                                                cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            <FileText size={14} />
+                                                            <span>Affiche Recrutement (PDF)</span>
+                                                        </button>
+                                                    ) : null}
                                                     <button
                                                         type="button"
                                                         onClick={(e) => goToCandidatures(e, offre)}

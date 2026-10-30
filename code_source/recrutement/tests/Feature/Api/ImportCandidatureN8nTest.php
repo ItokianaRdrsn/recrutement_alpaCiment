@@ -364,5 +364,48 @@ class ImportCandidatureN8nTest extends TestCase
             'statut' => 'doublon_ignore',
         ]);
     }
+
+    /**
+     * Test de régression spécifique : vérifie qu'un payload issu de n8n ne contenant que nom_complet
+     * (sans clé explicite 'nom' ni 'prenom') ne déclenche pas 'Undefined array key "nom"'.
+     */
+    public function test_import_candidature_sans_cle_nom_explicite_utilise_nom_complet(): void
+    {
+        $payload = [
+            'nom_complet' => 'Andria Manana',
+            'email' => 'andria.manana@alpaciment.local',
+            'telephone' => '+261320000099',
+            'ville' => 'Antsirabe',
+            'source' => 'email / n8n',
+            'cle_idempotence' => '<msg-test-nom-complet-123@alpaciment.local>',
+            'sujet_email' => 'Candidature Spontanée Ingénieur',
+            'corps_email' => 'Veuillez trouver ci-joint ma candidature.',
+            'donnees_json' => [
+                'contact' => [
+                    'nom_complet' => 'Andria Manana',
+                    'email' => 'andria.manana@alpaciment.local',
+                    'telephone' => '+261320000099',
+                    'ville' => 'Antsirabe',
+                ],
+                'competences' => [
+                    ['nom' => 'Python', 'niveau' => 'Intermédiaire'],
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/public/import-candidature', $payload);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('status', 'success');
+
+        $candidatureId = $response->json('data.id_candidature');
+        $this->assertNotNull($candidatureId);
+
+        $candidature = Candidature::with('candidat')->findOrFail($candidatureId);
+        $this->assertNotNull($candidature->candidat);
+        $this->assertEquals('Andria', $candidature->candidat->nom);
+        $this->assertEquals('Manana', $candidature->candidat->prenom);
+        $this->assertEquals('andria.manana@alpaciment.local', $candidature->candidat->email);
+    }
 }
 

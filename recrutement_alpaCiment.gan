@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><project name="Plateforme de Recrutement AlpA Ciment" company="Alpha Ciment" webLink="" view-date="2026-07-24" view-index="0" gantt-divider-location="713" resource-divider-location="300" version="3.3.3316" locale="fr_FR">
+    <description><![CDATA[Planning Gantt détaillé (7j/7 avec week-ends) - Plateforme de Recrutement AlpA Ciment]]></description>
+    <view zooming-state="default:2" id="gantt-chart">
+        <field id="tpd3" name="Nom" width="414" order="0"/>
+        <field id="tpd4" name="Date de début" width="141" order="1"/>
+        <field id="tpd5" name="Date de fin" width="142" order="2"/>
+        <option id="filter.completedTasks" value="false"/>
+        <option id="filter.dueTodayTasks" value="false"/>
+        <option id="filter.overdueTasks" value="false"/>
+        <option id="filter.inProgressTodayTasks" value="false"/>
+    </view>
+    <view id="resource-table">
+        <field id="0" name="Nom" width="210" order="0"/>
+        <field id="1" name="Rôle par défaut" width="86" order="1"/>
+    </view>
+    <!-- -->
+    <calendars>
+        <day-types>
+            <day-type id="0"/>
+            <day-type id="1"/>
+            <default-week id="1" name="default" sun="0" mon="0" tue="0" wed="0" thu="0" fri="0" sat="0"/>
+            <only-show-weekends value="true"/>
+            <overriden-day-types/>
+            <days/>
+        </day-types>
+    </calendars>
+    <tasks empty-milestones="true">
+        <taskproperties>
+            <taskproperty id="tpd0" name="type" type="default" valuetype="icon"/>
+            <taskproperty id="tpd1" name="priority" type="default" valuetype="icon"/>
+            <taskproperty id="tpd2" name="info" type="default" valuetype="icon"/>
+            <taskproperty id="tpd3" name="name" type="default" valuetype="text"/>
+            <taskproperty id="tpd4" name="begindate" type="default" valuetype="date"/>
+            <taskproperty id="tpd5" name="enddate" type="default" valuetype="date"/>
+            <taskproperty id="tpd6" name="duration" type="default" valuetype="int"/>
+            <taskproperty id="tpd7" name="completion" type="default" valuetype="int"/>
+            <taskproperty id="tpd8" name="coordinator" type="default" valuetype="text"/>
+            <taskproperty id="tpd9" name="predecessorsr" type="default" valuetype="text"/>
+        </taskproperties>
+        <task id="1" uid="4eca536a290f460a836506bd15e8842d" name="Induction en entreprise (Alpha Ciment)" color="#495057" meeting="false" start="2026-08-03" duration="1" complete="100" expand="true"/>
+        <task id="10" uid="1af73bbcb6e2478f9034eb4e2f65eb39" name="Sprint 0 : Analyse, cadrage et conception" color="#28a745" meeting="false" start="2026-08-04" duration="9" complete="100" expand="true">
+            <task id="11" uid="0f7b93fefa504fc7b0b54f8f6a32441e" name="Analyse du cahier des charges et définition du périmètre V1" color="#20c997" meeting="false" start="2026-08-04" duration="2" complete="100" expand="true"/>
+            <task id="12" uid="c443b239347a428bb94d90768902a7a1" name="Identification des modules fonctionnels du recrutement" color="#20c997" meeting="false" start="2026-08-06" duration="2" complete="100" expand="true"/>
+            <task id="13" uid="e296d1a76fdf41f7836e995d6348f610" name="Analyse des parcours candidat / RH / admin" color="#20c997" meeting="false" start="2026-08-07" duration="2" complete="100" expand="true"/>
+            <task id="14" uid="b55f6846c9d54a06afcca4fbe1f35e4b" name="Conception du MCD / MLD et des règles métier" color="#28a745" meeting="false" start="2026-08-09" duration="2" complete="100" expand="true"/>
+            <task id="15" uid="fd2ff888cdbf4ab5b9eca00e9ebd2cdf" name="Conception architecture Laravel / React / PostgreSQL / FastAPI" color="#28a745" meeting="false" start="2026-08-11" duration="1" complete="100" expand="true"/>
+            <task id="16" uid="6aebb731579e4db891f68769fa7996e2" name="Planification du projet et préparation environnement" color="#20c997" meeting="false" start="2026-08-11" duration="2" complete="100" expand="true"/>
+        </task>
+        <task id="20" uid="ad6defa1c0aa458393be7ef3d04909a5" name="Sprint 1 : Socle technique, sécurité et référentiels de base" color="#6f42c1" meeting="false" start="2026-08-13" duration="6" complete="100" expand="true">
+            <task id="21" uid="69fb8b8f4a4141209c24f4bca2446bd1" name="BACK-OFFICE / API : Configuration Laravel et PostgreSQL" color="#845ef7" meeting="false" start="2026-08-13" duration="1" complete="100" expand="true"/>
+            <task id="22" uid="214f9ead486140f3a04e0d37eb0e38ad" name="BACK-OFFICE / API : Migrations principales et seeders" color="#845ef7" meeting="false" start="2026-08-14" duration="1" complete="100" expand="true"/>
+            <task id="23" uid="a48e7441a17e40348b23d0d1743fbe75" name="BACK-OFFICE / API : Architecture API REST" color="#845ef7" meeting="false" start="2026-08-15" duration="1" complete="100" expand="true"/>
+            <task id="24" uid="6211a8de3c60413ab5ff6ed0d0680c36" name="BACK-OFFICE / API : Authentification et rôles RH / admin" color="#6f42c1" meeting="false" start="2026-08-16" duration="1" complete="100" expand="true"/>
+            <task id="25" uid="132e3a3cb07e47ada69646bc08486dab" name="FRONT-OFFICE : Installation React avec Vite et navigation" color="#b197fc" meeting="false" start="2026-08-17" duration="1" complete="100" expand="true"/>
+            <task id="26" uid="a8685c12c7af4282b7bd66b4d7a55e2c" name="FRONT-OFFICE : Mise en page générale du back-office" color="#b197fc" meeting="false" start="2026-08-17" duration="1" complete="100" expand="true"/>
+            <task id="27" uid="21db85605b4f4d8c8b332252969ad6f9" name="Tests et debug socle technique" color="#6f42c1" meeting="false" start="2026-08-18" duration="1" complete="100" expand="true"/>
+        </task>
+        <task id="30" uid="cd336461916f42b3a054d3142ad897d6" name="Sprint 2 : Gestion des offres, directions et domaines" color="#007bff" meeting="false" start="2026-08-19" duration="7" complete="100" expand="true">
+            <task id="31" uid="72358284b24049c2b3cfd1c150e4ba0f" name="BACK-OFFICE : CRUD des directions" color="#339af0" meeting="false" start="2026-08-19" duration="1" complete="100" expand="true"/>
+            <task id="32" uid="251e430352e14f1ca5a6db5f7b677b35" name="BACK-OFFICE : CRUD des domaines et validation en attente" color="#339af0" meeting="false" start="2026-08-19" duration="1" complete="100" expand="true"/>
+            <task id="33" uid="464407faa3da4873a873001e37507afd" name="BACK-OFFICE : CRUD des offres d'emploi" color="#007bff" meeting="false" start="2026-08-20" duration="1" complete="100" expand="true"/>
+            <task id="34" uid="f03d678f6de346808b9644936a49b52a" name="BACK-OFFICE : Statut des offres (brouillon, publiée, clôturée)" color="#007bff" meeting="false" start="2026-08-21" duration="1" complete="100" expand="true"/>
+            <task id="35" uid="112a1d44a02d408cbb7ee33a27225ebc" name="BACK-OFFICE : Profil, missions et formations requises" color="#339af0" meeting="false" start="2026-08-21" duration="2" complete="100" expand="true"/>
+            <task id="36" uid="40c4ed554fc5466cab81edb5f97d54d0" name="BACK-OFFICE : Compétences requises par offre" color="#007bff" meeting="false" start="2026-08-23" duration="1" complete="100" expand="true"/>
+            <task id="37" uid="dac442a33415460ab855343077e2535e" name="FRONT-OFFICE / API : Affichage offres et lien candidature" color="#74c0fc" meeting="false" start="2026-08-24" duration="1" complete="100" expand="true"/>
+            <task id="38" uid="d157f6463e004be1b8e7bd3ba83e5b3d" name="Tests et debug offres" color="#007bff" meeting="false" start="2026-08-25" duration="1" complete="100" expand="true"/>
+        </task>
+        <task id="40" uid="a4b0502995874766a821a096a3489b20" name="Sprint 3 : Dépôt et réception des candidatures" color="#17a2b8" meeting="false" start="2026-08-26" duration="8" complete="100" expand="true">
+            <task id="41" uid="acd67a5c77d9418fa2c2958376baa011" name="FRONT-OFFICE : Formulaire de candidature sur offre" color="#22b8cf" meeting="false" start="2026-08-26" duration="1" complete="100" expand="true"/>
+            <task id="42" uid="9dfedace408748b99d6b1e06c34e27ec" name="FRONT-OFFICE : Formulaire candidature spontanée avec domaine" color="#22b8cf" meeting="false" start="2026-08-26" duration="1" complete="100" expand="true"/>
+            <task id="43" uid="e88d6bf8e3ce4b82872a0e5c1feebd7d" name="FRONT-OFFICE : Upload des CV, photos et documents" color="#17a2b8" meeting="false" start="2026-08-27" duration="1" complete="100" expand="true"/>
+            <task id="44" uid="68bca67a77a345a88976bc751fb0c8f6" name="BACK-OFFICE : Saisie manuelle d'une candidature par RH" color="#15aabf" meeting="false" start="2026-08-28" duration="1" complete="100" expand="true"/>
+            <task id="45" uid="ae3407d9f63748d1901c9b5d30d4b2fb" name="API / SERVICES : Détection existant et dédoublonnage par email" color="#1098ad" meeting="false" start="2026-08-29" duration="1" complete="100" expand="true"/>
+            <task id="46" uid="3e81d046690248bebf8fc120abb2a2e3" name="API / SERVICES : Création transactionnelle candidat / candidature" color="#1098ad" meeting="false" start="2026-08-30" duration="2" complete="100" expand="true"/>
+            <task id="47" uid="fdcf3c7a04a34e369fe9fd1f59667722" name="API / SERVICES : Préparation réception/import site externe" color="#15aabf" meeting="false" start="2026-09-01" duration="1" complete="100" expand="true"/>
+            <task id="48" uid="2a74e0850b7a418eb9826d2214b6cebd" name="Tests et debug réception candidatures" color="#17a2b8" meeting="false" start="2026-09-01" duration="2" complete="100" expand="true"/>
+        </task>
+        <task id="50" uid="aabf01cf5309488984eba0352d9c95f2" name="Sprint 4 : Gestion RH des candidatures et fiche candidat" color="#fd7e14" meeting="false" start="2026-09-03" duration="6" complete="100" expand="true">
+            <task id="51" uid="55965d20aa8a40f79df24afe5c3ef11c" name="BACK-OFFICE : Liste générale des candidatures &amp; pagination" color="#ff922b" meeting="false" start="2026-09-03" duration="1" complete="100" expand="true"/>
+            <task id="52" uid="cc6c2537c6c040eea6f964610c7d1b0f" name="BACK-OFFICE : Recherche et filtres multicritères" color="#ff922b" meeting="false" start="2026-09-03" duration="1" complete="100" expand="true"/>
+            <task id="53" uid="1ca08875515d4751b3bb80805523cefa" name="BACK-OFFICE : Navigation Direction -&gt; Offre -&gt; Candidats" color="#fd7e14" meeting="false" start="2026-09-04" duration="1" complete="100" expand="true"/>
+            <task id="54" uid="2be8845cba2c498fb9ed91c0e403df6c" name="BACK-OFFICE : Fiche candidat 360° et documents" color="#e8590c" meeting="false" start="2026-09-04" duration="2" complete="100" expand="true"/>
+            <task id="55" uid="5757fe4368a24e75935b43d75abd3a32" name="BACK-OFFICE : Changement de statut avec commentaire &amp; historique" color="#e8590c" meeting="false" start="2026-09-06" duration="1" complete="100" expand="true"/>
+            <task id="56" uid="6247d0fc937d4397994a2bfca5886e54" name="BACK-OFFICE : Export PDF de la fiche candidat" color="#ff922b" meeting="false" start="2026-09-07" duration="1" complete="100" expand="true"/>
+            <task id="57" uid="a2c293b76d394925b49b57b6ce919250" name="Tests et debug fiche candidat" color="#fd7e14" meeting="false" start="2026-09-08" duration="1" complete="100" expand="true"/>
+        </task>
+        <task id="60" uid="fb49a23e922d4fd0a3f2a0395299bf5b" name="Sprint 5 : Vivier, compétences et validation CV" color="#e83e8c" meeting="false" start="2026-09-09" duration="12" complete="100" expand="true">
+            <task id="61" uid="2d79a8035f594087bc6e68132a8d0057" name="BACK-OFFICE : Gestion du vivier (ajout, retrait, consultation)" color="#f783ac" meeting="false" start="2026-09-09" duration="1" complete="100" expand="true"/>
+            <task id="62" uid="9427a8ab9c49440fab24b6fc9cd86c68" name="BACK-OFFICE : Recherche dans le vivier" color="#f783ac" meeting="false" start="2026-09-10" duration="1" complete="100" expand="true"/>
+            <task id="63" uid="5fbb14134fab4b559a50948070eaf591" name="BACK-OFFICE : CRUD du référentiel des compétences" color="#e83e8c" meeting="false" start="2026-09-11" duration="1" complete="100" expand="true"/>
+            <task id="64" uid="186476762fd24275ba2e2d5cb8d0ad0c" name="BACK-OFFICE : Gestion manuelle compétences et expériences" color="#f783ac" meeting="false" start="2026-09-12" duration="2" complete="100" expand="true"/>
+            <task id="65" uid="cb4494921e0241d18e7581ae807076be" name="OCR / IA : Intégration FastAPI et extraction PaddleOCR" color="#d63384" meeting="false" start="2026-09-14" duration="2" complete="100" expand="true"/>
+            <task id="66" uid="e07f6488ca7f40418dd819333e342c08" name="OCR / IA : Extraction structurée NER CV via Ollama LLM" color="#d63384" meeting="false" start="2026-09-16" duration="2" complete="100" expand="true"/>
+            <task id="67" uid="fc474ce832ef48df923d46611b9a0263" name="OCR / IA : Interface validation / correction RH du CV" color="#e83e8c" meeting="false" start="2026-09-18" duration="2" complete="100" expand="true"/>
+            <task id="68" uid="0155c89b136741b1ba783a80c0abe1b3" name="Tests et debug validation CV" color="#c2255c" meeting="false" start="2026-09-20" duration="1" complete="100" expand="true"/>
+        </task>
+        <task id="70" uid="d6466c3967084258bf474224377fb35f" name="Sprint 6 : Rendez-vous, communications, automatisation et modèles" color="#dc3545" meeting="false" start="2026-09-21" duration="15" complete="100" expand="true">
+            <task id="71" uid="4f7d9cbf27ee434ca2e76e895de5371b" name="BACK-OFFICE : CRUD rendez-vous (test, entretien, mode)" color="#ff6b6b" meeting="false" start="2026-09-21" duration="2" complete="100" expand="true"/>
+            <task id="72" uid="884f8385a11a4ba096c4ae4ac75503da" name="BACK-OFFICE : Vue agenda FullCalendar par utilisateur" color="#ff6b6b" meeting="false" start="2026-09-23" duration="1" complete="100" expand="true"/>
+            <task id="73" uid="af333dad8ee04340b8a827fa73915d73" name="BACK-OFFICE : Communication liée aux rendez-vous" color="#fa5252" meeting="false" start="2026-09-24" duration="1" complete="100" expand="true"/>
+            <task id="74" uid="ec9ca3f5cdfd4ff6934e2c335d5304ea" name="BACK-OFFICE : CRUD des modèles de communication" color="#fa5252" meeting="false" start="2026-09-25" duration="1" complete="100" expand="true"/>
+            <task id="75" uid="48911d79051b4e2fb5ac0b4c02865146" name="BACK-OFFICE : Accusé de réception &amp; envoi automatique" color="#ff8787" meeting="false" start="2026-09-26" duration="1" complete="100" expand="true"/>
+            <task id="76" uid="8bc0b2e6de5e4bfbb2d00c1c8b7466a0" name="AUTOMATISATION : Ingestion emails n8n &amp; FastAPI" color="#dc3545" meeting="false" start="2026-09-27" duration="2" complete="100" expand="true"/>
+            <task id="77" uid="0014244c04644e91b969468a4eeda07c" name="AUTOMATISATION : n8n classification IA, routage et import" color="#c92a2a" meeting="false" start="2026-09-29" duration="3" complete="100" expand="true"/>
+            <task id="78" uid="0316172404f1421b86da818771365290" name="AUTOMATISATION : Envoi manuel, historique et rappels" color="#e03131" meeting="false" start="2026-10-02" duration="2" complete="100" expand="true"/>
+            <task id="79" uid="71b33cdc6c924bdba0af3f9fa4077bcf" name="BACK-OFFICE : Journalisation des actions RH (Audit Log)" color="#fa5252" meeting="false" start="2026-10-04" duration="1" complete="100" expand="true"/>
+            <task id="80" uid="a74aabe035a94934a52fabf772dda575" name="Tests et debug communications &amp; automatisation" color="#c92a2a" meeting="false" start="2026-10-05" duration="1" complete="100" expand="true"/>
+        </task>
+        <task id="90" uid="f6fc876d6655487b8a5e126050719baf" name="Sprint 7 : Dashboard, recherche avancée, matching et finalisation" color="#2b8a3e" meeting="false" start="2026-10-06" duration="10" complete="100" expand="true">
+            <task id="91" uid="501a6901fe7a44f5a8495f38b8065b2d" name="BACK-OFFICE : Tableau de bord et indicateurs RH" color="#51cf66" meeting="false" start="2026-10-06" duration="1" complete="100" expand="true"/>
+            <task id="92" uid="9e91d9f88e4d421bb8867188e587e0f1" name="BACK-OFFICE : Statistiques mensuelles et taux conversion" color="#51cf66" meeting="false" start="2026-10-07" duration="2" complete="100" expand="true"/>
+            <task id="93" uid="e96d343d22b34a68913aac64ed740ff8" name="BACK-OFFICE : Délai moyen de traitement et filtres" color="#40c057" meeting="false" start="2026-10-09" duration="1" complete="100" expand="true"/>
+            <task id="94" uid="063785e225b44a47981aa541cad92909" name="BACK-OFFICE : Consultation et filtres Journal d'Audit" color="#37b24d" meeting="false" start="2026-10-10" duration="1" complete="100" expand="true"/>
+            <task id="95" uid="b9cf6913f8c54f948dd59e82ddec13c2" name="BACK-OFFICE : Recherche avancée mots-clés CV &amp; compétences" color="#2f9e44" meeting="false" start="2026-10-11" duration="1" complete="100" expand="true"/>
+            <task id="96" uid="a733230b30674032bf0f28227d58a94c" name="BACK-OFFICE : Matching candidat -&gt; offre avec score" color="#2b8a3e" meeting="false" start="2026-10-12" duration="2" complete="100" expand="true"/>
+            <task id="97" uid="163778ade97b409b839e97092697cb5b" name="Tests globaux, corrections et optimisations" color="#237032" meeting="false" start="2026-10-14" duration="1" complete="100" expand="true"/>
+            <task id="98" uid="e5d9bb92787f4309ae75d4ae965e596e" name="Documentation technique et préparation soutenance" color="#237032" meeting="false" start="2026-10-15" duration="1" complete="100" expand="true"/>
+        </task>
+    </tasks>
+    <resources/>
+    <allocations/>
+    <vacations/>
+    <previous/>
+    <roles roleset-name="Default"/>
+</project>

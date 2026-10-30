@@ -26,7 +26,12 @@ class CandidatureController extends Controller
      */
     public function postulerOffre(PostulerOffreRequest $request, string $idOffre): JsonResponse
     {
-        $candidature = $this->candidatureService->postulerOffre($idOffre, $request->validated(), $request);
+        $candidature = $this->candidatureService->postulerOffre(
+            $idOffre,
+            $request->validated(),
+            $request->file('cv') ?? $request->file('cv_file'),
+            $request->file('photo')
+        );
 
         return response()->json([
             'message' => 'Votre candidature a bien été enregistrée. Merci !',
@@ -42,7 +47,11 @@ class CandidatureController extends Controller
      */
     public function candidatureSpontanee(CandidatureSpontaneeRequest $request): JsonResponse
     {
-        $candidature = $this->candidatureService->candidatureSpontanee($request->validated(), $request);
+        $candidature = $this->candidatureService->candidatureSpontanee(
+            $request->validated(),
+            $request->file('cv') ?? $request->file('cv_file'),
+            $request->file('photo')
+        );
 
         return response()->json([
             'message' => 'Votre candidature spontanée a bien été enregistrée. Merci !',
@@ -58,8 +67,10 @@ class CandidatureController extends Controller
      */
     public function importExternalCandidature(ImportExternalCandidatureRequest $request): JsonResponse
     {
-        \Illuminate\Support\Facades\Log::info("ImportExternalCandidature request keys: " . json_encode(array_keys($request->all())) . " | has cv_base64: " . ($request->has('cv_base64') ? 'YES, len=' . strlen($request->input('cv_base64')) : 'NO') . " | has cv file: " . ($request->hasFile('cv') ? 'YES' : 'NO'));
-        $candidature = $this->candidatureService->importExternalCandidature($request->validated(), $request);
+        $candidature = $this->candidatureService->importExternalCandidature(
+            $request->validated(),
+            $request->file('cv') ?? $request->file('cv_file')
+        );
 
         return response()->json([
             'status' => 'success',
@@ -67,7 +78,7 @@ class CandidatureController extends Controller
             'data' => [
                 'id_candidature' => $candidature->id_candidature,
                 'candidat' => $candidature->candidat?->only(['nom', 'prenom', 'email']),
-                'source' => $candidature->postule_depuis,
+                'source' => $candidature->canal_depot,
             ],
         ], 201);
     }
@@ -77,7 +88,12 @@ class CandidatureController extends Controller
      */
     public function saisirRh(SaisirRhCandidatureRequest $request): JsonResponse
     {
-        $candidature = $this->candidatureService->saisirRh($request->validated(), $request, auth()->id());
+        $candidature = $this->candidatureService->saisirRh(
+            $request->validated(),
+            $request->file('cv') ?? $request->file('cv_file'),
+            $request->file('photo'),
+            auth()->id()
+        );
 
         return response()->json([
             'message' => 'Candidature saisie manuellement avec succès par le service RH.',
@@ -107,6 +123,7 @@ class CandidatureController extends Controller
     public function show(int $id): JsonResponse
     {
         $candidature = $this->candidatureService->find($id);
+        $this->candidatureService->markAsViewed($id);
 
         return response()->json(['data' => new CandidatureResource($candidature)]);
     }

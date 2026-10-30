@@ -6,14 +6,25 @@ use App\Models\Direction;
 use App\Repositories\Contracts\DirectionRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class EloquentDirectionRepository implements DirectionRepositoryInterface
 {
     public function paginateFiltered(array $filters, int $perPage = 15): LengthAwarePaginator
     {
+        $isPgsql = DB::getDriverName() === 'pgsql';
+        $likeOp = $isPgsql ? 'ILIKE' : 'like';
+
         return Direction::query()
             ->withCount(['domaines', 'offres'])
-            ->when($filters['q'] ?? null, fn ($query, string $search) => $query->where('nom_direction', 'like', "%{$search}%"))
+            ->when($filters['q'] ?? null, function ($query, string $search) use ($likeOp, $isPgsql) {
+                $escSearch = addcslashes(trim($search), '%_\\');
+                if ($isPgsql) {
+                    $query->whereRaw('unaccent(nom_direction) ILIKE unaccent(?)', ["%{$escSearch}%"]);
+                } else {
+                    $query->where('nom_direction', $likeOp, "%{$escSearch}%");
+                }
+            })
             ->orderBy('nom_direction')
             ->paginate($perPage)
             ->withQueryString();

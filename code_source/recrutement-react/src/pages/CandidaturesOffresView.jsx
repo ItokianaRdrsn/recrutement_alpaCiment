@@ -143,6 +143,12 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
                 if (appliedFilters.q) allCandsParams.set('q', appliedFilters.q);
                 if (appliedFilters.statut) allCandsParams.set('statut', appliedFilters.statut);
                 if (appliedFilters.canal_depot) allCandsParams.set('canal_depot', appliedFilters.canal_depot);
+                if (appliedFilters.cv_keyword) allCandsParams.set('cv_keyword', appliedFilters.cv_keyword);
+                if (appliedFilters.competences) allCandsParams.set('competences', appliedFilters.competences);
+                if (appliedFilters.competence_mode) allCandsParams.set('competence_mode', appliedFilters.competence_mode);
+                if (appliedFilters.niveau_etude) allCandsParams.set('niveau_etude', appliedFilters.niveau_etude);
+                if (appliedFilters.annees_exp_min) allCandsParams.set('annees_exp_min', appliedFilters.annees_exp_min);
+                if (appliedFilters.poste_keyword) allCandsParams.set('poste_keyword', appliedFilters.poste_keyword);
 
                 const allCandsResponse = await getJson(`/api/candidatures?${allCandsParams.toString()}`);
                 if (isMounted) {
@@ -156,7 +162,17 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
         return () => {
             isMounted = false;
         };
-    }, [appliedFilters.q, appliedFilters.statut, appliedFilters.canal_depot]);
+    }, [
+        appliedFilters.q,
+        appliedFilters.statut,
+        appliedFilters.canal_depot,
+        appliedFilters.cv_keyword,
+        appliedFilters.competences,
+        appliedFilters.competence_mode,
+        appliedFilters.niveau_etude,
+        appliedFilters.annees_exp_min,
+        appliedFilters.poste_keyword,
+    ]);
 
     // 3. Tableau principal des candidatures paginées
     const loadData = useCallback(async () => {
@@ -339,7 +355,7 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
                                 handleApplyFilters();
                             }
                         }}
-                        placeholder="Rechercher un candidat (nom, email)..."
+                        placeholder="Rechercher (nom, email, mot-clé CV)..."
                         type="search"
                         value={filters.q}
                     />
@@ -890,9 +906,16 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
                                                                                                     {isUnread && candId ? (
                                                                                                         <span title="Dossier non encore consulté" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#059669', flexShrink: 0 }} />
                                                                                                     ) : null}
-                                                                                                    <strong style={{ color: '#0f172a' }}>
-                                                                                                        {v.candidat?.prenom} {v.candidat?.nom}
-                                                                                                    </strong>
+                                                                                                    <div>
+                                                                                                        <strong style={{ color: '#0f172a' }}>
+                                                                                                            {v.candidat?.prenom} {v.candidat?.nom}
+                                                                                                        </strong>
+                                                                                                        {v.cv_snippet && (
+                                                                                                            <div style={{ marginTop: '5px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fff1f0', border: '1px solid #fecaca', padding: '3px 8px', borderRadius: '5px', display: 'inline-block' }}>
+                                                                                                                📄 <strong>Extrait CV :</strong> <em>{v.cv_snippet}</em>
+                                                                                                            </div>
+                                                                                                        )}
+                                                                                                    </div>
                                                                                                 </div>
                                                                                             </td>
                                                                                             <td>
@@ -979,7 +1002,26 @@ export function CandidaturesOffresView({ referentiels, competencesData }) {
                                                                                                 {isUnread ? (
                                                                                                     <span title="Candidature non encore vue" style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2563eb', flexShrink: 0 }} />
                                                                                                 ) : null}
-                                                                                                <strong style={{ color: '#0f172a' }}>{c.candidat?.prenom} {c.candidat?.nom}</strong>
+                                                                                                <div>
+                                                                                                    <strong style={{ color: '#0f172a' }}>{c.candidat?.prenom} {c.candidat?.nom}</strong>
+                                                                                                    {c.cv_snippet && (
+                                                                                                        <div style={{ marginTop: '5px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fff1f0', border: '1px solid #fecaca', padding: '3px 8px', borderRadius: '5px', display: 'inline-block' }}>
+                                                                                                            📄 <strong>Extrait CV :</strong> <em>{c.cv_snippet}</em>
+                                                                                                        </div>
+                                                                                                    )}
+                                                                                                    {c.competences && c.competences.length > 0 && (
+                                                                                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginTop: '4px' }}>
+                                                                                                            {c.competences.slice(0, 3).map((comp, idx) => (
+                                                                                                                <span key={comp.id_competence || idx} style={{ fontSize: '10px', backgroundColor: '#f1f5f9', color: '#475569', padding: '1px 5px', borderRadius: '3px', border: '1px solid #e2e8f0' }}>
+                                                                                                                    {comp.nom_competence}
+                                                                                                                </span>
+                                                                                                            ))}
+                                                                                                            {c.competences.length > 3 && (
+                                                                                                                <span style={{ fontSize: '10px', color: '#94a3b8' }}>+{c.competences.length - 3}</span>
+                                                                                                            )}
+                                                                                                        </div>
+                                                                                                    )}
+                                                                                                </div>
                                                                                             </div>
                                                                                         </td>
                                                                                         <td>

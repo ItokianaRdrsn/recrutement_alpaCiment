@@ -197,7 +197,7 @@ export function VivierView({ referentiels }) {
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') handleApplyVivierFilters();
                             }}
-                            placeholder="Rechercher dans le vivier (nom, email)..."
+                            placeholder="Rechercher dans le vivier (nom, email, mot-clé CV)..."
                             type="search"
                             value={filters.q}
                         />
@@ -294,6 +294,11 @@ export function VivierView({ referentiels }) {
                                             <strong>{item.candidat?.prenom} {item.candidat?.nom}</strong>
                                             <br />
                                             <small>{item.candidat?.email}</small>
+                                            {item.cv_snippet && (
+                                                <div style={{ marginTop: '5px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fff1f0', border: '1px solid #fecaca', padding: '3px 8px', borderRadius: '5px', display: 'inline-block' }}>
+                                                    📄 <strong>Extrait CV :</strong> <em>{item.cv_snippet}</em>
+                                                </div>
+                                            )}
                                         </td>
                                         <td>
                                             <strong>{item.direction?.nom_direction ?? 'Toutes directions'}</strong>
@@ -466,6 +471,11 @@ export function VivierView({ referentiels }) {
                                                     <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
                                                         {cand.candidat?.email} • Déposée le {formatDate(cand.created_at)}
                                                     </p>
+                                                    {cand.cv_snippet && (
+                                                        <div style={{ marginTop: '5px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fff1f0', border: '1px solid #fecaca', padding: '3px 8px', borderRadius: '5px', display: 'inline-block' }}>
+                                                            📄 <strong>Extrait CV :</strong> <em>{cand.cv_snippet}</em>
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 <div>

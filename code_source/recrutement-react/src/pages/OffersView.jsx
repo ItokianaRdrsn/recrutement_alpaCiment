@@ -5,6 +5,7 @@ import {
     BriefcaseBusiness,
     CheckCircle2,
     Edit3,
+    FileText,
     Filter,
     GraduationCap,
     ListChecks,
@@ -21,6 +22,7 @@ import { getJson, sendJson } from '../api/client';
 import { ErrorState, LoadingState, OffersSkeleton, TableSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { RowActions } from '../components/common/RowActions';
+import { AfficheOffreModal } from '../components/modals/AfficheOffreModal';
 import { CompetenceModal } from '../components/modals/CompetenceModal';
 import { SaisirRhCandidatureModal } from '../components/modals/SaisirRhCandidatureModal';
 import { emptyOfferForm, offerPayload } from '../utils/formatters';
@@ -56,6 +58,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
     const [selectedAddCompNiveau, setSelectedAddCompNiveau] = useState('Intermediaire');
     const [showCompetenceCreateModal, setShowCompetenceCreateModal] = useState(false);
     const [extraCompetences, setExtraCompetences] = useState([]);
+    const [selectedAfficheOffer, setSelectedAfficheOffer] = useState(null);
 
     const getCompId = useCallback((c) => Number(c?.id_competence ?? c?.id ?? 0), []);
     const getCompName = useCallback((c) => c?.nom_competence ?? c?.nom ?? `Compétence #${getCompId(c)}`, [getCompId]);
@@ -345,8 +348,10 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
             titre_poste: offre.titre_poste ?? '',
             id_direction: offre.direction?.id ? String(offre.direction.id) : '',
             description: offre.description ?? '',
+            id_lieu: offre.id_lieu ? String(offre.id_lieu) : '',
             lieu: offre.lieu ?? '',
             id_type_contrat: offre.type_contrat?.id ? String(offre.type_contrat.id) : '',
+            duree_contrat: offre.duree_contrat ?? '',
             date_publication: offre.date_publication ?? '',
             date_limite: offre.date_limite ?? '',
             id_statut_offre: offre.statut?.id ? String(offre.statut.id) : defaultStatusId ? String(defaultStatusId) : '',
@@ -374,6 +379,14 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         event.preventDefault();
         setSaving(true);
         setFormError('');
+
+        if (offerForm.date_publication && offerForm.date_limite) {
+            if (offerForm.date_limite < offerForm.date_publication) {
+                setFormError('La date limite de candidature doit être postérieure ou égale à la date de publication.');
+                setSaving(false);
+                return;
+            }
+        }
 
         try {
             await sendJson(offerForm.id ? `/api/offre/${offerForm.id}` : '/api/offres', {
@@ -403,6 +416,38 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         } catch (caughtError) {
             setFormError(caughtError.message);
         }
+    }
+
+    async function handleSaveAfficheToOffer(posterData) {
+        const cleanJobTitle = (posterData.prefix && !posterData.jobTitle.toLowerCase().startsWith(posterData.prefix.toLowerCase())
+            ? `${posterData.prefix} ${posterData.jobTitle.replace(/\n+/g, ' ')}`
+            : posterData.jobTitle.replace(/\n+/g, ' ')).trim();
+
+        const updated = {
+            ...offerForm,
+            titre_poste: cleanJobTitle || offerForm.titre_poste,
+            description: posterData.accroche || offerForm.description,
+            missions: posterData.missions?.map((m, idx) => ({
+                id: offerForm.missions?.[idx]?.id,
+                description: m,
+                ordre: idx + 1,
+            })) || offerForm.missions,
+        };
+        setOfferForm(updated);
+
+        const offerId = selectedAfficheOffer?.id ?? selectedAfficheOffer?.id_offre ?? offerForm.id;
+        if (offerId) {
+            try {
+                await sendJson(`/api/offre/${offerId}`, {
+                    body: offerPayload(updated),
+                    method: 'PUT',
+                });
+                await loadOffers();
+            } catch (err) {
+                console.warn('Erreur synchronisation API:', err);
+            }
+        }
+        alert("L'affiche et les données de l'offre ont été synchronisées avec succès !");
     }
 
     async function changeOfferStatus(offre, action) {
@@ -448,6 +493,15 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                     type="button"
                 >
                     <X aria-hidden="true" size={15} />
+                </button>
+                <button
+                    className="row-button"
+                    onClick={() => setSelectedAfficheOffer(offre)}
+                    style={{ color: '#e61e24' }}
+                    title="Générer l'affiche officielle de recrutement (PDF)"
+                    type="button"
+                >
+                    <FileText aria-hidden="true" size={15} />
                 </button>
                 <button
                     className="row-button"
@@ -497,6 +551,26 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         <div>
                             <h2>{offerForm.id ? 'Modifier une offre' : 'Nouvelle offre'}</h2>
                             <p>Formulaire de saisie complete de l'offre, des profils, missions, formations et competences.</p>
+                        </div>
+                        <div className="section-heading-actions">
+                            <button
+                                className="filter-button"
+                                onClick={() => setSelectedAfficheOffer(offerForm)}
+                                style={{
+                                    background: '#fef2f2',
+                                    color: '#e61e24',
+                                    borderColor: '#fca5a5',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    fontWeight: '700',
+                                }}
+                                title="Prévisualiser l'affiche officielle de recrutement au format PDF"
+                                type="button"
+                            >
+                                <FileText size={17} />
+                                <span>Affiche Recrutement (PDF)</span>
+                            </button>
                         </div>
                     </div>
 
@@ -549,6 +623,27 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                                 ))}
                             </select>
                         </label>
+
+                        {/* Durée du contrat (si CDD) */}
+                        {(() => {
+                            const selectedContrat = referentiels.types_contrat?.find(
+                                (c) => String(c.id_type_contrat) === String(offerForm.id_type_contrat)
+                            );
+                            const isCdd = selectedContrat?.libelle?.toUpperCase()?.includes('CDD');
+                            if (!isCdd) return null;
+                            return (
+                                <label>
+                                    <span>Durée du contrat (CDD) <span style={{ color: '#ef4444' }}>*</span></span>
+                                    <input
+                                        name="duree_contrat"
+                                        onChange={(event) => updateOfferForm('duree_contrat', event.target.value)}
+                                        placeholder="Ex: 6 mois, 1 an, 12 mois..."
+                                        type="text"
+                                        value={offerForm.duree_contrat || ''}
+                                    />
+                                </label>
+                            );
+                        })()}
 
                         <label>
                             <span>Statut <span style={{ color: '#ef4444' }}>*</span></span>
@@ -934,6 +1029,23 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                             </button>
                             <button
                                 className="ghost-button"
+                                onClick={() => setSelectedAfficheOffer(offerForm)}
+                                style={{
+                                    color: '#e61e24',
+                                    borderColor: '#fca5a5',
+                                    fontWeight: '600',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                }}
+                                title="Prévisualiser l'affiche officielle au format PDF"
+                                type="button"
+                            >
+                                <FileText size={17} />
+                                <span>Aperçu Affiche (PDF)</span>
+                            </button>
+                            <button
+                                className="ghost-button"
                                 onClick={() => {
                                     resetOfferForm();
                                     setViewMode('list');
@@ -972,6 +1084,16 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                             if (onRefreshBase) await onRefreshBase();
                         }}
                         typesList={competencesData?.types ?? []}
+                    />
+                ) : null}
+
+                {selectedAfficheOffer ? (
+                    <AfficheOffreModal
+                        allCompetences={allCompetences}
+                        offer={selectedAfficheOffer}
+                        onClose={() => setSelectedAfficheOffer(null)}
+                        onSaveToOffer={handleSaveAfficheToOffer}
+                        referentiels={referentiels}
                     />
                 ) : null}
             </div>
@@ -1082,6 +1204,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         onNavigate={onNavigate}
                         onSaisirRh={(id) => setSaisirRhOffreId(id)}
                         onSelectOffer={editOffer}
+                        onShowAffiche={(offre) => setSelectedAfficheOffer(offre)}
                         renderActions={renderOfferActions}
                     />
                 )}
@@ -1125,6 +1248,16 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         }
                     }}
                     typesList={competencesData.types ?? []}
+                />
+            ) : null}
+
+            {selectedAfficheOffer ? (
+                <AfficheOffreModal
+                    allCompetences={allCompetences}
+                    offer={selectedAfficheOffer}
+                    onClose={() => setSelectedAfficheOffer(null)}
+                    onSaveToOffer={handleSaveAfficheToOffer}
+                    referentiels={referentiels}
                 />
             ) : null}
         </div>

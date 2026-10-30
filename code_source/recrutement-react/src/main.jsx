@@ -2,7 +2,7 @@ import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import './styles.css';
-import { backendPath, getJson, getPublicJson, sendPublicFormData } from './api/client';
+import { backendPath, getAuthToken, getJson, getPublicJson, redirectToLogin, sendPublicFormData } from './api/client';
 import { ErrorState, PagePreloader } from './components/common/FeedbackStates';
 import { AppShell } from './components/layout/AppShell';
 import { PublicLayout } from './components/layout/PublicLayout';
@@ -70,6 +70,12 @@ function MainApp() {
     const loadBaseData = useCallback(async () => {
         if (isPublicCandidatePath || isLoginPage) {
             setBootstrapLoading(false);
+            return;
+        }
+
+        if (!getAuthToken()) {
+            setBootstrapLoading(false);
+            redirectToLogin();
             return;
         }
         try {

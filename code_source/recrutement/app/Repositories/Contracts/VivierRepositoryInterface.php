@@ -32,4 +32,8 @@ interface VivierRepositoryInterface
     public function getExtractionOcrByCandidature(int $idCandidature): ?CvExtractionOcr;
     public function updateOrCreateExtractionOcr(int $idCandidature, array $attributes): CvExtractionOcr;
     public function updateExtractionOcr(CvExtractionOcr $extraction, array $attributes): CvExtractionOcr;
+
+    // Référentiel Niveau
+    public function findNiveauById(int $id): ?\App\Models\Niveau;
+    public function findNiveauByLibelle(string $libelle): ?\App\Models\Niveau;
 }

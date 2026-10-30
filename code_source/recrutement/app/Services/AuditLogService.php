@@ -3,21 +3,19 @@
 namespace App\Services;
 
 use App\Models\AuditLog;
+use App\Repositories\Contracts\AuditLogRepositoryInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
 class AuditLogService
 {
+    public function __construct(
+        protected AuditLogRepositoryInterface $auditLogRepository
+    ) {}
+
     /**
-     * Enregistre un événement d'audit dans la table audit_log.
-     *
-     * @param string $action CREATION, MODIFICATION, SUPPRESSION, CHANGEMENT_STATUT, VALIDATION_OCR, etc.
-     * @param string $entite Offre, Candidature, Domaine, Direction, etc.
-     * @param int|string|null $idEntite
-     * @param string|null $description
-     * @param array|null $anciennesValeurs
-     * @param array|null $nouvellesValeurs
-     * @param int|null $idUtilisateur Si null, prend l'utilisateur connecté s'il existe
+     * Enregistre un événement d'audit dans la table audit_log via le repository.
      */
     public function log(
         string $action,
@@ -30,11 +28,10 @@ class AuditLogService
     ): AuditLog {
         $userId = $idUtilisateur ?? Auth::id();
 
-        // Récupération de l'IP et du User-Agent de la requête courante si disponible
         $ip = Request::ip();
         $userAgent = Request::header('User-Agent');
 
-        return AuditLog::create([
+        return $this->auditLogRepository->create([
             'id_utilisateur' => $userId,
             'action' => strtoupper($action),
             'entite' => $entite,
@@ -49,43 +46,10 @@ class AuditLogService
     }
 
     /**
-     * Récupère la liste paginée ou filtrée des logs d'audit pour le back-office RH.
+     * Récupère la liste paginée des logs d'audit pour le back-office RH.
      */
-    public function getLogs(array $filters = [], int $perPage = 20)
+    public function getLogs(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
-        $query = AuditLog::with('utilisateur')
-            ->orderByDesc('created_at')
-            ->orderByDesc('id_audit_log');
-
-        if (!empty($filters['action'])) {
-            $query->where('action', strtoupper($filters['action']));
-        }
-
-        if (!empty($filters['entite'])) {
-            $query->where('entite', $filters['entite']);
-        }
-
-        if (!empty($filters['id_utilisateur'])) {
-            $query->where('id_utilisateur', $filters['id_utilisateur']);
-        }
-
-        if (!empty($filters['date_debut'])) {
-            $query->whereDate('created_at', '>=', $filters['date_debut']);
-        }
-
-        if (!empty($filters['date_fin'])) {
-            $query->whereDate('created_at', '<=', $filters['date_fin']);
-        }
-
-        if (!empty($filters['q'])) {
-            $q = trim($filters['q']);
-            $query->where(function ($sub) use ($q) {
-                $sub->where('description', 'ilike', "%{$q}%")
-                    ->orWhere('action', 'ilike', "%{$q}%")
-                    ->orWhere('entite', 'ilike', "%{$q}%");
-            });
-        }
-
-        return $query->paginate($perPage);
+        return $this->auditLogRepository->paginate($filters, $perPage);
     }
 }

@@ -108,14 +108,17 @@ export default function AdvancedSearchPanel({
         });
     }, [selectedCompIds, competencesList]);
 
+    const stripAccents = (str) =>
+        (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+
     // Suggestions filtrées pour le dropdown d'ajout de compétence
     const filteredCompSuggestions = useMemo(() => {
         if (!compInput.trim()) return competencesList.slice(0, 10);
-        const q = compInput.toLowerCase().trim();
+        const q = stripAccents(compInput);
         return competencesList
             .filter((c) => {
-                const name = (c.nom_competence || '').toLowerCase();
-                const type = (c.type?.libelle || '').toLowerCase();
+                const name = stripAccents(c.nom_competence || '');
+                const type = stripAccents(c.type?.libelle || '');
                 const alreadySelected = selectedCompIds.includes(String(c.id_competence));
                 return !alreadySelected && (name.includes(q) || type.includes(q));
             })

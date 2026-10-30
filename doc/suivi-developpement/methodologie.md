@@ -45,6 +45,20 @@ Lorsqu'une demande concerne un ajustement mineur, un correctif de bug ou un alig
 
 ---
 
+## 📖 Règle de Non-Redondance et Consultation du Catalogue des Services (`catalogue-services.md`)
+
+Pour **TOUTE** modification, refactorisation ou ajout de méthode backend dans les Services :
+1. **Consultation préalable obligatoire** :
+   - Consulter systématiquement [`doc/suivi-developpement/catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/catalogue-services.md).
+   - Vérifier si la méthode n'existe pas déjà sous un autre nom ou dans un autre service pour éliminer la duplication de code.
+2. **Respect de la responsabilité unique (SRP)** :
+   - Ne jamais polluer un service avec des responsabilités étrangères.
+   - Par exemple : le stockage physique des fichiers et le MIME sniffing appartiennent à `DocumentService`, le parsing OCR appartient à `CvExtractionService`, les métriques à `PipelineMetricService`, et `CandidatureService` ne s'occupe que de l'entité Candidature.
+3. **Mise à jour du catalogue** :
+   - Dès qu'une fonction est créée, renommée, déplacée ou supprimée, mettre à jour immédiatement le tableau et la fiche correspondante dans [`doc/suivi-developpement/catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/catalogue-services.md).
+
+---
+
 ## 🔬 Règle Systématique de Justification Technologique (Architectural Decision Record)
 
 Pour **TOUTE** décision technique ou sélection de librairie / framework / outil :
@@ -67,6 +81,31 @@ Dès qu'une modification de structure de base de données est réalisée (nouvel
 
 ---
 
+## 📑 Format Standardisé des Outputs (Structure Obligatoire à Chaque Clôture de Tâche)
+
+À chaque fin d'intervention, l'assistant doit impérativement structurer sa restitution finale selon les 5 sections normalisées suivantes :
+
+1. **Résumé Exécutif & Contexte de l'Intervention** :
+   - Rappel clair de l'objectif initial formulé par l'utilisateur.
+   - Mention du statut de la tâche, de la branche Git active (ex: `harden-fastapi-microservice`) et de l'environnement d'exécution.
+2. **Inventaire Exhaustif des Fichiers Créés et Modifiés** :
+   - Répartition ordonnée : *Fichiers Créés* puis *Fichiers Modifiés*.
+   - Utilisation systématique de liens Markdown cliquables avec schéma `file:///` ([`NomFichier.ext`](file:///chemin/absolu/ou/relatif)).
+   - Synthèse technique des responsabilités et des choix architecturaux pour chaque fichier (patterns de conception, sécurité, non-discrimination).
+3. **Validation & Résultats Réels des Tests Automatisés** :
+   - Commandes réelles exécutées pour valider la non-régression (ex: `pytest`, `php artisan test`, `npm run build`).
+   - Rapport factuel des résultats : nombre de tests collectés et passés (100% PASS), durée d'exécution en secondes, détail des avertissements résolus.
+4. **Recommandations & Impacts Systèmes Tiers (Contrats d'Interface)** :
+   - Présentation claire des répercussions sur les systèmes communicants (API Laravel, workflows n8n, frontend React).
+   - Détail des en-têtes obligatoires (ex: `X-API-Key`), des codes d'état HTTP gérés (ex: 503 avec `Retry-After`), et des drapeaux de qualification enrichis.
+   - Confirmation de la rétrocompatibilité 100% des routes et des clés JSON historiques.
+5. **Clôture Méthodologique & Recommandation du Prochain Prompt Prêt à l'Emploi** :
+   - Prochaine action prioritaire selon le calendrier et l'avancement du projet.
+   - Commande slash idoine recommandée (`/plan`, `/boost`, `/goal`, etc.).
+   - Bloc de code copiable contenant le prompt exact formulé de façon optimale pour l'utilisateur.
+
+---
+
 ## 💡 Règle de Clôture : Recommandation Systématique du Bon Prompt et des Commandes Slash (`/`)
 
 À la fin de chaque réponse, l'assistant doit obligatoirement :
@@ -84,8 +123,10 @@ Dès qu'une modification de structure de base de données est réalisée (nouvel
 ## ✅ Checklist Obligatoire avant de Terminer un Prompt
 - [ ] Code backend & frontend modifié et vérifié.
 - [ ] Compilation frontend effectuée (`npm run build`).
-- [ ] Suite de tests backend validée (`php artisan test`).
+- [ ] Suite de tests backend / microservices validée (`php artisan test`, `pytest`).
 - [ ] **Mise à jour du fichier maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql)** si une modification ou un ajout touche la base de données.
+- [ ] **Catalogue des Services vérifié et synchronisé** ([`catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/catalogue-services.md)).
 - [ ] Fichiers de documentation générés ou mis à jour selon la méthodologie (Sprint vs Rectification).
 - [ ] Registre de justification technologique (`justification-technologique.md`) renseigné si une technologie/librairie est concernée.
+- [ ] **Restitution finale conforme aux 5 blocs du Format Standardisé des Outputs**.
 - [ ] **Recommandation du prompt exact optimal et de la commande slash (`/`) idoine** fournie à la fin de la réponse.

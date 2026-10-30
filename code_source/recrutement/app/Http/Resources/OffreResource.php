@@ -37,6 +37,7 @@ class OffreResource extends JsonResource
                 'id' => $this->typeContrat->id_type_contrat,
                 'libelle' => $this->typeContrat->libelle,
             ] : null),
+            'duree_contrat' => $this->duree_contrat,
             'profil' => $this->whenLoaded('profil', fn () => $this->profil ? [
                 'description' => $this->profil->description,
                 'type_valeur' => $this->profil->type_valeur,

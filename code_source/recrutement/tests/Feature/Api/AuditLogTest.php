@@ -38,7 +38,7 @@ class AuditLogTest extends TestCase
 
     public function test_audit_log_service_creates_records(): void
     {
-        $service = new AuditLogService();
+        $service = app(AuditLogService::class);
 
         $log = $service->log(
             action: 'CREATION_OFFRE',

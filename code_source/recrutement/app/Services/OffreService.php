@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\StatutOffreEnum;
 use App\Models\Offre;
-use App\Models\StatutOffre;
 use App\Repositories\Contracts\OffreRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -13,10 +13,8 @@ class OffreService
 {
     public function __construct(
         protected OffreRepositoryInterface $offreRepository,
-        protected ?AuditLogService $auditLogService = null
-    ) {
-        $this->auditLogService = $auditLogService ?? app(AuditLogService::class);
-    }
+        protected AuditLogService $auditLogService
+    ) {}
 
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
     {
@@ -44,7 +42,7 @@ class OffreService
 
     public function create(array $data, array $relationsData): Offre
     {
-        $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->offreRepository->getStatusId('Brouillon');
+        $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->offreRepository->getStatusId(StatutOffreEnum::Brouillon);
         $data['id_lieu'] = !empty($data['id_lieu']) ? (int) $data['id_lieu'] : 1;
 
         unset($data['profil'], $data['profils'], $data['missions'], $data['formations'], $data['competences']);
@@ -117,7 +115,7 @@ class OffreService
 
     public function publish(Offre $offre): Offre
     {
-        $targetId = $this->offreRepository->getStatusId('Publiee');
+        $targetId = $this->offreRepository->getStatusId(StatutOffreEnum::Publiee);
         if (!$targetId) {
             abort(500, 'Statut Publiee introuvable.');
         }
@@ -145,7 +143,7 @@ class OffreService
 
     public function close(Offre $offre): Offre
     {
-        $targetId = $this->offreRepository->getStatusId('Cloturee');
+        $targetId = $this->offreRepository->getStatusId(StatutOffreEnum::Cloturee);
         if (!$targetId) {
             abort(500, 'Statut Cloturee introuvable.');
         }
@@ -173,7 +171,7 @@ class OffreService
 
     public function delete(Offre $offre): void
     {
-        $brouillonId = $this->offreRepository->getStatusId('Brouillon');
+        $brouillonId = $this->offreRepository->getStatusId(StatutOffreEnum::Brouillon);
 
         if ($brouillonId && (int) $offre->id_statut_offre !== $brouillonId) {
             throw ValidationException::withMessages([
@@ -201,8 +199,8 @@ class OffreService
 
     public function validateWorkflowProgression(Offre $offre, int $targetStatusId): void
     {
-        $current = StatutOffre::find($offre->id_statut_offre);
-        $target = StatutOffre::find($targetStatusId);
+        $current = $this->offreRepository->findStatutById((int) $offre->id_statut_offre);
+        $target = $this->offreRepository->findStatutById($targetStatusId);
 
         if (!$current || !$target) {
             return;

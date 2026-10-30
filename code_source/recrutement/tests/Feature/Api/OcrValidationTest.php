@@ -73,7 +73,10 @@ class OcrValidationTest extends TestCase
         $auditMock = $this->createMock(\App\Services\AuditLogService::class);
         $auditMock->expects($this->once())->method('log');
 
-        $service = new VivierService($vivierRepo, $competenceRepo, $auditMock);
+        $candMock = $this->createMock(\App\Repositories\Contracts\CandidatureRepositoryInterface::class);
+        $candidatMock = $this->createMock(\App\Repositories\Contracts\CandidatRepositoryInterface::class);
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $candMock, $candidatMock, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'valide',
@@ -128,7 +131,10 @@ class OcrValidationTest extends TestCase
         $auditMock = $this->createMock(\App\Services\AuditLogService::class);
         $auditMock->expects($this->once())->method('log');
 
-        $service = new VivierService($vivierRepo, $competenceRepo, $auditMock);
+        $candMock = $this->createMock(\App\Repositories\Contracts\CandidatureRepositoryInterface::class);
+        $candidatMock = $this->createMock(\App\Repositories\Contracts\CandidatRepositoryInterface::class);
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $candMock, $candidatMock, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'rejete',
@@ -182,7 +188,10 @@ class OcrValidationTest extends TestCase
         $auditMock = $this->createMock(\App\Services\AuditLogService::class);
         $auditMock->expects($this->once())->method('log');
 
-        $service = new VivierService($vivierRepo, $competenceRepo, $auditMock);
+        $candMock = $this->createMock(\App\Repositories\Contracts\CandidatureRepositoryInterface::class);
+        $candidatMock = $this->createMock(\App\Repositories\Contracts\CandidatRepositoryInterface::class);
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $candMock, $candidatMock, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'corrige',

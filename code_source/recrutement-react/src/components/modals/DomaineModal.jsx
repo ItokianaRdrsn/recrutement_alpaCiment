@@ -28,8 +28,8 @@ export function DomaineModal({ directionsList = [], domaine = null, onClose, onS
 
         try {
             const endpoint = domaine
-                ? `/api/referentiels/domaines/${domaine.id}`
-                : '/api/referentiels/domaines';
+                ? `/api/domaines/${domaine.id}`
+                : '/api/domaines';
             const method = domaine ? 'PUT' : 'POST';
 
             const res = await sendJson(endpoint, {

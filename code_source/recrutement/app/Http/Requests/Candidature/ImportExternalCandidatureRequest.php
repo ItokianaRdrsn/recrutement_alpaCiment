@@ -48,6 +48,8 @@ class ImportExternalCandidatureRequest extends FormRequest
             $contact = $donneesJson['contact'];
             $this->merge([
                 'email' => $this->input('email') ?: ($contact['email'] ?? null),
+                'nom' => $this->input('nom') ?: ($contact['nom'] ?? null),
+                'prenom' => $this->input('prenom') ?: ($contact['prenom'] ?? null),
                 'nom_complet' => $this->input('nom_complet') ?: ($contact['nom_complet'] ?? null),
                 'telephone' => $this->input('telephone') ?: ($contact['telephone'] ?? null),
                 'ville' => $this->input('ville') ?: ($contact['ville'] ?? null),
@@ -59,11 +61,36 @@ class ImportExternalCandidatureRequest extends FormRequest
         if (is_array($candidatData)) {
             $this->merge([
                 'email' => $this->input('email') ?: ($candidatData['email'] ?? null),
+                'nom' => $this->input('nom') ?: ($candidatData['nom'] ?? null),
+                'prenom' => $this->input('prenom') ?: ($candidatData['prenom'] ?? null),
                 'nom_complet' => $this->input('nom_complet') ?: ($candidatData['nom_complet'] ?? null),
                 'telephone' => $this->input('telephone') ?: ($candidatData['telephone'] ?? null),
                 'ville' => $this->input('ville') ?: ($candidatData['ville'] ?? null),
             ]);
         }
+
+        // Normalisation et séparation robuste du nom et prénom
+        $nom = $this->input('nom');
+        $prenom = $this->input('prenom');
+        $nomComplet = $this->input('nom_complet');
+
+        if (empty($nom) && !empty($nomComplet)) {
+            $parts = preg_split('/\s+/', trim((string) $nomComplet), 2);
+            $nom = $parts[0] ?? 'Candidat';
+            $prenom = $prenom ?: ($parts[1] ?? '-');
+        } elseif (!empty($nom) && empty($nomComplet)) {
+            $nomComplet = trim($nom . ' ' . ($prenom ?? ''));
+        }
+
+        $nom = !empty($nom) ? trim((string) $nom) : 'Candidat';
+        $prenom = !empty($prenom) ? trim((string) $prenom) : '-';
+        $nomComplet = !empty($nomComplet) ? trim((string) $nomComplet) : $nom;
+
+        $this->merge([
+            'nom' => mb_substr($nom, 0, 100),
+            'prenom' => mb_substr($prenom, 0, 100),
+            'nom_complet' => mb_substr($nomComplet, 0, 200),
+        ]);
 
         // Nettoyage défensif de l'email (au cas où il contient "Nom <email@domaine.com>" ou vient de email_sender)
         $cleanEmail = $this->extractCleanEmail($this->input('email'))

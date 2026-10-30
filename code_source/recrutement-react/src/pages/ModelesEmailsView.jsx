@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
     CheckCircle2,
     Clock,
@@ -17,8 +17,10 @@ import {
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
 import { CardsGridSkeleton, ErrorState, LoadingState, ModelesEmailsSkeleton } from '../components/common/FeedbackStates';
+import { VariableChipEditor } from '../components/common/VariableChipEditor';
 
 export function ModelesEmailsView() {
+    const editorRef = useRef(null);
     const [modeles, setModeles] = useState([]);
     const [referentiels, setReferentiels] = useState({ types: [], statuts: [], variables_disponibles: [] });
     const [loading, setLoading] = useState(true);
@@ -106,12 +108,16 @@ export function ModelesEmailsView() {
         setModalOpen(true);
     };
 
-    // Insérer une variable dans le curseur ou à la fin
+    // Insérer une variable sous forme de bloc interactif (chip)
     const handleInsertTag = (tag) => {
-        setFormData((prev) => ({
-            ...prev,
-            contenu: prev.contenu + (prev.contenu ? ' ' : '') + tag,
-        }));
+        if (editorRef.current?.insertVariable) {
+            editorRef.current.insertVariable(tag);
+        } else {
+            setFormData((prev) => ({
+                ...prev,
+                contenu: prev.contenu + (prev.contenu ? ' ' : '') + tag,
+            }));
+        }
     };
 
     // Sauvegarder
@@ -521,13 +527,12 @@ export function ModelesEmailsView() {
                                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '6px' }}>
                                     Corps du message *
                                 </label>
-                                <textarea
-                                    onChange={(e) => setFormData({ ...formData, contenu: e.target.value })}
-                                    placeholder="Rédigez le texte du message..."
-                                    required
-                                    rows={9}
-                                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', fontFamily: 'inherit', lineHeight: '1.5' }}
+                                <VariableChipEditor
+                                    ref={editorRef}
                                     value={formData.contenu}
+                                    onChange={(val) => setFormData((prev) => ({ ...prev, contenu: val }))}
+                                    placeholder="Rédigez le texte du message..."
+                                    minHeight="210px"
                                 />
                             </div>
 

@@ -1895,6 +1895,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     loadCommunications(details?.id_candidature || idCandidature);
                 }}
                 candidature={details}
+                rendezVousList={rendezVousList}
             />
 
             {/* MODAL CRÉATION DE COMPÉTENCE */}

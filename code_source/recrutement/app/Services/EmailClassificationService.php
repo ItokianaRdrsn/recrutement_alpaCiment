@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Offre;
+use App\Repositories\Contracts\OffreRepositoryInterface;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -10,8 +10,9 @@ class EmailClassificationService
 {
     protected string $classifierUrl;
 
-    public function __construct()
-    {
+    public function __construct(
+        protected OffreRepositoryInterface $offreRepository
+    ) {
         $this->classifierUrl = config('services.ocr.url', 'http://127.0.0.1:8001') . '/classify-email';
     }
 
@@ -24,18 +25,8 @@ class EmailClassificationService
      */
     public function classify(string $subject, string $body): array
     {
-        // 1. Récupération des offres d'emploi actives et publiées pour le contexte IA
-        $activeOffers = Offre::query()
-            ->whereHas('statut', function ($query) {
-                $query->whereIn('libelle', ['Publiée', 'Publiee', 'Actif', 'Active']);
-            })
-            ->select('id_offre', 'titre_poste')
-            ->get()
-            ->map(fn($o) => [
-                'id' => $o->id_offre,
-                'title' => $o->titre_poste,
-            ])
-            ->toArray();
+        // 1. Récupération des offres d'emploi actives et publiées pour le contexte IA via repository
+        $activeOffers = $this->offreRepository->getActiveOffersSummary();
 
         // 2. Appel au microservice FastAPI local (Llama 3.2 via Ollama)
         try {

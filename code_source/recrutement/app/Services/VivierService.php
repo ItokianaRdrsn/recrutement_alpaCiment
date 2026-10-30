@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Candidat;
-use App\Models\Candidature;
-use App\Models\Competence;
+use App\Enums\SourceDonnee;
+use App\Enums\StatutValidationOcr;
+use App\Enums\TypeDocumentEnum;
 use App\Models\CvExtractionOcr;
-use App\Models\Niveau;
 use App\Models\VivierCandidat;
+use App\Repositories\Contracts\CandidatRepositoryInterface;
+use App\Repositories\Contracts\CandidatureRepositoryInterface;
 use App\Repositories\Contracts\CompetenceRepositoryInterface;
 use App\Repositories\Contracts\VivierRepositoryInterface;
 use Illuminate\Support\Collection;
@@ -19,10 +20,10 @@ class VivierService
     public function __construct(
         protected VivierRepositoryInterface $vivierRepository,
         protected CompetenceRepositoryInterface $competenceRepository,
-        protected ?AuditLogService $auditLogService = null
-    ) {
-        $this->auditLogService = $auditLogService ?? app(AuditLogService::class);
-    }
+        protected CandidatureRepositoryInterface $candidatureRepository,
+        protected CandidatRepositoryInterface $candidatRepository,
+        protected AuditLogService $auditLogService
+    ) {}
 
     public function listVivier(array $filters): Collection
     {
@@ -43,6 +44,7 @@ class VivierService
                 'poste_souhaite' => $cand->poste_souhaite ?? null,
                 'statut' => 'Actif',
                 'created_at' => $cand->created_at,
+                'cv_snippet' => $cand->cv_snippet ?? null,
             ]);
         }
 
@@ -58,6 +60,7 @@ class VivierService
                     'motif_ajout' => $viv->motif_ajout,
                     'statut' => $viv->statut,
                     'created_at' => $viv->created_at,
+                    'cv_snippet' => $viv->cv_snippet ?? null,
                 ]);
             }
         }
@@ -86,12 +89,21 @@ class VivierService
 
     public function getCandidatProfile(int $id): array
     {
-        $candidature = Candidature::with('candidat')->find($id);
-        if (!$candidature) {
-            $candidature = Candidature::with('candidat')->where('id_candidat', $id)->latest()->first();
+        $candidature = null;
+        try {
+            $candidature = $this->candidatureRepository->findById($id, ['candidat']);
+        } catch (\Throwable) {
+            $candidature = null;
         }
 
-        $candidat = $candidature ? $candidature->candidat : Candidat::find($id);
+        $candidat = $candidature ? $candidature->candidat : null;
+        if (!$candidat) {
+            try {
+                $candidat = $this->candidatRepository->findById($id);
+            } catch (\Throwable) {
+                $candidat = null;
+            }
+        }
 
         if (!$candidat && !$candidature) {
             abort(404, 'Dossier introuvable.');
@@ -116,42 +128,33 @@ class VivierService
 
     public function addCompetence(int $id, int $idCompetence, ?string $niveau): void
     {
-        $candidature = Candidature::find($id);
-        $idCandidature = $candidature ? $candidature->id_candidature : $id;
-
-        $this->vivierRepository->syncCandidatCompetence($idCandidature, $idCompetence, [
+        $this->vivierRepository->syncCandidatCompetence($id, $idCompetence, [
             'niveau' => $niveau ?? 'Intermédiaire',
             'valide' => true,
-            'source' => 'manuel',
+            'source' => SourceDonnee::Manuel->value,
         ]);
     }
 
     public function addExperience(int $id, array $data)
     {
-        $candidature = Candidature::find($id);
-        $idCandidature = $candidature ? $candidature->id_candidature : $id;
-
         $posteTitle = trim($data['poste'] ?? $data['intitule_poste'] ?? 'Poste non spécifié');
 
         return $this->vivierRepository->createExperience([
-            'id_candidature' => $idCandidature,
+            'id_candidature' => $id,
             'poste' => $posteTitle,
             'entreprise' => $data['entreprise'] ?? null,
             'date_debut' => $data['date_debut'] ?? null,
             'date_fin' => $data['date_fin'] ?? null,
             'description' => $data['description'] ?? null,
             'valide' => true,
-            'source' => 'manuel',
+            'source' => SourceDonnee::Manuel->value,
         ]);
     }
 
     public function addProjet(int $id, array $data)
     {
-        $candidature = Candidature::find($id);
-        $idCandidature = $candidature ? $candidature->id_candidature : $id;
-
         return $this->vivierRepository->createProjet([
-            'id_candidature' => $idCandidature,
+            'id_candidature' => $id,
             'titre_projet' => trim($data['titre_projet'] ?? 'Projet / Réalisation'),
             'role' => $data['role'] ?? null,
             'technologies' => $data['technologies'] ?? null,
@@ -160,13 +163,13 @@ class VivierService
             'date_fin' => $data['date_fin'] ?? null,
             'description' => $data['description'] ?? null,
             'valide' => true,
-            'source' => 'manuel',
+            'source' => SourceDonnee::Manuel->value,
         ]);
     }
 
     public function addFormation(int $id, array $data)
     {
-        $candidature = Candidature::find($id);
+        $candidature = $this->candidatureRepository->findById($id);
         $idCandidature = $candidature ? $candidature->id_candidature : $id;
 
         $dateObt = null;
@@ -180,12 +183,12 @@ class VivierService
         $niveauText = $data['niveau'] ?? null;
 
         if ($idNiveau && empty($niveauText)) {
-            $niveauObj = Niveau::find($idNiveau);
+            $niveauObj = $this->vivierRepository->findNiveauById((int) $idNiveau);
             if ($niveauObj) {
                 $niveauText = $niveauObj->libelle;
             }
         } elseif (!empty($niveauText) && empty($idNiveau)) {
-            $niveauObj = Niveau::where('libelle', $niveauText)->first();
+            $niveauObj = $this->vivierRepository->findNiveauByLibelle($niveauText);
             if ($niveauObj) {
                 $idNiveau = $niveauObj->id_niveau;
             }
@@ -200,7 +203,7 @@ class VivierService
             'id_niveau' => $idNiveau,
             'niveau' => $niveauText,
             'valide' => true,
-            'source' => 'manuel',
+            'source' => SourceDonnee::Manuel->value,
         ]);
 
         return $form->load('niveauRel');
@@ -208,13 +211,13 @@ class VivierService
 
     public function extractOcr(int $idCandidature): CvExtractionOcr
     {
-        $candidature = Candidature::with(['candidat', 'documents'])->findOrFail($idCandidature);
+        $candidature = $this->candidatureRepository->findById($idCandidature, ['candidat', 'documents']);
 
         $rawText = null;
         $extractedData = null;
 
         try {
-            $cvDocument = $candidature->documents->firstWhere('type_document', 'CV') ?? $candidature->documents->first();
+            $cvDocument = $candidature->documents->firstWhere('type_document', TypeDocumentEnum::Cv->value) ?? $candidature->documents->first();
 
             if ($cvDocument && file_exists(storage_path('app/public/' . $cvDocument->chemin_fichier))) {
                 $filePath = storage_path('app/public/' . $cvDocument->chemin_fichier);
@@ -245,7 +248,7 @@ class VivierService
         return $this->vivierRepository->updateOrCreateExtractionOcr($idCandidature, [
             'texte_brut_ocr' => $rawText,
             'donnees_json' => $extractedData,
-            'statut_validation' => 'en_attente',
+            'statut_validation' => StatutValidationOcr::EnAttente->value,
         ]);
     }
 
@@ -261,19 +264,24 @@ class VivierService
             'commentaire_rh' => $data['commentaire_rh'] ?? null,
         ]);
 
-        if (in_array($data['statut_validation'], ['valide', 'corrige'], true)) {
+        if (in_array($data['statut_validation'], [StatutValidationOcr::Valide->value, StatutValidationOcr::Corrige->value], true)) {
             // 1. Compétences
             if (!empty($data['competences'])) {
                 foreach ($data['competences'] as $comp) {
+                    $nomComp = is_array($comp) ? ($comp['nom'] ?? $comp['nom_competence'] ?? $comp['competence'] ?? null) : (is_string($comp) ? $comp : null);
+                    if (empty($nomComp) || !is_string($nomComp)) {
+                        continue;
+                    }
+
                     $compModel = $this->competenceRepository->firstOrCreate(
-                        ['nom_competence' => trim($comp['nom'])],
+                        ['nom_competence' => trim($nomComp)],
                         ['id_type_competence' => 1]
                     );
 
                     $this->vivierRepository->syncCandidatCompetence($idCandidature, $compModel->id_competence, [
-                        'niveau' => $comp['niveau'] ?? 'Intermédiaire',
+                        'niveau' => is_array($comp) ? ($comp['niveau'] ?? 'Intermédiaire') : 'Intermédiaire',
                         'valide' => true,
-                        'source' => 'cv_ocr',
+                        'source' => SourceDonnee::CvOcr->value,
                     ]);
                 }
             }
@@ -290,7 +298,7 @@ class VivierService
                         'date_fin' => $exp['date_fin'] ?? null,
                         'description' => $exp['description'] ?? null,
                         'valide' => true,
-                        'source' => 'cv_ocr',
+                        'source' => SourceDonnee::CvOcr->value,
                     ]);
                 }
             }
@@ -312,7 +320,7 @@ class VivierService
                         'date_obtention' => $dateObt,
                         'domaine_etude' => $form['domaine_etude'] ?? null,
                         'valide' => true,
-                        'source' => 'cv_ocr',
+                        'source' => SourceDonnee::CvOcr->value,
                     ]);
                 }
             }
@@ -331,22 +339,22 @@ class VivierService
                         'date_fin' => $proj['date_fin'] ?? null,
                         'description' => $proj['description'] ?? null,
                         'valide' => true,
-                        'source' => 'cv_ocr',
+                        'source' => SourceDonnee::CvOcr->value,
                     ]);
                 }
             }
         }
 
-        $actionLabel = $data['statut_validation'] === 'valide'
+        $actionLabel = $data['statut_validation'] === StatutValidationOcr::Valide->value
             ? 'VALIDATION_OCR'
-            : ($data['statut_validation'] === 'corrige' ? 'CORRECTION_OCR' : 'REJET_OCR');
+            : ($data['statut_validation'] === StatutValidationOcr::Corrige->value ? 'CORRECTION_OCR' : 'REJET_OCR');
 
         $this->auditLogService->log(
             action: $actionLabel,
             entite: 'Candidature',
             idEntite: $idCandidature,
             description: "Décision RH sur extraction CV (Statut: {$data['statut_validation']}) - Candidature #{$idCandidature}",
-            anciennesValeurs: ['statut_validation' => 'en_attente'],
+            anciennesValeurs: ['statut_validation' => StatutValidationOcr::EnAttente->value],
             nouvellesValeurs: [
                 'statut_validation' => $data['statut_validation'],
                 'commentaire_rh' => $data['commentaire_rh'] ?? null,

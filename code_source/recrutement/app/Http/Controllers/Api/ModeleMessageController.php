@@ -37,6 +37,7 @@ class ModeleMessageController extends Controller
                     ['cle' => '{heure_rdv}', 'description' => 'Heure de début et de fin du rendez-vous'],
                     ['cle' => '{mode_rdv}', 'description' => 'Mode (Présentiel, Visioconférence, Téléphone)'],
                     ['cle' => '{lieu_rdv}', 'description' => 'Détails du lieu ou lien de visioconférence'],
+                    ['cle' => '{responsable}', 'description' => 'Nom du responsable RH / manager'],
                     ['cle' => '{date_jour}', 'description' => 'Date du jour en toutes lettres'],
                 ],
             ],
@@ -177,7 +178,10 @@ class ModeleMessageController extends Controller
             'id_candidature' => 'nullable|exists:candidature,id_candidature',
             'objet' => 'nullable|string',
             'contenu' => 'required|string',
+            'extra_variables' => 'nullable|array',
         ]);
+
+        $extraVars = $validated['extra_variables'] ?? [];
 
         $candidature = !empty($validated['id_candidature'])
             ? Candidature::with(['candidat', 'offre.direction', 'domaine.direction'])->find($validated['id_candidature'])
@@ -193,10 +197,10 @@ class ModeleMessageController extends Controller
         }
 
         $sujetResolus = !empty($validated['objet'])
-            ? $this->communicationService->remplacerVariables($validated['objet'], $candidature)
+            ? $this->communicationService->remplacerVariables($validated['objet'], $candidature, null, $extraVars)
             : '';
 
-        $contenuResolus = $this->communicationService->remplacerVariables($validated['contenu'], $candidature);
+        $contenuResolus = $this->communicationService->remplacerVariables($validated['contenu'], $candidature, null, $extraVars);
 
         return response()->json([
             'data' => [

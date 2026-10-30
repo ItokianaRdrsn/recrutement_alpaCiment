@@ -18,6 +18,13 @@ import {
 } from 'lucide-react';
 import { submitLogout } from '../../api/client';
 
+function getInitials(name) {
+    if (!name) return 'RH';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 export function AppShell({ children, user }) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -278,12 +285,30 @@ export function AppShell({ children, user }) {
                     </div>
 
                     <div className="topbar-actions">
-                        <div className="user-chip">
-                            <span>{user?.name ?? 'Utilisateur'}</span>
-                            <small>{user?.role ?? '-'}</small>
+                        <div className="topbar-user-profile" title={user?.email ? `Connecté en tant que ${user.email}` : undefined}>
+                            <div className="topbar-user-avatar">
+                                <span className="topbar-avatar-initials">
+                                    {getInitials(user?.name)}
+                                </span>
+                                <span className="topbar-status-dot" title="Session active"></span>
+                            </div>
+                            <div className="topbar-user-meta">
+                                <span className="topbar-user-name">{user?.name ?? 'Utilisateur'}</span>
+                                <div className="topbar-user-role-wrap">
+                                    <span className={`topbar-role-pill ${user?.role === 'admin' ? 'is-admin' : ''}`}>
+                                        {user?.role ?? 'RH'}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <button className="icon-button danger" onClick={submitLogout} title="Se déconnecter" type="button">
-                            <LogOut aria-hidden="true" size={18} />
+
+                        <button 
+                            className="topbar-logout-btn" 
+                            onClick={submitLogout} 
+                            title="Se déconnecter" 
+                            type="button"
+                        >
+                            <LogOut aria-hidden="true" size={15} />
                             <span>Sortir</span>
                         </button>
                     </div>

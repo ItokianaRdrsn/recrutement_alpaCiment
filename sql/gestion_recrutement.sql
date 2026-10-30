@@ -347,6 +347,15 @@ CREATE INDEX idx_historique_candidature ON historique_statut(id_candidature);
 -- recherche_texte est une colonne "generated" (calcul natif PostgreSQL, pas de
 -- trigger PL/pgSQL, pas de logique metier) — a valider avec toi si tu preferes
 -- que meme ce calcul reste cote application plutot qu'en base.
+CREATE EXTENSION IF NOT EXISTS unaccent;
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'french_unaccent') THEN 
+        CREATE TEXT SEARCH CONFIGURATION french_unaccent (COPY = french); 
+        ALTER TEXT SEARCH CONFIGURATION french_unaccent ALTER MAPPING FOR word, hword, hword_part WITH unaccent, french_stem; 
+    END IF; 
+END $$;
+
 CREATE TABLE document (
     id_document BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_candidature BIGINT NOT NULL REFERENCES candidature(id_candidature) ON DELETE CASCADE,
@@ -358,11 +367,10 @@ CREATE TABLE document (
     -- Comment le document est entre dans le systeme
     mode_acquisition VARCHAR(20) NOT NULL DEFAULT 'fichier' CHECK (mode_acquisition IN ('fichier', 'photo_ocr')),
     -- Texte extrait (OCR sur photo/scan, ou extraction directe si PDF natif) —
-    -- alimente la recherche full-text et le pipeline de matching (competences,
-    -- experiences, formation) discute plus tot
+    -- alimente la recherche full-text vectorielle insensible aux accents (french_unaccent)
     contenu_texte_extrait TEXT,
     recherche_texte tsvector GENERATED ALWAYS AS (
-        to_tsvector('french', coalesce(contenu_texte_extrait, ''))
+        to_tsvector('french_unaccent', coalesce(contenu_texte_extrait, ''))
     ) STORED,
     date_upload TIMESTAMPTZ NOT NULL DEFAULT now()
 );

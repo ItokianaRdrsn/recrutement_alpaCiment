@@ -75,11 +75,12 @@ class PipelineMetricController extends Controller
 
         if ($request->filled('q')) {
             $q = trim($request->input('q'));
-            $query->where(function ($sub) use ($q) {
-                $sub->where('email_expediteur', 'like', "%{$q}%")
-                    ->orWhere('sujet_email', 'like', "%{$q}%")
-                    ->orWhere('cle_idempotence', 'like', "%{$q}%")
-                    ->orWhere('message_erreur', 'like', "%{$q}%");
+            $likeOp = DB::getDriverName() === 'pgsql' ? 'ILIKE' : 'like';
+            $query->where(function ($sub) use ($q, $likeOp) {
+                $sub->where('email_expediteur', $likeOp, "%{$q}%")
+                    ->orWhere('sujet_email', $likeOp, "%{$q}%")
+                    ->orWhere('cle_idempotence', $likeOp, "%{$q}%")
+                    ->orWhere('message_erreur', $likeOp, "%{$q}%");
             });
         }
 

@@ -42,6 +42,7 @@ class CommunicationController extends Controller
             'objet' => 'required|string|max:255',
             'contenu' => 'required|string',
             'mode_envoi' => 'nullable|in:manuel,auto',
+            'variables' => 'nullable|array',
         ]);
 
         $userId = Auth::id() ?? 1;

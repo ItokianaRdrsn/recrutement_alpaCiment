@@ -24,6 +24,7 @@ class VivierResource extends JsonResource
                 'motif_ajout' => $this->resource['motif_ajout'] ?? null,
                 'statut' => $this->resource['statut'] ?? null,
                 'created_at' => $this->resource['created_at'] ?? null,
+                'cv_snippet' => $this->resource['cv_snippet'] ?? null,
             ];
         }
 
@@ -38,6 +39,7 @@ class VivierResource extends JsonResource
             'motif_ajout' => $this->motif_ajout,
             'statut' => $this->statut,
             'created_at' => $this->created_at,
+            'cv_snippet' => $this->cv_snippet ?? null,
         ];
     }
 }

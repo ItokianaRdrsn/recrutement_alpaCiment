@@ -24,16 +24,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public Authentication & Session endpoints for React SPA
-Route::middleware(['web'])->group(function (): void {
-    Route::get('/csrf-token', fn () => response()->json([
-        'data' => [
-            'token' => csrf_token(),
-        ],
-    ]))->name('api.csrf-token');
+//RATE LIMITING 5 requete par minute throttle
+Route::post('/login', [SessionController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('api.login');
 
-    Route::post('/login', [SessionController::class, 'store'])->name('api.login');
-    Route::post('/logout', [SessionController::class, 'destroy'])->name('api.logout');
-});
+Route::post('/logout', [SessionController::class, 'destroy'])
+    ->middleware('auth:sanctum')
+    ->name('api.logout');
 
 // Public routes for candidates
 Route::get('/public/offres', [OffreController::class, 'publicIndex'])->name('api.public.offres.index');
@@ -85,14 +83,14 @@ Route::post('/public/pipeline-log-error', function (\Illuminate\Http\Request $re
     return response()->json(['status' => 'logged', 'timestamp' => now()->toIso8601String()]);
 })->name('api.public.pipeline-log-error');
 
-// Protected Back-Office routes
-Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
+// Protected Back-Office routes (Stateless Sanctum Bearer Token)
+Route::middleware(['auth:sanctum', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
     Route::get('/me', MeController::class)->name('api.me');
 
     Route::get('/dashboard', DashboardController::class)->name('api.dashboard');
     Route::get('/referentiels/recrutement', ReferentielController::class)->name('api.referentiels.recrutement');
     Route::get('/referentiels/statuts-candidature', [CandidatureController::class, 'statuts'])->name('api.referentiels.statuts-candidature');
-    
+
     Route::get('/lieux', [\App\Http\Controllers\Api\LieuController::class, 'index'])->name('api.lieux.index');
     Route::get('/niveaux', [\App\Http\Controllers\Api\NiveauController::class, 'index'])->name('api.niveaux.index');
 
@@ -113,18 +111,24 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     // --- ADMINISTRATION REFERENTIELS ---
     Route::middleware('permission:manage_referentiels')->group(function (): void {
         Route::post('/directions', [DirectionController::class, 'store'])->name('api.directions.store');
+        Route::post('/referentiels/directions', [DirectionController::class, 'store']); // Alias
         Route::put('/direction/{direction}', [DirectionController::class, 'update'])->name('api.direction.update');
         Route::put('/directions/{direction}', [DirectionController::class, 'update']); // Alias
+        Route::put('/referentiels/directions/{direction}', [DirectionController::class, 'update']); // Alias
         Route::delete('/direction/{direction}', [DirectionController::class, 'destroy'])->name('api.direction.destroy');
         Route::delete('/directions/{direction}', [DirectionController::class, 'destroy']); // Alias
+        Route::delete('/referentiels/directions/{direction}', [DirectionController::class, 'destroy']); // Alias
 
         Route::post('/domaines', [DomaineController::class, 'store'])->name('api.domaines.store');
+        Route::post('/referentiels/domaines', [DomaineController::class, 'store']); // Alias
         Route::put('/domaine/{domaine}', [DomaineController::class, 'update'])->name('api.domaine.update');
         Route::put('/domaines/{domaine}', [DomaineController::class, 'update']); // Alias
+        Route::put('/referentiels/domaines/{domaine}', [DomaineController::class, 'update']); // Alias
         Route::patch('/domaine/{domaine}/valider', [DomaineController::class, 'validateDomain'])->name('api.domaine.validate');
         Route::patch('/domaines/{domaine}/valider', [DomaineController::class, 'validateDomain']); // Alias
         Route::delete('/domaine/{domaine}', [DomaineController::class, 'destroy'])->name('api.domaine.destroy');
         Route::delete('/domaines/{domaine}', [DomaineController::class, 'destroy']); // Alias
+        Route::delete('/referentiels/domaines/{domaine}', [DomaineController::class, 'destroy']); // Alias
 
         Route::post('/competences', [CompetenceController::class, 'store'])->name('api.competences.store');
     });
@@ -149,7 +153,7 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     // --- CANDIDATURES ---
     Route::get('/candidatures', [CandidatureController::class, 'index'])->name('api.candidatures.index');
     Route::post('/candidatures/saisir-rh', [CandidatureController::class, 'saisirRh'])->name('api.candidatures.saisir-rh');
-    
+
     // Singular Candidature routes
     Route::get('/candidature/{id}', [CandidatureController::class, 'show'])->name('api.candidature.show');
     Route::get('/candidatures/{id}', [CandidatureController::class, 'show']); // Alias

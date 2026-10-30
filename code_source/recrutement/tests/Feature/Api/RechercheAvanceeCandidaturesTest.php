@@ -182,6 +182,16 @@ class RechercheAvanceeCandidaturesTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::create('vivier_candidat', function (Blueprint $table) {
+            $table->id('id_vivier_candidat');
+            $table->unsignedBigInteger('id_candidat');
+            $table->unsignedBigInteger('id_direction')->nullable();
+            $table->unsignedBigInteger('id_domaine')->nullable();
+            $table->string('motif_ajout', 255)->nullable();
+            $table->string('statut', 50)->default('Actif');
+            $table->timestamps();
+        });
+
         // 2. Utilisateur RH authentifié
         $this->rhUser = User::create([
             'nom' => 'Responsable RH AlpA',
@@ -406,5 +416,44 @@ class RechercheAvanceeCandidaturesTest extends TestCase
         $this->assertEquals($candTargetCandidature->id_candidature, $item['id_candidature']);
         $this->assertNotNull($item['cv_snippet']);
         $this->assertStringContainsString('logistique', strtolower($item['cv_snippet']));
+    }
+
+    public function test_recherche_cv_snippet_insensible_aux_accents_et_vivier(): void
+    {
+        $cand = Candidat::create(['nom' => 'Rakoto', 'prenom' => 'Jean', 'email' => 'jean.rakoto@alpa.mg']);
+        $candidature = Candidature::create([
+            'id_candidat' => $cand->id_candidat,
+            'dans_vivier' => true,
+            'poste_souhaite' => 'Développeur Fullstack',
+        ]);
+
+        Document::create([
+            'id_candidature' => $candidature->id_candidature,
+            'type_document' => 'cv',
+            'nom_fichier' => 'cv_jean.pdf',
+            'chemin_fichier' => '/docs/jean.pdf',
+            'contenu_texte_extrait' => 'Expérience significative : 5 ans en tant que développeur developpeur PHP Symfony et ingénieur ingenieur logiciel.',
+        ]);
+
+        // 1. Recherche dans candidatures sans accent "developpeur"
+        $respCand = $this->getJson('/api/candidatures?cv_keyword=developpeur');
+        $respCand->assertStatus(200);
+        $this->assertCount(1, $respCand->json('data'));
+        $this->assertNotNull($respCand->json('data.0.cv_snippet'));
+        $this->assertStringContainsString('développeur', $respCand->json('data.0.cv_snippet'));
+
+        // 2. Recherche dans candidatures sans accent "ingenieur"
+        $respIng = $this->getJson('/api/candidatures?cv_keyword=ingenieur');
+        $respIng->assertStatus(200);
+        $this->assertCount(1, $respIng->json('data'));
+        $this->assertNotNull($respIng->json('data.0.cv_snippet'));
+        $this->assertStringContainsString('ingénieur', $respIng->json('data.0.cv_snippet'));
+
+        // 3. Recherche dans vivier sans accent "developpeur"
+        $respVivier = $this->getJson('/api/vivier?q=developpeur');
+        $respVivier->assertStatus(200);
+        $this->assertNotEmpty($respVivier->json('data'));
+        $this->assertNotNull($respVivier->json('data.0.cv_snippet'));
+        $this->assertStringContainsString('développeur', $respVivier->json('data.0.cv_snippet'));
     }
 }
