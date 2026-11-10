@@ -1,5 +1,5 @@
 {
-  "name": "AlpA Ciment - Error Handler (Dead Letter Queue)",
+  "name": "Alpha Ciment - Error Handler (Dead Letter Queue)",
   "nodes": [
     {
       "parameters": {},
@@ -14,7 +14,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const errorData = $json;\nconst execution = errorData.execution || {};\nconst workflow = errorData.workflow || {};\nconst lastNode = execution.lastNodeExecuted || 'Inconnu';\nconst errorMsg = execution.error?.message || errorData.message || 'Erreur non spécifiée';\n\nreturn {\n  json: {\n    timestamp: new Date().toISOString(),\n    workflow_id: workflow.id || 'alpa-recrutement',\n    workflow_name: workflow.name || 'Ingestion Candidature',\n    noeud_en_echec: lastNode,\n    message_erreur: errorMsg,\n    details: execution.error || {},\n    severite: 'CRITIQUE',\n    alerte: `⚠️ Échec d'ingestion e-mail AlpA Ciment sur le nœud [${lastNode}]: ${errorMsg}`\n  }\n};"
+        "jsCode": "const errorData = $json;\nconst execution = errorData.execution || {};\nconst workflow = errorData.workflow || {};\nconst lastNode = execution.lastNodeExecuted || 'Inconnu';\nconst errorMsg = execution.error?.message || errorData.message || 'Erreur non spécifiée';\n\nreturn {\n  json: {\n    timestamp: new Date().toISOString(),\n    workflow_id: workflow.id || 'alpha-recrutement',\n    workflow_name: workflow.name || 'Ingestion Candidature',\n    noeud_en_echec: lastNode,\n    message_erreur: errorMsg,\n    details: execution.error || {},\n    severite: 'CRITIQUE',\n    alerte: `⚠️ Échec d'ingestion e-mail Alpha Ciment sur le nœud [${lastNode}]: ${errorMsg}`\n  }\n};"
       },
       "id": "node-format-error",
       "name": "1. Formater Données Erreur",
@@ -28,7 +28,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://host.docker.internal:8000/api/public/pipeline-log-error",
+        "url": "={{ $env.LARAVEL_BASE_URL }}/api/public/pipeline-log-error",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify($json) }}",

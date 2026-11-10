@@ -1,4 +1,4 @@
-# Frontend React - Recrutement AlpA Ciment
+# Frontend React - Recrutement Alpha Ciment
 
 Ce dossier contient le frontend React séparé du backend Laravel.
 

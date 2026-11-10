@@ -8,7 +8,7 @@ Vitesse d'écriture	Légèrement plus rapide	Nécessite une conversion binaire �
 Vitesse de lecture & recherche	Lente (PostgreSQL doit re-parser tout le texte à chaque requête)	Ultra-rapide (accès direct aux clés en mémoire)
 Indexation	Impossible d'indexer directement	Indexable avec GIN pour des recherches instantanées
 Suppression des espaces & doublons	Conserve les espaces inutiles	Élimine les doublons de clés et compresse les données
-3. Quel est l'intérêt métier pour AlpA Ciment ?
+3. Quel est l'intérêt métier pour Alpha Ciment ?
 La flexibilité d'un modèle NoSQL au sein d'une base SQL relationnelle : Chaque CV a une structure imprévisible : certains candidats ont 10 certifications, d'autres ont 3 projets de fin d'études. Au lieu de figer 40 colonnes SQL vides (certification_1, certification_2...), JSONB permet de stocker des structures polymorphes et évolutives.
 Des requêtes SQL avancées sans décoder en PHP : Grâce aux opérateurs PostgreSQL (->, ->>, @>), on peut interroger l'intérieur du JSON directement en SQL :
 sql

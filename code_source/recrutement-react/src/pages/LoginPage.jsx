@@ -61,12 +61,12 @@ export function LoginPage({ onLoginSuccess }) {
                         <div className="login-logo-container">
                             <img
                                 src="/logo/logo-cut.png"
-                                alt="AlpA Ciment Logo"
+                                alt="Alpha Ciment Logo"
                                 className="login-logo-img"
                             />
                         </div>
                         <div>
-                            <h1 className="login-brand-title">AlpA Ciment</h1>
+                            <h1 className="login-brand-title">Alpha Ciment</h1>
                             <p className="login-brand-tagline">
                                 Plateforme Recrutement & Gestion des Talents
                             </p>
@@ -106,7 +106,7 @@ export function LoginPage({ onLoginSuccess }) {
                     </div>
 
                     <div className="login-brand-footer">
-                        <span>AlpA Ciment Madagascar</span>
+                        <span>Alpha Ciment Madagascar</span>
                         <div className="login-badge-pill">
                             <span className="login-badge-dot"></span>
                             <span>Espace Sécurisé</span>

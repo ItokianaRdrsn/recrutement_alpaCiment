@@ -288,7 +288,7 @@ class CandidatureIntakeTest extends TestCase
         $payload = [
             'nom' => 'Corrupt',
             'prenom' => 'Base64',
-            'email' => 'corrupt@alpaciment.local',
+            'email' => 'corrupt@alphaciment.local',
             'source' => 'n8n',
             'cv_base64' => 'NOT-VALID-BASE64-CORRUPT!@#$',
             'cv_nom' => 'corrupted.pdf',
@@ -335,7 +335,7 @@ class CandidatureIntakeTest extends TestCase
         $payload = [
             'nom' => 'Rakoto',
             'prenom' => 'Valide',
-            'email' => 'rakoto.valide@alpaciment.local',
+            'email' => 'rakoto.valide@alphaciment.local',
             'source' => 'n8n',
             'cv_base64' => base64_encode($validPdf),
             'cv_nom' => 'mon_cv_original.pdf',
@@ -366,7 +366,7 @@ class CandidatureIntakeTest extends TestCase
         $payload = [
             'nom' => 'Rabe',
             'prenom' => 'Docx',
-            'email' => 'rabe.docx@alpaciment.local',
+            'email' => 'rabe.docx@alphaciment.local',
             'source' => 'n8n',
             'cv_base64' => base64_encode($fakeDocx),
             'cv_nom' => 'mon_cv.docx',
@@ -389,7 +389,7 @@ class CandidatureIntakeTest extends TestCase
         $payload = [
             'nom' => 'Sans',
             'prenom' => 'Cv',
-            'email' => 'sans.cv@alpaciment.local',
+            'email' => 'sans.cv@alphaciment.local',
             'source' => 'n8n',
         ];
 
@@ -426,7 +426,7 @@ class CandidatureIntakeTest extends TestCase
         $candidat = Candidat::create([
             'nom' => 'Workflow',
             'prenom' => 'Tester',
-            'email' => 'workflow@alpaciment.local',
+            'email' => 'workflow@alphaciment.local',
         ]);
 
         $candidature = Candidature::create([
@@ -452,7 +452,7 @@ class CandidatureIntakeTest extends TestCase
         $candidat = Candidat::create([
             'nom' => 'Workflow',
             'prenom' => 'Regress',
-            'email' => 'regress@alpaciment.local',
+            'email' => 'regress@alphaciment.local',
         ]);
 
         $candidature = Candidature::create([
@@ -474,7 +474,7 @@ class CandidatureIntakeTest extends TestCase
         $candidat = Candidat::create([
             'nom' => 'Vivier',
             'prenom' => 'Tester',
-            'email' => 'vivier@alpaciment.local',
+            'email' => 'vivier@alphaciment.local',
         ]);
 
         $candidature = Candidature::create([

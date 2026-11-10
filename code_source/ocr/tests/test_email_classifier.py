@@ -23,7 +23,7 @@ ACTIVE_OFFERS = [
 
 def test_pre_filter_sender_robot():
     """Vérifie que les expéditeurs système/no-reply sont interceptés sans IA."""
-    res = pre_filter_automatic_emails(sender="mailer-daemon@alpaciment.mg", subject="Test")
+    res = pre_filter_automatic_emails(sender="mailer-daemon@alphaciment.mg", subject="Test")
     assert res is not None
     assert res["type"] == "hors_sujet"
     assert res["confiance"] == 1.0

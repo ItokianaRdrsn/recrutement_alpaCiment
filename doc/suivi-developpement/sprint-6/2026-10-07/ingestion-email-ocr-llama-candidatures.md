@@ -2,7 +2,7 @@
 
 **Date :** 07 Octobre 2026  
 **Sprint :** Sprint 6 (Communication, Réception & Ingestion des Candidatures par E-mail)  
-**Auteurs :** Équipe Recrutement AlpA Ciment  
+**Auteurs :** Équipe Recrutement Alpha Ciment  
 
 ---
 
@@ -26,10 +26,10 @@ L'objectif de cette tâche est d'automatiser entièrement le cycle d'ingestion e
 
 ### Étape 1 : Optimisation de l'Extraction OCR & Parsing Local (FastAPI + Ollama)
 - **Fichiers modifiés / créés :**
-  - [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py)
-  - [`code_source/ocr/cv_ocr_extractor.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_ocr_extractor.py)
-  - [`code_source/ocr/email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/email_classifier.py)
-  - [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py)
+  - [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_llm_parser.py)
+  - [`code_source/ocr/cv_ocr_extractor.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_ocr_extractor.py)
+  - [`code_source/ocr/email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/email_classifier.py)
+  - [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py)
 - **Actions réalisées :**
   - Détection PDF universelle basée sur les octets magiques `b"%PDF"` : même si le nom de fichier temporaire n8n n'a pas d'extension `.pdf`, `pypdf` extrait le texte instantanément (~0.05s).
   - Désactivation de l'angle classification (`cls=False`, `use_angle_cls=False`) sur PaddleOCR pour alléger le traitement CPU si une image scannée est soumise.
@@ -40,22 +40,22 @@ L'objectif de cette tâche est d'automatiser entièrement le cycle d'ingestion e
 
 ### Étape 2 : Référentiel des Offres & Directions (Alias & Références)
 - **Fichier migration :**
-  - [`database/migrations/2026_10_07_000000_add_alias_to_direction_and_reference_to_offre.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_10_07_000000_add_alias_to_direction_and_reference_to_offre.php)
+  - [`database/migrations/2026_10_07_000000_add_alias_to_direction_and_reference_to_offre.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/database/migrations/2026_10_07_000000_add_alias_to_direction_and_reference_to_offre.php)
 - **Actions réalisées :**
   - Ajout de la colonne `alias` sur la table `direction` (IT, RH, FIN, MKT, COMM, etc.).
   - Ajout de la colonne `reference` sur la table `offre` (ex: `IT-1`, `RH-3`).
-  - Hook Eloquent sur [`Offre.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Offre.php) générant automatiquement la référence lors de la création d'une offre si non renseignée.
-  - Affichage de badges bleus de référence dans la liste des offres React ([`OffersTable.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/tables/OffersTable.jsx)).
+  - Hook Eloquent sur [`Offre.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/Offre.php) générant automatiquement la référence lors de la création d'une offre si non renseignée.
+  - Affichage de badges bleus de référence dans la liste des offres React ([`OffersTable.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/tables/OffersTable.jsx)).
 
 ---
 
 ### Étape 3 : Ingestion Automatique dans Laravel (Candidature, Profils & Documents)
 - **Fichiers modifiés :**
-  - [`app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php)
-  - [`app/Services/CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php)
-  - [`app/Models/Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Candidature.php)
-  - [`app/Repositories/Eloquent/EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php)
-  - [`app/Http/Resources/CandidatureResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/CandidatureResource.php)
+  - [`app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php)
+  - [`app/Services/CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php)
+  - [`app/Models/Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/Candidature.php)
+  - [`app/Repositories/Eloquent/EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php)
+  - [`app/Http/Resources/CandidatureResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Resources/CandidatureResource.php)
 - **Actions réalisées :**
   - **Support du payload JSON n8n** : Prise en charge des requêtes JSON brutes avec les champs `cv_base64`, `cv_nom`, `cv_mime`.
   - **Décodage Base64 et stockage fichier** : La méthode `storeFiles()` vérifie le tableau `$data` et l'objet `$request`, supprime les en-têtes Data-URI si présents, écrit le fichier dans `storage/app/public/documents/cv/` et crée une ligne dans `document`.
@@ -81,7 +81,7 @@ L'objectif de cette tâche est d'automatiser entièrement le cycle d'ingestion e
 
 ### Étape 5 : Interface RH - Fiche Candidat & Visualisation Double Colonne
 - **Fichier modifié :**
-  - [`code_source/recrutement-react/src/pages/CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx)
+  - [`code_source/recrutement-react/src/pages/CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx)
 - **Actions réalisées :**
   - **Chargement automatique** : Les données OCR existantes sont chargées dès l'ouverture de la vue depuis la ressource API.
   - **Onglet "Extraction CV" côte à côte** :

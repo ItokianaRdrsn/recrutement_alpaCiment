@@ -1,6 +1,6 @@
 # Document Central de Suivi par Étape et d'Avancement Global (68,0 j)
 
-Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et le journal chronologique cumulatif de toutes les demandes utilisateur (Prompts) avec leurs résolutions.
+Ce document récapitule l'organisation du projet *recrutement_alphaCiment*, l'avancement global en pourcentage (`% terminé`), le développement du **Sprint 5** et le journal chronologique cumulatif de toutes les demandes utilisateur (Prompts) avec leurs résolutions.
 
 ---
 
@@ -82,7 +82,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 10 : Uniformisation de la page de connexion Blade officielle & suppression du composant React en double
-> **User Prompt :** *"pourquoi je me retrouve parfois dans cette page qui ne fonctionne pas ... et lorsque je reactualise ,j'arrive sur la bonne: Back-office recrutement Connexion a l'espace RH AlpA Ciment. Compte de depart : admin@alphaciment.local / password ... supprime la premiere page ,je ne sais pas d'ou ca viens ,ensuite pour le doc de suivi ,arrete de supprimer les anciens ,rajoute toujours a chaque fois et mets aussi mes prompts"*
+> **User Prompt :** *"pourquoi je me retrouve parfois dans cette page qui ne fonctionne pas ... et lorsque je reactualise ,j'arrive sur la bonne: Back-office recrutement Connexion a l'espace RH Alpha Ciment. Compte de depart : admin@alphaciment.local / password ... supprime la premiere page ,je ne sais pas d'ou ca viens ,ensuite pour le doc de suivi ,arrete de supprimer les anciens ,rajoute toujours a chaque fois et mets aussi mes prompts"*
 - **Résolution :** 
   1. Suppression définitive du composant React temporaire `src/pages/LoginPage.jsx`.
   2. Configuration de `redirectToLogin()` et `submitLogout()` pour rediriger systématiquement vers la page officielle Laravel Blade (`resources/views/auth/login.blade.php`).
@@ -118,9 +118,9 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 12 : Nouvelles Règles de Gestion Vivier, Fichiers de Méthodologie, Règles & Dossier Horodaté Sprint 5
 > **User Prompt :** *"la maintenant ,c'est des sprint dont on parle alors ,tu crees un dossier du jour dans le sprint 5 ,franchement , supprimes l'ancien vivier et copie le dans ce nouveau dossier avec les mises a jour ,et aussi crees un nouveau dossier avec toutes les regles de gestion qu'on a mis depuis le debut ,et aussi rajoute justement cette regle de gestion ,lorsqu'un candidat est en vivier ,on ne peut plus changer son status ,et lorsqu'il est retunue ,on ne peut plus mettre en vivier .Creer moi un fichier methodologie qui devra lister les etapes par lesquelles du doit passer a chaque prompt que je te fais comme lorsqu'il s'agit des sprints , creer dossier du jour et faire fichier sur la taches ,explications du code ,source ,et aussi mettre dans doc suivi ,ensuite pour les rectifications ,mettres dans doc suivi juste ,pas de sprint ,a toi de juger si c'est rectification ou sprint ,mais dans tous les cas ,on doit mettre dans doc suivi ,et toutes les regles de gestion mettre dans un fichier regle de gestion"*
 - **Résolution :**
-  1. **Dossier Horodaté du jour** : Création de [sprint-5/2026-09-01/](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-09-01/) et rédaction de [vivier-talents-competences.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-09-01/vivier-talents-competences.md).
-  2. **Registre des Règles de Gestion** : Création de [regles-de-gestion.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/regles-de-gestion.md).
-  3. **Guide Méthodologique** : Création de [methodologie.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md).
+  1. **Dossier Horodaté du jour** : Création de [sprint-5/2026-09-01/](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/sprint-5/2026-09-01/) et rédaction de [vivier-talents-competences.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/sprint-5/2026-09-01/vivier-talents-competences.md).
+  2. **Registre des Règles de Gestion** : Création de [regles-de-gestion.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/regles-de-gestion.md).
+  3. **Guide Méthodologique** : Création de [methodologie.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/methodologie.md).
   4. **Nouvelles Règles Métier Implémentées (Code Backend + Frontend)** :
      - **Verrouillage du Statut RH en Vivier** : Si `dans_vivier = true`, le changement de statut RH est désactivé et bloqué.
      - **Exclusion du Vivier pour Statut Retenue** : Si le statut de la candidature est `Retenue`, le bouton d'ajout au vivier est désactivé et bloqué.
@@ -170,7 +170,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 18 (Sprint 5) : Gestion Manuelle des Compétences, Expériences et Formations Candidat (1,5 j - 100%)
 > **User Prompt :** *"pour me sprint 5 peux tu faire ceci #### **[À FAIRE]** Gestion manuelle des compétences, expériences et formations candidat (1,5 j) - **100%** - **Notes :** Drawe/Modal Profil Candidat RH permettant d'ajouter et consulter les compétences avec leur niveau (Débutant, Intermédiaire, Avancé, Expert), expériences pro et diplômes."*
-- **Résolution :** Création du document de tâche du jour [gestion-manuelle-competences-experiences-formations.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-5/2026-09-01/gestion-manuelle-competences-experiences-formations.md) et intégration de la gestion du profil.
+- **Résolution :** Création du document de tâche du jour [gestion-manuelle-competences-experiences-formations.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/sprint-5/2026-09-01/gestion-manuelle-competences-experiences-formations.md) et intégration de la gestion du profil.
 
 ---
 
@@ -424,9 +424,9 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 55 (Rectification / Migration Globale des Tables Candidat sur `id_candidature`) :
-1. **Migration PostgreSQL & Schéma Database ([2026_09_04_001000_alter_candidat_tables_to_id_candidature.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_09_04_001000_alter_candidat_tables_to_id_candidature.php))** :
+1. **Migration PostgreSQL & Schéma Database ([2026_09_04_001000_alter_candidat_tables_to_id_candidature.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/database/migrations/2026_09_04_001000_alter_candidat_tables_to_id_candidature.php))** :
    - Exécution de la migration PostgreSQL altérant `candidat_competence`, `candidat_experience_professionnelle` et `candidat_formation` pour remplacer la clé étrangère `id_candidat` par `id_candidature` (referencing `candidature(id_candidature) ON DELETE CASCADE`).
-2. **Alignement Backend Eloquent & Controller ([VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php#L418-L465))** :
+2. **Alignement Backend Eloquent & Controller ([VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php#L418-L465))** :
    - Mise à jour des insertions/mises à jour dans `VivierController.php` pour cibler strictement `id_candidature`.
 3. **Alignement Frontend React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L119-L193))** :
    - Remplacement de tout reliquat `details?.id_candidat` par `details?.id_candidature` dans les fonctions `handleAddCompetence`, `handleAddExperience`, `handleAddFormation` et `loadCandidateProfile`.
@@ -440,9 +440,9 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 56 (Explication / Architecture d'Intégration du Microservice FastAPI & NLP) :
-1. **Composant Microservice Python/FastAPI ([code_source/ocr/](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/))** :
+1. **Composant Microservice Python/FastAPI ([code_source/ocr/](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/))** :
    - Le microservice est hébergé dans le dossier `code_source/ocr/`. Il contient `main.py` (FastAPI sur le port **8001** avec les endpoints `POST /extract-cv` et `POST /extract`), `cv_nlp_parser.py` (module NLP pour le sectionnement heuristique, extraction de coordonnées, recherche floue avec RapidFuzz et spaCy) et `test_cv_nlp_parser.py`.
-2. **Point de Branchement Backend Laravel ([VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php#L318-L336))** :
+2. **Point de Branchement Backend Laravel ([VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php#L318-L336))** :
    - Lorsque le bouton d'extraction est cliqué dans l'interface RH, React appelle `POST /api/candidature/{id}/ocr/extract`.
    - La méthode `VivierController::extractOcr()` récupère le fichier CV stocké (PDF ou image) et le transmet via une requête HTTP multipart au microservice FastAPI : `Http::post('http://127.0.0.1:8001/extract-cv')`.
 3. **Point de Trigger dans l'Interface React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx#L890-L925))** :
@@ -453,7 +453,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 57 (Rectification / Intégration du Référentiel Niveau dans la Formation Candidat) :
-1. **Évolution Schéma Database & Backend Eloquent ([CandidatFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatFormation.php) & [VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php))** :
+1. **Évolution Schéma Database & Backend Eloquent ([CandidatFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/CandidatFormation.php) & [VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/VivierController.php))** :
    - Ajout de la colonne `id_niveau` (`BIGINT REFERENCES niveau(id_niveau) ON DELETE SET NULL`) sur la table PostgreSQL `candidat_formation`.
    - Ajout de la relation Eloquent `niveauRel()` `BelongsTo` dans `CandidatFormation` et chargement eager-load `with('niveauRel')` dans `getCandidateProfile()`.
    - Prise en charge explicite de `id_niveau` et `niveau` dans `VivierController::addFormation()`.
@@ -474,7 +474,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Réinitialisation des Données en Base PostgreSQL** :
    - Exécution du script de réinitialisation `reseed_database.php` vidant les anciennes candidatures et offres (`TRUNCATE TABLE candidat_competence, candidat_experience_professionnelle, candidat_formation, historique_statut, document, candidature, candidat, profil_competence, profil_formation, mission, offre RESTART IDENTITY CASCADE;`).
 2. **Génération des Offres de Postes Réelles (14 Offres Diversifiées)** :
-   - Insertion de 14 offres de recrutement réelles et diversifiées couvrant toutes les directions (`Informatique`, `Ressources Humaines`, `Finance`, `Marketing`, `Commercial`) et tous les lieux (`Antananarivo`, `Usine AlpA Ciment`, `Toamasina`, `Mahajanga`).
+   - Insertion de 14 offres de recrutement réelles et diversifiées couvrant toutes les directions (`Informatique`, `Ressources Humaines`, `Finance`, `Marketing`, `Commercial`) et tous les lieux (`Antananarivo`, `Usine Alpha Ciment`, `Toamasina`, `Mahajanga`).
 3. **Génération des Candidatures au Statut "Reçue" (98 Candidatures)** :
    - Génération de **98 candidatures** avec profils candidats complets (formations rattachées aux niveaux du référentiel, expériences professionnelles, compétences).
    - **Toutes les candidatures (100%)** ont été créées au statut **"Reçue"** (`id_statut_candidature = 1`, `ordre_workflow = 10`), avec `dans_vivier = false`.
@@ -590,7 +590,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 67 (Documentation / Intégration du Planning Calendaire avec Dates Prévisionnelles et Réelles Hors Week-ends) :
-1. **Périmètre & Calcul Calendaire ([planning-sprints.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/planning-sprints.md) & [doc-suivi-etape.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/doc-suivi-etape.md#L12-L22))** :
+1. **Périmètre & Calcul Calendaire ([planning-sprints.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/planning-sprints.md) & [doc-suivi-etape.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/doc-suivi-etape.md#L12-L22))** :
    - Prise en compte de la date de démarrage officielle au **Mercredi 12 Août 2026** (réception du cahier des charges).
    - Calcul strict des dates en **jours ouvrés uniquement** (Lundi au Vendredi - Hors week-ends Samedi et Dimanche).
    - Intégration des colonnes **Début Prévu**, **Fin Prévue**, **Début Réel** et **Fin Réelle** dans le tableau de synthèse et les sous-sections de détails.
@@ -601,7 +601,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 68 (Documentation / Harmonisation Complète sur la Découpe Officielle à 68,0 Jours) :
-1. **Nouveau Périmètre Officiel à 68,0 Jours ([planning-sprints.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/planning-sprints.md) & [doc-suivi-etape.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/doc-suivi-etape.md#L1-L25))** :
+1. **Nouveau Périmètre Officiel à 68,0 Jours ([planning-sprints.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/planning-sprints.md) & [doc-suivi-etape.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/doc-suivi-etape.md#L1-L25))** :
    - Mise à jour du Sprint 3 à **7,5 j** avec l'ajout de la tâche *Saisie manuelle d'une candidature par un RH (1,0 j)* sous la sous-catégorie *BACK-OFFICE*.
    - Ajustement du Sprint 7 à **10,0 j** (Recherche avancée mots-clés CV à 1,5 j et Documentation/Déploiement à 1,5 j).
    - Intégration de l'ensemble des sous-catégories fonctionnelles (`BACK-OFFICE`, `FRONT-OFFICE`, `API / SERVICES`, `OCR / IA`) dans le détail de chaque sprint.
@@ -651,11 +651,11 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 70 (Frontend React & Auth / Remplacement de `login.blade.php` par un Composant React `LoginPage` & Explication des Contrôleurs Web) :
-1. **Création du Composant Login React ([LoginPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/LoginPage.jsx))** :
-   - Conception d'une page de connexion moderne aux couleurs d'AlpA Ciment (fond dégradé sombre, carte élégante, icônes `Building2`, `Mail`, `Lock`, `Eye`/`EyeOff` pour masquer/afficher le mot de passe, bouton "Se connecter" avec indicateur de chargement).
+1. **Création du Composant Login React ([LoginPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/LoginPage.jsx))** :
+   - Conception d'une page de connexion moderne aux couleurs d'Alpha Ciment (fond dégradé sombre, carte élégante, icônes `Building2`, `Mail`, `Lock`, `Eye`/`EyeOff` pour masquer/afficher le mot de passe, bouton "Se connecter" avec indicateur de chargement).
    - Prise en charge des comptes de démonstration en 1 clic rapide (`admin@alphaciment.local`, `rh@alphaciment.local`).
    - Lien direct vers le portail public des offres d'emploi pour les candidats (`/candidat/offres`).
-2. **Routage SPA & Déconnexion du Template Blade ([main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx) & [client.js](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/api/client.js))** :
+2. **Routage SPA & Déconnexion du Template Blade ([main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx) & [client.js](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/api/client.js))** :
    - Intégration de la route `/login` directement dans React Router.
    - Si un utilisateur non authentifié accède au Back-Office, `BackOfficeLayout` redirige de manière fluide vers `<Navigate to="/login" replace />` au lieu d'une redirection externe vers le port 8000.
    - Mise à jour de `submitLogin({ email, password, remember })` et `submitLogout()` vers les endpoints d'API de session.
@@ -681,7 +681,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Inspection du fichier journal `storage/logs/laravel.log` et reproduction isolée par script de test backend :
      `local.ERROR: Call to a member function relationLoaded() on array at ... VivierResource.php(20): Illuminate\Http\Resources\Json\JsonResource->whenLoaded('direction')`.
    - **Origine** : `VivierService::listVivier()` retourne une collection combinée d'éléments sous forme de tableaux associatifs (`array`), et non d'instances de modèles Eloquent. Dans `VivierResource::toArray()`, l'appel direct à `$this->whenLoaded(...)` échouait car la méthode `whenLoaded()` attend une instance de modèle Eloquent et tente d'appeler `relationLoaded()` sur la ressource sous-jacente.
-2. **Correctif apporté ([VivierResource.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/VivierResource.php))** :
+2. **Correctif apporté ([VivierResource.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Resources/VivierResource.php))** :
    - Ajout d'une détection `is_array($this->resource)` au sein de `VivierResource::toArray()` :
      - Si la ressource est un tableau associatif (retour de listing combiné du vivier), les clés correspondantes (`id_vivier_candidat`, `candidat`, `direction`, `domaine`, etc.) sont mappées directement et de manière sécurisée sans invoquer `whenLoaded()`.
      - Si la ressource est un modèle Eloquent (ex. lors d'un `store()` ou consultation unitaire), le comportement avec `whenLoaded()` est préservé.
@@ -703,7 +703,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Les champs `id_type_contrat` et `description` avaient été déclarés avec la règle `'required'` dans `StoreOffreRequest.php` et `UpdateOffreRequest.php`.
      - Or, dans le schéma PostgreSQL de la table `offre` et dans l'interface React, le type de contrat est facultatif ("Non précisé" -> valeur `null`) et la description du poste peut être omise lors de la rédaction préliminaire d'un brouillon.
      - De plus, les sous-tableaux (`profils`, `missions`, `formations`, `competences`) contenaient des chaînes vides pour les valeurs non renseignées (ex: `valeur_min: ""`, `id_niveau_min: ""`), ce qui pouvait entrer en conflit avec les règles numériques/integer strictes.
-2. **Correctif apporté ([StoreOffreRequest.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Offre/StoreOffreRequest.php) & [UpdateOffreRequest.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Offre/UpdateOffreRequest.php) & [OffreService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/OffreService.php))** :
+2. **Correctif apporté ([StoreOffreRequest.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Requests/Offre/StoreOffreRequest.php) & [UpdateOffreRequest.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Requests/Offre/UpdateOffreRequest.php) & [OffreService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/OffreService.php))** :
    - **Règles assouplies et conformes** :
      - `description` : `['nullable', 'string']`
      - `id_type_contrat` : `['nullable', 'integer', 'exists:type_contrat,id_type_contrat']`
@@ -711,7 +711,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - `lieu` : `['nullable', 'string', 'max:150']`
    - **Méthode `prepareForValidation()`** : conversion sécurisée des chaînes vides en `null` ou entiers typés avant l'exécution du validateur.
    - **Nettoyage dans `OffreService`** : désimbrication (`unset`) des relations imbriquées (`profils`, `missions`, `formations`, `competences`) de `$data` avant l'écriture dans la table `offre`, puis synchronisation relationnelle via `EloquentOffreRepository::syncNestedRelations`.
-   - **Amélioration UX erreurs ([client.js](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/api/client.js))** : affichage explicite des messages d'erreur détaillés renvoyés par l'API dans le toast/bandeau rouge au lieu d'un code générique.
+   - **Amélioration UX erreurs ([client.js](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/api/client.js))** : affichage explicite des messages d'erreur détaillés renvoyés par l'API dans le toast/bandeau rouge au lieu d'un code générique.
 3. **Validation & Tests** :
    - Test d'intégration complet `test_post_offre_http.php` : `STATUS: 200 OK` avec retour de la ressource offre sérialisée.
    - Suite de tests des couches Clean Architecture (`test_refactored_backend.php`) : 5/5 validés.
@@ -733,7 +733,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **Origine dans le code** :
      - Dans `VivierService::addExperience()` et `addFormation()`, le code transmettait explicitement `'id_candidat' => $idCandidat` au repository.
      - Dans les modèles Eloquent `CandidatExperience.php` et `CandidatFormation.php`, `'id_candidat'` figurait dans `$fillable` et tentait une insertion directe en base.
-2. **Correctif apporté ([VivierService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php), [CandidatExperience.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatExperience.php), [CandidatFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatFormation.php))** :
+2. **Correctif apporté ([VivierService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/VivierService.php), [CandidatExperience.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/CandidatExperience.php), [CandidatFormation.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/CandidatFormation.php))** :
    - Retrait de `'id_candidat'` dans `VivierService::addExperience()` et `VivierService::addFormation()`.
    - Retrait de `'id_candidat'` de `$fillable` dans `CandidatExperience` et `CandidatFormation`.
    - Mise à jour de la relation `$this->candidat()` dans les deux modèles via `hasOneThrough(Candidat::class, Candidature::class, ...)` afin de permettre la lecture fluide du candidat sans exiger de colonne physique `id_candidat` sur la table enfant.
@@ -752,18 +752,18 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 74 (UX / Intégration d'un Loader Moderne & Fluide pour les Offres et Candidatures) :
 1. **Analyse du besoin & Réponse technique** :
    - L'utilisateur souhaitait afficher un loader lors du chargement des offres et des candidatures et demandait s'il était nécessaire de télécharger un asset externe (GIF, image, etc.).
-   - **Décision d'architecture frontend** : Aucun téléchargement externe nécessaire. Utilisation des composants React existants et de CSS3 moderne pour concevoir un loader natif, léger (0 Ko de média lourd), fluide à 60 fps et parfaitement harmonisé avec la charte graphique AlpA Ciment.
-2. **Implémentation ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Décision d'architecture frontend** : Aucun téléchargement externe nécessaire. Utilisation des composants React existants et de CSS3 moderne pour concevoir un loader natif, léger (0 Ko de média lourd), fluide à 60 fps et parfaitement harmonisé avec la charte graphique Alpha Ciment.
+2. **Implémentation ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
    - **Composant `LoadingState` modernisé** :
      - Spinner rotatif fluide `Loader2` animé via `@keyframes spin` avec halo lumineux pulsé (`@keyframes halo-pulse`).
      - Groupe textuel avec titre principal typé et sous-titre explicatif.
-     - Barre de progression linéaire indéterminée en dégradé pétrole/bleu AlpA Ciment (`@keyframes bar-slide`).
+     - Barre de progression linéaire indéterminée en dégradé pétrole/bleu Alpha Ciment (`@keyframes bar-slide`).
    - **Composant `TableSkeleton`** : mise à disposition d'un squelette de tableau animé par effet shimmer (`@keyframes skeleton-shimmer`) pour des chargements structurés.
    - **Personnalisation contextuelle des vues clés** :
-     - [OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx) : *"Chargement des offres d'emploi... (Récupération du catalogue et des critères de recrutement)"*
-     - [CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) : *"Chargement des candidatures sur offre... (Extraction des dossiers par direction et statut)"*
-     - [CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) : *"Chargement des candidatures spontanées... (Récupération des profils et compétences déclarées)"*
-     - [VivierView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) : *"Chargement du vivier de talents... (Agrégation des candidatures et profils RH qualifiés)"*
+     - [OffersView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/OffersView.jsx) : *"Chargement des offres d'emploi... (Récupération du catalogue et des critères de recrutement)"*
+     - [CandidaturesOffresView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) : *"Chargement des candidatures sur offre... (Extraction des dossiers par direction et statut)"*
+     - [CandidaturesSpontaneesView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) : *"Chargement des candidatures spontanées... (Récupération des profils et compétences déclarées)"*
+     - [VivierView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) : *"Chargement du vivier de talents... (Agrégation des candidatures et profils RH qualifiés)"*
 3. **Validation & Tests** :
    - Compilation Vite frontend (`npm run build`) : **✓ built in 520ms (0 erreur)**.
    - Rendu visuel propre et réactif sans aucun ralentissement ni asset externe.
@@ -773,21 +773,21 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Deux déclinaisons du logo fournies dans `logo/` :
      - `logo-cut.png` : logo officiel détouré pour fonds clairs / blancs.
      - `logo-white.png` : logo monochrome blanc pour fonds sombres ou colorés en rouge `#FF0D00`.
-   - Exigence : intégration d'un footer signature rouge `#FF0D00` avec le logo blanc affichant les informations institutionnelles de l'entreprise AlpA Ciment.
+   - Exigence : intégration d'un footer signature rouge `#FF0D00` avec le logo blanc affichant les informations institutionnelles de l'entreprise Alpha Ciment.
 2. **Implémentation Réalisée** :
    - **Déploiement des assets** :
      - Transfert de `logo-cut.png` et `logo-white.png` vers `code_source/recrutement-react/public/logo/` et `src/assets/logo/`.
      - Configuration du favicon du site et du titre dans `index.html`.
-   - **Charte CSS globale ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Charte CSS globale ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Harmonisation des variables CSS de thème : `--primary: #FF0D00;`, `--primary-hover: #E60C00;`, `--primary-dark: #D40B00;`, `--soft-red: #FFF0EF;`.
      - Définition des classes responsives pour le layout candidat et le footer rouge plein (`.public-red-footer`).
-   - **Nouveau Layout Candidat ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx))** :
+   - **Nouveau Layout Candidat ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx))** :
      - En-tête (Header) moderne avec `logo-cut.png`, navigation rapide (Offres, Candidature spontanée) et bouton d'accès Espace RH.
      - Footer institutionnel pleine largeur rouge `#FF0D00` avec `logo-white.png`, description d'entreprise, coordonnées de l'usine d'Ibity (Antsirabe) et du siège d'Antananarivo, liens de carrières et mention légale.
    - **Harmonisation de l'Espace RH et Authentification** :
-     - [AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) : intégration de `logo-cut.png` dans la barre latérale (sidebar).
-     - [LoginPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/LoginPage.jsx) : intégration du logo dans l'en-tête de la carte de connexion et bouton de connexion rouge `#FF0D00`.
-   - **Composant Public d'Offres ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx))** :
+     - [AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) : intégration de `logo-cut.png` dans la barre latérale (sidebar).
+     - [LoginPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/LoginPage.jsx) : intégration du logo dans l'en-tête de la carte de connexion et bouton de connexion rouge `#FF0D00`.
+   - **Composant Public d'Offres ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx))** :
      - Raccordement du `LoadingState` et `ErrorState` pour les candidats.
 3. **Validation & Tests** :
    - Compilation Vite frontend (`npm run build`) : **✓ built in 524ms (0 erreur, 22 bundles générés)**.
@@ -804,20 +804,20 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Copie de l'intégralité des fichiers CSS et JS de `css-js/` vers `code_source/recrutement-react/public/css/` et `public/sites/default/files/js/`.
      - Copie de l'ensemble des icônes et logos de `logo/` et `logo/images/` vers `public/themes/custom/apiqa/images/` (`logo-cut.png`, `logo-white.png`, `loader.png`, `icon-phone.svg`, `icon-mail.svg`, `icon-location.svg`).
      - Téléchargement et intégration locale des photographies réelles d'Alpha Ciment dans `public/sites/default/files/images/` et `public/sites/default/files/styles/optimise/public/images/` (bannière devant le bloc technique, cantine, usine, évènement RH, valeurs).
-   - **Mise à jour du Document Racine ([index.html](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/index.html))** :
+   - **Mise à jour du Document Racine ([index.html](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/index.html))** :
      - Inclusion de Font Awesome 6 (`all.min.css`), de `css_OfchSCC6Ik182tntv9o3E_uWhsm0WYdS9UiJ1D0aQT0.css` et de `css_OyQjWxlUxu--OhsMlYcrEWO-H05fcGFzxYLsU_W2jCk.css`.
      - Configuration du payload JSON Drupal et inclusion du script `js_ffcD9FB9b55EDTvf0v_CyEaKnYI-lMfzc1E0QUv5q34.js`.
-   - **Refonte Complète du Composant Layout Public ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx))** :
+   - **Refonte Complète du Composant Layout Public ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx))** :
      - Reproduction exacte de `<header class="main-header">` avec barre de navigation sticky, logo `logo-cut.png`, sous-menus déroulants (A propos, Nos Activités, RSE, Recrutement, Actualités), bouton "Nous contacter" et bouton d'accès dédié "Espace RH".
      - Menu burger responsive slicknav pour terminaux mobiles.
      - Reproduction exacte de `<footer class="main-footer">` avec `logo-white.png`, liens utiles, l'entreprise, coordonnées de contact (+261 20 22 293 88, contact@alphaciment.com, siège Tsaralalàna), copyright 2026 et liens réseaux sociaux.
      - Composant flottant `<div class="social-bar">` Facebook et LinkedIn.
-   - **Refonte de la Page Catalogue ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx))** :
+   - **Refonte de la Page Catalogue ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx))** :
      - Bannière parallaxe haute : *"Construisons ensemble votre carrière"*.
      - Section `.our-blog` : titre, paragraphe de présentation institutionnelle, et grille dynamique des offres raccordée à l'API `/api/public/offres` affichée dans le format exact des cartes annonces `.card.shadow--on-hover` avec badge contrat, icône date limite et icône localisation.
      - Conservation des offres expirées de référence pour préserver l'historique officiel.
      - Section `.hero-text` : *"Nos équipes, notre plus grande force"* et galerie photo 4 colonnes.
-   - **Routage & Isolation Back Office ([main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+   - **Routage & Isolation Back Office ([main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx))** :
      - Ajout des alias de route `/candidat/offres` et `/nos-offres`.
      - Maintien du back-office sans footer grand public conformément à la consigne.
 3. **Validation & Tests** :
@@ -835,13 +835,13 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Alignement du **Back Office** (Tableau de bord, Offres, Candidatures, Vivier, Référentiels) sur le même style élégant, épuré et moderne que le Front Office, tout en respectant la consigne stricte : **aucun footer dans le Back Office**.
    - Présence du grand footer rouge `#FF0D00` avec le logo blanc `logo-white.png` exclusivement dans le **Front Office (Portail Candidat)**.
 2. **Implémentation Réalisée** :
-   - **Rétablissement du Rouge Corporate (#FF0D00) ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Rétablissement du Rouge Corporate (#FF0D00) ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Variables globales `:root` verrouillées avec `!important` : `--primary: #FF0D00 !important;`, `--primary-dark: #D40B00 !important;`, `--primary-hover: #E60C00 !important;`, `--soft-red: #FFF0EF !important;`, `--bs-primary: #FF0D00 !important;`, `--bs-link-color: #FF0D00 !important;`.
      - Boutons primaires (`.filter-button`, `.icon-button`) stylisés en rouge `#FF0D00` avec ombre portée rouge douce.
      - Boutons secondaires (`.ghost-button`, `.pagination button`) stylisés en fond rouge clair `#FFF0EF` avec bordure et texte `#FF0D00`.
      - Boutons d'actions de ligne de tableau (`.row-button`) stylisés avec fond `#FFF0EF` et icône `#FF0D00`, survol plein `#FF0D00` et icône blanche.
      - Champs de saisie : contour au focus surligné en rouge `#FF0D00` avec halo lumineux.
-   - **Harmonisation et Modernisation du Back Office ([AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Harmonisation et Modernisation du Back Office ([AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - **Sidebar** :
        - Intégration du logo détouré officiel `logo-cut.png` dans un conteneur net à coins arrondis.
        - Liens de navigation actifs (`.nav-link.active` et `.sub-nav-link.active`) avec fond rouge vif `#FF0D00 !important`, typographie blanche en gras et ombre portée rouge dédiée (`box-shadow: 0 4px 14px rgba(255, 13, 0, 0.35)`).
@@ -852,7 +852,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
        - Survol des lignes de tableau (`tbody tr:hover`) avec surlignage doux `#FFF9F9`.
        - Cartes KPI avec ombre portée et accent rouge (`.kpi-card.blue .kpi-icon`).
      - **Zéro Footer dans le Back Office** : le layout `AppShell.jsx` ne comporte aucun composant footer.
-   - **Footer Signature Rouge du Front Office ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Footer Signature Rouge du Front Office ([PublicLayout.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/PublicLayout.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Application explicite de `background: #FF0D00 !important;` et `color: #ffffff !important;` sur `.main-footer`.
      - Logo blanc `logo-white.png` mis en valeur sur le fond rouge vif corporate.
      - Typographie, liens utiles et coordonnées de contact en blanc net (`#ffffff` / `rgba(255, 255, 255, 0.9)`), icônes inversées en blanc pur.
@@ -883,15 +883,15 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Animation d'apparition en cascade de haut en bas (`@keyframes offerCascadeDown`) avec délai progressif (`animationDelay: index * 0.07s`) sur toutes les cartes d'annonces.
      - Animation dynamique lors du survol ("lorsqu'on passe dessus") avec effet de haut en bas : balayage vertical d'accentuation rouge (`::before` passant de `height: 0` à `100%`), glissement fluide de la carte vers le bas (`transform: translateY(4px)`), surlignage du titre en rouge `#FF0D00` et translation de la flèche de navigation.
 2. **Implémentation Réalisée** :
-   - **Ajustements Back Office ([AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx))** :
+   - **Ajustements Back Office ([AppShell.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx))** :
      - Suppression de l'élément `<a className="topbar-candidate-portal-btn">` dans la topbar.
      - Activation automatique de la classe `body.in-backoffice` et masquage immédiat de `.cb-cursor` via React `useEffect`.
-   - **Correction CSS Globale, Rétablissement des Dimensions et Curseur ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Correction CSS Globale, Rétablissement des Dimensions et Curseur ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Retrait du `zoom: 0.8` global sur `html`.
      - Harmonisation de `min-height: 100vh` sur `body`, `.app-shell`, `.sidebar`, `.drawer-content` et `.portal-container`.
      - Règle de masquage absolu du curseur dans le backoffice : `body.in-backoffice .cb-cursor, .in-backoffice .cb-cursor, .app-shell ~ .cb-cursor { display: none !important; }`.
      - Curseur suiveur Front Office stylisé aux couleurs de la marque : `.cb-cursor:before { background: #FF0D00 !important; }`.
-   - **Animations des Offres ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Animations des Offres ([PublicOffresPage.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx) & [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Définition de `@keyframes offerCascadeDown` de `translateY(-26px)` vers `translateY(0)` avec rebond doux.
      - Application des délais cadencés `style={{ animationDelay: `${index * 0.07}s` }}` sur les cartes dynamiques et de référence.
      - Règle de survol `.card.shadow--on-hover:hover` avec transition verticale de haut en bas, gradient de surbrillance et ombre portée rouge.
@@ -914,7 +914,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Constat : le retrait du zoom global a rétabli les dimensions réelles du Front Office, mais a agrandi l'interface du Back Office (sidebar, tableaux, cartes KPI, filtres) rendant les composants trop imposants par rapport à l'affichage compact apprécié initialement.
    - Objectif : réappliquer le format compact (zoom 0.8) **strictement et exclusivement dans le Back Office**, sans réintroduire d'impact sur le Front Office (qui doit conserver ses dimensions 1:1 et la précision de son curseur).
 2. **Implémentation Réalisée** :
-   - **Ciblage CSS Strictement Délimité ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Ciblage CSS Strictement Délimité ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Application de `zoom: 0.8;` sur le sélecteur d'état `body.in-backoffice` (activé dynamiquement par `<AppShell>`).
      - Conservation de `html { zoom: 1; }` et `body { min-height: 100vh; }` pour l'ensemble du Front Office.
      - Ajustement des hauteurs de conteneurs pour le Back Office : `.app-shell`, `.sidebar` et `.drawer-content` reçoivent `min-height: calc(100vh / 0.8)` et `height: calc(100vh / 0.8)` pour occuper 100% de la fenêtre physique sans rupture d'affichage.
@@ -940,14 +940,14 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 2. **Implémentation Réalisée** :
    - **Déploiement des Assets & Image Loader** :
      - Vérification et synchronisation de `logo/images/loader.png` (dimensions 134x74, RGBA avec fond rouge et lettrage blanc `αC`) vers `code_source/recrutement-react/public/themes/custom/apiqa/images/loader.png` et `public/images/loader.png`.
-   - **Stylisation CSS Dédiée ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Stylisation CSS Dédiée ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - `.preloader`, `.preloader-overlay` configurés en `position: fixed`, `inset: 0`, `z-index: 99999999`, plein écran `100vw x 100vh` avec fond rouge pur `#FF0D00 !important`.
      - `.loading-container` (120x120px) centré au milieu de la fenêtre.
      - Semi-cercle tournant `.loading` (112x112px) avec bordure supérieure et droite blanches (`border-top: 3.5px solid #ffffff; border-right: 3.5px solid #ffffff;`) animé par `@keyframes preloaderSemiCircleSpin 0.9s infinite`.
      - Logo centré `#loading-icon` avec `mix-blend-mode: lighten` assurant une intégration harmonieuse du symbole blanc `αC` sans découpe disgracieuse et avec pulsation douce.
-   - **Intégration au Document Racine ([index.html](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/index.html))** :
+   - **Intégration au Document Racine ([index.html](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/index.html))** :
      - Insertion du bloc `<div id="site-preloader" class="preloader">` dès l'ouverture du `<body>` pour garantir un rendu rouge immédiat dès la première seconde de chargement du navigateur.
-   - **Composant React & Transitions ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+   - **Composant React & Transitions ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx))** :
      - Création et exportation du composant `<PagePreloader />`.
      - Utilisation de `<PagePreloader />` pour l'état d'amorçage applicatif (`bootstrapLoading`) et le fallback Suspense de React Router lors des transitions entre pages.
      - Fondu enchaîné doux (`preloader.classList.add('fade-out')`) au montage du frontend React.
@@ -970,7 +970,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Ajuster la couleur d'arrière-plan de l'écran lors du chargement de page (`.preloader`, `.preloader-overlay`) pour adopter la teinte rouge pure `#FF0000`.
    - Correspondance parfaite 1:1 avec les pixels d'arrière-plan du fichier `loader.png` (`rgb(255, 0, 0)`), assurant une fusion chromatique sans le moindre contour de délimitation.
 2. **Implémentation Réalisée** :
-   - Dans [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css) :
+   - Dans [styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css) :
      - `background-color: #FF0000 !important;` et `background: #FF0000 !important;` appliqués sur `.preloader` et `.preloader-overlay`.
 3. **Validation & Tests** :
    - Build Vite réussi (`npm run build`) : **✓ built in 2.06s (0 erreur, 22 modules)**.
@@ -986,11 +986,11 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Constat : une ombre portée (`drop-shadow`) sur l'image du loader créait un contour rectangulaire sombre visible autour du logo, empêchant sa fusion homogène avec le fond rouge.
    - Demande : supprimer toute ombre sur l'image pour que le rouge du logo se confonde à 100% avec le fond `#FF0000` de l'écran, et retirer tout texte du préchargeur pour un rendu ultra épuré et minimaliste.
 2. **Implémentation Réalisée** :
-   - **Nettoyage CSS ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Nettoyage CSS ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Suppression de `drop-shadow` sur `#loading-icon` et `#loading-icon img` (`box-shadow: none !important; filter: none !important; border: none !important;`).
      - Suppression définitive de la classe `.preloader-message`.
      - Arc blanc du semi-cercle rotatif `.loading` conservé net et précis sans ombres parasites.
-   - **Nettoyage Composant React ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+   - **Nettoyage Composant React ([FeedbackStates.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx) & [main.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx))** :
      - Retrait du bloc de texte `{message && ...}` dans `<PagePreloader />`.
      - Retrait de la prop `message="..."` dans `<BackOfficeLayout />`.
 3. **Validation & Tests** :
@@ -1056,12 +1056,12 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 - **Besoin :** Dans l'écran *Candidatures sur offre* -> Liste des directions -> Liste des offres, lorsqu'une offre est sélectionnée et dépliée pour afficher ses candidatures, ajouter un bouton **« Vivier »** à côté du bouton **« Masquer candidats »**, permettant de récupérer et afficher toutes les candidatures en vivier dont le domaine de compétences est rattaché à cette direction.
 - **Résolution :**
   1. **Backend Laravel** :
-     - Dans [`app/Repositories/Eloquent/EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php) :
+     - Dans [`app/Repositories/Eloquent/EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php) :
        - Prise en charge du paramètre `domaine_direction_only` dans `getVivierEntries` et `getCandidaturesEnVivier` pour filtrer précisément les candidatures en vivier rattachées aux domaines de la direction spécifiée (`whereHas('domaine', fn($s) => $s->where('id_direction', $dirId))`).
-     - Dans [`app/Services/VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php) et [`app/Http/Resources/VivierResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/VivierResource.php) :
+     - Dans [`app/Services/VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/VivierService.php) et [`app/Http/Resources/VivierResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Resources/VivierResource.php) :
        - Ajout du champ `poste_souhaite` pour un affichage complet des contextes de candidatures spontanées ou archivées en vivier.
   2. **Frontend React** :
-     - Dans [`src/pages/CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) :
+     - Dans [`src/pages/CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) :
        - Ajout du bouton d'action stylisé **« Vivier (X) »** (avec icône `BookmarkCheck`, compteur dynamique et état actif vert émeraude) immédiatement à côté du bouton « Masquer candidats » lorsque l'offre est dépliée.
        - Ajout d'onglets de navigation intégrés au volet déplié de l'offre :
          - Onglet 1 : **« Candidatures sur l'offre (X) »** (affiche les postulants directs).
@@ -1113,14 +1113,14 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 90 : Évolution du Filtrage Vivier par Direction & Harmonisation Universelle des Modales CRUD
-1. **Évolution du Filtrage Vivier ([EloquentVivierRepository.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php))** :
+1. **Évolution du Filtrage Vivier ([EloquentVivierRepository.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php))** :
    - Mise à jour de la requête `getCandidaturesEnVivier` et `getVivierEntries` lors du filtrage d'une offre/direction (`domaine_direction_only`) :
      - Si la candidature a un domaine rattaché (`id_domaine` non nul), la direction de son domaine est prise en compte (`domaine.id_direction == $dirId`).
      - Si la candidature n'a pas de domaine (`id_domaine` nul), vérification de la direction de l'offre à laquelle elle est rattachée (`offre.id_direction == $dirId`).
-2. **Correction du Bug d'Affichage & Flou Décentré sous Zoom 80% ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+2. **Correction du Bug d'Affichage & Flou Décentré sous Zoom 80% ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
    - **Diagnostic** : La règle `body.in-backoffice { zoom: 0.8; }` réduisait la grille de calcul du viewport de `position: fixed` à 80% depuis le coin supérieur gauche (`100vw * 0.8 = 80vw`, `100vh * 0.8 = 80vh`), limitant le fond flou au quart haut-gauche et excentrant les fenêtres modales.
    - **Correction CSS Universelle** : Application de `calc(100vw / 0.8)` (`125vw`) et `calc(100vh / 0.8)` (`125vh`) sur `.modal-backdrop`, `.modal-overlay` et `.drawer-overlay` sous `body.in-backoffice`, restaurant un recouvrement 100% physique plein écran et un alignement `flex` parfaitement centré au milieu de la vue.
-3. **Harmonisation Globale des Modales CRUD ([CompetenceModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/CompetenceModal.jsx), [DirectionModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/DirectionModal.jsx), [DomaineModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/DomaineModal.jsx), [SaisirRhCandidatureModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/SaisirRhCandidatureModal.jsx), [VivierView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx))** :
+3. **Harmonisation Globale des Modales CRUD ([CompetenceModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/CompetenceModal.jsx), [DirectionModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/DirectionModal.jsx), [DomaineModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/DomaineModal.jsx), [SaisirRhCandidatureModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/SaisirRhCandidatureModal.jsx), [VivierView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx))** :
    - Migration de toutes les modales vers `createPortal(..., document.body)` afin d'éviter tout conflit de superposition ou de conteneur父.
    - Design unifié : badge d'icône violet/indigo arrondi (`40x40px`, fond `#ede9fe`), typographie soignée (`.modal-title`, `.modal-subtitle`), boutons d'actions alignés (`.modal-submit-btn` avec dégradé et ombre, `.ghost-button`), bandeau d'erreur compact et gestion de la touche Échap (`Escape`).
 4. **Validation & Tests** :
@@ -1131,7 +1131,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 91 : Exclusion Git du venv Python et Cache OCR
 1. **Configuration Git Ignore** :
-   - Création de [`code_source/ocr/.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/.gitignore) et du fichier racine [`.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/.gitignore).
+   - Création de [`code_source/ocr/.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/.gitignore) et du fichier racine [`.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/.gitignore).
    - Exclusion de `venv/`, `.venv/`, `env/`, des caches Python `__pycache__/` et des artefacts de compilation `*.pyc`.
 2. **Validation** :
    - Commande `git check-ignore -v code_source/ocr/venv/` vérifiée avec succès.
@@ -1143,11 +1143,11 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Contexte & Spécification** :
    - L'utilisateur souhaite que le microservice OCR et la chaîne d'extraction réalisent uniquement l'extraction de texte brute du CV (OCR pur via PaddleOCR et PyPDF), sans référentiel de compétences ni données simulées.
 2. **Implémentation** :
-   - **FastAPI ([main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py))** :
+   - **FastAPI ([main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py))** :
      - Retrait du paramètre de formulaire `referentiel_competences` et de la désérialisation JSON.
      - Suppression des anciens modèles de compétences et expériences mockées en dur.
      - L'endpoint `/extract-cv` renvoie directement le texte brut extrait (`texte_brut_ocr` et `donnees_json: {"texte_brut": raw_text}`).
-   - **Laravel Backend ([VivierService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php))** :
+   - **Laravel Backend ([VivierService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/VivierService.php))** :
      - Nettoyage du fallback pour n'enregistrer que le texte OCR brut sans injecter de compétences ou expériences simulées.
 3. **Validation & Tests** :
    - Test d'extraction d'image CV via `TestClient` FastAPI : Code `200 OK`, retour du texte brut fidèle (`texte_brut_ocr`).
@@ -1160,14 +1160,14 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Découplage complet des responsabilités du microservice de parsing CV.
    - Intégration d'un grand modèle de langage local (LLM) sous Ollama (Mistral 7B) pour la reconnaissance des entités nommées (NER) et la structuration JSON de haute fidélité.
 2. **Implémentation Réalisée** :
-   - **Extraction OCR Isolée ([cv_ocr_extractor.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_ocr_extractor.py))** :
+   - **Extraction OCR Isolée ([cv_ocr_extractor.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_ocr_extractor.py))** :
      - Module dédié à l'extraction de texte brut via PaddleOCR (images/scans) et PyPDF (PDFs texte).
      - Gestion des variables anti-conflits CPU oneDNN pour Windows.
-   - **Structuration NER par LLM Local ([cv_llm_parser.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py))** :
+   - **Structuration NER par LLM Local ([cv_llm_parser.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_llm_parser.py))** :
      - Module dédié à l'appel de l'API locale Ollama (`http://127.0.0.1:11434/api/generate`) avec `model: "mistral"` et `format: "json"`.
      - Prompting système strict pour extraire le contact (nom, email, tel, ville), les compétences individuelles réelles avec niveau, les expériences et les formations.
      - Mode dégradé sécurisé en cas d'indisponibilité du serveur Ollama.
-   - **Point d'Entrée FastAPI Orchestrateur ([main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py))** :
+   - **Point d'Entrée FastAPI Orchestrateur ([main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py))** :
      - Contrôleur épuré orchestrant les deux modules : OCR $\rightarrow$ NER LLM $\rightarrow$ Réponse JSON.
      - Endpoint `/health` enrichi indiquant la connectivité de PaddleOCR, PyPDF et Ollama Mistral.
 3. **Validation & Tests** :
@@ -1180,28 +1180,28 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 2. **Implémentation Réalisée** :
    - **Base de données & Modèle** :
      - Migration `2026_10_09_000000_create_audit_log_table.php` créant la table `audit_log` (avec colonnes `anciennes_valeurs` et `nouvelles_valeurs` JSONB, `ip_adresse`, `user_agent`, et index composites).
-     - Modèle Eloquent [`AuditLog.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/AuditLog.php).
+     - Modèle Eloquent [`AuditLog.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/AuditLog.php).
    - **Services Métiers** :
-     - Service réutilisable [`AuditLogService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/AuditLogService.php).
+     - Service réutilisable [`AuditLogService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/AuditLogService.php).
      - Intégration dans `OffreService` (`CREATION_OFFRE`, `MODIFICATION_OFFRE`, `PUBLICATION_OFFRE`, `CLOTURE_OFFRE`, `SUPPRESSION_OFFRE`), `CandidatureService` (`CHANGEMENT_STATUT_CANDIDAT`, `AJOUT_VIVIER`, `RETRAIT_VIVIER`) et `VivierService` (`VALIDATION_OCR`, `CORRECTION_OCR`, `REJET_OCR`).
    - **API & Interface Frontend** :
-     - Contrôleur API [`AuditLogController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/AuditLogController.php) et route `GET /api/audit-logs`.
-     - Page React [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx) avec barre de filtres (action, entité, texte, dates), pagination, et modale de visualisation des différences (diff JSON).
-     - Ajout du lien dans le menu [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et de la route dans [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx).
+     - Contrôleur API [`AuditLogController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/AuditLogController.php) et route `GET /api/audit-logs`.
+     - Page React [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx) avec barre de filtres (action, entité, texte, dates), pagination, et modale de visualisation des différences (diff JSON).
+     - Ajout du lien dans le menu [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et de la route dans [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx).
 3. **Validation & Tests** :
    - Suite complète PHPUnit : 18/18 tests passés avec succès (`AuditLogTest.php`).
    - Build React : `npm run build` exécuté sans avertissement ni erreur.
-   - Documentation créée : [`doc/suivi-developpement/sprint-6/2026-10-09/journal-audit-actions-rh.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-6/2026-10-09/journal-audit-actions-rh.md).
+   - Documentation créée : [`doc/suivi-developpement/sprint-6/2026-10-09/journal-audit-actions-rh.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/sprint-6/2026-10-09/journal-audit-actions-rh.md).
 
 ---
 
 ### Demande 95 : Règle Méthodologique de Synchronisation Continue de `gestion_recrutement.sql`
 1. **Contexte & Spécification** :
-   - L'utilisateur demande que toute modification ou ajout dans le schéma de la base de données soit systématiquement reporté dans le script maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
-   - Cette règle doit obligatoirement être inscrite dans le document de référence méthodologique [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md) pour être consultée et appliquée à chaque prompt.
+   - L'utilisateur demande que toute modification ou ajout dans le schéma de la base de données soit systématiquement reporté dans le script maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql).
+   - Cette règle doit obligatoirement être inscrite dans le document de référence méthodologique [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/methodologie.md) pour être consultée et appliquée à chaque prompt.
 2. **Implémentation Réalisée** :
    - **Mise à jour de `methodologie.md`** : ajout d'une section dédiée *"Règle Impérative de Synchronisation de la Base de Données (gestion_recrutement.sql)"* et ajout d'un point de contrôle dans la *Checklist Obligatoire avant de Terminer un Prompt*.
-   - **Mise à jour du script maître** : ajout de la table `audit_log` et de ses index dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
+   - **Mise à jour du script maître** : ajout de la table `audit_log` et de ses index dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql).
 
 ---
 
@@ -1209,7 +1209,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Contexte & Spécification** :
    - L'utilisateur souhaite que l'assistant lui suggère systématiquement, à la clôture de chaque intervention, le prompt textuel exact prêt à l'emploi pour aborder l'étape suivante, accompagné de la commande slash appropriée (`/plan`, `/grill-me`, `/goal`, etc.) si pertinent.
 2. **Implémentation Réalisée** :
-   - **Mise à jour de [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md)** : ajout de la section *"Règle de Clôture : Recommandation Systématique du Bon Prompt et des Commandes Slash (/)"* et inscription dans la checklist obligatoire.
+   - **Mise à jour de [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/methodologie.md)** : ajout de la section *"Règle de Clôture : Recommandation Systématique du Bon Prompt et des Commandes Slash (/)"* et inscription dans la checklist obligatoire.
 
 ---
 
@@ -1218,15 +1218,15 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Implémentation du CRUD des rendez-vous RH (tests et entretiens) et intégration de l'agenda FullCalendar v6 dans le front-office React avec synchronisation du statut candidat et audit log.
 2. **Implémentation Réalisée** :
    - **Backend Laravel** :
-     - Modèles Eloquent [`RendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/RendezVous.php), [`TypeRendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/TypeRendezVous.php), [`StatutRendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/StatutRendezVous.php), [`ModeRealisation.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/ModeRealisation.php).
-     - Relation `rendezVous()` (hasMany) dans [`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Candidature.php).
-     - Service métier [`RendezVousService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/RendezVousService.php) avec validation chronologique (`date_fin > date_debut`), mise à jour synchronisée du statut de la candidature et traçabilité via `AuditLogService` (`PLANIFICATION_RDV`, `MODIFICATION_RDV`, `ANNULATION_RDV`, `SUPPRESSION_RDV`).
-     - Contrôleur [`RendezVousController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/RendezVousController.php) et routes API REST dans `routes/api.php`.
+     - Modèles Eloquent [`RendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/RendezVous.php), [`TypeRendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/TypeRendezVous.php), [`StatutRendezVous.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/StatutRendezVous.php), [`ModeRealisation.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/ModeRealisation.php).
+     - Relation `rendezVous()` (hasMany) dans [`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/Candidature.php).
+     - Service métier [`RendezVousService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/RendezVousService.php) avec validation chronologique (`date_fin > date_debut`), mise à jour synchronisée du statut de la candidature et traçabilité via `AuditLogService` (`PLANIFICATION_RDV`, `MODIFICATION_RDV`, `ANNULATION_RDV`, `SUPPRESSION_RDV`).
+     - Contrôleur [`RendezVousController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/RendezVousController.php) et routes API REST dans `routes/api.php`.
    - **Frontend React & FullCalendar** :
      - Installation de `@fullcalendar/react`, `@fullcalendar/core`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction` v6.
-     - Page d'agenda [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) (vues Mois, Semaine, Jour, filtres type/statut/mode/recruteur, glisser-déposer `eventDrop` et redimensionnement `eventResize`).
-     - Modale de planification / modification [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
-     - Onglet *Rendez-vous* dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx).
+     - Page d'agenda [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) (vues Mois, Semaine, Jour, filtres type/statut/mode/recruteur, glisser-déposer `eventDrop` et redimensionnement `eventResize`).
+     - Modale de planification / modification [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
+     - Onglet *Rendez-vous* dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx).
 ### Demande 98 : Résolution Cache Vite (Outdated Optimize Dep) & Affichage Référentiels Rendez-vous
 1. **Contexte & Spécification** :
    - Erreur de chargement des chunks Vite à chaud (`504 Outdated Optimize Dep` pour `@fullcalendar_react.js`, etc.) due au remplacement à chaud des modules.
@@ -1235,7 +1235,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **Dépendances & Cache Vite** :
      - Les dépendances FullCalendar ont été alignées de manière homogène sur la branche officielle `^6.1.15` avec les plugins `@fullcalendar/react`, `@fullcalendar/daygrid`, `@fullcalendar/timegrid`, `@fullcalendar/interaction`.
      - Rafraîchissement complet du bundle (`npm run build` compilé avec succès en 616ms).
-   - **Composant Modale [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx)** :
+   - **Composant Modale [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx)** :
      - Ajout de constantes de repli (fallbacks) immédiates pour `types` (Test, Entretien), `statuts` (A venir, Réalisé, Annulé), et `modes` (Présentiel, Visioconférence, Téléphone) pour garantir un affichage instantané des menus sans aucun temps mort ni champ vide.
      - Déclenchement automatique et systématique du chargement API `/api/rendez-vous/referentiels` à l'ouverture si les données parentes ne sont pas encore disponibles.
 3. **Validation & Tests** :
@@ -1248,7 +1248,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Contexte & Spécification** :
    - Erreur JavaScript `Uncaught ReferenceError: isEditing is not defined` à la ligne 288 lors de l'ouverture de la modale de planification de rendez-vous.
 2. **Implémentation Réalisée** :
-   - Réintégration de la constante `const isEditing = Boolean(initialData?.id_rendez_vous);` en tête du composant [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
+   - Réintégration de la constante `const isEditing = Boolean(initialData?.id_rendez_vous);` en tête du composant [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
 3. **Validation & Tests** :
    - Compilation React (`npm run build`) validée avec succès en 594ms sans aucune erreur.
 
@@ -1259,8 +1259,8 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Erreur HTTP `422 (Unprocessable Content)` renvoyée par l'API lors de la soumission du formulaire de rendez-vous.
    - La fonction `sendJson(url, { body, method })` du client API attendait un objet d'options `{ body, method }` et non des arguments positionnels `(url, method, payload)`, causant l'envoi d'un corps de requête `undefined` et l'échec de la validation Laravel (`required`).
 2. **Implémentation Réalisée** :
-   - **Correction des appels `sendJson`** dans [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx) : passage conforme du payload via `{ method: 'POST'|'PUT'|'DELETE', body: payload }`.
-   - **Correction des appels `sendJson`** dans [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) pour les événements de glisser-déposer (`eventDrop`) et de redimensionnement (`eventResize`).
+   - **Correction des appels `sendJson`** dans [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx) : passage conforme du payload via `{ method: 'POST'|'PUT'|'DELETE', body: payload }`.
+   - **Correction des appels `sendJson`** dans [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) pour les événements de glisser-déposer (`eventDrop`) et de redimensionnement (`eventResize`).
 3. **Validation & Tests** :
    - Tests PHPUnit : 21/21 tests passés avec succès.
    - Compilation React (`npm run build`) validée avec succès en 589ms (0 erreur).
@@ -1271,8 +1271,8 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Afficher au format compact : la Direction et le prénom du candidat (ex: `[IT] Faniry (Entretien)`).
    - En cas d'événements multiples sur un même créneau ou une même journée, condenser l'affichage avec un badge discret `+2 autres` et une popover interactive.
 2. **Implémentation Réalisée** :
-   - **Contrôleur & Resource API** : Eager loading de `candidature.offre.direction` et ajout de `direction` (`nom_direction`, `alias`) dans [`RendezVousResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/RendezVousResource.php).
-   - **Frontend [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx)** :
+   - **Contrôleur & Resource API** : Eager loading de `candidature.offre.direction` et ajout de `direction` (`nom_direction`, `alias`) dans [`RendezVousResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Resources/RendezVousResource.php).
+   - **Frontend [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx)** :
      - Titre de l'événement mis en forme dynamiquement : `[${directionLabel}] ${prenom} (${typeLibelle})`.
      - Configuration des options FullCalendar : `displayEventTime={false}`, `dayMaxEvents={2}`, `dayMaxEventRows={true}`, et `moreLinkClick="popover"`.
 3. **Validation & Tests** :
@@ -1290,22 +1290,22 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Interface web de gestion des modèles dans le portail RH avec simulation / prévisualisation instantanée.
 2. **Implémentation Réalisée** :
    - **Modèles Eloquent & Mailable** :
-     - [`TypeMessage.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/TypeMessage.php), [`ModeleMessage.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/ModeleMessage.php), [`Communication.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Communication.php).
-     - [`CandidatureCommunicationMail.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Mail/CandidatureCommunicationMail.php) avec vue Blade responsive [`candidature_communication.blade.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/resources/views/emails/candidature_communication.blade.php).
+     - [`TypeMessage.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/TypeMessage.php), [`ModeleMessage.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/ModeleMessage.php), [`Communication.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/Communication.php).
+     - [`CandidatureCommunicationMail.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Mail/CandidatureCommunicationMail.php) avec vue Blade responsive [`candidature_communication.blade.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/resources/views/emails/candidature_communication.blade.php).
    - **Service & Contrôleurs API** :
-     - [`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CommunicationService.php) avec moteur Regex insensible à la casse pour les variables.
-     - [`ModeleMessageController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/ModeleMessageController.php) et [`CommunicationController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/CommunicationController.php).
-     - Déclencheur automatique de convocation dans [`RendezVousService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/RendezVousService.php) et d'accusé de réception dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php).
+     - [`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CommunicationService.php) avec moteur Regex insensible à la casse pour les variables.
+     - [`ModeleMessageController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/ModeleMessageController.php) et [`CommunicationController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/CommunicationController.php).
+     - Déclencheur automatique de convocation dans [`RendezVousService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/RendezVousService.php) et d'accusé de réception dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php).
    - **Frontend React** :
-     - Page [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx) intégrée dans la barre latérale [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et les routes [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx).
-     - Modal d'envoi rapide [`EnvoyerMessageModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/EnvoyerMessageModal.jsx).
-     - Onglet *Communications* enrichi avec historique complet dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx).
-     - Case à cocher de convocation par e-mail dans [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
+     - Page [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx) intégrée dans la barre latérale [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et les routes [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx).
+     - Modal d'envoi rapide [`EnvoyerMessageModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/EnvoyerMessageModal.jsx).
+     - Onglet *Communications* enrichi avec historique complet dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx).
+     - Case à cocher de convocation par e-mail dans [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx).
 3. **Validation & Tests** :
-   - Suite de tests unitaires [`CommunicationTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/CommunicationTest.php) (4/4 tests validés).
+   - Suite de tests unitaires [`CommunicationTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/tests/Feature/Api/CommunicationTest.php) (4/4 tests validés).
    - Suite PHPUnit globale : `php artisan test` -> **25/25 tests passés (96 assertions)**.
    - Build React : `npm run build` réussi en 838ms (0 erreur).
-   - Script SQL maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) mis à jour avec les 5 templates initiaux.
+   - Script SQL maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql) mis à jour avec les 5 templates initiaux.
 
 ---
 
@@ -1313,18 +1313,18 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Contexte & Spécification** :
    - Régler l'exportation PDF / impression de la fiche candidat (`window.print()`).
    - Masquer tous les éléments parasites et interactifs de l'interface (barre latérale, barre supérieure, onglets, boutons d'action, formulaires d'ajout de compétences/expériences/formations, curseur suiveur, préchargeurs).
-   - Fournir une mise en page A4 élégante et professionnelle avec en-tête institutionnel AlpA Ciment (`.print-only-header`), carte récapitulative du candidat (photo, nom, coordonnées, badge de statut et vivier) et sections complètes (dossier, compétences avec niveaux, expériences professionnelles, diplômes et formations).
+   - Fournir une mise en page A4 élégante et professionnelle avec en-tête institutionnel Alpha Ciment (`.print-only-header`), carte récapitulative du candidat (photo, nom, coordonnées, badge de statut et vivier) et sections complètes (dossier, compétences avec niveaux, expériences professionnelles, diplômes et formations).
    - Neutraliser le `zoom: 0.8` du back-office lors de l'impression (`zoom: 1 !important`) et éliminer les coupures inopportunes (`page-break-inside: avoid`).
 2. **Implémentation Réalisée** :
-   - **Styles CSS d'impression ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Styles CSS d'impression ([styles.css](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Règle `@page { size: A4 portrait; margin: 12mm 15mm; }`.
      - Réinitialisation complète `html, body, body.in-backoffice { zoom: 1 !important; overflow: visible !important; }`.
      - Masquage strict de `.sidebar`, `.topbar`, `.ghost-button`, `.filter-button`, `.candidature-tabs-header`, `.no-print`, `form`, `button`, `.modal-backdrop`, `.cb-cursor`, `.preloader`.
      - Suppression des URLs automatiques ajoutées après les liens via `a[href]:after { content: "" !important; }`.
      - Stylisation de la carte candidat imprimée `.candidate-sidebar-card` en bandeau exécutif horizontal avec avatar, informations personnelles et coordonnées.
      - Prise en charge des sauts de page propres avec `page-break-inside: avoid !important; break-inside: avoid !important;` sur `.data-section`, `.history-item`, et `.print-break-inside-avoid`.
-   - **Composant React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
-     - Intégration de `.print-only-header` avec le logo officiel AlpA Ciment, titre RH, numéro de dossier, date du jour et statut actuel.
+   - **Composant React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+     - Intégration de `.print-only-header` avec le logo officiel Alpha Ciment, titre RH, numéro de dossier, date du jour et statut actuel.
      - Fonction intelligente `handlePrintPdf` qui bascule automatiquement sur l'onglet *Informations & Profil RH* avant d'invoquer l'impression si l'utilisateur consultait un autre onglet.
      - Application de la classe `.no-print` aux formulaires de saisie de compétence, d'expérience et de formation pour ne faire figurer que les données enregistrées.
 3. **Validation & Tests** :
@@ -1342,24 +1342,24 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Enregistrer l'e-mail source reçu dans la table `communication` (**RG-COM-03**) et déclencher l'accusé de réception automatique (**RG-COM-02**).
 2. **Implémentation Réalisée** :
    - **Base de données & Modèle Clean Architecture** :
-     - Table `candidat_projet` créée via migration `2026_10_09_000100_create_candidat_projet_table.php` et synchronisée dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
-     - Modèle Eloquent [`CandidatProjet.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatProjet.php).
+     - Table `candidat_projet` créée via migration `2026_10_09_000100_create_candidat_projet_table.php` et synchronisée dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql).
+     - Modèle Eloquent [`CandidatProjet.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/CandidatProjet.php).
      - Repositories (`VivierRepositoryInterface`, `EloquentVivierRepository`) avec méthodes `getProjetsByCandidature()` et `createProjet()`.
      - Services (`VivierService`, `CandidatureService`) pour intégrer les projets à la fois lors de l'ingestion API directe, lors de la saisie manuelle et lors de la validation OCR par les RH.
-     - Enregistrement de l'email reçu dans `communication` et déclenchement de l'accusé de réception officiel AlpA Ciment.
+     - Enregistrement de l'email reçu dans `communication` et déclenchement de l'accusé de réception officiel Alpha Ciment.
    - **Microservice FastAPI & n8n** :
      - Endpoint `POST /api/classifier-intention` avec 3 intentions (`demande_emploi`, `information`, `spam`) et détection de l'`id_offre`.
      - Endpoint `POST /api/extraire-cv-ocr` avec séparation explicite des `experiences` et `projets`.
-     - Workflow n8n exporté et prêt à l'emploi : [`workflow_candidature_email_final.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_email_final.json).
-   - **Frontend React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+     - Workflow n8n exporté et prêt à l'emploi : [`workflow_candidature_email_final.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_candidature_email_final.json).
+   - **Frontend React ([CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
      - Bloc *Projets & Réalisations* dans l'onglet *Informations* avec formulaire de saisie manuelle et affichage des technologies.
      - Bloc des *Projets & Réalisations identifiés* dans l'onglet *Extraction OCR* avec suppression individuelle et importation directe au profil.
      - Intégration transparente dans l'impression et export PDF A4.
 3. **Validation & Tests** :
-   - Test automatisé PHPUnit dédié [`ImportCandidatureN8nTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/ImportCandidatureN8nTest.php).
+   - Test automatisé PHPUnit dédié [`ImportCandidatureN8nTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/tests/Feature/Api/ImportCandidatureN8nTest.php).
 ### Demande 105 : Intégration de la Dissociation Projets / Expériences dans le System Prompt du LLM Parser OCR (`cv_llm_parser.py`)
 1. **Contexte & Spécification** :
-   - Mise à jour du System Prompt dans le module Python de structuration intelligente par LLM ([`cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py)).
+   - Mise à jour du System Prompt dans le module Python de structuration intelligente par LLM ([`cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_llm_parser.py)).
    - Obligation d'instruire explicitement le modèle local (Llama 3.2 via Ollama) de séparer strictement les contrats/postes en entreprise (`experiences`) des projets d'études, projets personnels, hackathons ou open-source (`projets`).
    - Schéma JSON de sortie enrichi avec la collection `projets` (titre_projet, role, technologies, url_projet, date_debut, date_fin, description).
 2. **Implémentation Réalisée** :
@@ -1380,13 +1380,13 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Contexte & Spécification** :
    - Remplacement du modèle par défaut `llama3.2` (3B) par **`qwen2.5:7b`** via Ollama pour une précision sémantique accrue, une élimination totale des hallucinations et une conformité stricte aux schémas JSON hiérarchisés complexes.
    - Téléchargement et intégration du modèle `qwen2.5:7b` sous Ollama.
-   - Configuration transparente du microservice OCR/NER ([`cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py)) et du classificateur d'emails ([`email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/email_classifier.py)) pour cibler `DEFAULT_MODEL = "qwen2.5:7b"`.
+   - Configuration transparente du microservice OCR/NER ([`cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_llm_parser.py)) et du classificateur d'emails ([`email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/email_classifier.py)) pour cibler `DEFAULT_MODEL = "qwen2.5:7b"`.
 2. **Implémentation Réalisée** :
    - Lancement en tâche de fond du téléchargement `ollama pull qwen2.5:7b` (taille 4.7 Go).
    - Bascule de la variable `DEFAULT_MODEL = "qwen2.5:7b"` dans :
      - `code_source/ocr/cv_llm_parser.py` (extraction sémantique NER CVs avec dissociation stricte des projets).
      - `code_source/ocr/email_classifier.py` (classification des intentions d'e-mails).
-   - Rédaction de la section 10 dans le registre d'architecture [`justification-technologique.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/justification-technologique.md) explicitant le comparatif entre Qwen 2.5 (7B), Llama 3.2 (3B), Mistral et les modèles propriétaires Cloud.
+   - Rédaction de la section 10 dans le registre d'architecture [`justification-technologique.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/justification-technologique.md) explicitant le comparatif entre Qwen 2.5 (7B), Llama 3.2 (3B), Mistral et les modèles propriétaires Cloud.
 3. **Validation & Tests** :
    - Validation syntaxique Python réussie.
    - Tests PHPUnit Laravel : **26/26 tests passés**.
@@ -1397,7 +1397,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Contexte & Spécification** :
    - Préciser le type exact de chaque champ dans le prompt du LLM (`string`, `string | null`, `array`, `enum`) pour garantir une intégrité absolue lors de la désérialisation JSON et éliminer toute ambiguïté de conversion (éviter qu'un objet, un entier ou un tableau inattendu ne soit retourné à la place d'une chaîne ou réciproquement).
 2. **Implémentation Réalisée** :
-   - Dans [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py) :
+   - Dans [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_llm_parser.py) :
      - Enrichissement du schéma JSON dans `SYSTEM_PROMPT` avec les types explicites pour chaque propriété :
        - `contact.nom_complet` : `string | null`
        - `contact.email` : `string | null`
@@ -1431,7 +1431,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Normaliser tous les champs temporels en type `date | null` (format ISO `YYYY-MM-DD`).
    - Éliminer les formats flous comme `'Mois AAAA'` ou les chaînes textuelles comme `'En cours'` qui provoquaient des erreurs de parsing ou d'insertion SQL dans PostgreSQL (`SQLSTATE[22007]: Invalid datetime format`).
 2. **Implémentation Réalisée** :
-   - Dans [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py) :
+   - Dans [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_llm_parser.py) :
      - Champs `date_debut` et `date_fin` des `experiences` typés en `date | null (Date ISO: YYYY-MM-DD)`.
      - Champs `date_debut` et `date_fin` des `projets` typés en `date | null (Date ISO: YYYY-MM-DD)`.
      - Champ `date_obtention` des `formations` typé en `date | null (Date ISO: YYYY-MM-DD)`.
@@ -1452,20 +1452,20 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 2. **Implémentation Réalisée** :
    - **Base de Données & Modèle Laravel** :
      - Migration `2026_10_12_000000_add_cle_idempotence_to_candidature_table.php` ajoutant la colonne `cle_idempotence VARCHAR(255) UNIQUE` sur la table `candidature`.
-     - Mise à jour du schéma maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) avec index partiel `idx_candidature_cle_idempotence`.
-     - Modèle [`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Candidature.php) : ajout de `cle_idempotence` dans `$fillable`.
-     - Request [`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php) : support de `cle_idempotence` et alias `email_message_id` / `message_id`.
-     - Service [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php) : garde d'idempotence vérifiant si la clé existe déjà, retournant la candidature existante sans créer de doublon ni renvoyer d'accusé de réception dupliqué.
-     - Route [`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/routes/api.php) : ajout de `POST /api/public/pipeline-log-error` consignant les incidents dans les logs applicatifs et la table `audit_log`.
+     - Mise à jour du schéma maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql) avec index partiel `idx_candidature_cle_idempotence`.
+     - Modèle [`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/Candidature.php) : ajout de `cle_idempotence` dans `$fillable`.
+     - Request [`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php) : support de `cle_idempotence` et alias `email_message_id` / `message_id`.
+     - Service [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php) : garde d'idempotence vérifiant si la clé existe déjà, retournant la candidature existante sans créer de doublon ni renvoyer d'accusé de réception dupliqué.
+     - Route [`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/routes/api.php) : ajout de `POST /api/public/pipeline-log-error` consignant les incidents dans les logs applicatifs et la table `audit_log`.
    - **Workflows n8n** :
-     - Création de [`automatisation/workflow_error_handler_n8n.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_error_handler_n8n.json) (Error Trigger n8n $\rightarrow$ Dead Letter Queue $\rightarrow$ notification Laravel).
-     - Mise à jour de [`automatisation/workflow_candidature_email_final.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_email_final.json) :
+     - Création de [`automatisation/workflow_error_handler_n8n.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_error_handler_n8n.json) (Error Trigger n8n $\rightarrow$ Dead Letter Queue $\rightarrow$ notification Laravel).
+     - Mise à jour de [`automatisation/workflow_candidature_email_final.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_candidature_email_final.json) :
        - Retries (3 essais avec attente de 2 à 3s) et timeouts explicites (30s à 60s) sur les nœuds HTTP.
        - Nœud 5A enrichi avec script défensif JS (`sanitizeIsoDate`, nettoyage des compétences/expériences/projets/formations, dérivation du `cle_idempotence` unique).
    - **Microservice FastAPI (`code_source/ocr/main.py`)** :
      - Ajout du paramètre `timeout: int = 45` dans la requête `/ner` pour borner les requêtes vers Ollama.
 3. **Validation & Tests** :
-   - Test unitaire d'idempotence [`ImportCandidatureN8nTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/ImportCandidatureN8nTest.php) (`test_idempotence_import_candidature_meme_message_id_ne_cree_pas_de_doublon`) : validé avec succès (**2/2 tests passés, 15 assertions**).
+   - Test unitaire d'idempotence [`ImportCandidatureN8nTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/tests/Feature/Api/ImportCandidatureN8nTest.php) (`test_idempotence_import_candidature_meme_message_id_ne_cree_pas_de_doublon`) : validé avec succès (**2/2 tests passés, 15 assertions**).
    - Validation syntaxique Python réussie.
 
 ---
@@ -1489,9 +1489,9 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Étape 12 : Vérification du statut de réponse (alerte e-mail en cas d'erreur de validation métier).
      - Étape 13 : Confirmation et journalisation du succès.
 2. **Implémentation Réalisée** :
-   - Création de [`automatisation/workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json) avec adressage réseau Docker `host.docker.internal` pour communiquer de manière transparente entre le conteneur n8n et les services de l'hôte (FastAPI port 8001 et Laravel port 8000).
+   - Création de [`automatisation/workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_candidature_imap_complet.json) avec adressage réseau Docker `host.docker.internal` pour communiquer de manière transparente entre le conteneur n8n et les services de l'hôte (FastAPI port 8001 et Laravel port 8000).
    - Configuration des politiques de retry et timeouts sur chaque nœud HTTP.
-   - Connexion documentée avec [`automatisation/workflow_error_handler_n8n.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_error_handler_n8n.json) pour la Dead Letter Queue.
+   - Connexion documentée avec [`automatisation/workflow_error_handler_n8n.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_error_handler_n8n.json) pour la Dead Letter Queue.
 3. **Validation & Tests** :
    - Structure JSON vérifiée et syntaxiquement valide.
    - Tests de conformité des routes FastAPI (`/ocr`, `/ner`, `/api/classifier-intention`) et Laravel (`/api/public/import-candidature`, `/api/public/pipeline-log-error`).
@@ -1502,18 +1502,18 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 111 (Rectification) : Correction de l'Erreur 422 lors de l'Import Laravel depuis n8n & Alignement du Payload POST
 > **User Prompt :** *"erreur avec l import laravel ,je pense c'est a cause du payload envoyer en post qui est pareil a l'ancien"*
 1. **Diagnostic Technique (Logs Docker n8n & Laravel)** :
-   - **Cause 1 (Erreur 422 Laravel sur `email_sender`)** : Dans les logs du conteneur `n8n_alpaciment`, l'appel `POST /api/public/import-candidature` renvoyait `422 - {"message":"validation.max.string","errors":{"email_sender":["validation.max.string"]}}` car le nœud IMAP `$json.from` retournait un objet complet (incluant HTML et métadonnées > 150 caractères).
+   - **Cause 1 (Erreur 422 Laravel sur `email_sender`)** : Dans les logs du conteneur `n8n_alphaciment`, l'appel `POST /api/public/import-candidature` renvoyait `422 - {"message":"validation.max.string","errors":{"email_sender":["validation.max.string"]}}` car le nœud IMAP `$json.from` retournait un objet complet (incluant HTML et métadonnées > 150 caractères).
    - **Cause 2 (Structure du Payload POST)** : Le nœud 10 (`10. Validation et Format`) du nouveau workflow envoyait `{ candidat: {...}, competences: [...] }` au lieu de la structure native attendue par Laravel (`donnees_json: { contact, profil, competences, experiences, projets, formations }`, `cv_base64`, `cv_nom`, `cv_mime`, `texte_brut_ocr`, `nom_complet`, `email`, `id_offre`, `cle_idempotence`).
    - **Cause 3 (Erreur 422 FastAPI `int_parsing` sur `id_offre`)** : Lorsque l'e-mail était une candidature spontanée (`id_offre` vide ou `"undefined"`), le `FormData` multipart vers `/ocr` envoyait une chaîne non entière rejetée par FastAPI.
 2. **Implémentation Réalisée** :
-   - **FormRequest Laravel ([`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php))** :
+   - **FormRequest Laravel ([`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php))** :
      - Ajout de `extractCleanEmail()` pour extraire proprement l'adresse e-mail depuis n'importe quel format IMAP (`"Nom <email@domaine.com>"` ou objet JSON).
      - Suppression de la limite bloquante `max:150` sur `email_sender` et troncature défensive automatique des champs (`telephone`, `ville`, `nom_complet`, `sujet_email`, `cle_idempotence`).
      - Validation défensive de `id_offre` : si `"undefined"`, `"null"`, `0` ou inexistant en base, conversion automatique en `null` (bascule en candidature spontanée sans rejet 422).
      - Journalisation explicite dans `failedValidation()` pour tracer tout éventuel rejet dans `laravel.log`.
-   - **Microservice FastAPI ([`main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py))** :
+   - **Microservice FastAPI ([`main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py))** :
      - Ajout de `_parse_optional_int()` sur `/ocr`, `/ner` et `/extract-cv` pour accepter `Optional[Union[int, str]]` et convertir proprement `""`, `"undefined"` ou `"null"` en `None`.
-   - **Workflow n8n ([`workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json))** :
+   - **Workflow n8n ([`workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_candidature_imap_complet.json))** :
      - Nœud 2 (`2. Normaliser Metadata`) : extraction directe de l'adresse e-mail propre depuis `$json.from`.
      - Nœud 10 (`10. Validation et Format`) : restauration exacte de la structure du payload historique (`donnees_json`, `cv_base64`, `cv_nom`, `cv_mime`, `texte_brut_ocr`, `email`, `nom_complet`, `id_offre`, `cle_idempotence`).
 3. **Validation & Tests** :
@@ -1527,16 +1527,16 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Finaliser à 100% la feuille de route de robustesse du pipeline d'automatisation n8n / FastAPI / Laravel en implémentant les jalons **P2** (traçabilité de performance et des volumes en base de données) et **P3** (tableau de bord de supervision Back-Office).
 2. **Implémentation Réalisée** :
    - **Jalon P2 — Base de données, Modèle & Enregistrement automatique des métriques** :
-     - **Migration Laravel ([`2026_10_13_000000_create_pipeline_metrics_table.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_10_13_000000_create_pipeline_metrics_table.php))** et synchronisation dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) (section `13septies. PIPELINE_METRICS` + index sur `statut`, `intention`, `created_at`).
-     - **Modèle Eloquent ([`PipelineMetric.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/PipelineMetric.php))** : stocke `id_candidature`, `id_offre`, `cle_idempotence`, `email_expediteur`, `sujet_email`, `intention`, `statut` (`succes`, `doublon_ignore`, `erreur`), `duree_classification_s`, `duree_ocr_s`, `duree_ner_s`, `duree_totale_s`, `nb_caracteres_ocr`, `nb_competences`, `nb_experiences`, `nb_projets`, `nb_formations`, `noeud_erreur`, `message_erreur`.
-     - **Service Métier ([`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php))** : journalisation automatique dans `pipeline_metrics` lors de chaque import (`statut = 'succes'`) et lors du blocage d'un doublon par idempotence (`statut = 'doublon_ignore'`).
-     - **Contrôleur API ([`PipelineMetricController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/PipelineMetricController.php)) & Routes ([`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/routes/api.php))** :
+     - **Migration Laravel ([`2026_10_13_000000_create_pipeline_metrics_table.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/database/migrations/2026_10_13_000000_create_pipeline_metrics_table.php))** et synchronisation dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql) (section `13septies. PIPELINE_METRICS` + index sur `statut`, `intention`, `created_at`).
+     - **Modèle Eloquent ([`PipelineMetric.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/PipelineMetric.php))** : stocke `id_candidature`, `id_offre`, `cle_idempotence`, `email_expediteur`, `sujet_email`, `intention`, `statut` (`succes`, `doublon_ignore`, `erreur`), `duree_classification_s`, `duree_ocr_s`, `duree_ner_s`, `duree_totale_s`, `nb_caracteres_ocr`, `nb_competences`, `nb_experiences`, `nb_projets`, `nb_formations`, `noeud_erreur`, `message_erreur`.
+     - **Service Métier ([`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php))** : journalisation automatique dans `pipeline_metrics` lors de chaque import (`statut = 'succes'`) et lors du blocage d'un doublon par idempotence (`statut = 'doublon_ignore'`).
+     - **Contrôleur API ([`PipelineMetricController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/PipelineMetricController.php)) & Routes ([`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/routes/api.php))** :
        - `GET /api/pipeline-metrics` : retourne les KPIs agrégés (total exécutions, taux de fiabilité, durées moyennes OCR / NER / totale, doublons évités, erreurs DLQ) et la liste paginée filtrable.
        - `POST /api/public/pipeline-metrics` et `POST /api/public/pipeline-log-error` : enregistrement direct des métriques et des erreurs capturées par l'Error Workflow n8n (DLQ).
-     - **Workflow n8n ([`workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json))** : Nœud 10 enrichi avec `duree_ocr_s`, `duree_ner_s` et `duree_totale_s`.
+     - **Workflow n8n ([`workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_candidature_imap_complet.json))** : Nœud 10 enrichi avec `duree_ocr_s`, `duree_ner_s` et `duree_totale_s`.
    - **Jalon P3 — Interface React de Supervision (`/monitoring-pipeline`)** :
-     - **Page React ([`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx))** : 7 cartes KPIs temps réel, barre de recherche et filtres (`statut`, `intention`), tableau paginé avec badges et modale d'inspection détaillée de chaque exécution.
-     - **Intégration Navigation & Routing** dans [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx).
+     - **Page React ([`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx))** : 7 cartes KPIs temps réel, barre de recherche et filtres (`statut`, `intention`), tableau paginé avec badges et modale d'inspection détaillée de chaque exécution.
+     - **Intégration Navigation & Routing** dans [`AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) et [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx).
 3. **Validation & Tests** :
    - Migration PostgreSQL exécutée avec succès (`2026_10_13_000000_create_pipeline_metrics_table DONE`).
    - Tests PHPUnit (`ImportCandidatureN8nTest.php`) : **2/2 tests passés (17 assertions)** incluant la vérification de `pipeline_metrics` (`succes` et `doublon_ignore`).
@@ -1553,7 +1553,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Tâche 3 : Calcul du délai moyen de traitement (*Time-to-Hire* en jours), ventilation par Direction et Canaux d'ingestion (Site, E-mail n8n, Manuel RH), dossiers prioritaires en attente de traitement et filtres dynamiques (période, dates personnalisées, direction).
 2. **Implémentation Réalisée** :
    - **Backend (Laravel Repository & Service)** :
-     - **Interface ([`DashboardRepositoryInterface.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Contracts/DashboardRepositoryInterface.php))** enrichie avec :
+     - **Interface ([`DashboardRepositoryInterface.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Contracts/DashboardRepositoryInterface.php))** enrichie avec :
        - `getKpis(array $filters = []): array` (calcul de `total_candidatures`, `candidatures_sur_offre`, `candidatures_spontanees`, `candidatures_en_vivier`, `offres_total`, `offres_publiees`, `domaines_en_attente`, `rdv_a_venir`, `taux_recrutement`, `delai_moyen_jours`).
        - `getFunnel(array $filters = []): array` (statuts ordonnés, décompte et pourcentage de conversion).
        - `getMonthlyEvolution(array $filters = [], int $months = 6): array` (histogramme mensuel ventilé sur offre vs spontanée).
@@ -1561,17 +1561,17 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
        - `getChannelBreakdown(array $filters = []): array` (Site web direct vs E-mail n8n IA vs Saisie RH).
        - `getPendingCandidatures(int $limit = 5): array` (dossiers en statut Reçue triés par ancienneté avec calcul des jours d'attente).
        - `getRecentOffers(int $limit = 5): Collection`.
-     - **Implémentation Eloquent ([`EloquentDashboardRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDashboardRepository.php))** : requêtes optimisées avec gestion défensive des filtres temporels (`all`, `this_month`, `last_month`, `30_days`, `this_year`, `custom`) et de direction.
-     - **Service Métier ([`DashboardService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/DashboardService.php))** : agrégation complète de la charge analytique pour l'API `/api/dashboard`.
+     - **Implémentation Eloquent ([`EloquentDashboardRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDashboardRepository.php))** : requêtes optimisées avec gestion défensive des filtres temporels (`all`, `this_month`, `last_month`, `30_days`, `this_year`, `custom`) et de direction.
+     - **Service Métier ([`DashboardService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/DashboardService.php))** : agrégation complète de la charge analytique pour l'API `/api/dashboard`.
    - **Frontend (React DashboardView)** :
-     - Refonte complète de [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) :
+     - Refonte complète de [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) :
        - **Toolbar de filtrage** : sélection de période (rapide ou dates personnalisées), filtre de direction et réinitialisation.
        - **6 Cartes KPIs interactives** avec liens d'accès direct (`/candidatures/offres`, `/offres`, `/vivier`, `/agenda`).
        - **Composant Entonnoir de Recrutement RH** : barres de progression colorées étape par étape et pourcentages de conversion.
        - **Histogramme d'Évolution Mensuelle (6 mois)** : barres interactives avec répartition offre/spontanée et tooltips.
        - **Panneaux décisionnels** : Répartition par Direction, Canaux d'ingestion, et liste d'alerte des dossiers en attente avec badges de délai SLA.
 3. **Validation & Tests** :
-   - Création et exécution du test d'intégration [`DashboardAnalyticsTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/DashboardAnalyticsTest.php) : **3/3 tests passés (35 assertions)**.
+   - Création et exécution du test d'intégration [`DashboardAnalyticsTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/tests/Feature/Api/DashboardAnalyticsTest.php) : **3/3 tests passés (35 assertions)**.
    - Suite complète des tests PHPUnit : **30/30 tests passés (148 assertions)**.
    - Build de production React (`npm run build`) : **succès (2.71s)**.
 
@@ -1587,12 +1587,12 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Granularité **mensuelle** si la plage est étendue ($> 35$ jours ou vue globale).
      - Prise en charge des cas à 1 seul point (tracé horizontal de référence) sans crash de la courbe Bézier spline.
 2. **Implémentation Réalisée** :
-   - **Backend Laravel ([`EloquentDashboardRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDashboardRepository.php))** :
+   - **Backend Laravel ([`EloquentDashboardRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDashboardRepository.php))** :
      - Méthode `applyCandidatureFilters` : prise en compte directe des filtres `date_debut` et `date_fin` indépendamment du paramètre `periode`.
      - Méthode `getMonthlyEvolution` : calcul dynamique de la plage de dates et bascule automatique de granularité :
        - Si $\le 35$ jours : itération quotidienne (`cle_periode`, `label` format `d M`, `type_granulat = 'jour'`, `total`, `sur_offre`, `spontanee`).
        - Si $> 35$ jours : itération mensuelle (`cle_periode`, `label` format `M y`, `type_granulat = 'mois'`).
-   - **Frontend React ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
+   - **Frontend React ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
      - Barre de contrôle supérieure : sélecteur de dates direct et toujours visible avec icône calendrier, inputs stylisés et bouton "Effacer".
      - Raccourcis de périodes qui pré-remplissent automatiquement les inputs visibles.
      - Graphique SVG Spline et mode Barres :
@@ -1600,7 +1600,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
        - Espacement dynamique et lisibilité optimisée des labels d'axe X (`labelStep`).
        - En-tête de section dynamique indiquant la période active et le nombre de jours ou mois affichés.
 3. **Validation & Tests** :
-   - Test PHPUnit ajouté : `test_dashboard_filters_by_direct_dates_and_adapts_trend_curve_to_period` dans [`DashboardAnalyticsTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/DashboardAnalyticsTest.php) (**4/4 tests passés, 41 assertions**).
+   - Test PHPUnit ajouté : `test_dashboard_filters_by_direct_dates_and_adapts_trend_curve_to_period` dans [`DashboardAnalyticsTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/tests/Feature/Api/DashboardAnalyticsTest.php) (**4/4 tests passés, 41 assertions**).
    - Suite PHPUnit complète : **31/31 tests passés (154 assertions)**.
    - Build de production React : **compilation Vite réussie en 1.25s**.
 
@@ -1613,15 +1613,15 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Supprimer le gros bandeau descriptif "Centre de Pilotage RH & Analytics", les descriptions superflues et le doublon du titre "Dashboard".
    - Concevoir une disposition **Cockpit Décisionnel Haute Densité** : afficher dès le premier écran (sans scroller) les **6 indicateurs KPIs, la courbe de tendance, les alertes SLA, l'entonnoir pipeline et les canaux/directions**, tout en gardant le tableau détaillé des offres en scroll naturel.
 2. **Implémentation Réalisée** :
-   - **Styles Globaux Réduits ([`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Styles Globaux Réduits ([`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - `.app-shell` : passage de `215px` à `190px minmax(0, 1fr)` (gain de 25px de largeur supplémentaire pour les données).
      - `.sidebar` : padding compact (`12px 8px`), logos (`32px`), nav-links compacts (`min-height: 36px`, font `13px`).
      - `.topbar` : hauteur min abaissée à `44px`, padding `6px 16px`, titre à `16px`.
      - `.workspace` : padding abaissé à `10px 16px`.
-   - **Toolbar Dashboard Inline & Compacte ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
+   - **Toolbar Dashboard Inline & Compacte ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
      - Suppression du doublon de titre "Dashboard" et des descriptions verbeuses.
      - Organisation en une seule rangée fluide : Sélecteurs de dates directs (`Du [..] Au [..]`) + Presets (`Tout`, `Ce mois`, `30j`, `Année`) + Sélecteur de direction + Bouton Réinitialiser + Bouton Actualiser.
-   - **Agencement Cockpit Haute Densité ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
+   - **Agencement Cockpit Haute Densité ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
      - **Ruban KPIs horizontal (Rangée 1)** : 6 micro-cartes statistiques compactes (~56px de hauteur) : Dossiers Reçus, Postes Ouverts, Vivier Actif, Agenda, Taux d'Embauche, Time-to-Hire.
      - **Grille 2 Colonnes Côte-à-Côte (Rangées 2 & 3 - Tout visible sans scroller)** :
        - *Colonne Gauche* :
@@ -1650,29 +1650,29 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Création du composant React `AdvancedSearchPanel.jsx` (accordéon moderne repliable avec compteurs de filtres actifs et autocomplétion des compétences).
    - Intégration dans `CandidaturesOffresView.jsx` et `CandidaturesSpontaneesView.jsx` avec affichage du snippet `📄 Extrait CV` et des badges de compétences sous chaque profil.
 2. **Implémentation Réalisée** :
-   - **Modèle Eloquent ([`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/Candidature.php))** :
+   - **Modèle Eloquent ([`Candidature.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/Candidature.php))** :
      - Ajout des relations : `competences()`, `formations()`, `experiences()`, `projets()`.
      - Ajout de l'attribut calculé `$appends = ['cv_snippet']` et accesseur `getCvSnippetAttribute()`.
-   - **Repository ([`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php))** :
+   - **Repository ([`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php))** :
      - Implémentation des clauses de filtrage dans `paginateFiltered` : `cv_keyword`, `competences` (modes `any`/`all`), `niveau_etude`, `id_niveau`, `annees_exp_min`, `poste_keyword`, `dans_vivier`.
      - Méthode `generateSnippet(?string $text, string $keyword, int $radius)` extrayant le fragment textuel pertinent.
      - Eager-loading complet dans `findById` et `paginateFiltered`.
-   - **Resource API ([`CandidatureResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/CandidatureResource.php))** :
+   - **Resource API ([`CandidatureResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Resources/CandidatureResource.php))** :
      - Exposition des relations formatées `competences`, `formations`, `experiences`, `projets` et de `cv_snippet`.
-   - **Composant UI React ([`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
+   - **Composant UI React ([`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
      - En-tête dépliable compact avec pastille rouge dynamique du nombre de filtres actifs.
      - Inputs stylisés : mot-clé OCR CV, poste recherché, select niveau d'études, select années d'expérience.
      - Sélecteur de compétences avec autocomplétion depuis `/api/competences`, tags amovibles et toggle interactif de correspondance OU/ET.
      - Boutons Réinitialiser et Appliquer.
-   - **Intégration Vues Candidatures ([`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx))** :
+   - **Intégration Vues Candidatures ([`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx))** :
      - Transmission des critères avancés à l'API `/api/candidatures`.
      - Affichage d'un encart rouge stylisé `📄 Extrait CV : "..."` pour tout candidat matché par mot-clé CV.
      - Affichage des badges des premières compétences déclarées.
 3. **Validation & Tests** :
-   - Nouvelle suite de tests PHPUnit : [`RechercheAvanceeCandidaturesTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/RechercheAvanceeCandidaturesTest.php) (**5/5 tests passés, 28 assertions**).
+   - Nouvelle suite de tests PHPUnit : [`RechercheAvanceeCandidaturesTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/tests/Feature/Api/RechercheAvanceeCandidaturesTest.php) (**5/5 tests passés, 28 assertions**).
    - Suite complète des tests PHPUnit backend : **36/36 tests passés (182 assertions, 0 régression)**.
    - Build de production frontend React : **compilation Vite réussie en 2.69s (0 erreur, 0 avertissement)**.
-   - Mise à jour de [`sprint-7/taches.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-7/taches.md) : Tâche 5 marquée comme `[FAIT]`, progression du Sprint 7 à **54.5%** (6,0/11,0 j) et avancement global à **94.1%** (64,0/68,0 j).
+   - Mise à jour de [`sprint-7/taches.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/sprint-7/taches.md) : Tâche 5 marquée comme `[FAIT]`, progression du Sprint 7 à **54.5%** (6,0/11,0 j) et avancement global à **94.1%** (64,0/68,0 j).
 
 ---
 
@@ -1683,13 +1683,13 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - La table `document` en base de données locale avait été créée par une migration initiale sans la colonne générée `recherche_texte tsvector` (qui figurait dans `sql/gestion_recrutement.sql` mais pas dans les migrations de build).
    - De plus, côté frontend, chaque frappe de touche dans le champ de recherche de CV déclenchait immédiatement une requête HTTP non temporisée.
 2. **Correctifs Appliqués** :
-   - **Backend Résilient ([`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php))** :
+   - **Backend Résilient ([`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php))** :
      - Vérification dynamique via `Schema::hasColumn('document', 'recherche_texte')`.
      - Si la colonne existe : combinaison `recherche_texte @@ plainto_tsquery('french', ?)` ou `ILIKE`.
      - Si la colonne n'existe pas : bascule automatique sans erreur sur `ILIKE` en PostgreSQL et `LIKE` en SQLite.
-   - **Migration PostgreSQL ([`2026_10_14_000000_add_recherche_texte_to_document_table.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_10_14_000000_add_recherche_texte_to_document_table.php))** :
+   - **Migration PostgreSQL ([`2026_10_14_000000_add_recherche_texte_to_document_table.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/database/migrations/2026_10_14_000000_add_recherche_texte_to_document_table.php))** :
      - Ajout officiel de la colonne générée `recherche_texte tsvector GENERATED ALWAYS AS (to_tsvector('french', coalesce(contenu_texte_extrait, ''))) STORED` et création de son index `GIN`. Migration exécutée avec succès (`434.91ms`).
-   - **Frontend Debounce ([`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
+   - **Frontend Debounce ([`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
      - Ajout d'états locaux `cvKeywordLocal` et `posteKeywordLocal` avec temporisation (debounce de 350ms) pour une frappe fluide sans marteler le serveur à chaque lettre.
      - Prise en compte de la touche `Entrée` pour soumission instantanée.
 3. **Validation & Tests** :
@@ -1703,22 +1703,22 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 118 (Sprint 7 — Tâche 5) : Déclenchement Exclusif des Filtres par Bouton & Résolution Recherche Plein Texte CV
 > **User Prompt :** *"okey deja tous les filtres je veux que ca s'active apres avoir cliquer sur un bouton mais pas directement apres avoir interagit avec l'input ,et aussi la recherche de mot cle j'ai l'impression il dit tous toujours aucune candidature"*
 1. **Diagnostic & Causes Racines** :
-   - **Déclenchement intempestif des filtres** : Dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) et [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx), l'état `filters` figurait directement dans les dépendances du `useCallback` de `loadData()`, déclenchant une requête HTTP à chaque modification d'un input ou d'un select.
+   - **Déclenchement intempestif des filtres** : Dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) et [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx), l'état `filters` figurait directement dans les dépendances du `useCallback` de `loadData()`, déclenchant une requête HTTP à chaque modification d'un input ou d'un select.
    - **Recherche mot-clé CV retournant 0 résultat** :
      - Dans la base PostgreSQL existante, la table `document` comptait 38 lignes mais avec `contenu_texte_extrait` vide (longueur 0).
      - Le texte intégral des 37 CVs scannés par PaddleOCR était en réalité stocké dans la table `cv_extraction_ocr` (`texte_brut_ocr` et `donnees_json`).
-     - Le repository [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) ne cherchait que dans `document.contenu_texte_extrait`.
+     - Le repository [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) ne cherchait que dans `document.contenu_texte_extrait`.
 2. **Correctifs Appliqués** :
    - **Découplage Frontend `filters` (saisie) vs `appliedFilters` (exécution API)** :
-     - Implémentation du pattern `appliedFilters` dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) et [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx).
+     - Implémentation du pattern `appliedFilters` dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) et [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx).
      - `loadData` dépend désormais de `appliedFilters` (et non plus de `filters`).
      - La requête réseau n'est déclenchée **qu'après validation explicite** :
        - Clic sur le bouton **"Filtrer"** de la barre principale.
-       - Clic sur le bouton **"Appliquer les filtres"** du panneau avancé [`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx).
+       - Clic sur le bouton **"Appliquer les filtres"** du panneau avancé [`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx).
        - Touche **Entrée** dans un champ de saisie (`q`, `cv_keyword`, `poste_keyword`).
      - Le bouton **"Réinitialiser"** remet à zéro `filters` ET `appliedFilters` et recharge la liste initiale.
    - **Recherche CV Hybride & Résiliente Multitable** :
-     - Extension de [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) pour interroger simultanément la table `document` (via `recherche_texte @@ plainto_tsquery` / `ILIKE`) et la table `cv_extraction_ocr` (`texte_brut_ocr` / `CAST(donnees_json AS TEXT) ILIKE`).
+     - Extension de [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) pour interroger simultanément la table `document` (via `recherche_texte @@ plainto_tsquery` / `ILIKE`) et la table `cv_extraction_ocr` (`texte_brut_ocr` / `CAST(donnees_json AS TEXT) ILIKE`).
      - Protection par `Schema::hasTable('cv_extraction_ocr')` garantissant la compatibilité universelle (SQLite en tests in-memory, PostgreSQL en environnement réel).
      - Synchronisation des documents avec le texte OCR existant dans PostgreSQL.
      - Fallback contextuel automatique dans `generateSnippet()` : si le document n'a pas de texte extrait, le snippet est généré directement depuis `cv_extraction_ocr`.
@@ -1734,7 +1734,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Objectif** :
    - Fournir un document de référence clair, exhaustif et directement actionnable pour tout développeur ou évaluateur de soutenance souhaitant déployer la plateforme à partir de zéro sur Windows, Linux ou macOS.
 2. **Réalisations** :
-   - Création du document racine [`PREREQUIS.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/PREREQUIS.md) structuré en 7 sections majeures :
+   - Création du document racine [`PREREQUIS.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/PREREQUIS.md) structuré en 7 sections majeures :
      1. **Matrice des logiciels à télécharger** : PHP 8.2+/8.3, Composer 2.x, Node.js LTS (18/20), PostgreSQL 15+, pgAdmin 4, Python 3.10/3.11, Visual C++ Redistributable 2015-2022 (x64), Git, Docker Desktop (optionnel pour n8n), avec liens de téléchargement officiels et commandes CLI de vérification.
      2. **Installation et configuration détaillée** :
         - Configuration obligatoire du `php.ini` (`pdo_pgsql`, `pgsql`, `pdo_sqlite`, `sqlite3`, `curl`, `mbstring`, `fileinfo`, `gd`, `zip`, quotas d'upload et mémoire).
@@ -1745,7 +1745,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      5. **Procédure de démarrage quotidien (Runbook 3 terminaux)** : commandes de lancement prêtes à copier-coller pour OCR (8001), Backend (8000), Frontend (5173).
      6. **Comptes & URLs d'accès** : tableau récapitulatif des adresses Front-Office, Back-Office, API Swagger docs, et identifiants administrateur par défaut (`admin@alphaciment.local` / `password`).
      7. **Dépannage & FAQ** : résolution des pannes courantes (`driver not found`, DLL C++ manquante, CORS, politique PowerShell).
-   - Ajout d'une mise en avant et lien direct dans [`README.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/README.md).
+   - Ajout d'une mise en avant et lien direct dans [`README.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/README.md).
 
 ---
 
@@ -1754,7 +1754,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Objectif** :
    - Inclure explicitement **Ollama** comme pré-requis obligatoire pour le parsing sémantique des CVs scannés (NER) et la classification intelligente des emails entrants via les LLMs locaux (`qwen2.5:7b`, `mistral`, `llama3.2`).
 2. **Réalisations** :
-   - **Mise à jour de [`PREREQUIS.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/PREREQUIS.md)** :
+   - **Mise à jour de [`PREREQUIS.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/PREREQUIS.md)** :
      - Ajout d'Ollama dans la matrice générale des logiciels à télécharger avec lien officiel ([ollama.com/download](https://ollama.com/download)).
      - Section dédiée **2.6 : Ollama & Modèles LLM Locaux** :
        - Explication des rôles : dissociation stricte Expériences vs Projets vs Formations vs Compétences (`cv_llm_parser.py`) et routage des emails entrants en `demande_offre` (avec rattachement à la référence ex: `IT-1`), `demande_spontanee`, `demande_information` (`email_classifier.py`).
@@ -1762,7 +1762,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
        - Commande de démarrage et test de connectivité sur le port `11434` (`http://127.0.0.1:11434/api/tags`).
      - Mise à jour de la procédure d'initialisation (Étape 3 : Ollama) et du Runbook quotidien (Service 0 : `ollama serve`).
      - Ajout des cas d'erreurs Ollama dans la section FAQ / Dépannage (`fallback_ollama_offline`, modèle manquant).
-   - **Mise à jour de [`README.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/README.md)** :
+   - **Mise à jour de [`README.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/README.md)** :
      - Ajout de la section 4 consacrée à Ollama (`ollama pull qwen2.5:7b` et `ollama serve`).
      - Ajout de l'entrée `http://localhost:11434` dans le tableau officiel des URLs d'accès.
 
@@ -1779,20 +1779,20 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 > **User Prompt :** *"/generative_ui okey ,maintenant ,je te demande de mettre tous les filtres comme je t'ai dit ,ameliorer le style ,certains bouton sur la meme ligne n'ont pas la meme taille ,dans la fiche candidat je t'ai dit que lorsqu'on slide vers le bas ,les informations doivent rester sur place et a droite pour les competences et tout on peut slider ,et fais pareil pour le cv ,meme si on slide a droite ,la partie gauche reste a la bonne place ,et en gros je veux un style tres professionnelle ,meme taille pour les elements ,meme pour la side bar agenda et candidature spontannee n'ont pas le meme taille ,les couleurs ,et tout"*
 1. **Généralisation du Déclenchement Manuel des Filtres (Anti-Spam Requêtes)** :
    - Découplage complet de l'état de saisie locale (`filters`) de l'état d'interrogation API (`appliedFilters`) étendu à l'intégralité des vues restantes :
-     - [`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx) : la recherche d'offres ne part plus sur chaque frappe ou sélection, mais uniquement sur clic du bouton "Filtrer" ou touche Entrée.
-     - [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) : filtrage par direction, domaine et mot-clé déclenché uniquement sur clic "Filtrer" ou touche Entrée.
-     - [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx) : ajout d'un bouton explicite "Filtrer" et "Réinitialiser" (qui déclenchaient auparavant une requête immédiate à chaque caractère).
+     - [`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/OffersView.jsx) : la recherche d'offres ne part plus sur chaque frappe ou sélection, mais uniquement sur clic du bouton "Filtrer" ou touche Entrée.
+     - [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) : filtrage par direction, domaine et mot-clé déclenché uniquement sur clic "Filtrer" ou touche Entrée.
+     - [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx) : ajout d'un bouton explicite "Filtrer" et "Réinitialiser" (qui déclenchaient auparavant une requête immédiate à chaque caractère).
 2. **Harmonisation Strictement Alignée des Boutons et Contrôles (Hauteur 38px)** :
-   - Mise à jour de [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css) :
+   - Mise à jour de [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css) :
      - `.filter-bar input`, `.filter-bar select` et `.filter-button`, `.ghost-button`, `.primary-button`, `.action-button` unifiés à `height: 38px; min-height: 38px; max-height: 38px; box-sizing: border-box; font-size: 13px; font-weight: 700;`.
      - Alignement vertical `align-items: center` garanti sans décalage.
-     - Remplacement du bouton d'ajout au vivier dans [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) (anciennement gradient violet démesuré de 48px) par le bouton officiel AlpA Ciment unifié (`.filter-button`, 38px, rouge `#FF0D00`).
+     - Remplacement du bouton d'ajout au vivier dans [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) (anciennement gradient violet démesuré de 48px) par le bouton officiel Alpha Ciment unifié (`.filter-button`, 38px, rouge `#FF0D00`).
 3. **Fiche Candidat : Défilement Indépendant & Colonne Gauche Sticky** :
    - **Onglet Informations & Profil RH** : Application des règles CSS `.candidate-sidebar-card { position: sticky; top: 16px; align-self: start; max-height: calc(100vh / 0.8 - 40px); overflow-y: auto; scrollbar-width: thin; }`. La carte de profil du candidat (photo, coordonnées, progression du statut RH) reste fixe et visible à gauche pendant que l'utilisateur fait défiler la longue liste de compétences, formations, expériences et notes à droite.
-   - **Onglet Extraction CV** : Intégration des classes `.cv-split-grid` et `.cv-sticky-card` dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx). L'aperçu format A4 du CV original reste ancré à gauche pendant que les entités extraites et le texte brut OCR défilent à droite.
+   - **Onglet Extraction CV** : Intégration des classes `.cv-split-grid` et `.cv-sticky-card` dans [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx). L'aperçu format A4 du CV original reste ancré à gauche pendant que les entités extraites et le texte brut OCR défilent à droite.
    - Préservation stricte de l'export PDF / impression A4 (`@media print` avec `position: static !important; max-height: none !important;`).
 4. **Uniformisation de la Barre Latérale de Navigation (Sidebar 230px)** :
-   - Élargissement du gabarit de grille `.app-shell` de `190px` à `230px` dans [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css).
+   - Élargissement du gabarit de grille `.app-shell` de `190px` à `230px` dans [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css).
    - Fixation stricte de `.nav-link` à `height: 38px; min-height: 38px; max-height: 38px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 12px;`.
    - Élimination définitive du saut de ligne sur "Candidatures spontanées" et égalisation parfaite de la hauteur avec "Agenda & Tests".
 5. **Artefact Generative UI** :
@@ -1807,7 +1807,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Philosophie & Choix d'Architecture (Zero Heavy Library Dependency)** :
    - Plutôt que d'intégrer des bibliothèques de graphiques tierces lourdes (Chart.js ou Recharts qui augmentent le bundle de 300 à 500 Ko et ralentissent l'hydratation), adoption d'un **moteur de rendu SVG vectoriel natif haute performance à 60 fps** couplé aux icônes `lucide-react`.
    - Temps de compilation Vite maintenu sous les 5 secondes (`built in 4.89s`) et taille de bundle pour le Dashboard de seulement 26.2 Ko.
-   - Design System exécutif inspiré des standards modernes actuels (Linear, Vercel, Stripe Dashboard) : micro-interactions au survol, cartes de données surélevées (`.dashboard-card-panel`), liserés et accents AlpA Ciment (`#FF0D00`, `#0f172a`, `#64748b`), typographie ultra-nette.
+   - Design System exécutif inspiré des standards modernes actuels (Linear, Vercel, Stripe Dashboard) : micro-interactions au survol, cartes de données surélevées (`.dashboard-card-panel`), liserés et accents Alpha Ciment (`#FF0D00`, `#0f172a`, `#64748b`), typographie ultra-nette.
 2. **Innovations Apportées au Dashboard (`DashboardView.jsx` & `styles.css`)** :
    - **Bandeau Supérieur : 6 KPI Micro-Cards Exécutives avec Sparklines SVG Inline** :
      - Cartes `.kpi-card-modern` avec micro-hover lift (`transform: translateY(-2px)`), liseré rouge signature et ombre portée subtile.
@@ -1844,7 +1844,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Contexte & Spécification** :
    - Initialement regroupés au sein d'une seule carte partitionnée (`gridTemplateColumns: '120px 1fr'`), les blocs **Canaux d'Acquisition** et **Pression par Direction** manquaient d'indépendance visuelle et d'aération.
    - Demande utilisateur de séparer explicitement ces deux métriques en deux cartes distinctes et autonomes.
-2. **Implémentation Réalisée dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx)** :
+2. **Implémentation Réalisée dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx)** :
    - Mise en place d'une sous-grille dédiée : `display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px'`.
    - **Carte D1 : Canaux d'Acquisition** :
      - Conteneur indépendant `.dashboard-card-panel`.
@@ -1854,7 +1854,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **Carte D2 : Pression par Direction** :
      - Conteneur indépendant `.dashboard-card-panel`.
      - En-tête avec icône `Layers` (#0284c7), titre dédié et badge du nombre de directions actives.
-     - Liste enrichie des 4 premières directions de l'entreprise avec libellé tronqué proprement, volume de candidatures, pourcentage de charge globale et barre de progression à dégradé signature AlpA Ciment (`#FF0D00` à `#f97316`).
+     - Liste enrichie des 4 premières directions de l'entreprise avec libellé tronqué proprement, volume de candidatures, pourcentage de charge globale et barre de progression à dégradé signature Alpha Ciment (`#FF0D00` à `#f97316`).
 3. **Validation & Tests** :
    - **Build Vite React** : **Compilé avec succès en 2.30s (0 erreur, 0 avertissement)**.
 ---
@@ -1862,18 +1862,18 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 124 (Dashboard SLA & Navigation Fiche Candidat) : Affichage Intégral des Dossiers SLA et Ouverture Directe de la Fiche Candidat
 > **User Prompt :** *"okey Dossiers Prioritaires (SLA) il dit 5 en attentes mais il n'affiche que 3 ensuite lorsqu'on clique traiter ca va pas vers sa fiche mais juste dans la liste des candidatures"*
 1. **Diagnostic & Causes Racines** :
-   - **Affichage limité à 3 items** : La liste des dossiers SLA dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) appliquait un `candidaturesATraiter.slice(0, 3)` en dur, masquant les candidatures suivantes même lorsque le badge indiquait 5 dossiers en attente.
+   - **Affichage limité à 3 items** : La liste des dossiers SLA dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) appliquait un `candidaturesATraiter.slice(0, 3)` en dur, masquant les candidatures suivantes même lorsque le badge indiquait 5 dossiers en attente.
    - **Navigation vers la liste au lieu de la fiche** : Le bouton "Traiter" exécutait un simple `navigate(cand.dans_vivier ? '/vivier' : '/candidatures/offres')` sans spécifier l'identifiant du dossier, amenant le recruteur sur la liste globale non filtrée au lieu de la fiche d'évaluation du candidat.
 2. **Correctifs & Améliorations Apportés** :
    - **Affichage exhaustif des dossiers en attente SLA** :
-     - Suppression de la troncature `.slice(0, 3)` dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx).
+     - Suppression de la troncature `.slice(0, 3)` dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx).
      - Conteneur rendu défilable avec `maxHeight: 250px`, `overflowY: 'auto'` et scrollbar fine : tous les dossiers (5 ou plus) sont immédiatement visibles et consultables sans déformer la grille du cockpit.
      - Ligne du candidat rendue cliquable dans son intégralité avec curseur pointer et infobulle d'invitation.
-   - **Routage direct vers la fiche candidat ([`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx))** :
+   - **Routage direct vers la fiche candidat ([`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx))** :
      - Création d'une route dédiée de premier niveau : `/candidatures/:id` encapsulée dans `BackOfficeLayout` et relayant `CandidatureDetailView` avec bouton retour `navigate(-1)` renvoyant immédiatement au Dashboard.
      - Le bouton "Traiter" (et le clic sur la carte candidat) exécute désormais `navigate(/candidatures/${cand.id_candidature})`, ouvrant directement le dossier RH complet du candidat (CV, compétences, parcours, OCR, statut).
    - **Prise en charge universelle des paramètres d'URL (`?candidature=` / `?id=`)** :
-     - Ajout de la détection de paramètre d'URL dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) pour ouvrir automatiquement la fiche correspondante si un lien avec query parameter est partagé.
+     - Ajout de la détection de paramètre d'URL dans [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) pour ouvrir automatiquement la fiche correspondante si un lien avec query parameter est partagé.
 3. **Validation Technique** :
    - **Tests automatisés PHPUnit** : **36/36 passés (182 assertions, 0 échec)**.
    - **Build Vite React** : **Compilé avec succès en 3.13s (0 erreur, 0 avertissement)**.
@@ -1888,16 +1888,16 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Dossiers du vivier : `/vivier?candidature={id}`
    - **Élimination du vide sous la carte SLA** : Dans le cockpit à deux colonnes du Dashboard, la colonne de droite (entonnoir + canaux + pression) était plus haute que la colonne de gauche (tendance + SLA), laissant un espace blanc vide sous la liste des dossiers prioritaires. La carte SLA doit descendre et s'étirer jusqu'au bas de la colonne pour s'aligner parfaitement.
 2. **Implémentations Réalisées** :
-   - **Routage Officiel Contextuel ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
+   - **Routage Officiel Contextuel ([`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx))** :
      - Remplacement de la navigation générique par un aiguillage intelligent selon la nature de la candidature :
        - `cand.dans_vivier` ➔ `/vivier?candidature=${cand.id_candidature}`
        - `cand.intitule` spontanée ➔ `/candidatures/spontanees?candidature=${cand.id_candidature}`
        - Autre (sur offre) ➔ `/candidatures/offres?candidature=${cand.id_candidature}`
      - L'action "Traiter" (et le clic sur la carte) ouvre immédiatement la vue officielle avec le dossier candidat ouvert et la navigation active dans la barre latérale.
-     - Dans [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx), `/candidatures/:id` effectue une redirection transparente `<Navigate replace to="/candidatures/offres?candidature={id}" />` sans composant orphelin.
-     - Dans les vues [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx), la fermeture de la fiche via `onBack` nettoie proprement le paramètre d'URL sans rechargement de page.
+     - Dans [`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx), `/candidatures/:id` effectue une redirection transparente `<Navigate replace to="/candidatures/offres?candidature={id}" />` sans composant orphelin.
+     - Dans les vues [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx), la fermeture de la fiche via `onBack` nettoie proprement le paramètre d'URL sans rechargement de page.
    - **Étirement Complet de la Carte SLA (Zero Empty Gap)** :
-     - Application de `alignItems: 'stretch'` sur la grille du cockpit 2 colonnes dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx).
+     - Application de `alignItems: 'stretch'` sur la grille du cockpit 2 colonnes dans [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx).
      - Colonne gauche configurée en `height: '100%'`.
      - Carte B (Dossiers Prioritaires SLA) passée en `flex: 1, display: 'flex', flexDirection: 'column'`.
      - Conteneur interne de la liste des dossiers configuré en `flex: 1, overflowY: 'auto'` : la carte descend jusqu'au plus bas possible et s'aligne rigoureusement sur le bas de la colonne droite.
@@ -1917,10 +1917,10 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **Pourquoi `/api/referentiels/statuts-candidature` et `/api/offres` étaient interrogés plusieurs fois ?**
      - Ces données de référence statiques étaient imbriquées à l'intérieur de `loadData()`. À chaque changement de filtre ou de page, la liste des statuts et la liste des offres étaient re-téléchargées inutilement.
 2. **Optimisations & Découplage Mis en Place** :
-   - **Transmission et Réutilisation du Référentiel Compétences ([`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/main.jsx) & [`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
+   - **Transmission et Réutilisation du Référentiel Compétences ([`main.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/main.jsx) & [`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx))** :
      - `main.jsx` transmet désormais `competencesData` aux vues de candidatures.
      - `AdvancedSearchPanel` accepte la prop `competencesList` et n'interroge plus `/api/competences` si le référentiel est déjà fourni par le parent.
-   - **Découplage des Référentiels Statiques ([`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx), [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx))** :
+   - **Découplage des Référentiels Statiques ([`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx), [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx))** :
      - Chargement unique de `/api/referentiels/statuts-candidature` et `/api/offres` au montage initial de la vue (`useEffect` dédié avec cleanup).
      - La navigation par page et les changements de filtres ciblés n'interrogent plus ces référentiels statiques.
    - **Découplage du Calcul des Badges et Compteurs** :
@@ -1937,13 +1937,13 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - `/api/competences` est désormais résolu à 100% (passé de 3 appels à 1 seul appel unique au bootstrap).
    - Le second bloc d'appels à 15:11:16 (5 secondes après 15:11:11) correspond au double-montage délibéré de `<React.StrictMode>` en environnement de développement React 18+.
    - Comme le serveur PHP local (`php artisan serve`) est mono-threadé, le deuxième lot de requêtes s'empilait dans la file d'attente du socket pendant que le premier lot était traité, d'où le déclenchement décalé de 5 secondes.
-2. **Solutions Déployées ([`client.js`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/api/client.js))** :
+2. **Solutions Déployées ([`client.js`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/api/client.js))** :
    - **Déduplication en vol (In-Flight Request Coalescing)** :
      - Implémentation d'un registre `inFlightRequests (Map)` dans le client HTTP centralisé.
      - Si une requête `GET` vers la même URL est déjà en cours d'exécution, la promesse existante est immédiatement retournée à tous les appelants simultanés sans émettre de seconde requête réseau vers le serveur Laravel.
    - **Cache mémoire pour référentiels statiques (`getCachedJson`)** :
      - Mise en place d'un cache mémoire avec TTL (5 minutes par défaut) pour les référentiels immuables (`/api/referentiels/statuts-candidature`, `/api/offres`).
-     - Appliqué à [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx).
+     - Appliqué à [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx), [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) et [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx).
      - Tout changement d'onglet ou retour ultérieur sur ces pages accède instantanément aux données en 0ms sans aucune sollicitation de la base de données.
 3. **Validation & Tests** :
    - **Tests automatisés PHPUnit** : **36/36 passés (182 assertions, 0 échec)**.
@@ -1953,12 +1953,12 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 128 (Web Performance & Lighthouse LCP) : Élimination des Ressources Bloquant le Rendu Initial (Économie ~600-1000 ms)
 > **User Prompt :** *"j'ai fait des petits test avec lighthouse et voici une des remarques : Requêtes de blocage du rendu Économies estimées : 600 ms ... all.min.css ... css_OyQjW....css ... css_OfchS....css"*
 1. **Diagnostic & Analyse Lighthouse** :
-   - **Problème identifié** : Trois balises `<link rel="stylesheet">` synchrones étaient présentes dans le `<head>` de [`index.html`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/index.html) :
+   - **Problème identifié** : Trois balises `<link rel="stylesheet">` synchrones étaient présentes dans le `<head>` de [`index.html`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/index.html) :
      1. `https://cdnjs.cloudflare.com/.../all.min.css` (FontAwesome, bloquant pour ~710 ms via DNS + TLS handshake externe).
      2. `/css/css_OyQjWxlUxu--OhsMlYcrEWO-H05fcGFzxYLsU_W2jCk.css` (Feuille de style globale Drupal ~490 KiB, bloquant pour ~970 ms).
      3. `/css/css_OfchSCC6Ik182tntv9o3E_uWhsm0WYdS9UiJ1D0aQT0.css` (Feuille d'appoint ~7 KiB).
    - **Impact** : Le navigateur interrompait l'analyse HTML et différait le First Contentful Paint (FCP) et le Largest Contentful Paint (LCP) de plus d'1 seconde, affichant un écran blanc jusqu'au téléchargement intégral de ces feuilles.
-2. **Optimisations Mises en Place ([`index.html`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/index.html))** :
+2. **Optimisations Mises en Place ([`index.html`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/index.html))** :
    - **Préconnexion & DNS-Prefetch** :
      - Ajout de `<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />` et `<link rel="dns-prefetch" />` pour anticiper la résolution DNS et la négociation TLS du CDN sans bloquer le parseur.
    - **Chargement Asynchrone Non-Bloquant (`media="print"` + switch `onload`)** :
@@ -1981,27 +1981,27 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Diagnostic & Analyse de la Cause Racine (Décalage UTC+3)** :
    - **Origine du problème** : Madagascar se situe sur le fuseau horaire **UTC+3** (`Indian/Antananarivo`).
    - Lorsque le recruteur sélectionnait `09:00 à 10:00` dans le formulaire modal :
-     1. Dans [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx), le code exécutait `new Date(dateDebut).toISOString()`.
+     1. Dans [`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx), le code exécutait `new Date(dateDebut).toISOString()`.
      2. L'appel JS `.toISOString()` convertissait l'heure locale (09:00) en heure UTC en soustrayant 3 heures : `"2026-10-15T06:00:00.000Z"`.
      3. La colonne PostgreSQL `rendez_vous.date_debut` est de type `TIMESTAMP WITHOUT TIME ZONE`.
      4. Laravel (configuré par défaut en UTC) persistait littéralement `2026-10-15 06:00:00`.
-     5. Lors de la génération immédiate de la convocation email dans [`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CommunicationService.php), `$heureRdv = $dateDebut->format('H:i') . ' à ' . $dateFin->format('H:i');` formatait donc `06:00 à 07:00`.
+     5. Lors de la génération immédiate de la convocation email dans [`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CommunicationService.php), `$heureRdv = $dateDebut->format('H:i') . ' à ' . $dateFin->format('H:i');` formatait donc `06:00 à 07:00`.
      6. Ce texte erroné était archivé de manière immuable dans `communication.contenu`.
 2. **Mesures et Correctifs Appliqués** :
-   - **Frontend - Suppression du décalage UTC ([`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx))** :
+   - **Frontend - Suppression du décalage UTC ([`RendezVousModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/RendezVousModal.jsx))** :
      - Remplacement de `.toISOString()` par un formateur local strict `formatDateTimePayload` (`YYYY-MM-DD HH:mm:ss`) qui préserve l'heure exacte saisie par le recruteur (ex. `09:00:00`).
      - Initialisation des dates par défaut de demain à 09:00/10:00 en construction locale directe au lieu de `.toISOString()`.
      - Renforcement de `toLocalInputString` pour parser directement les chaînes PostgreSQL `YYYY-MM-DD HH:mm:ss` sans conversion de fuseau horaire.
-   - **Frontend - Préservation horaire sur l'Agenda ([`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx))** :
+   - **Frontend - Préservation horaire sur l'Agenda ([`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx))** :
      - Remplacement de `.toISOString()` dans `handleEventDrop` et `handleEventResize` par `formatEventDatePayload` pour préserver l'heure locale lors du glisser-déposer de créneaux.
-   - **Frontend - Affichage des Heures dans la Fiche Candidat ([`formatters.js`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/utils/formatters.js) & [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+   - **Frontend - Affichage des Heures dans la Fiche Candidat ([`formatters.js`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/utils/formatters.js) & [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
      - Création de la fonction utilitaire `formatTime(dateString)`.
      - Mise à jour de la carte Rendez-vous pour afficher explicitement : `📅 Le [Date] de [Heure début] à [Heure fin]`.
-   - **Backend - Auto-résolution du dernier RDV ([`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CommunicationService.php))** :
+   - **Backend - Auto-résolution du dernier RDV ([`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CommunicationService.php))** :
      - Dans `remplacerVariables()`, si `$rdv` est omis (notamment lors de l'aperçu ou de l'envoi manuel de message), le service résout automatiquement le dernier rendez-vous planifié pour peupler `{date_rdv}`, `{heure_rdv}`, `{mode_rdv}` et `{lieu_rdv}`.
-   - **Backend - Sérialisation des Dates sans 'Z' ([`RendezVousResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/RendezVousResource.php))** :
+   - **Backend - Sérialisation des Dates sans 'Z' ([`RendezVousResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Resources/RendezVousResource.php))** :
      - Utilisation de `format('Y-m-d\TH:i:s')` au lieu de `toISOString()` pour éviter que le navigateur n'applique un second décalage horaire.
-   - **Backend - Configuration du Fuseau Horaire ([`config/app.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/config/app.php) & [`.env`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/.env))** :
+   - **Backend - Configuration du Fuseau Horaire ([`config/app.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/config/app.php) & [`.env`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/.env))** :
      - Définition de `APP_TIMEZONE=Indian/Antananarivo` et `'timezone' => env('APP_TIMEZONE', 'Indian/Antananarivo')`.
    - **Migration des Données Antérieures** :
      - Exécution d'un script correctif pour ajuster les 7 rendez-vous existants en base (+3h pour passer de `06:00:00` à `09:00:00`).
@@ -2022,9 +2022,9 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Conteneurs `div` web avec bordures arrondies, ombres portées, marges disproportionnées et scrollbars inadaptées à une pagination A4.
      - Absence des données des autres onglets : les rendez-vous d'évaluation et l'historique du workflow étaient tronqués car cloisonnés dans des onglets inactifs lors de l'impression.
 2. **Architecture et Solutions Déployées** :
-   - **Création du Composant Document Dédié ([`CandidaturePrintDossier.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/CandidaturePrintDossier.jsx))** :
+   - **Création du Composant Document Dédié ([`CandidaturePrintDossier.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/candidatures/CandidaturePrintDossier.jsx))** :
      - Élaboration d'un document PDF A4 autonome, structuré, typographiquement optimisé et 100% exempt d'éléments interactifs ou de formulaires.
-     - **Cartouche officiel AlpA Ciment** : Logo de l'entreprise, en-tête institutionnel "ALPA CIMENT MADAGASCAR — Direction des Ressources Humaines", bandeau d'authentification "DOSSIER OFFICIEL DE CANDIDATURE • FICHE DE SYNTHÈSE RH", métadonnées de traçabilité (Réf. Dossier `#XXXXX`, Date et heure d'édition, Statut RH actuel).
+     - **Cartouche officiel Alpha Ciment** : Logo de l'entreprise, en-tête institutionnel "ALPHA CIMENT MADAGASCAR — Direction des Ressources Humaines", bandeau d'authentification "DOSSIER OFFICIEL DE CANDIDATURE • FICHE DE SYNTHÈSE RH", métadonnées de traçabilité (Réf. Dossier `#XXXXX`, Date et heure d'édition, Statut RH actuel).
      - **Cartouche d'Identité & Affectation** : Photo d'identité au format passeport (70×85mm) avec bordure neutre (ou cadre placeholder officiel), Prénom et NOM en majuscules, poste souhaité, direction de rattachement, tableau des coordonnées (Email, Téléphone, Canal de dépôt, Statut vivier RH).
      - **Synthèse du Profil & Motivation** : Bloc de présentation sobre et formel.
      - **Tableaux Professionnels Imprimables (A4)** :
@@ -2035,7 +2035,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
        - *Planning des Évaluations & Entretiens RH* : Nature du RDV (Test / Entretien), Date & Horaire exact (`formatTime`), Modalité & Lieu, Responsable RH, Statut du rendez-vous.
        - *Historique des Décisions & Traçabilité Workflow* : Traçabilité chronologique complète des statuts, opérateurs et commentaires RH.
      - **Cadre de Visa & Signatures RH** : Double zone d'émargement "Visa du Chargé de Recrutement" et "Visa de la Direction des Ressources Humaines" avec mentions légales de confidentialité.
-   - **Isolation Stricte Écran vs Impression ([`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx) & [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Isolation Stricte Écran vs Impression ([`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx) & [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Encapsulation de l'interface web interactive dans `.candidature-screen-view`.
      - Règle `@media screen` : `.print-candidat-dossier { display: none !important; }`.
      - Règle `@media print` : Masquage total de `.candidature-screen-view`, `.no-print`, `.sidebar`, `.topbar`, `.app-shell > *`, formulaires, boutons et inputs. Affichage exclusif de `.print-candidat-dossier` avec pagination A4 maîtrisée (`break-inside: avoid`, `page-break-inside: avoid`).
@@ -2053,10 +2053,10 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Par conséquent, l'injection de dépendances créait un modèle vide sans ID. Lors de l'appel à `$rendezVous->fresh()`, l'absence de clé primaire retournait `null`, causant l'exception fatale `Call to a member function toArray() on null`.
    - De plus, les attributs transmis par le formulaire (`id_candidature`, `id_statut_candidature_cible`, `envoyer_notification_email`) n'étaient pas filtrés avant `$rendezVous->update()`.
    - **Correctifs apportés** :
-     - [`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/routes/api.php) : Déclaration explicite du paramètre avec `->parameters(['rendez-vous' => 'rendezVous'])`.
-     - [`RendezVousController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/RendezVousController.php) : Implémentation de la méthode défensive `resolveRendezVous()` pour garantir la résolution du modèle quel que soit le binding, et élargissement des règles de validation de `update()`.
-     - [`RendezVousService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/RendezVousService.php) : Nettoyage préalable des champs hors colonnes (`id_statut_candidature_cible`, `envoyer_notification_email`), synchronisation facultative du statut de la candidature et gestion défensive des dates partielles.
-2. **Refonte Moderne du Design de l'Agenda RH ([`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) & [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+     - [`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/routes/api.php) : Déclaration explicite du paramètre avec `->parameters(['rendez-vous' => 'rendezVous'])`.
+     - [`RendezVousController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/RendezVousController.php) : Implémentation de la méthode défensive `resolveRendezVous()` pour garantir la résolution du modèle quel que soit le binding, et élargissement des règles de validation de `update()`.
+     - [`RendezVousService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/RendezVousService.php) : Nettoyage préalable des champs hors colonnes (`id_statut_candidature_cible`, `envoyer_notification_email`), synchronisation facultative du statut de la candidature et gestion défensive des dates partielles.
+2. **Refonte Moderne du Design de l'Agenda RH ([`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) & [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
    - **Bandeau Exécutif & KPI Quick-Filters** :
      - Compteurs dynamiques interactifs : *Tous*, *Entretiens*, *Tests*, *Réalisés*, *Annulés*.
      - Un clic sur un badge filtre instantanément le calendrier.
@@ -2076,7 +2076,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **Thématisation Avancée de FullCalendar en CSS** :
      - En-tête des jours avec badge circulaire pour le numéro (cercle rouge `#FF0D00` avec texte blanc pour le jour actuel).
      - Remplacement des bordures grises épaisses par des lignes subtiles (`#f1f5f9`).
-     - Ligne d'heure actuelle `nowIndicator` animée en rouge officiel AlpA Ciment.
+     - Ligne d'heure actuelle `nowIndicator` animée en rouge officiel Alpha Ciment.
 3. **Validation & Tests** :
    - **Tests automatisés PHPUnit** : **3/3 tests RendezVous passés avec succès (11 assertions)**.
    - **Vérification du PUT `/api/rendez-vous/{id}`** : Exécuté avec code 200 et message `Rendez-vous mis à jour avec succès`.
@@ -2086,7 +2086,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 132 (UI/UX Performance & Perceptive Speed) : Intégration de Skeleton Loaders Dédiés sur l'Agenda et la Fiche Candidat
 > **User Prompt :** *"est ce que tu peux mettre un skeleton loader dans l'agenda et fiche candidat uniquement pour l'instant"*
-1. **Conception des Composants Skeleton Dédiés ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
+1. **Conception des Composants Skeleton Dédiés ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
    - **Skeleton Agenda RH (`AgendaSkeleton`)** :
      - Reproduction fidèle de la structure de l'agenda :
        - Bandeau d'en-tête (titre, sous-titre et boutons d'action).
@@ -2098,11 +2098,11 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
        - Barre supérieure avec bouton retour, nom, statut actuel et boutons d'action.
        - **Colonne latérale gauche** : Avatar photo circulaire (96px), nom, prénom, email, téléphone, canal de dépôt et stepper vertical des 5 étapes du workflow de recrutement.
        - **Zone principale droite** : Barre d'onglets (Informations, Documents, Parcours, Rendez-vous, Communication), carte de synthèse du profil / motivation, grille de pastilles de compétences et blocs d'expériences professionnelles.
-2. **Stylisation CSS & Effet Shimmer ([`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+2. **Stylisation CSS & Effet Shimmer ([`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
    - Utilisation de l'animation fluide `skeleton-shimmer` (gradient horizontal 200% défilant en 1.4s).
    - Règles responsive pour adapter la grille sur les écrans mobiles/tablettes (`@media (max-width: 1024px)`).
 3. **Application Ciblée aux Vues Demandées** :
-   - [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) : Affichage conditionnel de `<AgendaSkeleton />` lors du premier chargement des rendez-vous.
+   - [`AgendaView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AgendaView.jsx) : Affichage conditionnel de `<AgendaSkeleton />` lors du premier chargement des rendez-vous.
    - [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx) : Remplacement de l'ancien spinner circulaire générique par `<CandidatureDetailSkeleton />` pendant la récupération des détails du dossier.
 4. **Validation & Tests** :
    - **Build Vite React** : **Compilé avec succès en 1.52s (0 erreur, 0 avertissement)**.
@@ -2111,7 +2111,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 133 (UI/UX Performance & Perceptive Speed) : Généralisation des Skeleton Loaders à Travers Toutes les Vues de l'Application
 > **User Prompt :** *"okey je suis satisfait met partout maintenant"*
-1. **Création d'une Bibliothèque Complète de Skeletons Contextuels ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
+1. **Création d'une Bibliothèque Complète de Skeletons Contextuels ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
    - `<TableSkeleton rows cols />` : Squelette universel de tableaux avec en-tête shimmering et lignes paramétrables.
    - `<DashboardSkeleton />` : Ruban de 6 micro-indicateurs KPI, 2 graphiques analytiques (courbes d'évolution et donut de ventilation), et tableau des candidatures récentes.
    - `<CardsGridSkeleton count />` : Grille responsive de cartes modèles d'emails avec badges d'objet, boutons d'action et métadonnées.
@@ -2119,22 +2119,22 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - `<PublicOffersSkeleton count />` : Cartes d'offres publiques avec badge de direction, titre, méta-tags (contrat, lieu, date) et bouton de candidature.
 2. **Déploiement Intégral sur Tous les Modules de l'Application** :
    - **Tableaux de bord & Pilotage** :
-     - [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) : `<DashboardSkeleton />`
-     - [`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx) : `<TableSkeleton rows={6} cols={7} />`
-     - [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx) : `<TableSkeleton rows={8} cols={6} />`
+     - [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) : `<DashboardSkeleton />`
+     - [`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx) : `<TableSkeleton rows={6} cols={7} />`
+     - [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx) : `<TableSkeleton rows={8} cols={6} />`
    - **Gestion des Candidatures & Vivier** :
-     - [`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx) : `<TableSkeleton rows={6} cols={6} />`
-     - [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) : `<TableSkeleton />` sur la liste des offres, le vivier suggéré et le tableau des candidats.
-     - [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) : `<TableSkeleton rows={6} cols={5} />`
-     - [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) : `<TableSkeleton rows={6} cols={6} />` pour la table principale et cartes skeleton pour la recherche modale.
+     - [`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/OffersView.jsx) : `<TableSkeleton rows={6} cols={6} />`
+     - [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) : `<TableSkeleton />` sur la liste des offres, le vivier suggéré et le tableau des candidats.
+     - [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) : `<TableSkeleton rows={6} cols={5} />`
+     - [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx) : `<TableSkeleton rows={6} cols={6} />` pour la table principale et cartes skeleton pour la recherche modale.
    - **Communication & Référentiels** :
-     - [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx) : `<CardsGridSkeleton count={6} />` et prévisualisation skeleton.
-     - [`ReferentialsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ReferentialsView.jsx) : `<ReferentialsSkeleton />`
+     - [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx) : `<CardsGridSkeleton count={6} />` et prévisualisation skeleton.
+     - [`ReferentialsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/ReferentialsView.jsx) : `<ReferentialsSkeleton />`
    - **Portail Public Front-Office & Formulaires** :
-     - [`PublicOffresPage.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx) : `<PublicOffersSkeleton count={3} />`
-     - [`PostulerOffrePage.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PostulerOffrePage.jsx) : Squelette de formulaire avec champs, en-tête et boutons animés.
+     - [`PublicOffresPage.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx) : `<PublicOffersSkeleton count={3} />`
+     - [`PostulerOffrePage.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/frontOffice/PostulerOffrePage.jsx) : Squelette de formulaire avec champs, en-tête et boutons animés.
    - **Onglets secondaires Fiche Candidat** :
-     - [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx) : Cartes skeleton dans l'historique des communications et dans la liste des rendez-vous.
+     - [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx) : Cartes skeleton dans l'historique des communications et dans la liste des rendez-vous.
 3. **Validation & Contrôle Qualité** :
    - **Compilation Vite React** : **Compilé avec succès en 1.26s (0 erreur, 0 avertissement)**.
    - **Zero Spinner Bloquant** : Toutes les vues disposent d'un feedback visuel immédiat calqué sur leur structure finale (zéro saut de page ou CLS - Cumulative Layout Shift).
@@ -2143,22 +2143,22 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 134 (UI/UX Pixel-Perfect Full-Page Skeletons) : Squelettes Pleine Page 1:1 pour Candidatures sur Offre, Spontanées et Fiche Candidat
 > **User Prompt :** *"okey ,bon je trouve que le seul qui est vraiment parfais c'est pour l'agenda ,le skeleton loader prends exactement la place des div qui apparait et cela pour toute la page ,je veux que ca soit aussi comme ca pour toutes les pages ,commencons pour candidature sur offre et spontanne et pour les fiche candidats"*
-1. **Refonte Pixel-Perfect de `CandidatureDetailSkeleton` ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
-   - Réalignement structurel exact sur le DOM de [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx) :
+1. **Refonte Pixel-Perfect de `CandidatureDetailSkeleton` ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
+   - Réalignement structurel exact sur le DOM de [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx) :
      - **Barre supérieure pleine largeur** : Bouton retour aux candidatures, bouton exporter en PDF / imprimer, et pilule de statut actuel.
      - **En-tête des 6 onglets pleine largeur** : Informations & Profil RH, Documents, Parcours, Rendez-vous, Communications, Extraction CV.
      - **Grille 2 colonnes (`.candidature-detail-grid`)** :
        - **Colonne latérale gauche (`.candidate-sidebar-card` 360px sticky)** : Avatar circulaire 90px, nom complet, badges de type de candidature et canal, coordonnées (email/téléphone), les 5 boutons du workflow des statuts RH, et bouton de mise en vivier.
        - **Zone de droite (1fr)** : Carte informations dossier avec métadonnées et bloc lettre de motivation, carte gestion des compétences (tags et formulaire d'ajout), cartes expériences professionnelles, et cartes formations/diplômes.
-2. **Création du Squelette Pleine Page `CandidaturesOffresSkeleton` ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
-   - Calqué à l'identique sur [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) :
+2. **Création du Squelette Pleine Page `CandidaturesOffresSkeleton` ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
+   - Calqué à l'identique sur [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx) :
      - Barre de filtres globale : recherche de candidat, select statut RH, select canal de dépôt, boutons Filtrer & Réinitialiser.
      - Panneau de recherche avancée : accordéon avec icône, titre et bouton bascule.
      - Grille 2 colonnes (`340px 1fr`) :
        - Colonne gauche (Directions & Pôles) : En-tête, carte active "Toutes les directions" avec badge, et 6 cartes de directions avec chevrons et compteurs de candidats.
        - Colonne droite : Bandeau d'en-tête de sélection (titre, sous-titre, boutons d'action), et table complète des candidatures avec shimmer.
-3. **Création du Squelette Pleine Page `CandidaturesSpontaneesSkeleton` ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
-   - Calqué à l'identique sur [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) :
+3. **Création du Squelette Pleine Page `CandidaturesSpontaneesSkeleton` ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
+   - Calqué à l'identique sur [`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx) :
      - Barre de filtres : recherche, statut RH, direction suggérée, canal de dépôt, boutons Filtrer & Réinitialiser.
      - Panneau de recherche avancée.
      - Section principale : Titre "Dossiers de Candidatures Spontanées" avec badge ambre, boutons "Actualiser" et "+ Candidature RH", et tableau complet à 6 colonnes.
@@ -2170,15 +2170,15 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ### Demande 135 (UI/UX Synchronization & Full-Page Dashboard Skeleton) : Synchronisation Complète de la Fiche Candidat et Squelette Pleine Page 1:1 pour le Tableau de Bord
 > **User Prompt :** *"okey mais on a un probleme le skeleton loader s'arrete alors que les competences ,diplomes et le restes n'ont pas encore charger ,et commence le dashboard aussi"*
-1. **Résolution du Désynchronisme de Chargement sur la Fiche Candidat ([`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+1. **Résolution du Désynchronisme de Chargement sur la Fiche Candidat ([`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
    - **Cause identifiée** : La méthode `loadDetails()` ne chargeait initialement que `/api/candidature/{id}` puis passait `loading = false`, alors que le profil (`/api/candidature/{id}/profile`) et les référentiels de compétences (`/api/competences`) étaient récupérés asynchronement en tâche de fond dans un hook secondaire, créant un décalage visuel (apparition des cartes vides puis peuplement différé).
    - **Correction appliquée** :
      - Fusion des requêtes dans `Promise.all` au sein de `loadDetails` : la candidature, le profil (compétences, expériences, formations) et le catalogue de compétences sont chargés en parallèle.
      - Condition de garde stricte : `if (loading || !details || (loadingProfile && !profileData)) return <CandidatureDetailSkeleton />;`.
      - Le skeleton loader reste désormais affiché jusqu'à ce que **l'intégralité** du dossier (identité, workflow, compétences, diplômes, expériences) soit disponible en mémoire.
-2. **Refonte Pixel-Perfect Pleine Page de `DashboardSkeleton` ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
-   - Calqué à l'identique sur [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) :
-     - **En-tête de contrôle compact** : Avec le liseré rouge dégradé signature AlpA Ciment (`linear-gradient(90deg, #FF0D00 ...)`), le sélecteur de dates "Du / Au", les raccourcis de périodes ("Tout", "Ce mois", "30j", "Année"), le filtre Direction et le bouton Actualiser.
+2. **Refonte Pixel-Perfect Pleine Page de `DashboardSkeleton` ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
+   - Calqué à l'identique sur [`DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) :
+     - **En-tête de contrôle compact** : Avec le liseré rouge dégradé signature Alpha Ciment (`linear-gradient(90deg, #FF0D00 ...)`), le sélecteur de dates "Du / Au", les raccourcis de périodes ("Tout", "Ce mois", "30j", "Année"), le filtre Direction et le bouton Actualiser.
      - **Ruban de 6 micro-KPIs haute densité avec sparklines** : Dossiers Reçus, Postes Ouverts, Vivier Actif, En Évaluation, Taux d'Embauche, Time-to-Hire.
      - **Cockpit Analytics 2 colonnes (`minmax(0, 1.22fr) minmax(0, 1fr)`)** :
        - Colonne gauche : Squelette de la courbe de tendance (avec légende, sélecteur courbe/barres, barres d'évolution) et tableau des dossiers prioritaires SLA (3 lignes avec avatar, nom, tag de retard, bouton Traiter).
@@ -2194,63 +2194,63 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 > **User Prompt :** *"okey fais pareil avec les pages qui ne sont pas encore parfaites"*
 1. **Audit Global et Normalisation des Vues Restantes** :
    - Analyse exhaustive de l'ensemble des pages de l'application pour garantir que chaque vue dispose d'un squelette structurel pleine page 1:1 reprenant exactement ses balises DOM réelles, ses classes CSS de conteneur, ses espacements et ses dimensions sans Cumulative Layout Shift (CLS = 0).
-2. **Nouveaux Squelettes Pleine Page Implémentés ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
-   - **`OffersSkeleton`** (pour [`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx)) :
+2. **Nouveaux Squelettes Pleine Page Implémentés ([`FeedbackStates.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/FeedbackStates.jsx))** :
+   - **`OffersSkeleton`** (pour [`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/OffersView.jsx)) :
      - Conteneur `.view-stack`.
      - Barre de filtres `.filter-bar` complète : champ de recherche avec icône, selects Direction, Statut, Contrat, et boutons Filtrer / Réinitialiser.
      - Section de données `.data-section` : en-tête avec titre "Liste des offres", compteur et boutons d'action (Nouvelle offre, Actualiser), tableau des offres avec chevrons d'expansion, références, titres, direction, contrat, badge candidatures, dates et boutons d'actions contextuelles.
-   - **`VivierSkeleton`** (pour [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx)) :
+   - **`VivierSkeleton`** (pour [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx)) :
      - Conteneur `.view-stack`.
      - Barre de filtres complète avec recherche, sélection de direction, sélection de domaine d'expertise validé, boutons de filtrage et bouton "+ Ajouter au vivier RH".
      - Section `.data-section` avec en-tête et tableau à 6 colonnes (Candidat, Candidature / Direction & Domaine, Motif, Date, Statut, Actions de consultation et suppression).
-   - **`ModelesEmailsSkeleton`** (pour [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx)) :
+   - **`ModelesEmailsSkeleton`** (pour [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx)) :
      - Conteneur `.view-container` (padding: 24px).
      - En-tête de la page avec titre "Modèles d'E-mails RH", sous-titre explicatif et boutons "Actualiser" et "+ Nouveau modèle".
      - Barre de filtres avec recherche plein texte, sélection des types de messages et filtre d'activation.
      - Grille responsive (`grid-template-columns: repeat(auto-fill, minmax(340px, 1fr))`) de 6 cartes de templates d'e-mails complètes (badges de type, statut auto/manuel, titre, objet, déclencheur de statut, extrait de corps et barre d'actions avec switch et boutons de copie/modification/suppression).
-   - **`AuditLogsSkeleton`** (pour [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx)) :
+   - **`AuditLogsSkeleton`** (pour [`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx)) :
      - Conteneur `.audit-logs-page` (padding: 24px).
      - En-tête avec titre "Journal d’Audit & Traçabilité RH", descriptif et bouton Actualiser.
      - Barre d'outils multi-filtres (champ de recherche dans description, selects Action et Entité, dates début et fin, boutons Filtrer et Réinitialiser).
      - Table d'audit de 8 lignes complètes (Date & Heure, Utilisateur et rôle, badge d'Action coloré, Entité/ID, Description, et bouton de modal de détails).
-   - **`PipelineMonitoringSkeleton`** (pour [`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx)) :
+   - **`PipelineMonitoringSkeleton`** (pour [`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx)) :
      - Conteneur `.pipeline-monitoring-page` (padding: 24px).
      - En-tête avec titre "Monitoring du Pipeline IA & n8n" et bouton d'actualisation.
      - Grille des 7 cartes KPIs (Exécutions Pipeline, Taux de Fiabilité, Durée Moy. OCR, Durée Moy. NER, Temps Total, Doublons Évités, Erreurs DLQ).
      - Barre de filtres (recherche, statut et intention).
      - Table de supervision du pipeline de 6 lignes avec badges de statut, intentions, durées et actions.
-   - **`ReferentialsSkeleton` (Perfectionné)** (pour [`ReferentialsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ReferentialsView.jsx)) :
+   - **`ReferentialsSkeleton` (Perfectionné)** (pour [`ReferentialsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/ReferentialsView.jsx)) :
      - Réaligné sur les vraies classes CSS : `.view-stack`, `.sub-nav-tabs` (4 onglets de sous-navigation), `.management-grid` avec 2 cartes `.data-section` pour Directions et Domaines avec tables, boutons d'ajout et pagination.
-   - **`PublicOffersSkeleton` (Perfectionné)** (pour [`PublicOffresPage.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx)) :
+   - **`PublicOffersSkeleton` (Perfectionné)** (pour [`PublicOffresPage.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/frontOffice/PublicOffresPage.jsx)) :
      - Réaligné fidèlement sur les cartes d'annonces Bootstrap du front-office (`.card.p-0.mb-3.border-1.shadow-sm`) avec badge de contrat, titre d'annonce, date limite avec icône horloge, localisation avec marqueur, et chevron de consultation.
 ---
 
 ### Demande 137 (Pagination Enhancement : Sélecteur d'Éléments par Page (10 par défaut) & Remontée Automatique en Haut de Liste) : Amélioration Globale du Composant Pagination et des Vues
 > **User Prompt :** *"pour les pagination aussi fais en sorte que je puisse choisir le nombre d'elements et fais 10 de base et lorsque je clique sur suivant je veux que ca revienne en haut de la liste"*
-1. **Évolution du Composant Central [`Pagination.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/Pagination.jsx)** :
+1. **Évolution du Composant Central [`Pagination.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/Pagination.jsx)** :
    - **Sélecteur du nombre d'éléments par page** : Ajout d'une liste déroulante ergonomique proposant les paliers standards `[10, 20, 50, 100]` par page, avec **10 comme valeur par défaut stricte**.
    - **Remontée automatique en haut de liste (Auto-Scroll)** :
      - Implémentation de la fonction `scrollToTop()` déclenchée à chaque clic de pagination ("Suivant", "Précédent", ou modification du nombre d'éléments par page).
      - Détection dynamique du conteneur de liste/tableau parent le plus proche (`.data-section`, `.table-wrap`, `.candidatures-right-column`, `.audit-logs-page`, `.pipeline-monitoring-page`, `.view-stack`) avec appel `scrollIntoView({ behavior: 'smooth', block: 'start' })` et repli fluide vers le haut de fenêtre (`window.scrollTo({ top: 0, behavior: 'smooth' })`).
 2. **Harmonisation et Intégration sur l'Ensemble des Vues** :
-   - **[`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx)** :
+   - **[`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesOffresView.jsx)** :
      - Remplacement de la limite initiale fixe de 50 par `perPage = 10` de base.
      - Connexion du sélecteur `onChangePerPage` et mise à jour dynamique de la requête backend `/api/candidatures?per_page=...`.
-   - **[`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx)** :
+   - **[`CandidaturesSpontaneesView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidaturesSpontaneesView.jsx)** :
      - Remplacement de la limite initiale fixe de 50 par `perPage = 10` de base.
      - Connexion de `onChangePerPage` avec réinitialisation à la page 1 et scroll en haut.
-   - **[`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/OffersView.jsx)** :
+   - **[`OffersView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/OffersView.jsx)** :
      - Dé-durcissement du paramètre `per_page: '10'` en state réactif `filters.per_page` et `appliedFilters.per_page`.
      - Intégration de `changePerPage(n)` et transmission à `<Pagination />`.
-   - **[`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/VivierView.jsx)** :
+   - **[`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/VivierView.jsx)** :
      - Transformation de la constante `perPage = 10` en variable d'état `[perPage, setPerPage] = useState(10)`.
      - Calcul dynamique des index `from` et `to` et transmission de `onChangePerPage`.
-   - **[`ReferentialsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ReferentialsView.jsx)** :
+   - **[`ReferentialsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/ReferentialsView.jsx)** :
      - Transformation de `perPage` en état dynamique réactif pour les 3 sous-onglets (Directions, Domaines, Compétences) avec reset de page associé.
-   - **[`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx)** :
+   - **[`AuditLogsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/AuditLogsView.jsx)** :
      - Remplacement de l'ancien bandeau personnalisé par le composant central `<Pagination />`.
      - Support du paramètre d'API `/api/audit-logs?per_page=...` avec 10 entrées par défaut et sélection dynamique.
-   - **[`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx)** :
+   - **[`PipelineMonitoringView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/PipelineMonitoringView.jsx)** :
      - Remplacement de l'ancien bandeau personnalisé par `<Pagination />`.
      - Paramètre `per_page` dynamique dans `/api/pipeline-metrics?per_page=...` avec auto-scroll.
 3. **Validation & Contrôle** :
@@ -2266,7 +2266,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Proposer des contrôles dédiés indépendants :
      - **Date du rendez-vous** : sélecteur de date `<input type="date">` avec libellé formaté en français (ex: Mercredi 28 octobre 2026).
      - **Heure / Créneau** : liste déroulante `<select>` proposant les créneaux standards de travail (`08:00 à 09:00`, `08:30 à 09:30`, `09:00 à 10:00`, ..., `16:00 à 17:00`).
-     - **Lieu / Modalités** : champ `<input type="text">` avec suggestions dynamiques `<datalist>` (Siège AlpA Ciment - Salle RH, Visioconférence, Usine AlpA Ciment...).
+     - **Lieu / Modalités** : champ `<input type="text">` avec suggestions dynamiques `<datalist>` (Siège Alpha Ciment - Salle RH, Visioconférence, Usine Alpha Ciment...).
      - **Responsable en charge** : liste déroulante `<select>` alimentée dynamiquement par l'API des utilisateurs/référentiels (`/api/rendez-vous/referentiels`).
      - **Mode de réalisation** : liste déroulante `<select>` (Présentiel, Visioconférence, Téléphone).
    - Synchronisation automatique bidirectionnelle :
@@ -2274,10 +2274,10 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
      - Ajout d'un bouton d'insertion rapide `[ + Insérer le récapitulatif dans le corps ]` pour coller les détails directement dans un message personnalisé libre.
      - Si la candidature dispose déjà d'un rendez-vous planifié dans `rendezVousList`, les champs se pré-remplissent automatiquement avec les informations de ce rendez-vous.
 2. **Implémentation Backend & Frontend** :
-   - **Backend ([CommunicationService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CommunicationService.php), [CommunicationController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/CommunicationController.php), [ModeleMessageController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Api/ModeleMessageController.php))** :
+   - **Backend ([CommunicationService.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CommunicationService.php), [CommunicationController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/CommunicationController.php), [ModeleMessageController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Api/ModeleMessageController.php))** :
      - Méthode `remplacerVariables` enrichie pour prendre en compte `$extraVariables` et résoudre `{responsable}` / `{nom_responsable}`.
      - Endpoints `/api/modeles-messages/apercu` et `/api/candidature/{id}/communications` mis à jour pour accepter et transmettre `extra_variables` / `variables`.
-   - **Frontend ([EnvoyerMessageModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/EnvoyerMessageModal.jsx), [CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
+   - **Frontend ([EnvoyerMessageModal.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/EnvoyerMessageModal.jsx), [CandidatureDetailView.jsx](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/CandidatureDetailView.jsx))** :
      - Intégration de la section stylisée *Détails du rendez-vous & variables (Date, Heure, Lieu, Responsable)*.
      - Transmission de la prop `rendezVousList={rendezVousList}` depuis `CandidatureDetailView.jsx`.
      - Gestion du pré-remplissage et de la synchronisation en temps réel avec les modèles.
@@ -2290,22 +2290,22 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 139 (Éditeur de Modèles d'E-mails : Variables Dynamiques sous Forme de Blocs / Puces Interactives Déplaçables et Supprimables en un Clic) :
 > **User Prompt :** *"okey maintenant encore sur le model d'email avec la partie Insérer une variable dynamique dans le message : avec ceci lorsque je clique dessus et que je veux que ca soit un bloc pas un texte dont je peux supprimer et le differencier des autres texte ,et lorsque je veux le supprimer c'est le div de la variable directement"*
 1. **Analyse du besoin & Spécifications** :
-   - Dans la vue de gestion des modèles d'e-mails ([`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx)), le clic sur un bouton de variable dynamique insérait auparavant du texte brut `{prenom}` au sein d'un simple `<textarea>`, rendant la distinction difficile et obligeant l'utilisateur à effacer caractère par caractère.
+   - Dans la vue de gestion des modèles d'e-mails ([`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx)), le clic sur un bouton de variable dynamique insérait auparavant du texte brut `{prenom}` au sein d'un simple `<textarea>`, rendant la distinction difficile et obligeant l'utilisateur à effacer caractère par caractère.
    - Demande :
      - Insérer chaque variable sous la forme d'un **bloc visuel distinct** (chip / pill / div), clairement reconnaissable au milieu du texte.
      - Permettre la suppression directe du bloc complet en un clic (croix de fermeture dédiée) ou via la touche Retour arrière sans effacer lettre par lettre.
 2. **Implémentation Réalisée** :
-   - **Nouveau Composant Réutilisable [`VariableChipEditor.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/common/VariableChipEditor.jsx)** :
+   - **Nouveau Composant Réutilisable [`VariableChipEditor.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/common/VariableChipEditor.jsx)** :
      - Éditeur enrichi basé sur `contentEditable` avec gestion des éléments atomiques non éditables (`contenteditable="false"`).
      - Rendu des variables sous forme de badges stylisés `.variable-chip` (icône 🏷️, fond bleu doux `#e0f2fe`, bordure cyan `#7dd3fc`, libellé gras, et bouton de suppression dédié `×`).
      - Méthode impérative `insertVariable(tag)` insérant le bloc à la position exacte du curseur avec un espace de continuation automatique.
      - Suppression atomique : un clic sur la croix `×` détruit le bloc div/span entier et recalcule le texte sous-jacent.
      - La touche Retour arrière / Supprimer supprime le bloc en une seule frappe (comportement natif des nœuds `contenteditable="false"`).
      - Sérialisation et désérialisation bidirectionnelles automatiques préservant le format `{cle}` standard pour le backend.
-   - **Stylisation CSS ([`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css))** :
+   - **Stylisation CSS ([`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css))** :
      - Classes `.variable-chip-container`, `.variable-chip-editor`, `.variable-chip`, `.variable-chip-remove`.
      - Effets au survol : passage au bleu clair, croix de suppression devenant rouge vif avec micro-agrandissement.
-   - **Intégration dans [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx)** :
+   - **Intégration dans [`ModelesEmailsView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/ModelesEmailsView.jsx)** :
      - Remplacement du `<textarea>` par `<VariableChipEditor ref={editorRef} />`.
      - Boutons de fusion connectés à `editorRef.current.insertVariable(v.cle)`.
      - Rétrocompatibilité totale à la création et à l'édition des modèles existants.
@@ -2327,10 +2327,10 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
        `ALTER TEXT SEARCH CONFIGURATION french_unaccent ALTER MAPPING FOR word, hword, hword_part WITH unaccent, french_stem;`.
      - Régénération de la colonne calculée stockée `document.recherche_texte` avec `to_tsvector('french_unaccent', coalesce(contenu_texte_extrait, ''))` et réindexation GIN `idx_document_recherche_texte`.
    - **Migration Laravel Dédiée** :
-     - Création de [`2026_10_23_000001_create_french_unaccent_text_search_configuration.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/database/migrations/2026_10_23_000001_create_french_unaccent_text_search_configuration.php) pour rendre le déploiement reproductible et automatisé.
-     - Mise à jour du schéma maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
+     - Création de [`2026_10_23_000001_create_french_unaccent_text_search_configuration.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/database/migrations/2026_10_23_000001_create_french_unaccent_text_search_configuration.php) pour rendre le déploiement reproductible et automatisé.
+     - Mise à jour du schéma maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql).
    - **Mise à Jour des Repositories Backend** :
-     - Dans [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) et [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php) :
+     - Dans [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) et [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php) :
        - Utilisation de `plainto_tsquery('french_unaccent', ?)` sur `recherche_texte`.
        - Application de `unaccent(...) ILIKE unaccent(?)` pour PostgreSQL sur le texte OCR brut (`cv_extraction_ocr`), les données JSON, et le texte brut des documents.
        - Maintien du fallback compatible SQLite pour les tests unitaires.
@@ -2350,19 +2350,19 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **Absence du snippet dans la vue accordéon des offres** : Dans `CandidaturesOffresView.jsx`, la vue dépliée sous chaque offre n'affichait pas le snippet, et les compteurs d'arborescence ne transmettaient pas `cv_keyword`.
    - **Recherches avancées non-unaccent** : Les filtres de compétences (`competence.nom_competence`), de formations (`niveau`, `diplome`), de métiers (`poste_souhaite`, `poste`), et les offres/directions/domaines utilisaient de simples `ILIKE` sensibles aux accents.
 2. **Implémentations Réalisées** :
-   - **Extraction de Snippet Insensible aux Accents & Multi-mots ([`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php), [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php))** :
+   - **Extraction de Snippet Insensible aux Accents & Multi-mots ([`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php), [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php))** :
      - Refonte complète de `generateSnippet` avec normalisation ASCII (`Str::ascii`) pour localiser la position exacte du mot-clé tout en extrayant le texte original avec ses accents et sa mise en forme.
      - Prise en charge des recherches multi-mots et dérivation des racines pour les variantes lexicales.
      - Cascade de secours : documents extraits -> OCR brut -> poste souhaité -> compétences -> nom complet du candidat.
    - **Généralisation de `unaccent` sur Toutes les Recherches** :
-     - [`EloquentOffreRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentOffreRepository.php) : `titre_poste`, `description`, `lieu`, `nom_direction`.
-     - [`EloquentDirectionRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDirectionRepository.php) : `nom_direction`.
-     - [`EloquentDomaineRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDomaineRepository.php) : `nom_domaine`.
-     - [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) : filtres compétences (mode ANY/ALL), formations (`niveau`, `diplome`), intitulé/poste (`poste_souhaite`, `poste`).
+     - [`EloquentOffreRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentOffreRepository.php) : `titre_poste`, `description`, `lieu`, `nom_direction`.
+     - [`EloquentDirectionRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDirectionRepository.php) : `nom_direction`.
+     - [`EloquentDomaineRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDomaineRepository.php) : `nom_domaine`.
+     - [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) : filtres compétences (mode ANY/ALL), formations (`niveau`, `diplome`), intitulé/poste (`poste_souhaite`, `poste`).
      - [`AdvancedSearchPanel.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/components/candidatures/AdvancedSearchPanel.jsx) : suggestions d'autocomplétion des compétences insensibles aux accents via `stripAccents`.
    - **Génération & Affichage du Snippet dans le Vivier & les Offres** :
-     - [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php) : eager loading de `documents` / `cvExtractionOcr` et génération dynamique de `cv_snippet`.
-     - [`VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php) & [`VivierResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Resources/VivierResource.php) : exposition de `cv_snippet`.
+     - [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php) : eager loading de `documents` / `cvExtractionOcr` et génération dynamique de `cv_snippet`.
+     - [`VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/VivierService.php) & [`VivierResource.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Resources/VivierResource.php) : exposition de `cv_snippet`.
      - [`VivierView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/VivierView.jsx) : affichage du badge `📄 Extrait CV : ...` sous chaque candidat du vivier et dans la modale d'ajout.
      - [`CandidaturesOffresView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidaturesOffresView.jsx) : affichage du snippet dans les lignes de candidatures par offre et dans l'onglet vivier de chaque offre, avec propagation complète de `cv_keyword` et des filtres avancés dans `loadSidebarCounts`.
 3. **Validation & Résultats** :
@@ -2384,11 +2384,11 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **Protection contre les caractères jokers** : Application de `addcslashes($term, '%_\\')` sur l'ensemble des requêtes `LIKE` et `ILIKE` dans les repositories de candidatures, vivier, offres, directions et domaines.
    - **Factorisation & Nettoyage** : Extraction des méthodes privées `applyDocumentSearch` et `applyOcrSearch`, suppression des imports inutilisés et des doublons d'affectation d'attributs.
 2. **Fichiers Modifiés** :
-   - [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php)
-   - [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php)
-   - [`EloquentOffreRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentOffreRepository.php)
-   - [`EloquentDirectionRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDirectionRepository.php)
-   - [`EloquentDomaineRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDomaineRepository.php)
+   - [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php)
+   - [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php)
+   - [`EloquentOffreRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentOffreRepository.php)
+   - [`EloquentDirectionRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDirectionRepository.php)
+   - [`EloquentDomaineRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentDomaineRepository.php)
 3. **Validation & Résultats** :
    - Tests PHPUnit : **37/37 tests passés avec succès (194 assertions)**.
    - Build Vite React : **✓ built in 4.08s sans aucune erreur**.
@@ -2401,11 +2401,11 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Aucun service backend n'avait besoin d'être démarré : l'export PDF repose sur le moteur de mise en page natif A4 (`window.print()`).
    - **Cause du blocage** : Dans `styles.css`, la règle globale `@media print` introduite pour `AfficheOffreModal` appliquait `body > * { visibility: hidden !important; }` et `height: 297mm !important;`. Lorsque l'utilisateur cliquait sur « Exporter en PDF » depuis `CandidatureDetailView`, tout le DOM React dans `#root` était masqué et l'aperçu PDF sortait totalement blanc ou tronqué.
 2. **Corrections Réalisées** :
-   - Isolation stricte des styles d'impression de l'affiche de recrutement dans [`AfficheOffreModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/modals/AfficheOffreModal.jsx) via injection dynamique de la classe `body.affiche-modal-open` et d'une balise `<style>` dédiée nettoyée au démontage.
-   - Sécurisation dans [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/styles.css) : le dossier d'impression du candidat ([`CandidaturePrintDossier.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/components/candidatures/CandidaturePrintDossier.jsx)) a désormais `visibility: visible !important;` et préserve ses marges A4 multi-pages (`10mm 12mm`).
+   - Isolation stricte des styles d'impression de l'affiche de recrutement dans [`AfficheOffreModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/modals/AfficheOffreModal.jsx) via injection dynamique de la classe `body.affiche-modal-open` et d'une balise `<style>` dédiée nettoyée au démontage.
+   - Sécurisation dans [`styles.css`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/styles.css) : le dossier d'impression du candidat ([`CandidaturePrintDossier.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/candidatures/CandidaturePrintDossier.jsx)) a désormais `visibility: visible !important;` et préserve ses marges A4 multi-pages (`10mm 12mm`).
 3. **Validation** :
    - Build Vite React : **✓ built in 1.92s sans aucune erreur**.
-   - Le bouton « Exporter en PDF / Imprimer » ouvre désormais immédiatement le dossier officiel complet A4 avec mise en page institutionnelle AlpA Ciment.
+   - Le bouton « Exporter en PDF / Imprimer » ouvre désormais immédiatement le dossier officiel complet A4 avec mise en page institutionnelle Alpha Ciment.
 
 ---
 
@@ -2425,21 +2425,21 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Mise en Place de Laravel Sanctum & Persistance Stateless** :
    - Installation de `laravel/sanctum` (v4.3.3) via Composer.
    - Exécution de la migration `2026_10_27_085543_create_personal_access_tokens_table.php` créant la table PostgreSQL `personal_access_tokens`.
-   - Ajout du trait `HasApiTokens` sur le modèle [`User.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/User.php) et déclaration du guard `'sanctum'` dans [`config/auth.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/config/auth.php).
-   - Bascule du groupe de routes d'administration dans [`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/routes/api.php) sur `middleware(['auth:sanctum', 'role:...'])`.
+   - Ajout du trait `HasApiTokens` sur le modèle [`User.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/User.php) et déclaration du guard `'sanctum'` dans [`config/auth.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/config/auth.php).
+   - Bascule du groupe de routes d'administration dans [`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/routes/api.php) sur `middleware(['auth:sanctum', 'role:...'])`.
 2. **Durée de Validité à 8 Heures & Cycle de Vie** :
-   - Dans [`SessionController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Controllers/Auth/SessionController.php) :
+   - Dans [`SessionController.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Controllers/Auth/SessionController.php) :
      - Émission du jeton avec expiration explicite : `$user->createToken('auth-token', ['*'], now()->addHours(8))->plainTextToken`.
      - Révocation immédiate en base de données à la déconnexion (`$token->delete()`) et fermeture sécurisée des sessions orphelines sans risque d'erreur `BadMethodCallException: RequestGuard::logout`.
 3. **Protection Anti Brute-Force (Rate Limiting)** :
    - Application de `middleware('throttle:5,1')` sur la route `POST /api/login` dans `routes/api.php` pour limiter les tentatives à 5 requêtes par minute par IP (rejet HTTP 429 au-delà).
 4. **Purge Automatique Programmée des Tokens Expirés** :
-   - Ajout dans le planificateur de tâches Laravel ([`routes/console.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/routes/console.php)) de :
+   - Ajout dans le planificateur de tâches Laravel ([`routes/console.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/routes/console.php)) de :
      `Schedule::command('sanctum:prune-expired --hours=0')->daily();`
    - Vérification avec `php artisan schedule:list` : exécution planifiée quotidiennement à minuit (`0 0 * * *`).
 5. **Nettoyage Intégral du Code CSRF Obsolète** :
-   - Côté React ([`client.js`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/api/client.js)) : suppression de la fonction `getCsrfToken()`, de la variable `csrfToken`, et de tous les en-têtes `X-CSRF-TOKEN`. Stockage du token dans `localStorage` sous `alpa_ciment_auth_token` et injection automatique de `Authorization: Bearer <token>`. Économie d'un aller-retour réseau sur chaque requête mutante.
-   - Côté Laravel ([`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/routes/api.php)) : suppression de la route `/api/csrf-token`.
+   - Côté React ([`client.js`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/api/client.js)) : suppression de la fonction `getCsrfToken()`, de la variable `csrfToken`, et de tous les en-têtes `X-CSRF-TOKEN`. Stockage du token dans `localStorage` sous `alpha_ciment_auth_token` et injection automatique de `Authorization: Bearer <token>`. Économie d'un aller-retour réseau sur chaque requête mutante.
+   - Côté Laravel ([`routes/api.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/routes/api.php)) : suppression de la route `/api/csrf-token`.
 6. **Validation Globale & Tests Automatisés** :
    - Suite de tests PHPUnit/Pest portée à **40 / 40 tests réussis (211 assertions, durée : 2.3s)** :
      - `test_login_returns_sanctum_bearer_token` (cycle d'émission/accès/révocation).
@@ -2536,10 +2536,10 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 150 (Séparation des Responsabilités SRP & Création du Catalogue Central des Services) :
 > **User Prompt :** *"okey maintenant continuons encore sur la refactorisation ,deja pourquoi ces fonctions sont ici : // 5. SOUS-FONCTIONS PRIVEES : FICHIERS, OCR & METRIQUES non ne mets pas cela ,je veux que tu ne mettes pas cela ca n'a rien a faire dans candidature ,ensuite ,je veux que dans ta methodologie ,tu crees un fichier qui creer listes toutes les fonctions dans les services pour voir si tu l'as deja creer ou non et pour eviter la redondance et tu vas aussi regarder ce fichiers lorsque tu ajouteras une nouvelle fonction si elle n'existe pas deja"*
 1. **Épuration de `CandidatureService.php` (Respect Strict du Principe de Responsabilité Unique - SRP)** :
-   - Extraction du stockage physique des fichiers, du décodage Base64 et du nettoyage disque dans un service dédié : [`app/Services/DocumentService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/DocumentService.php).
-   - Extraction du parsing OCR et de l'insertion des compétences, expériences, formations et projets dans un service dédié : [`app/Services/CvExtractionService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CvExtractionService.php).
-   - Extraction de l'enregistrement des durées et traces de doublons dans un service dédié : [`app/Services/PipelineMetricService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/PipelineMetricService.php).
-   - [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php) passe de 450 lignes encombrées à **170 lignes limpides**, se concentrant uniquement sur le cycle de vie de la candidature.
+   - Extraction du stockage physique des fichiers, du décodage Base64 et du nettoyage disque dans un service dédié : [`app/Services/DocumentService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/DocumentService.php).
+   - Extraction du parsing OCR et de l'insertion des compétences, expériences, formations et projets dans un service dédié : [`app/Services/CvExtractionService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CvExtractionService.php).
+   - Extraction de l'enregistrement des durées et traces de doublons dans un service dédié : [`app/Services/PipelineMetricService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/PipelineMetricService.php).
+   - [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php) passe de 450 lignes encombrées à **170 lignes limpides**, se concentrant uniquement sur le cycle de vie de la candidature.
 2. **Création du Catalogue Central des Services (`doc/suivi-developpement/catalogue-services.md`)** :
    - Recensement exhaustif des **15 services backend** du projet avec leurs responsabilités, signatures complètes de méthodes, types d'arguments et retours.
    - Sert de registre unique pour éviter toute duplication de code et garantir le placement au bon endroit.
@@ -2561,7 +2561,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - **`OffreService.php`** : Suppression de l'import obsolète `StatutOffre`, injection stricte et typée de `AuditLogService` sans résolution tardive via `app()`.
 2. **Nouveaux Contrats et Implémentations de Repositories** :
    - Ajout de `getActiveOffersSummary(): array` dans `OffreRepositoryInterface` et implémentation dans `EloquentOffreRepository`.
-   - Câblage de l'ensemble des 14 repositories dans [`app/Providers/RepositoryServiceProvider.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Providers/RepositoryServiceProvider.php).
+   - Câblage de l'ensemble des 14 repositories dans [`app/Providers/RepositoryServiceProvider.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Providers/RepositoryServiceProvider.php).
 3. **Mise à Jour des Tests & Injection de Dépendances** :
    - Alignement des tests unitaires et d'intégration (`AuditLogTest`, `RendezVousTest`, `OcrValidationTest`) avec les nouveaux constructeurs typés via la résolution par conteneur de services `app(...)`.
 4. **Validation Complète & Non-Régression** :
@@ -2574,21 +2574,21 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 152 (Remplacement Systématique des Chaînes en Dur par des PHP Enums Typés) :
 > **User Prompt :** *"okey et aussi n'oublie pas d'utiliser les Enum tu ecris directement dans le code juste par exemple mais il y a surement autre par dans le code je te parle des donnees ecris en dur directement comme recue ou site externe je te parle pas des donnees qui changent rarement juste des donnees ecris en dur..."*
 1. **Création du Référentiel des Enums Typés (`app/Enums/`)** :
-   - [`CanalDepot.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/CanalDepot.php) : `SiteExterne ('site_externe')`, `RhManuel ('rh_manuel')`, `ImportExterne ('import_externe')`.
-   - [`TypeDemandeEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/TypeDemandeEnum.php) : `Offre ('Offre')`, `Spontanee ('Spontanee')`.
-   - [`StatutCandidatureEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/StatutCandidatureEnum.php) : `Recue`, `Preselectionnee`, `Test`, `Entretien`, `Retenue`, `NonRetenue` (avec méthode `variations()` pour gérer les accents et `matches($libelle)`).
-   - [`StatutOffreEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/StatutOffreEnum.php) : `Brouillon`, `Publiee`, `Cloturee` (avec gestion tolérante des variantes d'accents).
-   - [`TypeDocumentEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/TypeDocumentEnum.php) : `Cv ('CV')`, `Photo ('Photo')`, `Autre ('Autre')`.
-   - [`StatutValidationOcr.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/StatutValidationOcr.php) : `EnAttente ('en_attente')`, `Valide ('valide')`, `Corrige ('corrige')`, `Rejete ('rejete')`.
-   - [`ModeEnvoiCommunication.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/ModeEnvoiCommunication.php) : `Manuel ('manuel')`, `Auto ('auto')`.
-   - [`SourceDonnee.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/SourceDonnee.php) : `Manuel ('manuel')`, `CvOcr ('cv_ocr')`, `Ocr ('ocr')`.
-   - [`StatutPipelineMetric.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/StatutPipelineMetric.php) : `Succes ('succes')`, `DoublonIgnore ('doublon_ignore')`, `Erreur ('erreur')`.
-   - [`StatutRendezVousEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Enums/StatutRendezVousEnum.php) : `AVenir (1)`, `Realise (2)`, `Annule (3)`.
+   - [`CanalDepot.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/CanalDepot.php) : `SiteExterne ('site_externe')`, `RhManuel ('rh_manuel')`, `ImportExterne ('import_externe')`.
+   - [`TypeDemandeEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/TypeDemandeEnum.php) : `Offre ('Offre')`, `Spontanee ('Spontanee')`.
+   - [`StatutCandidatureEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/StatutCandidatureEnum.php) : `Recue`, `Preselectionnee`, `Test`, `Entretien`, `Retenue`, `NonRetenue` (avec méthode `variations()` pour gérer les accents et `matches($libelle)`).
+   - [`StatutOffreEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/StatutOffreEnum.php) : `Brouillon`, `Publiee`, `Cloturee` (avec gestion tolérante des variantes d'accents).
+   - [`TypeDocumentEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/TypeDocumentEnum.php) : `Cv ('CV')`, `Photo ('Photo')`, `Autre ('Autre')`.
+   - [`StatutValidationOcr.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/StatutValidationOcr.php) : `EnAttente ('en_attente')`, `Valide ('valide')`, `Corrige ('corrige')`, `Rejete ('rejete')`.
+   - [`ModeEnvoiCommunication.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/ModeEnvoiCommunication.php) : `Manuel ('manuel')`, `Auto ('auto')`.
+   - [`SourceDonnee.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/SourceDonnee.php) : `Manuel ('manuel')`, `CvOcr ('cv_ocr')`, `Ocr ('ocr')`.
+   - [`StatutPipelineMetric.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/StatutPipelineMetric.php) : `Succes ('succes')`, `DoublonIgnore ('doublon_ignore')`, `Erreur ('erreur')`.
+   - [`StatutRendezVousEnum.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Enums/StatutRendezVousEnum.php) : `AVenir (1)`, `Realise (2)`, `Annule (3)`.
 2. **Refactorisation des Services & Repositories** :
-   - Mise à niveau de [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php) : substitution intégrale des chaînes magiques (`'site_externe'`, `'rh_manuel'`, `'import_externe'`, `['Reçue', 'Recue']`, `'Offre'`, `'Spontanee'`) par leurs Enums respectifs.
-   - Mise à niveau de [`OffreService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/OffreService.php) : utilisation de `StatutOffreEnum` pour la création, publication et clôture.
-   - Mise à niveau de [`DocumentService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/DocumentService.php) : typage de `$type` avec `string|TypeDocumentEnum`.
-   - Mise à niveau de [`VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php), [`CvExtractionService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CvExtractionService.php), [`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CommunicationService.php) et [`PipelineMetricService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/PipelineMetricService.php).
+   - Mise à niveau de [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php) : substitution intégrale des chaînes magiques (`'site_externe'`, `'rh_manuel'`, `'import_externe'`, `['Reçue', 'Recue']`, `'Offre'`, `'Spontanee'`) par leurs Enums respectifs.
+   - Mise à niveau de [`OffreService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/OffreService.php) : utilisation de `StatutOffreEnum` pour la création, publication et clôture.
+   - Mise à niveau de [`DocumentService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/DocumentService.php) : typage de `$type` avec `string|TypeDocumentEnum`.
+   - Mise à niveau de [`VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/VivierService.php), [`CvExtractionService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CvExtractionService.php), [`CommunicationService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CommunicationService.php) et [`PipelineMetricService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/PipelineMetricService.php).
    - Prise en charge transparente des Enums dans `CandidatureRepositoryInterface` (`getStatusIdByLibelle`, `getTypeDemandeIdByLibelle`) et `OffreRepositoryInterface` (`getStatusId`).
 3. **Validation & Non-Régression** :
    - Tests PHPUnit : **49 / 49 tests PASS (237 assertions)**.
@@ -2599,7 +2599,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 153 (Rétablissement de la Courbe de Tendance des Candidatures) :
 > **User Prompt :** *"je veux tout de meme la courbe du nombre de candidatures et ensuite ceci /goal MISSION..."*
 1. **Intégration du Composant de Tendance Temporelle** :
-   - Création du sous-composant `TendanceCandidaturesCard` dans [`code_source/recrutement-react/src/pages/DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx).
+   - Création du sous-composant `TendanceCandidaturesCard` dans [`code_source/recrutement-react/src/pages/DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx).
    - Intégration de la courbe SVG réactive avec zone dégradée et infobulles dynamiques dans les deux profils : **Vue RH** et **Vue Direction**.
 2. **Validation & Build** :
    - Compilation Vite réussie en 1.04s sans avertissement.
@@ -2609,27 +2609,27 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 154 (Mission `/goal` : Durcissement Intégral du Microservice FastAPI OCR & NER) :
 > **User Prompt :** *"/goal MISSION Corrige et durcis mon microservice FastAPI (OCR + NER + classification d'e-mails)..."*
 1. **P1 — Configuration & Résilience Ollama** :
-   - Création de [`code_source/ocr/config.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/config.py) (variables d'environnement centralisées) et [`code_source/ocr/ollama_client.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/ollama_client.py) avec sémaphore de concurrence (1), timeouts et détection `OutputTruncated`.
+   - Création de [`code_source/ocr/config.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/config.py) (variables d'environnement centralisées) et [`code_source/ocr/ollama_client.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/ollama_client.py) avec sémaphore de concurrence (1), timeouts et détection `OutputTruncated`.
    - Modèle standardisé `qwen2.5:7b`, gestion des erreurs en HTTP 503 (`Retry-After: 5`), HTTP 502, HTTP 413, HTTP 415.
    - Traçabilité sécurisée via middleware `X-Request-ID` avec masquage des données sensibles.
 2. **P2 — Extraction Robuste par Signatures Binaires** :
-   - Mise à niveau de [`code_source/ocr/cv_ocr_extractor.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_ocr_extractor.py) : magic bytes (`%PDF`, `PK\x03\x04`, `\xff\xd8\xff`, `\x89PNG`, `RIFF...WEBP`), rejet de `.doc`, support natif de `.docx` via `python-docx`, redressement EXIF.
+   - Mise à niveau de [`code_source/ocr/cv_ocr_extractor.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_ocr_extractor.py) : magic bytes (`%PDF`, `PK\x03\x04`, `\xff\xd8\xff`, `\x89PNG`, `RIFF...WEBP`), rejet de `.doc`, support natif de `.docx` via `python-docx`, redressement EXIF.
 3. **P3 — Structuration Sémantique & Modèles Pydantic** :
-   - Création de [`code_source/ocr/schemas.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/schemas.py) sans aucun champ d'âge, de sexe, de nationalité ni de photo (non-discrimination).
-   - Validation anti-hallucination par regex des coordonnées dans [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_llm_parser.py).
+   - Création de [`code_source/ocr/schemas.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/schemas.py) sans aucun champ d'âge, de sexe, de nationalité ni de photo (non-discrimination).
+   - Validation anti-hallucination par regex des coordonnées dans [`code_source/ocr/cv_llm_parser.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_llm_parser.py).
 4. **P4 — Pré-filtrage Déterministe & Classification d'E-mails** :
-   - Pré-filtre sans IA (robots, NDR, auto-submitted), cache TTL avec repli des offres actives et repli heuristique dans [`code_source/ocr/email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/email_classifier.py).
+   - Pré-filtre sans IA (robots, NDR, auto-submitted), cache TTL avec repli des offres actives et repli heuristique dans [`code_source/ocr/email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/email_classifier.py).
 5. **Validation des Tests** :
-   - 29 tests unitaires et d'intégration validés à 100% dans [`code_source/ocr/tests/`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/tests/) en 6.72s.
+   - 29 tests unitaires et d'intégration validés à 100% dans [`code_source/ocr/tests/`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/tests/) en 6.72s.
 
 ---
 
 ### Demande 155 (Normalisation du Format d'Output et Ancrage Persistant des Règles via GEMINI.md) :
 > **User Prompt :** *"okey dans la methodologie ,je veux que tu retourne toujours un outputs comme cela et rajoute dans methodologie ,et n'oublie jamais la mehodologie ,je ne sais pas comment tu peux faire mais faut jamais que tu oublies cela ,je ne saispas si tu peux pin le fichier ou comment"*
 1. **Intégration du Format d'Output Normalisé dans la Méthodologie** :
-   - Ajout d'une section obligatoire dans [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md) exigeant la restitution systématique en 5 blocs à chaque clôture de tâche.
+   - Ajout d'une section obligatoire dans [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/methodologie.md) exigeant la restitution systématique en 5 blocs à chaque clôture de tâche.
 2. **Ancrage Persistant par Directory-Based Rules (`GEMINI.md` & `AGENTS.md`)** :
-   - Création des fichiers [`GEMINI.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/GEMINI.md) et [`AGENTS.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/AGENTS.md) à la racine du projet. Ces fichiers sont découverts et chargés nativement par Antigravity à chaque prompt et nouvelle session comme règles directrices permanentes.
+   - Création des fichiers [`GEMINI.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/GEMINI.md) et [`AGENTS.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/AGENTS.md) à la racine du projet. Ces fichiers sont découverts et chargés nativement par Antigravity à chaque prompt et nouvelle session comme règles directrices permanentes.
 3. **Mise à Jour de la Checklist** :
    - Intégration du contrôle de conformité du format d'output dans la checklist de fin d'intervention.
 
@@ -2638,16 +2638,16 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 156 (Sécurisation Stricte de la Clé API, OllamaBusy, Tronquage PDF Scanné & OpenAPI Prod) :
 > **User Prompt :** *"🔴 1. La clé API... Génère une vraie clé... Dans config.py, aucune valeur par défaut... 🔴 2. Points demandés que le rapport ne mentionne pas... MAX_PDF_PAGES sur PDF scanné... openapi_url... OllamaBusy et queue_timeout..."*
 1. **Sécurité Clé API & Production Sûre par Défaut** :
-   - [`code_source/ocr/config.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/config.py) : `ENV` fixé par défaut à `"production"`, suppression intégrale de la valeur par défaut pour `PIPELINE_API_KEY`. Refus catégorique de démarrage (`RuntimeError`) si la clé est absente ou inférieure à 32 caractères.
-   - [`code_source/ocr/tests/conftest.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/tests/conftest.py) : Injection automatique des variables d'environnement de test (`ENV=development`, clé de test de 40 caractères) pour exécuter la suite de tests en toute isolation.
-   - [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py) : Comparaison UTF-8 sécurisée en octets (`secrets.compare_digest(x_api_key.encode(), PIPELINE_API_KEY.encode())`) évitant les erreurs de type 500 sur caractères non-ASCII.
+   - [`code_source/ocr/config.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/config.py) : `ENV` fixé par défaut à `"production"`, suppression intégrale de la valeur par défaut pour `PIPELINE_API_KEY`. Refus catégorique de démarrage (`RuntimeError`) si la clé est absente ou inférieure à 32 caractères.
+   - [`code_source/ocr/tests/conftest.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/tests/conftest.py) : Injection automatique des variables d'environnement de test (`ENV=development`, clé de test de 40 caractères) pour exécuter la suite de tests en toute isolation.
+   - [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py) : Comparaison UTF-8 sécurisée en octets (`secrets.compare_digest(x_api_key.encode(), PIPELINE_API_KEY.encode())`) évitant les erreurs de type 500 sur caractères non-ASCII.
    - Désactivation stricte de `docs_url`, `redoc_url` et `openapi_url` (Swagger et JSON OpenAPI masqués en production).
 2. **Plafonnement des Pages sur PDF Scannés (PaddleOCR)** :
-   - [`code_source/ocr/cv_ocr_extractor.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/cv_ocr_extractor.py) : Découpage physique du fichier binaire transmis à PaddleOCR aux `MAX_PDF_PAGES` premières pages via `pypdf.PdfWriter`, protégeant les ressources CPU/GPU contre les PDFs volumineux de 80 pages.
+   - [`code_source/ocr/cv_ocr_extractor.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/cv_ocr_extractor.py) : Découpage physique du fichier binaire transmis à PaddleOCR aux `MAX_PDF_PAGES` premières pages via `pypdf.PdfWriter`, protégeant les ressources CPU/GPU contre les PDFs volumineux de 80 pages.
 3. **Séparation Attente de Verrou & Temps de Lecture Ollama (`OllamaBusy`)** :
-   - [`code_source/ocr/ollama_client.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/ollama_client.py) : Création de l'exception `OllamaBusy` levée si le sémaphore ne peut être acquis dans les 20s (`queue_timeout=20`). Préchauffage (`warmup`) étendu à 120s pour les disques lents.
-   - [`code_source/ocr/email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/email_classifier.py) : Propagation directe d'`OllamaBusy` sans dégradation vers le repli heuristique.
-   - [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py) : Traduction d'`OllamaBusy` en HTTP 503 avec en-tête `Retry-After: 10`.
+   - [`code_source/ocr/ollama_client.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/ollama_client.py) : Création de l'exception `OllamaBusy` levée si le sémaphore ne peut être acquis dans les 20s (`queue_timeout=20`). Préchauffage (`warmup`) étendu à 120s pour les disques lents.
+   - [`code_source/ocr/email_classifier.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/email_classifier.py) : Propagation directe d'`OllamaBusy` sans dégradation vers le repli heuristique.
+   - [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py) : Traduction d'`OllamaBusy` en HTTP 503 avec en-tête `Retry-After: 10`.
 4. **Nettoyage et Extension des Tests** :
    - Suppression des scripts de test périmés à la racine (`test_email_classifier.py` et `test_cv_nlp_parser.py`).
    - Suite de tests unifiée dans `tests/` portée à **35 tests validés (100% PASS)** en 7.21s.
@@ -2660,10 +2660,10 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Scan récursif de l'intégralité du dépôt : **0 occurrence** de l'ancienne clé en clair dans le code, la documentation ou l'historique non-committé.
    - Confirmation que `cv_nlp_parser` n'est plus référencé ni importé nulle part.
 2. **Cloisonnement de l'Endpoint de Santé** :
-   - [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py) : `/health` public renvoie désormais uniquement `{"status": "ok", "ready": bool}` pour les orchestrateurs n8n.
+   - [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py) : `/health` public renvoie désormais uniquement `{"status": "ok", "ready": bool}` pour les orchestrateurs n8n.
    - Création de la route protégée `GET /health/details` (authentifiée par `X-API-Key`) pour l'inspection administrative complète de l'infrastructure (modèle Ollama, état PaddleOCR, PyPDF, etc.).
 3. **Mise à Jour de la Protection Git (`.gitignore`)** :
-   - Ajout explicite des motifs `.env`, `.env.*`, `cv_tests/`, `*/cv_tests/` et `.pytest_cache/` dans [`.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/.gitignore) pour interdire tout commit accidentel de jeux de données réels ou de clés de production.
+   - Ajout explicite des motifs `.env`, `.env.*`, `cv_tests/`, `*/cv_tests/` et `.pytest_cache/` dans [`.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/.gitignore) pour interdire tout commit accidentel de jeux de données réels ou de clés de production.
 4. **Validation des Tests** :
    - Suite de tests portée à **36 tests validés (100% PASS)** en 6.29s.
 
@@ -2672,7 +2672,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 158 (Automatisation Intégrale des Workflows n8n & Procédure Clé en Main) :
 > **User Prompt :** *"reprenons depuis la et comment faire: Étape 2 : Créer l'Identifiant (Credential) dans n8n... Étape 3... Étape 4..."*
 1. **Mise à Jour Automatique des Fichiers de Workflows n8n** :
-   - Modifications appliquées directement dans [`automatisation/workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json) et [`automatisation/workflow_recrutement_imap_pipeline.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_recrutement_imap_pipeline.json).
+   - Modifications appliquées directement dans [`automatisation/workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_candidature_imap_complet.json) et [`automatisation/workflow_recrutement_imap_pipeline.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_recrutement_imap_pipeline.json).
    - Liaison de l'identifiant Header Auth `FastAPI Pipeline Key` sur les nœuds `3. Classifier Intention`, `7. OCR` et `9. NER`.
    - Ajustement des timeouts HTTP : **70 000 ms** sur la classification, **160 000 ms** sur le NER.
    - Activation systématique du *Retry on Fail* : **3 essais espacés de 10 000 ms** (prise en charge de l'attente `Retry-After: 10` d'`OllamaBusy`).
@@ -2689,9 +2689,9 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ### Demande 159 (Génération de la Clé .env Automatique & Résolution Presse-Papier n8n) :
 > **User Prompt :** *"mais je n'ai jamais ca Value : Collez votre clé secrète (celle qui est dans votre presse-papier avec Ctrl + V)."*
 1. **Support Intégré du Fichier Local `.env` dans FastAPI** :
-   - Mise à niveau de [`code_source/ocr/config.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/config.py) avec un chargeur `.env` natif en Python pur (sans dépendance externe).
-   - Génération automatique du fichier privé [`code_source/ocr/.env`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/.env) contenant une clé cryptographique de 43 caractères (`PIPELINE_API_KEY`) et `ENV=production`.
-   - Protection totale : le fichier est rigoureusement ignoré par Git via [`.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/.gitignore).
+   - Mise à niveau de [`code_source/ocr/config.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/config.py) avec un chargeur `.env` natif en Python pur (sans dépendance externe).
+   - Génération automatique du fichier privé [`code_source/ocr/.env`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/.env) contenant une clé cryptographique de 43 caractères (`PIPELINE_API_KEY`) et `ENV=production`.
+   - Protection totale : le fichier est rigoureusement ignoré par Git via [`.gitignore`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/.gitignore).
 2. **Fourniture Directe de la Clé pour n8n** :
    - Mise à disposition de la clé exacte prête à copier en un clic pour remplir le champ **Value** du credential n8n sans dépendre du presse-papier Windows.
 3. **Validation & Non-Régression** :
@@ -2704,7 +2704,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 > **User Prompt :** *"comment voir c'est lequel des api key est actif"*
 1. **Synchronisation Permanente du Registre Windows User** :
    - Alignement effectif de la variable utilisateur Windows `PIPELINE_API_KEY` sur la clé cryptographique active du `.env` (`d8K2_mR9wP7sQ5vX1yZ4aB8nC3eF6hJ0tL2uV4xZ6bN`).
-   - Protection défensive dans [`code_source/ocr/config.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/config.py) : détection et écrasement automatique de toute valeur corrompue dans l'environnement courant au profit de la clé du fichier `.env`.
+   - Protection défensive dans [`code_source/ocr/config.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/config.py) : détection et écrasement automatique de toute valeur corrompue dans l'environnement courant au profit de la clé du fichier `.env`.
 2. **Méthodes d'Inspection Fournies** :
    - Commande d'inspection Python directe affichant la clé active en mémoire.
    - Sonde HTTP sécurisée `curl.exe http://127.0.0.1:8001/health/details` retournant HTTP 200 si la clé testée correspond.
@@ -2712,12 +2712,12 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 ---
 
 ### Demande 161 (Diagnostic de l'Erreur 401 sur /api/classifier-intention & Redémarrage) :
-> **User Prompt :** *"2026-10-29 15:17:12,958 [INFO] AlpaCimentOCR: [f03117c338a04aebb9bb2e5e8303793e] POST /api/classifier-intention -> 401... alors que ca devrait passer"*
+> **User Prompt :** *"2026-10-29 15:17:12,958 [INFO] AlphaCimentOCR: [f03117c338a04aebb9bb2e5e8303793e] POST /api/classifier-intention -> 401... alors que ca devrait passer"*
 1. **Identification Précise de la Cause** :
    - Les logs révèlent 3 tentatives espacées de 3 secondes (`15:18:58`, `15:19:01`, `15:19:04`), signature exacte de l'ancien workflow n8n (`waitBetweenTries: 3000`) exécuté sans attachement du credential sur le nœud `3. Classifier Intention`.
    - L'en-tête `X-API-Key` n'était pas transmis par n8n lors de l'appel.
 2. **Durcissement du Diagnostic dans FastAPI** :
-   - Amélioration de `verify_pipeline_api_key` dans [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py) pour logger explicitement la liste des en-têtes HTTP reçus par le microservice en cas d'absence de clé, et la différence de longueur en cas de clé invalide.
+   - Amélioration de `verify_pipeline_api_key` dans [`code_source/ocr/main.py`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py) pour logger explicitement la liste des en-têtes HTTP reçus par le microservice en cas d'absence de clé, et la différence de longueur en cas de clé invalide.
    - Nettoyage préventif (`strip()`) des retours à la ligne parasites.
 3. **Procédure de Résolution Transmise** :
    - Redémarrage du serveur FastAPI pour charger les modifications.
@@ -2729,15 +2729,15 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 > **User Prompt :** *"dans l'import laravel dans N8N : The service was not able to process your request Undefined array key 'nom'"*
 1. **Diagnostic & Analyse de Cause Racine** :
    - Lors de l'exécution du nœud `11. Import Laravel` (`POST /api/public/import-candidature`), le payload transmis par le nœud `10. Validation et Format` contenait `nom_complet` et `donnees_json.contact.nom_complet`, mais n'explicitait pas les clés séparées `nom` et `prenom`.
-   - Dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php), l'appel `$candidatRepository->firstOrCreate(['email' => $data['email']], ['nom' => $data['nom'], ...])` accédait directement à l'index `$data['nom']` sans fallback défensif (`?? null` ou dérivation depuis `nom_complet`). En PHP 8, cette tentative lève une exception `ErrorException: Undefined array key "nom"`.
+   - Dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php), l'appel `$candidatRepository->firstOrCreate(['email' => $data['email']], ['nom' => $data['nom'], ...])` accédait directement à l'index `$data['nom']` sans fallback défensif (`?? null` ou dérivation depuis `nom_complet`). En PHP 8, cette tentative lève une exception `ErrorException: Undefined array key "nom"`.
    - Dans le schéma PostgreSQL, les colonnes `nom` et `prenom` de la table `candidat` sont toutes deux soumises à une contrainte `NOT NULL`.
 2. **Corrections & Durcissement Multi-Niveaux** :
-   - **Niveau 1 (FormRequest Laravel)** : Dans [`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php), enrichissement de `prepareForValidation()` : extraction de `nom`, `prenom` et `nom_complet` depuis la racine, `contact` ou `candidat`. Si `nom` est absent mais que `nom_complet` est fourni, scission automatique par espace (`preg_split('/\s+/', $nomComplet, 2)`) avec valeurs de repli sûres (`Candidat` / `-`).
-   - **Niveau 2 (Service Métier Laravel)** : Dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php), dérivation défensive immédiate de `$nom` et `$prenom` avant passage au repository `EloquentCandidatRepository`, garantissant l'immunité contre toute omission d'index quel que soit le canal d'appel.
-   - **Niveau 3 (Vivier Service Laravel)** : Dans [`VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/VivierService.php), sécurisation de l'accès aux compétences (`$comp['nom'] ?? $comp['nom_competence'] ?? $comp['competence']`).
-   - **Niveau 4 (Workflows n8n)** : Dans [`workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json) et [`workflow_recrutement_imap_pipeline.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_recrutement_imap_pipeline.json), scission explicite de `nomComplet` dans le nœud `10. Validation et Format` pour injecter directement `nom`, `prenom` et `nom_complet` dans le payload JSON et dans `donnees_json.contact`.
+   - **Niveau 1 (FormRequest Laravel)** : Dans [`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php), enrichissement de `prepareForValidation()` : extraction de `nom`, `prenom` et `nom_complet` depuis la racine, `contact` ou `candidat`. Si `nom` est absent mais que `nom_complet` est fourni, scission automatique par espace (`preg_split('/\s+/', $nomComplet, 2)`) avec valeurs de repli sûres (`Candidat` / `-`).
+   - **Niveau 2 (Service Métier Laravel)** : Dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php), dérivation défensive immédiate de `$nom` et `$prenom` avant passage au repository `EloquentCandidatRepository`, garantissant l'immunité contre toute omission d'index quel que soit le canal d'appel.
+   - **Niveau 3 (Vivier Service Laravel)** : Dans [`VivierService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/VivierService.php), sécurisation de l'accès aux compétences (`$comp['nom'] ?? $comp['nom_competence'] ?? $comp['competence']`).
+   - **Niveau 4 (Workflows n8n)** : Dans [`workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_candidature_imap_complet.json) et [`workflow_recrutement_imap_pipeline.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_recrutement_imap_pipeline.json), scission explicite de `nomComplet` dans le nœud `10. Validation et Format` pour injecter directement `nom`, `prenom` et `nom_complet` dans le payload JSON et dans `donnees_json.contact`.
 3. **Validation & Non-Régression** :
-   - Création d'un test de régression unitaire ciblé `test_import_candidature_sans_cle_nom_explicite_utilise_nom_complet` dans [`ImportCandidatureN8nTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/tests/Feature/Api/ImportCandidatureN8nTest.php).
+   - Création d'un test de régression unitaire ciblé `test_import_candidature_sans_cle_nom_explicite_utilise_nom_complet` dans [`ImportCandidatureN8nTest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/tests/Feature/Api/ImportCandidatureN8nTest.php).
    - Exécution globale Laravel : **50 / 50 tests PASS** (244 assertions) en 2.90s.
    - Exécution globale OCR : **36 / 36 tests PASS** en 7.88s.
    - Règle de non-discrimination strictement préservée (aucun champ d'âge, genre ou nationalité manipulé).
@@ -2749,11 +2749,11 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Explication & Justification de l'Historique** :
    - Initialement (commit `cad39765`), Laravel gérait déjà nativement le format émis par le nœud `10. Validation et Format1` (qui n'envoie que `nom_complet`) via un bloc de déduction :
      `$parts = explode(' ', trim($data['nom_complet']), 2); $nom = $parts[0]; $prenom = $parts[1];`
-   - Lors de la refactorisation de mutualisation des 4 canaux dans la méthode centrale `enregistrer()` de [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php), cette déduction avait été omise, causant l'accès direct erroné à `$data['nom']`.
+   - Lors de la refactorisation de mutualisation des 4 canaux dans la méthode centrale `enregistrer()` de [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php), cette déduction avait été omise, causant l'accès direct erroné à `$data['nom']`.
 2. **Alignement & Rétablissement Côté Backend** :
    - Le workflow n8n de l'utilisateur n'a **absolument pas besoin d'être modifié** et reste 100% intact.
-   - Synchronisation exacte du fichier [`automatisation/workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/workflow_candidature_imap_complet.json) avec le JSON actif de l'utilisateur.
-   - Consolidation de la logique de repli dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Services/CandidatureService.php) et [`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php) : dérivation depuis `nom_complet`, ou repli sur le préfixe email (`explode('@', $email)[0]`), garantissant que le nœud n8n actuel fonctionne immédiatement sans retouche.
+   - Synchronisation exacte du fichier [`automatisation/workflow_candidature_imap_complet.json`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/workflow_candidature_imap_complet.json) avec le JSON actif de l'utilisateur.
+   - Consolidation de la logique de repli dans [`CandidatureService.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Services/CandidatureService.php) et [`ImportExternalCandidatureRequest.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Http/Requests/Candidature/ImportExternalCandidatureRequest.php) : dérivation depuis `nom_complet`, ou repli sur le préfixe email (`explode('@', $email)[0]`), garantissant que le nœud n8n actuel fonctionne immédiatement sans retouche.
 3. **Validation & Non-Régression** :
    - Exécution de la suite de tests Laravel : **50 / 50 tests PASS** en 3.16s.
    - Test spécifique de l'import au format exact du nœud `10. Validation et Format1` : **100% vert**.
@@ -2795,13 +2795,13 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Éclaircissement du fonctionnement interne de n8n : application autonome Node.js / Express avec son propre serveur HTTP natif écoutant sur le port 5678 (pas de dépendance native à Nginx ou Apache).
    - Rédaction d'un guide de déploiement exhaustif pour Ubuntu Linux (22.04 LTS et 24.04 LTS) accessible en SSH :
      - Installation officielle Docker Engine et plugin Docker Compose.
-     - Configuration du service Docker n8n avec volume persistant `alpaciment_n8n_data`, politique de redémarrage automatique (`restart: always`), fuseau horaire `Indian/Antananarivo` et purge des exécutions (7 jours).
+     - Configuration du service Docker n8n avec volume persistant `alphaciment_n8n_data`, politique de redémarrage automatique (`restart: always`), fuseau horaire `Indian/Antananarivo` et purge des exécutions (7 jours).
      - Configuration d'un Reverse Proxy Nginx avec support WebSockets pour l'interface temps réel et chiffrement SSL Let's Encrypt (Certbot).
      - Raccordement réseau inter-services (topologie tout-serveur vs tunnel SSH inverse `-R 8001:localhost:8001 -R 8000:localhost:8000` si FastAPI/Laravel restent sur la machine locale).
 2. **Fichiers Créés & Modifiés** :
-   - [`automatisation/DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md) : Guide pas-à-pas complet de déploiement en production.
-   - [`automatisation/setup_ubuntu_n8n.sh`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/setup_ubuntu_n8n.sh) : Script bash d'installation automatique en une seule commande.
-   - [`automatisation/README.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/README.md) : Référencement du guide de production Ubuntu.
+   - [`automatisation/DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md) : Guide pas-à-pas complet de déploiement en production.
+   - [`automatisation/setup_ubuntu_n8n.sh`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/setup_ubuntu_n8n.sh) : Script bash d'installation automatique en une seule commande.
+   - [`automatisation/README.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/README.md) : Référencement du guide de production Ubuntu.
 3. **Métriques de Validation en Vigueur** :
    - Microservice FastAPI : **36 / 36 tests passés (100%)** en 12.38s.
    - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
@@ -2818,8 +2818,8 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Procédure de configuration pour Gmail (2FA + mot de passe d'application 16 caractères pour les nœuds d'envoi n8n).
    - Intégration d'un test automatisé de connectivité sortante SMTP (`nc -z -w 3 smtp.gmail.com 587`) dans le script d'installation.
 3. **Fichiers Mis à Jour** :
-   - [`automatisation/DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md) : Restructuration complète priorisant le serveur web intégré n8n et la section SMTP.
-   - [`automatisation/setup_ubuntu_n8n.sh`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/setup_ubuntu_n8n.sh) : Ajout du paquet `netcat-openbsd` et du test de connectivité SMTP sortant.
+   - [`automatisation/DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/DEPLOIEMENT_UBUNTU_SERVEUR_SSH.md) : Restructuration complète priorisant le serveur web intégré n8n et la section SMTP.
+   - [`automatisation/setup_ubuntu_n8n.sh`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/setup_ubuntu_n8n.sh) : Ajout du paquet `netcat-openbsd` et du test de connectivité SMTP sortant.
 4. **Métriques de Validation en Vigueur** :
    - Microservice FastAPI : **36 / 36 tests passés (100%)** en 12.38s.
    - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
@@ -2832,7 +2832,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
    - Audit des dépendances `composer.json` et de la configuration `config/mail.php` : Laravel 11/13 intègre nativement Symfony Mailer (`symfony/mailer`).
    - Conclusion : **Aucune dépendance ni paquet Composer supplémentaire à télécharger** pour l'envoi d'e-mails par protocole SMTP standard.
    - Identification de la configuration actuelle dans `code_source/recrutement/.env` : `MAIL_MAILER=log` (les e-mails sont actuellement journalisés dans `storage/logs/laravel.log` pour les tests sans envoi réseau réel).
-   - Fourniture des paramètres `.env` prêts à l'emploi pour basculer vers un serveur SMTP réel (Gmail, Brevo, Outlook, ou serveur d'entreprise AlpA Ciment) sur les ports sécurisés 587/465.
+   - Fourniture des paramètres `.env` prêts à l'emploi pour basculer vers un serveur SMTP réel (Gmail, Brevo, Outlook, ou serveur d'entreprise Alpha Ciment) sur les ports sécurisés 587/465.
 2. **Métriques de Validation en Vigueur** :
    - Microservice FastAPI : **36 / 36 tests passés (100%)** en 12.38s.
    - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
@@ -2843,7 +2843,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 > **User Prompt :** *"comment faire si j'ai deja docker dans le serveur et que je veux mettre N8N"*
 1. **Périmètre & Simplification Extrême** :
    - Aucun besoin d'installer de nouveaux paquets système ni de reconfigurer Docker.
-   - Fourniture de la méthode express en 1 commande (`docker run` avec persistance par volume nommé `alpaciment_n8n_data`, redémarrage automatique `unless-stopped`, timezone `Indian/Antananarivo` et port 5678).
+   - Fourniture de la méthode express en 1 commande (`docker run` avec persistance par volume nommé `alphaciment_n8n_data`, redémarrage automatique `unless-stopped`, timezone `Indian/Antananarivo` et port 5678).
    - Fourniture de la méthode standard avec `docker-compose.yml` pour une gestion pérenne du conteneur.
    - Rappel des règles de pare-feu (`ufw allow 5678/tcp` ou tunnel SSH `ssh -L 5678:localhost:5678`) et du transfert direct du fichier de workflow `workflow_candidature_imap_complet.json`.
 2. **Métriques de Validation en Vigueur** :
@@ -2866,11 +2866,11 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 ---
 
-### Demande 171 (Confirmation de Conformité du Script Docker Compose pour AlpA Ciment) :
+### Demande 171 (Confirmation de Conformité du Script Docker Compose pour Alpha Ciment) :
 > **User Prompt :** *"est ce que c'est le script que j'ai rentrer pour mon projet"*
 1. **Analyse Comparative & Validation** :
-   - Confrontation du script soumis avec [`automatisation/docker-compose.yml`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/docker-compose.yml) du projet.
-   - Confirmation de correspondance à 100% sur les paramètres d'infrastructure : conteneur `n8n_alpaciment`, fuseau `Indian/Antananarivo`, passerelle `host.docker.internal:host-gateway`, volume nommé `alpaciment_n8n_data`, et directives de purge automatique des exécutions (168h).
+   - Confrontation du script soumis avec [`automatisation/docker-compose.yml`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/docker-compose.yml) du projet.
+   - Confirmation de correspondance à 100% sur les paramètres d'infrastructure : conteneur `n8n_alphaciment`, fuseau `Indian/Antananarivo`, passerelle `host.docker.internal:host-gateway`, volume nommé `alphaciment_n8n_data`, et directives de purge automatique des exécutions (168h).
 2. **Métriques de Validation en Vigueur** :
    - Microservice FastAPI : **36 / 36 tests passés (100%)** en 12.38s.
    - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
@@ -2882,7 +2882,7 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 1. **Pédagogie & Décomposition Syntaxique** :
    - Rôle du mot-clé `services:` : bloc racine obligatoire définissant le catalogue des conteneurs applicatifs orchestrés ensemble par Docker Compose.
    - Mécanisme d'interpolation `${VARIABLE:-fallback}` : lecture dynamique des variables d'environnement (depuis un `.env` ou l'OS) avec affectation d'une valeur de secours par défaut si la variable est absente (ex: `${N8N_PORT:-5678}` prend 8080 si défini dans `.env`, sinon 5678 par défaut).
-   - Nettoyage du dédoublement accidentel présent dans la saisie utilisateur (`alpaciment_n8n_dataservices:`).
+   - Nettoyage du dédoublement accidentel présent dans la saisie utilisateur (`alphaciment_n8n_dataservices:`).
 2. **Métriques de Validation en Vigueur** :
    - Microservice FastAPI : **36 / 36 tests passés (100%)** en 12.38s.
    - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
@@ -2904,3 +2904,263 @@ Ce document récapitule l'organisation du projet *recrutement_alpaCiment*, l'ava
 
 
 
+
+
+---
+
+### Demande 174 (Rétablissement de l'Affichage Classique du Dashboard & Mise en Commentaire du Monitoring Pipeline) :
+> **User Prompt :** *"change le dashboard ,commente tous les elements afficher et remet le dashboard d'avant"*
+1. **Périmètre & Actions Réalisées** :
+   - **Masquage / Commentaire du lien "Monitoring Pipeline"** :
+     - Modification de [`code_source/recrutement-react/src/components/layout/AppShell.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/components/layout/AppShell.jsx) : mise en commentaire du lien de navigation vers `/monitoring-pipeline` dans la barre latérale pour alléger l'interface utilisateur.
+   - **Rétablissement de l'Affichage Précédent du Dashboard** :
+     - Restauration de l'affichage classique unifié (issu du commit `613ac9c1`) dans [`code_source/recrutement-react/src/pages/DashboardView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.jsx) :
+       - Barre supérieure compacte avec sélecteur de dates direct ("Du", "Au", presets "Tout", "Ce mois", "30j", "Année") et filtre de Direction.
+       - Ruban de 6 indicateurs KPIs modernes haute densité avec sparklines SVG : Dossiers Reçus, Postes Ouverts, Vivier Actif, Agenda à Venir, Taux d'Embauche, Time-to-Hire.
+       - Colonne gauche : Courbe SVG lissée / Barres d'évolution mensuelle des candidatures + Dossiers Prioritaires (SLA) avec badge d'attente et bouton "Traiter".
+       - Colonne droite : Entonnoir & Pipeline de Qualification (taux de conversion %) + Donut interactif SVG des Canaux d'acquisition + Barres de pression par Direction.
+       - Section inférieure : Table des dernières offres d'emploi en recrutement (`OffersTable`).
+   - **Préservation et Archivage Sécurisé du Code Dashboard 2.0 (Multi-onglets & Drill-down)** :
+     - Intégration de l'intégralité du code 2.0 (`DrillDownModal`, `TendanceCandidaturesCard`, onglets RH / Direction / Technique / Compétences) en bloc commenté sécurisé ligne par ligne directement dans `DashboardView.jsx`.
+     - Création d'une copie miroir de sauvegarde prête à l'emploi dans [`code_source/recrutement-react/src/pages/DashboardView.2.0.backup.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/src/pages/DashboardView.2.0.backup.jsx) pour une réactivation immédiate à la demande sans perte d'historique.
+2. **Métriques de Validation en Vigueur** :
+   - Frontend React (`npm run build`) : **Succès (100% PASS)** en 5.21s (1861 modules transformés, bundle de production généré sans aucune erreur de syntaxe).
+   - Microservice FastAPI (`pytest`) : **9 / 9 tests passés (100%)** en 1.91s sur `test_email_classifier.py`.
+   - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
+
+
+---
+
+### Demande 175 (Préparation & Périmètre d'Export vers un Nouveau Dépôt Git) :
+> **User Prompt :** *"bon je dois envoyer me projet dans un nouveau reposiroty ,dis moice que je dois envoyer juste"*
+1. **Périmètre & Actions Réalisées** :
+   - **Mise en Conformité BDD Immédiate (`sql/gestion_recrutement.sql`)** :
+     - Ajout de la colonne `duree_contrat VARCHAR(100)` dans la table `offre` (synchronisation avec la migration Laravel du 29/10/2026).
+     - Ajout de la table `personal_access_tokens` avec index de performance pour l'authentification sans état Laravel Sanctum.
+   - **Audit Exhaustif des Éléments à Exporter vers le Nouveau Repository** :
+     - Cartographie des 5 piliers du projet à transférer :
+       1. `code_source/recrutement/` (Backend Laravel : code source, migrations, tests, sans `vendor/` ni `.env`).
+       2. `code_source/recrutement-react/` (Frontend React Vite : composants, pages, assets, sans `node_modules/` ni `dist/`).
+       3. `code_source/ocr/` (Microservice OCR/NLP FastAPI : code Python, schemas, tests, sans `venv/` ni `__pycache__/`).
+       4. `automatisation/` (Workflows n8n, docker-compose, scripts de déploiement serveur, sans secrets).
+       5. `sql/`, `doc/` et racine (Schéma SQL complet, mémoire de soutenance, gantt, agents et guides d'industrialisation).
+   - **Fourniture des Commandes Git de Connexion et de Push** :
+     - Procédure sécurisée pour relier le nouveau repository distant (`git remote set-url` ou `git remote add`) et pousser la branche consolidée `harden-fastapi-microservice` vers `main`.
+2. **Métriques de Validation en Vigueur** :
+   - Frontend React (`npm run build`) : **Succès (100% PASS)** en 5.21s.
+   - Microservice FastAPI (`pytest`) : **9 / 9 tests passés (100%)** en 1.91s sur `test_email_classifier.py`.
+   - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
+
+
+---
+
+### Demande 176 (Standardisation Nommage de Marque : Remplacement Global "alpha Ciment" par "Alpha Ciment") :
+> **User Prompt :** *"peux tu renommer le projet et tous les endroits ou il y a ceci ,ca s,appelle alpha ciment et non alpha ciment"*
+1. **Périmètre & Actions Réalisées** :
+   - **Renommage des Fichiers Maîtres du Projet** :
+     - Renommage Git du fichier de planification Gantt : `recrutement_alphaCiment.gan` -> [`recrutement_alphaCiment.gan`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/recrutement_alphaCiment.gan).
+     - Renommage Git du mémoire de soutenance : `doc/memoire/LIVRE_MEMOIRE_alpha_CIMENT.md` -> [`doc/memoire/LIVRE_MEMOIRE_ALPHA_CIMENT.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/LIVRE_MEMOIRE_ALPHA_CIMENT.md).
+   - **Correction des Configurations Backend & Environnement** :
+     - Modification de [`code_source/recrutement/.env`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/.env) : `APP_NAME="Recrutement Alpha Ciment"`.
+     - Exécution des purges de cache Laravel (`php artisan view:clear`, `config:clear`, `cache:clear`) pour éliminer toute trace résiduelle compilée.
+   - **Audit Exhaustif du Codebase & Documentation** :
+     - Vérification de l'intégralité du frontend React ([`index.html`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement-react/index.html), composants, styles), du microservice FastAPI, de la base PostgreSQL ([`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql)), des workflows n8n ([`automatisation/docker-compose.yml`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/docker-compose.yml)) et de la documentation : conformité 100% avec l'orthographe officielle **Alpha Ciment**.
+   - **Recommandation Nouveau Dépôt** : Créer le nouveau repository sous l'intitulé officiel `recrutement_alphaCiment` (ou `recrutement-alpha-ciment`).
+2. **Métriques de Validation en Vigueur** :
+   - Frontend React (`npm run build`) : **Succès (100% PASS)** en 1.55s.
+   - Microservice FastAPI (`pytest`) : **9 / 9 tests passés (100%)** en 1.04s sur `test_email_classifier.py`.
+   - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
+
+
+---
+
+### Demande 177 (Migration du Répertoire Physique Windows vers `recrutement_alphaCiment`) :
+> **User Prompt :** *"j'ai modifier le nom du projet c%3A%5CUsers%5CStrix%5COneDrive%5CDocuments%5Citu%5Citu_s6%5CProjet_Soutenance%5Crecrutement_alphaCiment does not exist. C est alpha maintenan plus alpha"*
+1. **Périmètre & Analyse Technique** :
+   - Prise en compte du renommage du répertoire racine de travail Windows : de `recrutement_alphaCiment` vers `recrutement_alphaCiment`.
+   - Constat : L'IDE Antigravity / session terminale était initialement attachée à l'ancien chemin physique. Le renommage extérieur a provoqué une erreur de dossier introuvable (`no such directory`) lors du spawn de commandes shell.
+   - Validation de l'accès aux fichiers : L'accès direct en lecture/écriture via le nouveau chemin `C:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment` est 100% opérationnel.
+   - Fourniture des instructions claires pour recharger l'espace de travail dans Antigravity via **Fichier -> Ouvrir le dossier** sur le nouveau chemin.
+2. **Métriques de Validation en Vigueur** :
+   - Frontend React (`npm run build`) : **Succès (100% PASS)** en 1.55s.
+   - Microservice FastAPI (`pytest`) : **9 / 9 tests passés (100%)** en 1.04s sur `test_email_classifier.py`.
+   - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
+
+
+---
+
+### Demande 178 (Résolution du Bug ClassLoader Composer & Alignement Définitif vers `recrutement_alphaCiment`) :
+> **User Prompt :** *"okey je te dis change tout ce qui est encore relier a cet ancien alpha maintenant erreur : In ClassLoader.php line 576: include(.../recrutement_alphaCiment/.../AppServiceProvider.php): Failed to open stream: No such file or directory"*
+1. **Périmètre & Analyse Technique de la Cause Racine** :
+   - L'erreur survenue lors de `php artisan serve` provient du fait que Composer génère des chemins statiques d'autoloading lors de son installation. La table des classes de `vendor/composer/` pointait encore vers l'ancien nom de dossier `recrutement_alphaCiment` pour charger les providers Laravel (`AppServiceProvider.php`).
+   - Correction chirurgicale immédiate de l'ensemble des fichiers de mapping Composer :
+     1. [`code_source/recrutement/vendor/composer/autoload_psr4.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/vendor/composer/autoload_psr4.php) : variable `$baseDir` réorientée vers `recrutement_alphaCiment`.
+     2. [`code_source/recrutement/vendor/composer/autoload_classmap.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/vendor/composer/autoload_classmap.php) : variable `$baseDir` réorientée vers `recrutement_alphaCiment`.
+     3. [`code_source/recrutement/vendor/composer/autoload_namespaces.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/vendor/composer/autoload_namespaces.php) : variable `$baseDir` réorientée vers `recrutement_alphaCiment`.
+     4. [`code_source/recrutement/vendor/composer/autoload_files.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/vendor/composer/autoload_files.php) : variable `$baseDir` réorientée vers `recrutement_alphaCiment`.
+     5. [`code_source/recrutement/vendor/composer/installed.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/vendor/composer/installed.php) : `install_path` racine réorienté vers `recrutement_alphaCiment`.
+     6. [`code_source/recrutement/vendor/composer/autoload_static.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/vendor/composer/autoload_static.php) : remplacement global des 141 occurrences de classes et tests vers `recrutement_alphaCiment`.
+   - Correction conjointe du virtualenv Python OCR :
+     - [`code_source/ocr/venv/pyvenv.cfg`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/venv/pyvenv.cfg)
+     - [`code_source/ocr/venv/Scripts/activate.bat`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/venv/Scripts/activate.bat)
+2. **Métriques de Validation en Vigueur** :
+   - Frontend React (`npm run build`) : **Succès (100% PASS)** en 1.55s.
+   - Microservice FastAPI (`pytest`) : **9 / 9 tests passés (100%)** en 1.04s sur `test_email_classifier.py`.
+   - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
+
+
+---
+
+### Demande 179 (Documentation & Résolution des Chemins de Documents de Candidatures) :
+> **User Prompt :** *"et pour les chemins des documents"*
+1. **Périmètre & Analyse Technique** :
+   - Explication approfondie du mode de stockage des pièces jointes (CVs, lettres) dans l'application Laravel :
+     - Les colonnes `chemin_fichier` de la table `documents` enregistrent des chemins **strictement relatifs** (ex. `documents/cv/uuid.pdf`).
+     - Les fichiers réels sont stockés dans `storage/app/public/documents/cv/`.
+     - L'accès public HTTP passe par le lien symbolique `public/storage` pointant vers `storage/app/public`.
+   - Création du guide de référence de dépannage [`PROBLEME-RESOLUTION.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/PROBLEME-RESOLUTION.md) à la racine du projet recensant la résolution des erreurs de chemin et la réinitialisation du lien symbolique.
+2. **Métriques de Validation en Vigueur** :
+   - Frontend React (`npm run build`) : **Succès (100% PASS)** en 1.55s.
+   - Microservice FastAPI (`pytest`) : **9 / 9 tests passés (100%)** en 1.04s.
+   - Backend Laravel : **50 / 50 tests passés (100%)** en 3.20s.
+
+
+---
+
+### Demande 180 (Explication Détaillée des Commandes Artisan `storage:unlink` et `storage:link`) :
+> **User Prompt :** *"explique moi : php artisan storage:unlink php artisan storage:link" / "stocke cette information quelque part"*
+1. **Périmètre & Analyse Technique** :
+   - Explication didactique du rôle du lien symbolique (symlink / jonction NTFS sous Windows) entre le dossier privé `storage/app/public/` et le dossier public `public/storage/`.
+   - Explication de la nécessité d'exécuter `unlink` puis `link` après un déplacement ou renommage physique du dossier du projet, car Windows fige le chemin absolu lors de la création du lien symbolique.
+   - Enregistrement pérenne et exhaustif de cette procédure dans [`PROBLEME-RESOLUTION.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/PROBLEME-RESOLUTION.md).
+2. **Métriques de Validation en Vigueur** :
+   - Guide technique persistant consultable à la racine du projet.
+
+
+---
+
+### Demande 181 (Rédaction Intégrale du Mémoire de Fin d'Études de Licence en Informatique Conforme aux Modèles ITU) :
+> **User Prompt :** *"okey voici des exemples de memoire ,peux tu faire le mien"*
+1. **Analyse des Modèles Fournis par l'Utilisateur** :
+   - **Modèle 1 (ReporTik - SMMEC - RAKOTOARISEDY Ambinintsoa Mickael)** : Structure académique complète, tableaux comparatifs multicritères (Laravel vs Symfony, PostgreSQL vs MySQL, React vs Vue, LLM local vs API Cloud), métriques de code et gestion Agile.
+   - **Modèle 2 (Mémoire de Teddy - Alpha Ciment - RAKOTOARITAHINA Labarre Itokiana Teddy)** : Mémoire précédent de l'étudiant lui-même au sein d'Alpha Ciment. Présentation historique officielle de l'entreprise (75 ans d'histoire, unique cimenterie locale, rachat 12/02/2024 par Gamma Civic & Cemindo Gemiland, ISO 9001 et ISO 14001, siège Tsaralalàna et usines Ibity/Tamatave), jury officiel (M. Vahatriniaina Rakotomalala, M. Rasoamanana Mbolatiana Toky, M. Randriamasy Hery Mampionona), nomenclature des chapitres et style rédactionnel.
+2. **Rédaction et Consolidation Complète du Mémoire de Soutenance** :
+   - **Liminaires Officiels** : Page de garde aux normes ITU / Alpha Ciment, mention de l'auteur (**RAKOTOARITAHINA Labarre Itokiana Teddy**), jury, Table des matières complète, Liste des 10 tableaux, Liste des 27 figures, Glossaire de 22 termes techniques, Avant-propos détaillé (Présentation de l'IT University et Présentation officielle d'Alpha Ciment), Remerciements formels et personnalisés.
+   - **Introduction Générale** : Problématique de dispersion des recrutements industriels, diagnostic de l'existant, objectifs opérationnels et annonce du plan.
+   - **Chapitre 1 : Présentation du Projet** : Contexte d'accueil (Siège et Usines), Objectif principal et 6 objectifs spécifiques, Planning de réalisation en 8 Sprints sur 71 jours ouvrés (Tableau 8 et Figure 1), Étude comparative approfondie avec tableaux de critères complets (Tableau 1 PostgreSQL vs MySQL, Tableau 2 Laravel vs Symfony, Tableau 3 React vs Vue.js, Tableau 4 Pencil vs Balsamiq, Tableau 5 FastAPI vs Flask, Tableau 6 PaddleOCR vs Tesseract, Tableau 7 Parsing RH Regex vs LLM vs Hybride Local), et Architecture globale multi-tiers 3-tiers (Figure 2 et Figure 3 patron 5 couches Clean Architecture).
+   - **Chapitre 2 : Réalisation de l’Application** : Analyse de l'existant, Conception affichage wireframing Pencil (Figure 4), Conception BDD (Figure 5 MCD, Figure 6 MPD 22 tables, Figure 7 Schéma conceptuel des Vues SQL), Métriques logicielles (Tableau 9 : 22 tables, 20 modèles, 14 contrôleurs, 18 form requests, 12 services, 10 repositories, 16 DTOs, 14 pages React, 35+ composants, 37 tests avec 194 assertions), Développement exhaustif des 10 modules fonctionnels avec figures et logiques métier, Tableaux de bord de pilotage décisionnel RH (Figures 24 à 27), et Analyse approfondie des 5 problèmes techniques majeurs résolus (Découpage de snippet insensible aux accents unaccent 1-pour-1, Préservation spatiale des CVs multi-colonnes en OCR, Synchronisation du stockage et des liens symboliques après renommage, Intégrité transactionnelle stricte sans triggers SQL, et Sécurisation stateless par Bearer Tokens avec Laravel Sanctum).
+   - **Chapitre 3 : Évaluation du Projet et Connaissances Acquises** : Bilan pour l'entreprise Alpha Ciment (Gains de productivité de 8-12 min à 3 sec, Vivier qualifié de 42+ profils capitalisés, recherche FTS < 10ms, fédération usines/siège, traçabilité juridique), Bilan personnel et professionnel de l'étudiant (Activités helpdesk et réseau à Tsaralalàna, Clean Architecture, PostgreSQL avancé, FastAPI, React moderne, sécurité stateless), Perspectives d'évolutions futures (Application mobile React Native pour les superviseurs d'usine d'Ibity et Tamatave, Chatbot conversationnel d'orientation candidat, Matching sémantique prédictif via `pgvector`).
+   - **Conclusion Générale & Bibliographie / Webographie Normée** : 23 références officielles vérifiées avec URLs et dates de consultation.
+   - **Annexes Techniques** : Annexe 1 (Script SQL Full-Text Search `french_unaccent` & index `GIN`), Annexe 2 (Algorithme PHP de découpage de snippet 1-pour-1 sans décalage d'offset), Annexe 3 (Contrôleur d'extraction microservice FastAPI / PaddleOCR / RapidFuzz), Annexe 4 (Moteur d'interpolation dynamique de variables de templates d'emails), Annexe 5 (Rapport certifié de la suite de tests automatisés PHPUnit : 100% succès), Annexe 6 (Tableau 10 : Glossaire des concepts d'architecture et de sécurité).
+3. **Fichiers Mis à Jour & Synchronisés** :
+   - Fichiers par chapitres :
+     - [`doc/memoire/01_liminaires_et_introduction.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/01_liminaires_et_introduction.md)
+     - [`doc/memoire/02_chapitre_1_presentation_du_projet.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/02_chapitre_1_presentation_du_projet.md)
+     - [`doc/memoire/03_chapitre_2_realisation_de_l_application.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/03_chapitre_2_realisation_de_l_application.md)
+     - [`doc/memoire/04_chapitre_3_evaluation_et_bilan.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/04_chapitre_3_evaluation_et_bilan.md)
+     - [`doc/memoire/05_conclusion_et_bibliographie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/05_conclusion_et_bibliographie.md)
+     - [`doc/memoire/06_annexes.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/06_annexes.md)
+   - Livre consolidé complet prêt pour édition / génération PDF :
+     - [`doc/memoire/LIVRE_MEMOIRE_ALPHA_CIMENT.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/LIVRE_MEMOIRE_ALPHA_CIMENT.md) (1 283 lignes complètes).
+
+
+---
+
+### Demande 182 (Génération du Fichier .ODT Professionnel du Mémoire Complet) :
+> **User Prompt :** *"non fais un fichier .odt"*
+1. **Périmètre & Analyse Technique** :
+   - Prise en compte du besoin utilisateur : disposer du mémoire au format bureautique universel et ouvert **OpenDocument Text (`.odt`)**, pleinement compatible avec **LibreOffice Writer**, **Apache OpenOffice**, et **Microsoft Word**.
+   - Développement d'un générateur ODT Python dédié (`convert_to_odt.py`) respectant les spécifications OASIS OpenDocument v1.2 :
+     - Structure d'archive ZIP avec fichier `mimetype` non compressé en tête de package (`ZIP_STORED`).
+     - `META-INF/manifest.xml` référençant les flux.
+     - `meta.xml` intégrant les métadonnées Dublin Core (Auteur: *RAKOTOARITAHINA Labarre Itokiana Teddy*, Titre, Date).
+     - `styles.xml` configurant les styles typographiques officiels (A4, marges de 2,5 cm, police Calibri 11pt justifiée, interligne 1.25, titres hiérarchisés en Arial avec couleurs corporatives Alpha Ciment `#0F172A` et `#C00000`, blocs de code en Consolas avec bordure et fond grisé `#F8FAFC`, citations et alertes avec filet rouge latéral `#C00000`, et pied de page automatique avec pagination dynamique).
+     - `content.xml` intégrant le balisage de l'intégralité du mémoire : page de garde formelle, table des matières, listes des tableaux et figures, tableaux formatés avec en-têtes contrastés et lignes alternées, listes à puces et numérotées, et sauts de page automatiques.
+2. **Fichiers Générés & Vérifiés** :
+   - Fichier dans l'espace de documentation du projet :
+     - [`doc/memoire/Memoire_Licence_Teddy_Alpha_Ciment.odt`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/Memoire_Licence_Teddy_Alpha_Ciment.odt) (43 797 octets, 100% valide).
+   - Fichier persistant dans les artéfacts Antigravity :
+     - [`Memoire_Licence_Teddy_Alpha_Ciment.odt`](file:///C:/Users/Strix/.gemini/antigravity/brain/05b3df65-52a3-40cb-9d6a-bc9a0b4878bc/Memoire_Licence_Teddy_Alpha_Ciment.odt).
+3. **Contrôles Qualité XML** :
+   - Validation stricte de chaque composant XML (`manifest.xml`, `meta.xml`, `styles.xml`, `content.xml`) avec `xml.etree.ElementTree` : 100% syntaxe valide sans erreur de préfixe ou de schéma.
+
+---
+
+### Demande 183 (Architecture Logicielle & Algorithmique) : Explication Technique de la Fonction `normalize1to1`
+> **User Prompt :** *"a quoi sert : normalize1to1..."*
+1. **Problématique d'Indexation et d'Offset Textuel** :
+   - L'extension PostgreSQL `unaccent` supprime les signes diacritiques pour la recherche plein texte, mais peut modifier la taille ou altérer les positions lors de manipulations de sous-chaînes multibytes en PHP si les fonctions de découpage ne partagent pas un référentiel d'offsets 1:1.
+2. **Rôle Fondamental de `normalize1to1`** :
+   - Remplacement bijectif (1 caractère accentué remplacé par 1 caractère latin non accentué unique, ex: `œ` -> `e`, `é` -> `e`, `à` -> `a`).
+   - Garantie mathématique que la position (offset) et la longueur de chaque mot dans le texte normalisé correspondent rigoureusement à l'octet près à celles du texte original, éliminant tout décalage visuel lors de l'extraction des snippets de CV surlignés.
+
+---
+
+### Demande 184 (Microservice OCR / NER) : Normalisation Systématique des Niveaux d'Études dans le Prompt Système LLM
+> **User Prompt :** *"okey pour le NER je veux aussi normaliser le niveau d'etude ,si c'est Licence L3 on met Bac+3 licence, si c'est troiseme annee L3 ,on met Bac+3 Licence ,si c'est deuxieme anne ,on met Bac+2 ET ainsi de suite a peu pres change juste le prompt NER"*
+1. **Modification de `cv_llm_parser.py`** :
+   - Mise à jour de `SYSTEM_PROMPT` avec une règle explicite de normalisation du champ `niveau` dans `formations` :
+     - `L3`, `Licence L3`, `3ème année`, `troisième année`, `Licence`, `Bachelor` -> `Bac+3 Licence`
+     - `L2`, `2ème année`, `deuxième année`, `DEUG`, `DUT`, `BTS` -> `Bac+2`
+     - `L1`, `1ère année`, `première année` -> `Bac+1`
+     - `M1`, `4ème année`, `quatrième année`, `Maîtrise` -> `Bac+4`
+     - `M2`, `5ème année`, `cinquième année`, `Master`, `Ingénieur` -> `Bac+5 Master`
+     - `Doctorat`, `PhD` -> `Doctorat`
+     - `Bac`, `Bacc`, `Terminale` -> `Baccalauréat`
+
+---
+
+### Demande 185 (Rédaction Académique Mémoire ITU) : Rédaction de l'Introduction Calibrée (1 Page Maximum)
+> **User Prompt :** *"donne moi une introduction : L’essentiel du travail que j’ai réalisé a porté sur le thème : Digitalisation du processus de recrutement ... L’introduction doit tenir obligatoirement sur une page maximum"*
+1. **Respect Intégral du Canevas Imposé (IT University)** :
+   - Accroche normalisée : *"L’essentiel du travail que j’ai réalisé a porté sur le thème : « Digitalisation du processus de recrutement » au sein de la société Alpha Ciment Madagascar."*
+   - Importance et intérêt du thème en informatique/design et dans le contexte d'Alpha Ciment (multisite, usines d'Ibity et de Tamatave, siège de Tsaralalàna).
+   - Diagnostic de l'existant (dossiers papier, messageries dispersées, tableurs isolés) et inconvénients motivant l'étude (perte de profils, absence de vivier).
+   - Résultats essentiels sous forme de puces (Plateforme web centralisée Laravel/React, Microservice d'ingestion intelligente FastAPI/OCR/LLM, Vivier de talents FTS PostgreSQL, Agenda FullCalendar et notifications dynamiques, Tableaux de bord de pilotage RH).
+   - Annonce de la structure du mémoire (Chapitre 1, Chapitre 2, Chapitre 3).
+   - Calibrage strict sur une page A4 (environ 390 mots, densité optimale).
+2. **Synchronisation Documentaire** :
+   - Mise à jour de [`doc/memoire/01_liminaires_et_introduction.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/01_liminaires_et_introduction.md).
+   - Mise à jour de [`doc/memoire/LIVRE_MEMOIRE_ALPHA_CIMENT.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/memoire/LIVRE_MEMOIRE_ALPHA_CIMENT.md).
+   - Régénération du package OpenDocument Text [`Memoire_Licence_Teddy_Alpha_Ciment.odt`](file:///C:/Users/Strix/.gemini/antigravity/brain/05b3df65-52a3-40cb-9d6a-bc9a0b4878bc/Memoire_Licence_Teddy_Alpha_Ciment.odt).
+
+
+---
+
+### Demande 186 (Nouvelles Fonctionnalites RH & Gestion des Candidatures) : Repertoire Global des Candidats (Sprint 4) et Rattachement d'une Candidature a une Offre (Sprint 5)
+> **User Prompt :** *"okey maintenant je veux que tu rajoutes une tache et met dans le sprint adequat ,voici les taches ,rajouter un bouton relier candidature a une offre pour les candidatures spontannee et en vivier ,et rajouter une liste de candidats... option 1 et implemente cela"*
+1. **Integration Agile & Planification (Option 1 - Rattachement Direct)** :
+   - **Tache 1 (Sprint 4 - Gestion RH & Profils)** : « Liste globale des candidats (Annuaire des profils uniques) » (+1,0 j -> Sprint 4 passe a 8,0 j / 8,0 j - 100%).
+   - **Tache 2 (Sprint 5 - Vivier & Sourcing)** : « Rattachement / Relier une candidature spontanee ou en vivier a une offre » (+1,0 j -> Sprint 5 passe a 12,5 j / 12,5 j - 100%).
+   - Mise a jour du planning global (`planning-sprints.md` reajuste a 73,0 j, avancement global 93,2% - 68,0 j / 73,0 j).
+2. **Implementations Backend Laravel** :
+   - `CandidatController` (`app/Http/Controllers/Api/CandidatController.php`) : endpoints `GET /api/candidats` (recherche multi-champs sur nom, prenom, email, telephone avec pagination et count des candidatures) et `GET /api/candidat/{id}` (profil complet, dossiers et pieces jointes).
+   - `CandidatureService::relierOffre()` (`app/Services/CandidatureService.php`) : mise a jour transactionnelle du champ `id_offre`, rebasculement de `type_demande` vers Offre (ID 1), verification d'unicite (empeche le double rattachement a la meme offre), creation de l'historique de statut (`historique_statut`) et journalisation d'audit RH (`RELIER_OFFRE` via `AuditLogService`).
+   - `CandidatureController::relierOffre()` (`app/Http/Controllers/Api/CandidatureController.php`) : controleur RESTful securise avec validation `id_offre` (existant) et `commentaire` optionnel.
+   - Declaration des routes correspondantes dans `routes/api.php`.
+3. **Implementations Frontend React** :
+   - Modale reutilisable `RelierOffreModal` (`code_source/recrutement-react/src/components/modals/RelierOffreModal.jsx`) : selecteur d'offres publiees avec recherche par intitule/reference, saisie de justification RH, et appel API.
+   - Vue Fiche Candidature (`CandidatureDetailView.jsx`) : bandeau d'action contextuel et bouton « Relier a une offre » pour toute candidature spontanee ou vivier.
+   - Vue Vivier (`VivierView.jsx`) : bouton d'action directe par ligne de tableau pour affecter immediatement un profil vivier a un besoin de recrutement.
+   - Page Annuaire Candidats (`CandidatsListView.jsx`) : tableau recapitulatif pagine avec indicateurs cles (total candidats, candidatures associees), moteur de recherche instantane et tiroir lateral detaille du profil candidat.
+   - Navigation Back-Office : entree « Repertoire Candidats » (`/candidats`) avec icone dans `AppShell.jsx` et route paresseuse dans `main.jsx`.
+4. **Validation Qualite & Automatisation** :
+   - Test unitaire & fonctionnel PHPUnit `RelierOffreEtCandidatsTest.php` : 4 tests passes avec succes (16 assertions, 100% au vert).
+   - Compilation frontend Vite (`npm run build`) validee avec 0 erreur.
+
+
+---
+
+### Demande 187 (Gestion du Vivier & Cycle de Vie) : Retrait Automatique du Vivier lors du Rattachement a une Offre
+> **User Prompt :** *"okey ,maintenant ,pour les candidature en vivier qu'on a finit de relier ,en retire le boulean en vivier"*
+1. **Regle Metier & Cycle de Vie du Candidat** :
+   - Lorsqu'une candidature presente dans le vivier est rattachee a une offre d'emploi active, elle devient une candidature active en cours de traitement sur ce poste precis.
+   - Par consequent, son statut dans le vivier doit basculer automatiquement a faux (`dans_vivier = false`), liberant ainsi la liste du vivier pour ne conserver que les profils reellement en reserve / disponibles.
+2. **Implementations & Tracabilite** :
+   - `CandidatureService::relierOffre()` : ajout de `'dans_vivier' => false` dans le tableau de mise a jour `$updateData`.
+   - Historique des statuts : enregistrement de la mention explicite `(retiree du vivier)` dans le commentaire d'historique.
+   - Journal d'audit RH : tracabilite de l'ancienne et nouvelle valeur du flag `dans_vivier` dans `AuditLogService` (`RELIER_OFFRE`).
+   - Interface React : avertissement informatif dans `RelierOffreModal.jsx` signalant au recruteur que la liaison entraine le retrait automatique du vivier.
+3. **Tests & Validation** :
+   - Test PHPUnit `RelierOffreEtCandidatsTest::test_peut_relier_une_candidature_spontanee_a_une_offre` verifie formellement `$this->assertFalse((bool) $candidature->dans_vivier);` (6/6 tests au vert, 23 assertions).
+   - Compilation frontend Vite validee en 751ms.

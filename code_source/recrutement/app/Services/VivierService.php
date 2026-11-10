@@ -5,8 +5,8 @@ namespace App\Services;
 use App\Enums\SourceDonnee;
 use App\Enums\StatutValidationOcr;
 use App\Enums\TypeDocumentEnum;
+use App\Models\Candidature;
 use App\Models\CvExtractionOcr;
-use App\Models\VivierCandidat;
 use App\Repositories\Contracts\CandidatRepositoryInterface;
 use App\Repositories\Contracts\CandidatureRepositoryInterface;
 use App\Repositories\Contracts\CompetenceRepositoryInterface;
@@ -27,64 +27,52 @@ class VivierService
 
     public function listVivier(array $filters): Collection
     {
-        $vivierItems = $this->vivierRepository->getVivierEntries($filters);
         $candidaturesEnVivier = $this->vivierRepository->getCandidaturesEnVivier($filters);
 
-        $combined = collect();
-
-        foreach ($candidaturesEnVivier as $cand) {
-            $combined->push([
-                'id_vivier_candidat' => 'cand_' . $cand->id_candidature,
+        return $candidaturesEnVivier->map(function ($cand) {
+            return [
+                'id_vivier_candidat' => $cand->id_candidature,
                 'id_candidature' => $cand->id_candidature,
                 'id_candidat' => $cand->id_candidat,
                 'candidat' => $cand->candidat,
                 'direction' => $cand->direction ?? $cand->offre?->direction ?? $cand->domaine?->direction,
                 'domaine' => $cand->domaine,
-                'motif_ajout' => $cand->offre ? 'Mis en vivier RH (Candidature sur offre)' : 'Candidature spontanée (En vivier par défaut)',
-                'poste_souhaite' => $cand->poste_souhaite ?? null,
-                'statut' => 'Actif',
+                'offre' => $cand->offre,
+                'motif_ajout' => $cand->offre 
+                    ? "Mis en vivier RH (Candidature sur offre : " . ($cand->offre->titre_poste ?? $cand->offre->titre ?? 'Poste') . ")"
+                    : 'Candidature spontanée (En vivier par défaut)',
+                'poste_souhaite' => $cand->poste_souhaite ?? ($cand->offre?->titre_poste ?? $cand->offre?->titre ?? null),
+                'statut' => $cand->statut?->libelle ?? 'Actif',
                 'created_at' => $cand->created_at,
                 'cv_snippet' => $cand->cv_snippet ?? null,
-            ]);
-        }
-
-        foreach ($vivierItems as $viv) {
-            if (!$combined->firstWhere('id_candidat', $viv->id_candidat)) {
-                $combined->push([
-                    'id_vivier_candidat' => $viv->id_vivier_candidat,
-                    'id_candidature' => null,
-                    'id_candidat' => $viv->id_candidat,
-                    'candidat' => $viv->candidat,
-                    'direction' => $viv->direction,
-                    'domaine' => $viv->domaine,
-                    'motif_ajout' => $viv->motif_ajout,
-                    'statut' => $viv->statut,
-                    'created_at' => $viv->created_at,
-                    'cv_snippet' => $viv->cv_snippet ?? null,
-                ]);
-            }
-        }
-
-        return $combined->values();
+            ];
+        })->values();
     }
 
-    public function addToVivier(array $data): VivierCandidat
+    public function addToVivier(array $data): ?Candidature
     {
-        return $this->vivierRepository->updateOrCreate(
-            ['id_candidat' => $data['id_candidat']],
-            [
-                'id_direction' => $data['id_direction'] ?? null,
-                'id_domaine' => $data['id_domaine'] ?? null,
-                'motif_ajout' => $data['motif_ajout'] ?? 'Ajouté au vivier de talents',
-                'statut' => 'Actif',
-            ]
-        );
+        $id = $data['id_candidature'] ?? null;
+        if (!$id && !empty($data['id_candidat'])) {
+            $cand = Candidature::where('id_candidat', $data['id_candidat'])->latest()->first();
+            $id = $cand?->id_candidature;
+        }
+
+        if ($id) {
+            return $this->candidatureRepository->updateVivierStatus((int) $id, true);
+        }
+
+        return null;
     }
 
     public function removeFromVivier(int $id): void
     {
-        $vivier = $this->vivierRepository->findById($id);
-        $this->vivierRepository->delete($vivier);
+        $cand = Candidature::find($id);
+        if ($cand) {
+            $this->candidatureRepository->updateVivierStatus($cand->id_candidature, false);
+            return;
+        }
+
+        Candidature::where('id_candidat', $id)->where('dans_vivier', true)->update(['dans_vivier' => false]);
     }
 
     public function getCandidatProfile(int $id): array
@@ -115,6 +103,7 @@ class VivierService
         $formations = $idCandidature ? $this->vivierRepository->getFormationsByCandidature($idCandidature) : collect();
         $projets = $idCandidature ? $this->vivierRepository->getProjetsByCandidature($idCandidature) : collect();
         $competences = $idCandidature ? $this->vivierRepository->getCompetencesByCandidature($idCandidature) : collect();
+        $autres = $idCandidature ? $this->vivierRepository->getAutresByCandidature($idCandidature) : collect();
 
         return [
             'candidat' => $candidat,
@@ -123,6 +112,7 @@ class VivierService
             'experiences' => $experiences,
             'formations' => $formations,
             'projets' => $projets,
+            'autres' => $autres,
         ];
     }
 
@@ -161,6 +151,17 @@ class VivierService
             'url_projet' => $data['url_projet'] ?? null,
             'date_debut' => $data['date_debut'] ?? null,
             'date_fin' => $data['date_fin'] ?? null,
+            'description' => $data['description'] ?? null,
+            'valide' => true,
+            'source' => SourceDonnee::Manuel->value,
+        ]);
+    }
+
+    public function addAutre(int $id, array $data)
+    {
+        return $this->vivierRepository->createAutre([
+            'id_candidature' => $id,
+            'titre' => trim($data['titre'] ?? 'Information complémentaire'),
             'description' => $data['description'] ?? null,
             'valide' => true,
             'source' => SourceDonnee::Manuel->value,
@@ -338,6 +339,20 @@ class VivierService
                         'date_debut' => $proj['date_debut'] ?? null,
                         'date_fin' => $proj['date_fin'] ?? null,
                         'description' => $proj['description'] ?? null,
+                        'valide' => true,
+                        'source' => SourceDonnee::CvOcr->value,
+                    ]);
+                }
+            }
+
+            // 5. Autres (Loisirs, Permis, Références...)
+            if (!empty($data['autres'])) {
+                foreach ($data['autres'] as $autre) {
+                    $titre = trim($autre['titre'] ?? 'Information complémentaire');
+                    $this->vivierRepository->createAutre([
+                        'id_candidature' => $idCandidature,
+                        'titre' => $titre,
+                        'description' => $autre['description'] ?? null,
                         'valide' => true,
                         'source' => SourceDonnee::CvOcr->value,
                     ]);

@@ -12,6 +12,7 @@ const DashboardView = lazy(() => import('./pages/DashboardView').then((m) => ({ 
 const OffersView = lazy(() => import('./pages/OffersView').then((m) => ({ default: m.OffersView })));
 const CandidaturesOffresView = lazy(() => import('./pages/CandidaturesOffresView').then((m) => ({ default: m.CandidaturesOffresView })));
 const CandidaturesSpontaneesView = lazy(() => import('./pages/CandidaturesSpontaneesView').then((m) => ({ default: m.CandidaturesSpontaneesView })));
+const CandidatsListView = lazy(() => import('./pages/CandidatsListView').then((m) => ({ default: m.CandidatsListView })));
 const ReferentialsView = lazy(() => import('./pages/ReferentialsView').then((m) => ({ default: m.ReferentialsView })));
 const VivierView = lazy(() => import('./pages/VivierView').then((m) => ({ default: m.VivierView })));
 const AgendaView = lazy(() => import('./pages/AgendaView').then((m) => ({ default: m.AgendaView })));
@@ -79,18 +80,25 @@ function MainApp() {
             return;
         }
         try {
-            const [meResponse, referentielResponse, competencesResponse] = await Promise.all([
-                getJson('/api/me'),
-                getJson('/api/referentiels/recrutement'),
-                getJson('/api/competences'),
-            ]);
-
-            if (!meResponse || !referentielResponse) {
+            // 1. Auth Guard : Vérification préalable de l'authentification avec /api/me
+            const meResponse = await getJson('/api/me');
+            if (!meResponse?.data) {
+                // Token expiré ou invalide : getJson déclenche déjà la redirection vers /login
+                setBootstrapLoading(false);
                 return;
             }
 
             setUser(meResponse.data);
-            setReferentiels(referentielResponse.data);
+
+            // 2. Utilisateur validé : chargement sécurisé des référentiels et compétences
+            const [referentielResponse, competencesResponse] = await Promise.all([
+                getJson('/api/referentiels/recrutement'),
+                getJson('/api/competences'),
+            ]);
+
+            if (referentielResponse?.data) {
+                setReferentiels(referentielResponse.data);
+            }
             if (competencesResponse?.data) {
                 setCompetencesData(competencesResponse.data);
             }
@@ -247,6 +255,14 @@ function MainApp() {
                         </BackOfficeLayout>
                     }
                     path="/candidatures/spontanees"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <CandidatsListView />
+                        </BackOfficeLayout>
+                    }
+                    path="/candidats"
                 />
                 <Route
                     element={

@@ -14,18 +14,27 @@ class OffreResource extends JsonResource
     {
         return [
             'id' => $this->id_offre,
+            'id_offre' => $this->id_offre,
             'reference' => $this->reference,
             'slug' => \Illuminate\Support\Str::slug($this->titre_poste),
             'titre_poste' => $this->titre_poste,
+            'titre' => $this->titre_poste,
             'description' => $this->description,
             'id_lieu' => $this->id_lieu,
             'lieu' => $this->relationLoaded('lieuRef') && $this->lieuRef ? $this->lieuRef->libelle : ($this->lieu ?? 'Antananarivo'),
             'date_publication' => $this->date_publication?->toDateString(),
             'date_limite' => $this->date_limite?->toDateString(),
+            'date_cloture' => $this->date_cloture?->toDateString(),
+            'est_archivee' => $this->relationLoaded('statut') && $this->statut?->libelle === 'Cloturee',
+            'suppression_prevue_le' => $this->date_cloture
+                ? $this->date_cloture->copy()->addMonths((int) config('recrutement.retention_offres_archivees_mois', 12))->toDateString()
+                : null,
             'candidatures_count' => (int) ($this->candidatures_count ?? ($this->relationLoaded('candidatures') ? $this->candidatures->count() : $this->candidatures()->count())),
             'direction' => $this->whenLoaded('direction', fn () => [
                 'id' => $this->direction->id_direction,
+                'id_direction' => $this->direction->id_direction,
                 'nom' => $this->direction->nom_direction,
+                'nom_direction' => $this->direction->nom_direction,
                 'alias' => $this->direction->alias,
             ]),
             'statut' => $this->whenLoaded('statut', fn () => [

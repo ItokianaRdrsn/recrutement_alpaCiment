@@ -252,6 +252,31 @@ class CandidatureService
                 }
                 if ($photoFile) {
                     $this->documentService->stockerDocument($candidature->id_candidature, $photoFile, TypeDocumentEnum::Photo, 'documents/photos', $fichiersCrees);
+                } elseif (!empty($data['photo_base64'])) {
+                    try {
+                        $this->documentService->stockerPhotoBase64($candidature->id_candidature, $data['photo_base64'], $data['photo_nom'] ?? 'photo.jpg', $fichiersCrees);
+                    } catch (\Throwable $e) {
+                        Log::warning("Impossible de stocker la photo Base64 pour candidature #{$candidature->id_candidature}: " . $e->getMessage());
+                    }
+                }
+
+                // D2. Stockage des pièces jointes additionnelles (Lettre de motivation, diplômes, annexes)
+                if (!empty($data['pieces_jointes']) && is_array($data['pieces_jointes'])) {
+                    foreach ($data['pieces_jointes'] as $pj) {
+                        if (!empty($pj['base64'])) {
+                            try {
+                                $this->documentService->stockerPieceJointeBase64(
+                                    $candidature->id_candidature,
+                                    $pj['base64'],
+                                    $pj['nom_fichier'] ?? 'document.pdf',
+                                    $pj['type_document'] ?? 'Autre',
+                                    $fichiersCrees
+                                );
+                            } catch (\Throwable $pjErr) {
+                                Log::warning("Erreur stockage pièce jointe additionnelle [{$pj['nom_fichier']}]: " . $pjErr->getMessage());
+                            }
+                        }
+                    }
                 }
 
                 // E. Profil structuré & extraction OCR (délégué à CvExtractionService qui utilise CvExtractionRepository)
@@ -398,6 +423,80 @@ class CandidatureService
             );
 
             return $candidature->fresh(['statut', 'candidat']);
+        });
+    }
+
+    /**
+     * Rattache une candidature (spontanée ou en vivier) à une offre d'emploi active.
+     */
+    public function relierOffre(int $id, int $idOffre, ?string $commentaire = null, ?int $userId = null): Candidature
+    {
+        return DB::transaction(function () use ($id, $idOffre, $commentaire, $userId) {
+            $candidature = $this->candidatureRepository->findByIdForUpdate($id);
+            $offre = $this->offreRepository->findById($idOffre);
+
+            $statutCloture = DB::table('statut_offre')->where('libelle', 'Cloturee')->value('id_statut_offre');
+            if ($statutCloture && (int) $offre->id_statut_offre === (int) $statutCloture) {
+                throw ValidationException::withMessages([
+                    'id_offre' => ["L'offre sélectionnée est déjà clôturée."],
+                ]);
+            }
+
+            // Vérifier si le candidat a déjà une candidature distincte sur cette même offre
+            $dejaPostule = Candidature::where('id_candidat', $candidature->id_candidat)
+                ->where('id_offre', $idOffre)
+                ->where('id_candidature', '!=', $id)
+                ->exists();
+
+            if ($dejaPostule) {
+                throw ValidationException::withMessages([
+                    'id_offre' => ["Ce candidat possède déjà un dossier de candidature distinct pour cette offre d'emploi."],
+                ]);
+            }
+
+            $oldOffreTitre = $candidature->offre?->titre_poste ?? $candidature->offre?->titre ?? 'Candidature Spontanée';
+            $titreOffre = $offre->titre_poste ?? $offre->titre ?? "Offre #{$idOffre}";
+            $oldIdOffre = $candidature->id_offre;
+            $oldDansVivier = (bool) $candidature->dans_vivier;
+
+            $typeOffreId = DB::table('type_demande')->where('libelle', 'Offre')->value('id_type_demande');
+
+            $updateData = [
+                'id_offre' => $idOffre,
+                'dans_vivier' => false,
+            ];
+            if ($typeOffreId) {
+                $updateData['id_type_demande'] = $typeOffreId;
+            }
+            if ($offre->id_domaine) {
+                $updateData['id_domaine'] = $offre->id_domaine;
+            }
+
+            $this->candidatureRepository->update($candidature, $updateData);
+
+            // Historique du statut avec commentaire explicite
+            $motifVivier = $oldDansVivier ? " (retirée du vivier)" : "";
+            $this->candidatureRepository->createHistorique([
+                'id_candidature' => $candidature->id_candidature,
+                'id_statut_candidature' => $candidature->id_statut_candidature,
+                'id_utilisateur' => $userId ?? auth()->id(),
+                'commentaire' => "Rattachement à l'offre : {$titreOffre}{$motifVivier}." . ($commentaire ? " Motif : {$commentaire}" : ""),
+                'date_changement' => now(),
+            ]);
+
+            // Journal d'audit
+            $nom = $candidature->candidat ? "{$candidature->candidat->nom} {$candidature->candidat->prenom}" : "#{$candidature->id_candidature}";
+            $this->auditLogService->log(
+                action: 'RELIER_OFFRE',
+                entite: 'Candidature',
+                idEntite: $candidature->id_candidature,
+                description: "Candidature {$nom} reliée à l'offre {$titreOffre} (Précédente : {$oldOffreTitre})" . ($oldDansVivier ? " et retirée du vivier" : ""),
+                anciennesValeurs: ['id_offre' => $oldIdOffre, 'dans_vivier' => $oldDansVivier],
+                nouvellesValeurs: ['id_offre' => $idOffre, 'dans_vivier' => false, 'commentaire' => $commentaire],
+                idUtilisateur: $userId
+            );
+
+            return $candidature->fresh(['statut', 'candidat', 'offre.direction', 'domaine', 'documents', 'historique.statut']);
         });
     }
 }

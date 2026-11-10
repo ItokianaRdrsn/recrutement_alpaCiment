@@ -20,6 +20,7 @@ class ValidateOcrRequest extends FormRequest
             'experiences' => ['nullable', 'array'],
             'formations' => ['nullable', 'array'],
             'projets' => ['nullable', 'array'],
+            'autres' => ['nullable', 'array'],
         ];
     }
 }

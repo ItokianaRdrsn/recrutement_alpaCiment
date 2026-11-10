@@ -15,7 +15,7 @@ Dans le pipeline d'ingestion des candidatures par e-mail et de parsing automatiq
 ## 2. Architecture & Réalisations
 
 ### A. Base de Données PostgreSQL & Modèle Clean Architecture
-- **Table `candidat_projet`** créée et synchronisée dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) et migration Laravel `2026_10_09_000100_create_candidat_projet_table.php` :
+- **Table `candidat_projet`** créée et synchronisée dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql) et migration Laravel `2026_10_09_000100_create_candidat_projet_table.php` :
   - `id_projet` (BIGINT PK)
   - `id_candidature` (BIGINT FK ON DELETE CASCADE)
   - `titre_projet` (VARCHAR 200)
@@ -26,7 +26,7 @@ Dans le pipeline d'ingestion des candidatures par e-mail et de parsing automatiq
   - `description` (TEXT)
   - `source` ('manuel', 'cv_ocr')
   - `valide` (BOOLEAN)
-- **Modèle Eloquent** : [`CandidatProjet.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Models/CandidatProjet.php).
+- **Modèle Eloquent** : [`CandidatProjet.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/recrutement/app/Models/CandidatProjet.php).
 - **Couche Repository** :
   - `VivierRepositoryInterface` enrichi de `getProjetsByCandidature()` et `createProjet()`.
   - `EloquentVivierRepository` implémente les méthodes requises.
@@ -72,4 +72,4 @@ Workflow officiel complet importable dans n8n contenant :
 ## 3. Validation & Tests
 - **PHPUnit** : `php artisan test` $\rightarrow$ **26/26 tests réussis (103 assertions)**, incluant `ImportCandidatureN8nTest`.
 - **Vite Build** : `npm run build` exécuté avec succès en 2.29s (0 erreur).
-- **SQL Maître** : [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) mis à jour avec `candidat_projet` et `cv_extraction_ocr`.
+- **SQL Maître** : [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql) mis à jour avec `candidat_projet` et `cv_extraction_ocr`.

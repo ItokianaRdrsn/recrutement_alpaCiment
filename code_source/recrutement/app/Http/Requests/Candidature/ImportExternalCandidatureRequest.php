@@ -139,8 +139,8 @@ class ImportExternalCandidatureRequest extends FormRequest
             $this->merge(['nom_complet' => mb_substr(trim($this->input('nom_complet')), 0, 200)]);
         }
 
-        // Auto-remplissage de donnees_json si passé à la racine (competences, experiences, projets, formations)
-        if (empty($donneesJson) && ($this->has('competences') || $this->has('experiences') || $this->has('projets') || $this->has('formations'))) {
+        // Auto-remplissage de donnees_json si passé à la racine (competences, experiences, projets, formations, autres)
+        if (empty($donneesJson) && ($this->has('competences') || $this->has('experiences') || $this->has('projets') || $this->has('formations') || $this->has('autres'))) {
             $this->merge([
                 'donnees_json' => [
                     'contact' => is_array($candidatData) ? $candidatData : [
@@ -154,6 +154,7 @@ class ImportExternalCandidatureRequest extends FormRequest
                     'experiences' => $this->input('experiences', []),
                     'projets' => $this->input('projets', []),
                     'formations' => $this->input('formations', []),
+                    'autres' => $this->input('autres', []),
                 ]
             ]);
         }
@@ -195,6 +196,7 @@ class ImportExternalCandidatureRequest extends FormRequest
             'experiences' => ['nullable', 'array'],
             'projets' => ['nullable', 'array'],
             'formations' => ['nullable', 'array'],
+            'autres' => ['nullable', 'array'],
             'code_offre' => ['nullable'],
             'email_subject' => ['nullable'],
             'email_sender' => ['nullable'],
@@ -204,6 +206,10 @@ class ImportExternalCandidatureRequest extends FormRequest
             'cv_nom' => ['nullable', 'string', 'max:255'],
             'cv_mime' => ['nullable', 'string', 'max:100'],
             'photo' => ['nullable', 'file', 'image', 'max:5120'],
+            'photo_base64' => ['nullable', 'string'],
+            'photo_nom' => ['nullable', 'string', 'max:255'],
+            'photo_mime' => ['nullable', 'string', 'max:100'],
+            'pieces_jointes' => ['nullable', 'array'],
             'texte_brut_ocr' => ['nullable', 'string'],
             'donnees_json' => ['nullable'],
             'sujet_email' => ['nullable', 'string', 'max:255'],

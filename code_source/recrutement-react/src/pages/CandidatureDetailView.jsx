@@ -11,6 +11,7 @@ import {
     Edit3,
     FileText,
     FolderGit2,
+    Link2,
     GraduationCap,
     Layers,
     Lock,
@@ -29,7 +30,10 @@ import { CandidatureDetailSkeleton, ErrorState, LoadingState } from '../componen
 import { CompetenceModal } from '../components/modals/CompetenceModal';
 import { RendezVousModal } from '../components/modals/RendezVousModal';
 import { EnvoyerMessageModal } from '../components/modals/EnvoyerMessageModal';
+import { RelierOffreModal } from '../components/modals/RelierOffreModal';
 import { CandidaturePrintDossier } from '../components/candidatures/CandidaturePrintDossier';
+import { MatchingCard } from '../components/candidatures/MatchingCard';
+import { DocumentUploadForm } from '../components/candidatures/DocumentUploadForm';
 import { formatDate, formatTime } from '../utils/formatters';
 
 export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, statutsList, referentiels }) {
@@ -52,6 +56,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const [communicationsList, setCommunicationsList] = useState([]);
     const [loadingCommunications, setLoadingCommunications] = useState(false);
     const [messageModalOpen, setMessageModalOpen] = useState(false);
+    const [showRelierModal, setShowRelierModal] = useState(false);
 
     // Extraction OCR
     const [ocrExtracting, setOcrExtracting] = useState(false);
@@ -71,6 +76,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
     const [newExp, setNewExp] = useState({ intitule_poste: '', entreprise: '', date_debut: '', date_fin: '', description: '' });
     const [newProj, setNewProj] = useState({ titre_projet: '', role: '', technologies: '', url_projet: '', date_debut: '', date_fin: '', description: '' });
     const [newForm, setNewForm] = useState({ diplome: '', etablissement: '', annee_obtention: '', domaine_etude: '', id_niveau: '', niveau: '' });
+    const [newAutre, setNewAutre] = useState({ titre: '', description: '' });
     const [profileMsg, setProfileMsg] = useState('');
 
     const fallbackNiveaux = useMemo(() => [
@@ -132,6 +138,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     experiences: data.cv_extraction_ocr.donnees_json?.experiences ?? [],
                     formations: data.cv_extraction_ocr.donnees_json?.formations ?? [],
                     projets: data.cv_extraction_ocr.donnees_json?.projets ?? [],
+                    autres: data.cv_extraction_ocr.donnees_json?.autres ?? [],
                     contact: data.cv_extraction_ocr.donnees_json?.contact ?? null,
                     profil: data.cv_extraction_ocr.donnees_json?.profil ?? null,
                     statut_validation: data.cv_extraction_ocr.statut_validation ?? 'en_attente',
@@ -282,6 +289,23 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
         }
     }
 
+    async function handleAddAutre(e) {
+        e.preventDefault();
+        const targetId = idCandidature || details?.id_candidature;
+        if (!targetId || !newAutre.titre) return;
+        setProfileMsg('');
+        try {
+            await sendJson(`/api/candidature/${targetId}/autres`, {
+                body: newAutre,
+            });
+            setNewAutre({ titre: '', description: '' });
+            setProfileMsg('Information complémentaire ajoutée à la candidature !');
+            await loadCandidateProfile(targetId);
+        } catch (err) {
+            setError(err.message);
+        }
+    }
+
     async function handleAddFormation(e) {
         e.preventDefault();
         const targetId = idCandidature || details?.id_candidature;
@@ -325,6 +349,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     experiences: ocrData.experiences ?? [],
                     formations: ocrData.formations ?? [],
                     projets: ocrData.projets ?? [],
+                    autres: ocrData.autres ?? [],
                 },
             });
             const actionLabel = statusVal === 'valide' 
@@ -368,6 +393,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
             const list = [...(prev.projets ?? [])];
             list.splice(index, 1);
             return { ...prev, projets: list };
+        });
+    }
+
+    function removeExtractedAutre(index) {
+        setOcrData((prev) => {
+            const list = [...(prev.autres ?? [])];
+            list.splice(index, 1);
+            return { ...prev, autres: list };
         });
     }
 
@@ -470,6 +503,8 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     </span>
                 </div>
             </div>
+
+            <MatchingCard idCandidature={details?.id_candidature} idOffre={details?.id_offre} />
 
             {/* SECTIONS TABS (MASQUÉES À L'IMPRESSION) */}
             <div className="candidature-tabs-header no-print" style={{ display: 'flex', gap: '8px', borderBottom: '2px solid var(--border)', paddingBottom: '8px', marginBottom: '16px', background: '#fff', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
@@ -609,6 +644,22 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                             <p style={{ margin: 0, fontSize: '13.5px' }}><strong>Email:</strong> {details.candidat?.email}</p>
                             <p style={{ margin: 0, fontSize: '13.5px' }}><strong>Téléphone:</strong> {details.candidat?.telephone ?? '-'}</p>
                         </div>
+
+                        {profileData?.autres && profileData.autres.length > 0 && (
+                            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '12px', marginTop: '12px' }}>
+                                <strong style={{ fontSize: '13px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                    <Sparkles size={14} />
+                                    <span>Informations complémentaires ({profileData.autres.length})</span>
+                                </strong>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                                    {profileData.autres.map((a, i) => (
+                                        <span key={i} className="badge purple" style={{ fontSize: '11px', padding: '3px 8px' }} title={a.description}>
+                                            {a.titre}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* SECTION 1: WORKFLOW RH DES STATUTS (MASQUÉE À L'IMPRESSION) */}
                         <div className="no-print" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px', marginTop: '16px' }}>
@@ -851,6 +902,27 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 </>
                             )}
                             <p style={{ margin: '6px 0' }}><strong>Date de dépôt :</strong> {formatDate(details.created_at)}</p>
+                            {(!details.offre || details.id_type_demande === 2 || details.dans_vivier) && (
+                                <div style={{ marginTop: '16px', padding: '14px', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                                    <div>
+                                        <strong style={{ color: '#065f46', display: 'block', fontSize: '13.5px' }}>
+                                            {details.dans_vivier ? 'Candidat disponible en Vivier RH' : 'Candidature Spontanée'}
+                                        </strong>
+                                        <span style={{ fontSize: '12.5px', color: '#047857' }}>
+                                            Vous pouvez affecter ce profil directement à une offre d'emploi active d'Alpha Ciment.
+                                        </span>
+                                    </div>
+                                    <button
+                                        className="primary-button"
+                                        onClick={() => setShowRelierModal(true)}
+                                        style={{ background: '#059669', fontSize: '13px', padding: '8px 14px', gap: '6px' }}
+                                        type="button"
+                                    >
+                                        <Link2 size={15} />
+                                        <span>Relier à une offre</span>
+                                    </button>
+                                </div>
+                            )}
 
                             <div style={{ marginTop: '16px' }}>
                                 <strong style={{ display: 'block', marginBottom: '6px' }}>Message de présentation / Lettre de motivation :</strong>
@@ -1088,7 +1160,7 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                     <input
                                         onChange={(e) => setNewProj((curr) => ({ ...curr, titre_projet: e.target.value }))}
-                                        placeholder="Titre du projet (ex: ERP AlpA Ciment)..."
+                                        placeholder="Titre du projet (ex: ERP Alpha Ciment)..."
                                         required
                                         style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
                                         type="text"
@@ -1237,6 +1309,64 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                 </div>
                             </form>
                         </div>
+
+                        {/* SECTION DIRECTE : INFORMATIONS COMPLÉMENTAIRES & AUTRES */}
+                        <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                            <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Sparkles size={18} />
+                                <span>Informations Complémentaires & Autres ({profileData?.autres?.length ?? 0})</span>
+                            </h3>
+
+                            <div style={{ display: 'grid', gap: '10px', marginBottom: '16px' }}>
+                                {(profileData?.autres ?? []).map((a) => (
+                                    <div key={a.id_autre} style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <strong style={{ fontSize: '14px', color: '#0f172a' }}>{a.titre}</strong>
+                                            {a.source && (
+                                                <span className={a.source === 'ocr' ? 'badge blue' : 'badge gray'} style={{ fontSize: '11px' }}>
+                                                    {a.source === 'ocr' ? 'Extrait CV' : 'Manuel'}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {a.description && (
+                                            <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#334155', whiteSpace: 'pre-line' }}>
+                                                {a.description}
+                                            </p>
+                                        )}
+                                    </div>
+                                ))}
+                                {(!profileData?.autres || profileData.autres.length === 0) && (
+                                    <div style={{ fontSize: '12.5px', color: 'var(--muted)', fontStyle: 'italic', padding: '6px 0' }}>
+                                        Aucune information complémentaire (centres d'intérêt, permis, bénévolat, etc.) pour l'instant.
+                                    </div>
+                                )}
+                            </div>
+
+                            <form className="no-print" onSubmit={handleAddAutre} style={{ display: 'grid', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                                <strong style={{ fontSize: '14px', color: '#0f172a' }}>Ajouter une information complémentaire :</strong>
+                                <input
+                                    onChange={(e) => setNewAutre((curr) => ({ ...curr, titre: e.target.value }))}
+                                    placeholder="Titre ou catégorie (ex: Permis de conduire, Loisirs, Références, Bénévolat)..."
+                                    required
+                                    style={{ height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                    type="text"
+                                    value={newAutre.titre}
+                                />
+                                <textarea
+                                    onChange={(e) => setNewAutre((curr) => ({ ...curr, description: e.target.value }))}
+                                    placeholder="Détails (ex: Permis B, Président du club d'échecs, disponible sous préavis de 1 mois)..."
+                                    rows={2}
+                                    style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border)', fontSize: '13.5px', background: '#ffffff' }}
+                                    value={newAutre.description}
+                                />
+                                <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                    <button className="ghost-button" style={{ justifySelf: 'start' }} type="submit">
+                                        <Plus size={16} />
+                                        <span>Ajouter l'information</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
@@ -1247,6 +1377,14 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                     <h3 style={{ marginTop: 0, color: 'var(--primary)', fontSize: '18px' }}>
                         Documents & Pièces Jointes du Candidat ({details.documents?.length ?? 0})
                     </h3>
+                    <DocumentUploadForm
+                        idCandidature={details.id_candidature}
+                        onUploaded={async () => {
+                            // rafraîchit seulement la candidature (pas de spinner plein écran)
+                            const res = await getJson(`/api/candidature/${details.id_candidature}`);
+                            if (res?.data) setDetails((prev) => ({ ...prev, ...res.data }));
+                        }}
+                    />
                     {!details.documents?.length ? (
                         <div className="empty-state">Aucun document joint à cette candidature.</div>
                     ) : (
@@ -1687,6 +1825,38 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                                                 )}
                                             </div>
                                         </div>
+
+                                        <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                                            <strong style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#7c3aed' }}>
+                                                <Sparkles size={16} />
+                                                Autres informations identifiées ({(ocrData.autres ?? []).length}) :
+                                            </strong>
+                                            <div style={{ display: 'grid', gap: '8px', marginTop: '6px' }}>
+                                                {(ocrData.autres ?? []).map((a, i) => (
+                                                    <div key={i} style={{ background: '#f8fafc', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <strong style={{ color: '#0f172a' }}>{a.titre}</strong>
+                                                            {isEditingOcr && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => removeExtractedAutre(i)}
+                                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#b91c1c' }}
+                                                                    title="Supprimer cette mention"
+                                                                >
+                                                                    <X size={14} />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                        {a.description && <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '3px' }}>{a.description}</div>}
+                                                    </div>
+                                                ))}
+                                                {(!ocrData.autres || ocrData.autres.length === 0) && (
+                                                    <div style={{ fontSize: '12px', color: 'var(--muted)', fontStyle: 'italic' }}>
+                                                        Aucune autre mention diverse (loisirs, permis...) dans ce CV.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1903,6 +2073,16 @@ export function CandidatureDetailView({ idCandidature, onBack, onRefreshList, st
                 <CompetenceModal
                     onClose={() => setShowCompetenceCreateModal(false)}
                     onSuccess={handleCompetenceCreated}
+                />
+            )}
+            {showRelierModal && (
+                <RelierOffreModal
+                    candidature={details}
+                    onClose={() => setShowRelierModal(false)}
+                    onSuccess={async () => {
+                        await loadDetails();
+                        if (onRefreshList) onRefreshList();
+                    }}
                 />
             )}
             </div>

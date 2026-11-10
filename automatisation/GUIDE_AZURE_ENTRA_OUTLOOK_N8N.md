@@ -6,7 +6,7 @@ Ce guide détaille toutes les étapes pour connecter votre instance **n8n** à u
 
 ## 🎯 Objectif
 Permettre à n8n de :
-1. Écouter ou lire les e-mails reçus sur l'adresse de recrutement (ex: `recrutement@alpaciment.mg`).
+1. Écouter ou lire les e-mails reçus sur l'adresse de recrutement (ex: `recrutement@alphaciment.mg`).
 2. Récupérer le contenu du message et les pièces jointes (CV en PDF/Word).
 3. Marquer le message comme lu ou le déplacer dans un dossier "Traité" après ingestion.
 4. Envoyer éventuellement des e-mails d'accusé de réception.
@@ -14,7 +14,7 @@ Permettre à n8n de :
 ---
 
 ## 📋 Prérequis
-- Un compte **Microsoft 365** (compte professionnel AlpA Ciment ou compte personnel Microsoft / Outlook.com).
+- Un compte **Microsoft 365** (compte professionnel Alpha Ciment ou compte personnel Microsoft / Outlook.com).
 - Accès au portail **Microsoft Entra ID / Azure** ([https://entra.microsoft.com](https://entra.microsoft.com) ou [https://portal.azure.com](https://portal.azure.com)).
 - Votre instance **n8n** en cours d'exécution (ex: `http://localhost:5678`).
 
@@ -38,7 +38,7 @@ Permettre à n8n de :
 2. Dans le menu de gauche, déployez **Applications** puis cliquez sur **Inscriptions d'applications** (*App registrations*).
 3. Cliquez sur **+ Nouvelle inscription** (*+ New registration*).
 4. Remplissez les champs :
-   - **Nom** : `n8n-alpaciment-recrutement` (ou le nom de votre choix).
+   - **Nom** : `n8n-alphaciment-recrutement` (ou le nom de votre choix).
    - **Types de comptes pris en charge** (*Supported account types*) :
      - *Si vous utilisez un compte professionnel d'entreprise (tenant unique)* : Choisissez **Comptes dans cet annuaire organisationnel uniquement (Locataire unique / Single tenant)**.
      - *Si vous utilisez un compte Outlook personnel (@outlook.com, @hotmail.com) ou multi-organisations* : Choisissez **Comptes dans n'importe quel annuaire organisationnel et comptes personnels Microsoft**.

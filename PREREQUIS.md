@@ -1,5 +1,5 @@
 # 📋 Guide des Pré-requis & Manuel d'Installation Complète
-## Projet : Plateforme de Recrutement AlpA Ciment
+## Projet : Plateforme de Recrutement Alpha Ciment
 
 Ce document répertorie de manière exhaustive **tous les logiciels à télécharger**, les **modèles d'IA locaux (Ollama & PaddleOCR)**, les **extensions et dépendances à activer**, ainsi que les **configurations système pas à pas** nécessaires pour déployer et exécuter le projet sur votre machine (Windows, Linux ou macOS).
 
@@ -164,7 +164,7 @@ Le microservice d'analyse OCR de CVs utilise **PaddleOCR** et **PaddlePaddle**, 
 
 Ollama est le **moteur d'intelligence artificielle locale** du projet. Il permet d'exécuter des modèles de langage (LLMs) directement sur votre machine sans aucune dépendance cloud, 100% gratuitement et dans le respect total de la confidentialité des données des candidats.
 
-#### Rôles clés d'Ollama dans AlpA Ciment :
+#### Rôles clés d'Ollama dans Alpha Ciment :
 1. **Extraction Structurée des CVs (`cv_llm_parser.py`)** : Prend le texte brut extrait par PaddleOCR et dissocie intelligemment les compétences, les expériences en entreprise, les projets académiques/personnels, et les formations sous un format JSON strict.
 2. **Classification d'Intention des Emails (`email_classifier.py`)** : Analyse automatiquement les emails entrants reçus par n8n pour les router en `demande_offre` (avec rattachement automatique à l'offre correspondante ex: `IT-1`), `demande_spontanee` (vivier) ou `demande_information`.
 
@@ -242,7 +242,7 @@ cp .env.example .env
 Vérifiez et adaptez les variables principales dans le fichier `.env` :
 
 ```env
-APP_NAME="AlpA Ciment Recrutement"
+APP_NAME="Alpha Ciment Recrutement"
 APP_ENV=local
 APP_KEY=
 APP_DEBUG=true
@@ -266,7 +266,7 @@ CACHE_STORE=database
 # Envoi d'emails (local / test)
 MAIL_MAILER=log
 MAIL_FROM_ADDRESS="recrutement@alphaciment.local"
-MAIL_FROM_NAME="AlpA Ciment RH"
+MAIL_FROM_NAME="Alpha Ciment RH"
 
 # URL du Microservice OCR Python
 OCR_SERVICE_URL=http://127.0.0.1:8001
@@ -460,7 +460,7 @@ npm run dev
 | Application / Module | URL | Description |
 | :--- | :--- | :--- |
 | **Back-Office RH (Pilotage & Recrutement)** | [http://127.0.0.1:5173/backoffice/dashboard](http://127.0.0.1:5173/backoffice/dashboard) | Tableau de bord RH, gestion des candidatures, vivier, entretiens |
-| **Portail Candidat (Portail Public)** | [http://127.0.0.1:5173/candidat/offres](http://127.0.0.1:5173/candidat/offres) | Consultation des offres d'emploi AlpA Ciment et formulaire de candidature |
+| **Portail Candidat (Portail Public)** | [http://127.0.0.1:5173/candidat/offres](http://127.0.0.1:5173/candidat/offres) | Consultation des offres d'emploi Alpha Ciment et formulaire de candidature |
 | **Swagger OCR FastAPI** | [http://127.0.0.1:8001/docs](http://127.0.0.1:8001/docs) | Test interactif de l'endpoint `/extract-cv` et `/health` |
 | **Serveur LLM Ollama** | [http://127.0.0.1:11434](http://127.0.0.1:11434) | API locale du moteur IA (Mistral / Llama / Qwen) |
 | **API Backend Laravel** | [http://127.0.0.1:8000/api](http://127.0.0.1:8000/api) | Point d'entrée RESTful |
@@ -509,4 +509,4 @@ npm run dev
 
 ---
 
-*Document maintenu dans le cadre du projet de fin d'études AlpA Ciment — ITU S6.*
+*Document maintenu dans le cadre du projet de fin d'études Alpha Ciment — ITU S6.*

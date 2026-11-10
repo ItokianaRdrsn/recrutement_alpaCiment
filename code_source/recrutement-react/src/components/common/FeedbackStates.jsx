@@ -523,7 +523,7 @@ export function DashboardSkeleton() {
                     position: 'relative',
                 }}
             >
-                {/* Liseré rouge dégradé signature AlpA Ciment */}
+                {/* Liseré rouge dégradé signature Alpha Ciment */}
                 <div
                     style={{
                         position: 'absolute',

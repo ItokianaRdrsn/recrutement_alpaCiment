@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
             'Fianarantsoa',
             'Toliara',
             'Antsiranana',
-            'Usine AlpA Ciment',
+            'Usine Alpha Ciment',
         ] as $lieuName) {
             DB::table('lieu')->updateOrInsert([
                 'libelle' => $lieuName,

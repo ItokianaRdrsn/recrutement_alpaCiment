@@ -62,16 +62,16 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>AlpA Ciment</h1>
+            <h1>Alpha Ciment</h1>
             <p>Direction des Ressources Humaines</p>
         </div>
         <div class="body">
 {{ $emailContent }}
         </div>
         <div class="footer">
-            <p>Cet email vous a été adressé par la plateforme de recrutement d'AlpA Ciment.<br>
+            <p>Cet email vous a été adressé par la plateforme de recrutement d'Alpha Ciment.<br>
             Merci de ne pas modifier les mentions de référence lors de vos réponses.</p>
-            <p>© {{ date('Y') }} AlpA Ciment - Tous droits réservés.</p>
+            <p>© {{ date('Y') }} Alpha Ciment - Tous droits réservés.</p>
         </div>
     </div>
 </body>

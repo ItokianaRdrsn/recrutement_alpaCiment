@@ -25,7 +25,7 @@ class CompetenceItemSchema(BaseModel):
     nom: str = Field(..., description="Nom de la compétence ou technologie")
     niveau: Optional[str] = Field(
         None,
-        description="Niveau déclaré explicitement dans le CV ('Débutant', 'Intermédiaire', 'Avancé', 'Expert'). null si non précisé."
+        description="Niveau déclaré explicitement dans le CV ('Débutant', 'Intermédiaire', 'Avancé', 'Expert'). Intermédiaire si non précisé."
     )
 
 
@@ -52,7 +52,12 @@ class FormationItemSchema(BaseModel):
     etablissement: Optional[str] = Field(None, description="Nom de l'établissement d'enseignement")
     date_obtention: Optional[str] = Field(None, description="Date d'obtention (YYYY-MM-DD ou YYYY-01-01)")
     domaine_etude: Optional[str] = Field(None, description="Filière ou domaine d'étude")
-    niveau: Optional[str] = Field(None, description="Niveau d'études (ex: Bac+3, Bac+5, Master)")
+    niveau: Optional[str] = Field(None, description="Niveau d'études normalisé (ex: Bac+3 (Licence), Bac+5 (Master 2 / Ingénieur))")
+
+
+class AutreItemSchema(BaseModel):
+    titre: str = Field(..., description="Titre ou catégorie de l'information (ex: Loisirs, Permis, Bénévolat)")
+    description: Optional[str] = Field(None, description="Détail ou description de l'information")
 
 
 class CvStructuredSchema(BaseModel):
@@ -62,6 +67,7 @@ class CvStructuredSchema(BaseModel):
     experiences: List[ExperienceItemSchema] = Field(default_factory=list)
     projets: List[ProjetItemSchema] = Field(default_factory=list)
     formations: List[FormationItemSchema] = Field(default_factory=list)
+    autres: List[AutreItemSchema] = Field(default_factory=list)
 
 
 # =============================================================================

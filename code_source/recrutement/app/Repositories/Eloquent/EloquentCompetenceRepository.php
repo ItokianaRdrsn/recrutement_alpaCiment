@@ -26,6 +26,11 @@ class EloquentCompetenceRepository implements CompetenceRepositoryInterface
 
     public function firstOrCreate(array $matchAttributes, array $values = []): Competence
     {
+        // Recherche par nom seul : insensible à la casse pour ne pas dupliquer le référentiel
+        if (array_keys($matchAttributes) === ['nom_competence']) {
+            return Competence::trouverOuCreer((string) $matchAttributes['nom_competence'], $values);
+        }
+
         return Competence::firstOrCreate($matchAttributes, $values);
     }
 }

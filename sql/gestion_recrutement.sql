@@ -95,7 +95,7 @@ INSERT INTO lieu (libelle) VALUES
 ('Fianarantsoa'),
 ('Toliara'),
 ('Antsiranana'),
-('Usine AlpA Ciment');
+('Usine Alpha Ciment');
 
 CREATE TABLE niveau (
     id_niveau BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -120,6 +120,7 @@ CREATE TABLE offre (
     description TEXT,
     id_lieu BIGINT NOT NULL REFERENCES lieu(id_lieu) ON DELETE RESTRICT,
     id_type_contrat BIGINT REFERENCES type_contrat(id_type_contrat) ON DELETE RESTRICT,
+    duree_contrat VARCHAR(100),
     date_publication DATE,
     date_limite DATE,
     id_statut_offre BIGINT NOT NULL REFERENCES statut_offre(id_statut_offre) ON DELETE RESTRICT,
@@ -660,7 +661,7 @@ WHERE envoi_automatique = TRUE
 
 INSERT INTO modele_message (id_type_message, id_statut_candidature, nom_modele, objet, contenu, envoi_automatique, actif)
 VALUES
-    (1, 1, 'Accusé de réception de candidature', 'AlpA Ciment - Accusé de réception de votre candidature pour {poste}', 'Bonjour {prenom} {nom},
+    (1, 1, 'Accusé de réception de candidature', 'Alpha Ciment - Accusé de réception de votre candidature pour {poste}', 'Bonjour {prenom} {nom},
 
 Nous accusons bonne réception de votre candidature pour le poste de {poste} au sein de la direction {direction}.
 
@@ -668,8 +669,8 @@ Nos équipes RH étudient actuellement votre profil avec la plus grande attentio
 
 Bien cordialement,
 L''équipe Ressources Humaines
-AlpA Ciment', TRUE, TRUE),
-    (2, 3, 'Convocation à un test de compétences', 'AlpA Ciment - Convocation : Test technique pour {poste}', 'Bonjour {prenom} {nom},
+Alpha Ciment', TRUE, TRUE),
+    (2, 3, 'Convocation à un test de compétences', 'Alpha Ciment - Convocation : Test technique pour {poste}', 'Bonjour {prenom} {nom},
 
 Dans le cadre du processus de recrutement pour le poste de {poste}, nous avons le plaisir de vous inviter à passer une session de test.
 
@@ -683,8 +684,8 @@ Merci de bien vouloir nous confirmer votre disponibilité par retour de cet e-ma
 
 Cordialement,
 L''équipe Ressources Humaines
-AlpA Ciment', FALSE, TRUE),
-    (2, 4, 'Convocation à un entretien de recrutement', 'AlpA Ciment - Convocation : Entretien pour {poste}', 'Bonjour {prenom} {nom},
+Alpha Ciment', FALSE, TRUE),
+    (2, 4, 'Convocation à un entretien de recrutement', 'Alpha Ciment - Convocation : Entretien pour {poste}', 'Bonjour {prenom} {nom},
 
 Suite à l''étude de votre candidature pour le poste de {poste}, nous serions ravis d''échanger avec vous lors d''un entretien d''embauche.
 
@@ -698,8 +699,8 @@ Nous vous prions de bien vouloir confirmer votre présence en répondant à cet 
 
 Bien cordialement,
 L''équipe Ressources Humaines
-AlpA Ciment', FALSE, TRUE),
-    (4, NULL, 'Demande de documents complémentaires', 'AlpA Ciment - Pièces justificatives complémentaires pour votre candidature', 'Bonjour {prenom} {nom},
+Alpha Ciment', FALSE, TRUE),
+    (4, NULL, 'Demande de documents complémentaires', 'Alpha Ciment - Pièces justificatives complémentaires pour votre candidature', 'Bonjour {prenom} {nom},
 
 Afin de compléter l''instruction de votre dossier de candidature pour le poste de {poste}, nous vous serions reconnaissants de bien vouloir nous transmettre les pièces justificatives manquantes (diplômes, certificats de travail, pièces d''identité).
 
@@ -707,10 +708,10 @@ Vous pouvez nous les adresser par retour d''e-mail dans les plus brefs délais.
 
 Avec nos remerciements,
 L''équipe Ressources Humaines
-AlpA Ciment', FALSE, TRUE),
-    (5, 6, 'Notification de non-retenue', 'AlpA Ciment - Suite donnée à votre candidature pour {poste}', 'Bonjour {prenom} {nom},
+Alpha Ciment', FALSE, TRUE),
+    (5, 6, 'Notification de non-retenue', 'Alpha Ciment - Suite donnée à votre candidature pour {poste}', 'Bonjour {prenom} {nom},
 
-Nous tenons à vous remercier pour l''intérêt que vous portez à AlpA Ciment et pour le temps consacré à votre candidature pour le poste de {poste}.
+Nous tenons à vous remercier pour l''intérêt que vous portez à Alpha Ciment et pour le temps consacré à votre candidature pour le poste de {poste}.
 
 Après examen attentif de l''ensemble des profils reçus, nous avons le regret de vous informer que nous n''avons pas retenu votre candidature pour cette opportunité.
 
@@ -720,7 +721,7 @@ Nous vous souhaitons pleine réussite dans vos projets professionnels.
 
 Cordialement,
 L''équipe Ressources Humaines
-AlpA Ciment', FALSE, TRUE);
+Alpha Ciment', FALSE, TRUE);
 -- ============================================================
 -- 17. COMMUNICATION
 -- ============================================================
@@ -1413,6 +1414,25 @@ FROM premiere_reception pr
     JOIN statut_final sf ON sf.id_candidature = pr.id_candidature
 GROUP BY 1
 ORDER BY 1;
+-- ============================================================
+-- ============================================================
+-- 19. JETONS D AUTHENTIFICATION API (LARAVEL SANCTUM)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS personal_access_tokens (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    tokenable_type VARCHAR(255) NOT NULL,
+    tokenable_id BIGINT NOT NULL,
+    name TEXT NOT NULL,
+    token VARCHAR(64) NOT NULL UNIQUE,
+    abilities TEXT,
+    last_used_at TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_personal_access_tokens_tokenable ON personal_access_tokens(tokenable_type, tokenable_id);
+CREATE INDEX IF NOT EXISTS idx_personal_access_tokens_expires_at ON personal_access_tokens(expires_at);
+
 -- ============================================================
 -- FIN DU SCRIPT
 -- ============================================================

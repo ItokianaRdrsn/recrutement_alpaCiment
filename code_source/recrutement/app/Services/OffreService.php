@@ -71,8 +71,29 @@ class OffreService
         });
     }
 
+    /**
+     * Une offre clôturée (= archivée) est figée : plus aucune modification ni changement de statut.
+     */
+    public function estCloturee(Offre $offre): bool
+    {
+        $clotureeId = $this->offreRepository->getStatusId(StatutOffreEnum::Cloturee);
+
+        return $clotureeId !== null && (int) $offre->id_statut_offre === (int) $clotureeId;
+    }
+
+    protected function refuserSiCloturee(Offre $offre): void
+    {
+        if ($this->estCloturee($offre)) {
+            throw ValidationException::withMessages([
+                'offre' => ["Cette offre est clôturée (archivée) : elle n'est plus modifiable."],
+            ]);
+        }
+    }
+
     public function update(Offre $offre, array $data, array $relationsData): Offre
     {
+        $this->refuserSiCloturee($offre);
+
         if (isset($data['id_statut_offre']) && (int) $data['id_statut_offre'] !== (int) $offre->id_statut_offre) {
             $this->validateWorkflowProgression($offre, (int) $data['id_statut_offre']);
         }
@@ -115,6 +136,8 @@ class OffreService
 
     public function publish(Offre $offre): Offre
     {
+        $this->refuserSiCloturee($offre);
+
         $targetId = $this->offreRepository->getStatusId(StatutOffreEnum::Publiee);
         if (!$targetId) {
             abort(500, 'Statut Publiee introuvable.');
@@ -143,6 +166,8 @@ class OffreService
 
     public function close(Offre $offre): Offre
     {
+        $this->refuserSiCloturee($offre);
+
         $targetId = $this->offreRepository->getStatusId(StatutOffreEnum::Cloturee);
         if (!$targetId) {
             abort(500, 'Statut Cloturee introuvable.');
@@ -153,6 +178,7 @@ class OffreService
         $this->offreRepository->update($offre, [
             'id_statut_offre' => $targetId,
             'date_limite' => $offre->date_limite ?? today(),
+            'date_cloture' => now(),
         ]);
 
         $closed = $this->offreRepository->findById($offre->id_offre);

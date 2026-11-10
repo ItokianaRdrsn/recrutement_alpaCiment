@@ -135,7 +135,7 @@ class RendezVousTest extends TestCase
         $this->rhUser = User::factory()->rh()->make([
             'id' => 1,
             'name' => 'Agent RH Test',
-            'email' => 'rh.test@alpaciment.mg',
+            'email' => 'rh.test@alphaciment.mg',
         ]);
     }
 

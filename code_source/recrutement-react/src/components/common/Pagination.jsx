@@ -4,13 +4,18 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 export function Pagination({
     meta,
     onChangePage,
+    onPageChange,
     onChangePerPage,
+    onPerPageChange,
     perPage = 10,
     perPageOptions = [10, 20, 50, 100],
     scrollTargetRef = null,
 }) {
     const paginationRef = useRef(null);
     if (!meta) return null;
+
+    const triggerPageChange = onChangePage || onPageChange;
+    const triggerPerPageChange = onChangePerPage || onPerPageChange;
 
     const currentPage = meta.current_page ?? meta.page ?? 1;
     const itemsPerPage = perPage || meta.per_page || 10;
@@ -46,16 +51,16 @@ export function Pagination({
 
     const handlePageChange = (newPage) => {
         if (newPage < 1 || newPage > lastPage || newPage === currentPage) return;
-        if (onChangePage) {
-            onChangePage(newPage);
+        if (triggerPageChange) {
+            triggerPageChange(newPage);
         }
         scrollToTop();
     };
 
     const handlePerPageChange = (e) => {
         const nextPerPage = Number(e.target.value);
-        if (onChangePerPage) {
-            onChangePerPage(nextPerPage);
+        if (triggerPerPageChange) {
+            triggerPerPageChange(nextPerPage);
         }
         scrollToTop();
     };
@@ -80,7 +85,7 @@ export function Pagination({
                     Affichage de <strong style={{ color: '#0f172a' }}>{from}</strong> à <strong style={{ color: '#0f172a' }}>{to}</strong> sur <strong style={{ color: '#0f172a' }}>{total}</strong> éléments
                 </div>
 
-                {onChangePerPage && (
+                {triggerPerPageChange && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <label htmlFor="pagination-per-page-select" style={{ fontSize: '12.5px', color: '#64748b', margin: 0, fontWeight: 500 }}>
                             Afficher :

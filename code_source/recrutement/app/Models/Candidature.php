@@ -22,6 +22,7 @@ class Candidature extends Model
         'id_domaine',
         'id_statut_candidature',
         'dans_vivier',
+        'score_matching',
         'vue',
         'poste_souhaite',
         'message',
@@ -129,5 +130,10 @@ class Candidature extends Model
     public function projets(): HasMany
     {
         return $this->hasMany(CandidatProjet::class, 'id_candidature', 'id_candidature');
+    }
+
+    public function autres(): HasMany
+    {
+        return $this->hasMany(CandidatAutre::class, 'id_candidature', 'id_candidature');
     }
 }

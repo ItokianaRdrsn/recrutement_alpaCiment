@@ -27,6 +27,8 @@ class EloquentCandidatureRepository implements CandidatureRepositoryInterface
             'competences',
             'formations',
             'experiences',
+            'projets',
+            'autres',
         ];
         if ($hasOcrTable) {
             $withRelations[] = 'cvExtractionOcr';
@@ -383,6 +385,7 @@ class EloquentCandidatureRepository implements CandidatureRepositoryInterface
                 'formations',
                 'experiences',
                 'projets',
+                'autres',
             ]);
         }
 

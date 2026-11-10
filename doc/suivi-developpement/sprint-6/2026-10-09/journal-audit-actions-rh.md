@@ -6,11 +6,11 @@
 
 ## Tâche
 
-Mise en place de la journalisation complète et de la traçabilité des actions sensibles RH (Audit Log) dans le portail de recrutement AlpA Ciment : création, modification, publication et clôture d'offres d'emploi, changements de statuts des candidatures, opérations de validation/correction/rejet OCR et gestion du vivier de talents, avec interface de consultation et visualiseur de différences (diff JSON).
+Mise en place de la journalisation complète et de la traçabilité des actions sensibles RH (Audit Log) dans le portail de recrutement Alpha Ciment : création, modification, publication et clôture d'offres d'emploi, changements de statuts des candidatures, opérations de validation/correction/rejet OCR et gestion du vivier de talents, avec interface de consultation et visualiseur de différences (diff JSON).
 
 ## Pourquoi faire cela
 
-Dans un système de gestion de recrutement d'entreprise industrielle comme AlpA Ciment, plusieurs collaborateurs RH et gestionnaires interviennent sur les mêmes offres et candidatures. Il est crucial de :
+Dans un système de gestion de recrutement d'entreprise industrielle comme Alpha Ciment, plusieurs collaborateurs RH et gestionnaires interviennent sur les mêmes offres et candidatures. Il est crucial de :
 1. Garantir la conformité et la sécurité réglementaire (traçabilité de qui a modifié ou rejeté un profil, quand, et avec quelles valeurs antérieures).
 2. Assurer la non-répudiation et la transparence des décisions de recrutement.
 3. Permettre une analyse d'audit immédiate en cas d'erreur opérationnelle (ex. offre passée par erreur au statut clôturé, candidat indûment rejeté ou validé en vivier).
@@ -78,7 +78,7 @@ Chaque fois qu'un recruteur crée une offre, modifie un descriptif, change l'ét
 ## Sources
 
 - `[S1]` Documentation Laravel Database & Migrations : https://laravel.com/docs/11.x/migrations
-- `[S2]` Cahier des charges et architecture du projet AlpA Ciment (`sql/audit_log.sql`).
+- `[S2]` Cahier des charges et architecture du projet Alpha Ciment (`sql/audit_log.sql`).
 
 ## Vérifications
 

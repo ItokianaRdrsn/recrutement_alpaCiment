@@ -102,7 +102,7 @@ export default function PostulerOffrePage({ backendPath, getJson, idOffre, onNav
 
             <div className="data-section" style={{ background: '#fff', padding: '24px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
                 <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '16px', marginBottom: '20px' }}>
-                    <p className="eyebrow" style={{ color: 'var(--primary)', fontWeight: 600 }}>Candidature en ligne - AlpA Ciment</p>
+                    <p className="eyebrow" style={{ color: 'var(--primary)', fontWeight: 600 }}>Candidature en ligne - Alpha Ciment</p>
                     <h1 style={{ fontSize: '24px', margin: '4px 0' }}>{offre?.titre_poste ?? `Offre #${idOffre}`}</h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
                         Direction : {offre?.direction?.nom ?? 'Générale'} | Lieu : {offre?.lieu ?? 'Madagascar'} | Contrat : {offre?.type_contrat?.libelle ?? 'CDI'}

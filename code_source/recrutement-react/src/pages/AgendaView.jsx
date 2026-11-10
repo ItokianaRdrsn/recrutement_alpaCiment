@@ -372,7 +372,7 @@ export function AgendaView() {
                         <CalendarDays size={26} className="text-primary" /> Agenda des Entretiens & Tests RH
                     </h2>
                     <p>
-                        Planification des entretiens candidats, tests techniques et suivi du calendrier des recruteurs AlpA Ciment.
+                        Planification des entretiens candidats, tests techniques et suivi du calendrier des recruteurs Alpha Ciment.
                     </p>
                 </div>
 

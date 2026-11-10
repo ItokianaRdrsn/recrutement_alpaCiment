@@ -40,7 +40,7 @@ class CommunicationService
             ?? $offre?->titre_poste 
             ?? $offre?->titre 
             ?? $candidature->poste_souhaite 
-            ?? 'Poste chez AlpA Ciment';
+            ?? 'Poste chez Alpha Ciment';
 
         $direction = $extraVariables['direction']
             ?? $offre?->direction?->nom_direction 
@@ -74,7 +74,7 @@ class CommunicationService
                 $modeRdv = $rdv->modeRealisation?->libelle ?? 'Présentiel';
             }
             if (empty($lieuRdv)) {
-                $lieuRdv = $rdv->details_lieu ?? ($modeRdv === 'Visioconference' ? 'Lien communiqué ultérieurement' : 'Siège AlpA Ciment');
+                $lieuRdv = $rdv->details_lieu ?? ($modeRdv === 'Visioconference' ? 'Lien communiqué ultérieurement' : 'Siège Alpha Ciment');
             }
             if (empty($responsable) && $rdv->utilisateur) {
                 $responsable = $rdv->utilisateur->nom;
@@ -134,7 +134,7 @@ class CommunicationService
             ?? 6; // 6 = Autre par défaut
 
         $modeEnvoi = $data['mode_envoi'] ?? ModeEnvoiCommunication::Manuel->value;
-        $sujetBrut = $data['objet'] ?? $modele?->objet ?? 'Communication AlpA Ciment';
+        $sujetBrut = $data['objet'] ?? $modele?->objet ?? 'Communication Alpha Ciment';
         $contenuBrut = $data['contenu'] ?? $modele?->contenu ?? '';
 
         $extraVars = $data['variables'] ?? [];
@@ -212,8 +212,8 @@ class CommunicationService
 
         if (!$modele) {
             // Modèle par défaut générique si aucun en base
-            $sujetBrut = 'AlpA Ciment - Convocation à votre rendez-vous';
-            $contenuBrut = "Bonjour {prenom} {nom},\n\nNous vous confirmons votre rendez-vous le {date_rdv} à {heure_rdv} ({mode_rdv}).\nLieu / Modalités : {lieu_rdv}\n\nCordialement,\nAlpA Ciment";
+            $sujetBrut = 'Alpha Ciment - Convocation à votre rendez-vous';
+            $contenuBrut = "Bonjour {prenom} {nom},\n\nNous vous confirmons votre rendez-vous le {date_rdv} à {heure_rdv} ({mode_rdv}).\nLieu / Modalités : {lieu_rdv}\n\nCordialement,\nAlpha Ciment";
         } else {
             $sujetBrut = $modele->objet;
             $contenuBrut = $modele->contenu;

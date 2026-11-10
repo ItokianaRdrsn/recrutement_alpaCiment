@@ -237,13 +237,13 @@ class ImportCandidatureN8nTest extends TestCase
         $payload = [
             'nom' => 'Rakoto',
             'prenom' => 'Jean',
-            'email' => 'rakoto.jean.test@alpaciment.local',
+            'email' => 'rakoto.jean.test@alphaciment.local',
             'telephone' => '+261340000001',
             'ville' => 'Antananarivo',
             'id_offre' => null, // Spontanée
             'source' => 'email / n8n',
             'sujet_email' => 'Candidature Spontanée Développeur Web',
-            'corps_email' => 'Bonjour, je souhaite postuler pour rejoindre AlpA Ciment.',
+            'corps_email' => 'Bonjour, je souhaite postuler pour rejoindre Alpha Ciment.',
             'texte_brut_ocr' => 'Texte brut CV OCR',
             'duree_ocr_s' => 1.45,
             'duree_ner_s' => 12.80,
@@ -264,7 +264,7 @@ class ImportCandidatureN8nTest extends TestCase
                 ],
                 'projets' => [
                     [
-                        'titre_projet' => 'AlpA Logistics App',
+                        'titre_projet' => 'Alpha Logistics App',
                         'role' => 'Lead Dev',
                         'technologies' => 'React, PostgreSQL',
                         'url_projet' => 'https://github.com/test/logistics',
@@ -299,7 +299,7 @@ class ImportCandidatureN8nTest extends TestCase
         // 2. Vérification projet créé
         $this->assertDatabaseHas('candidat_projet', [
             'id_candidature' => $candidatureId,
-            'titre_projet' => 'AlpA Logistics App',
+            'titre_projet' => 'Alpha Logistics App',
             'role' => 'Lead Dev',
         ]);
 
@@ -313,7 +313,7 @@ class ImportCandidatureN8nTest extends TestCase
         // 4. Vérification enregistrement métriques P2 dans pipeline_metrics
         $this->assertDatabaseHas('pipeline_metrics', [
             'id_candidature' => $candidatureId,
-            'email_expediteur' => 'rakoto.jean.test@alpaciment.local',
+            'email_expediteur' => 'rakoto.jean.test@alphaciment.local',
             'statut' => 'succes',
             'nb_competences' => 2,
             'nb_experiences' => 1,
@@ -324,13 +324,13 @@ class ImportCandidatureN8nTest extends TestCase
 
     public function test_idempotence_import_candidature_meme_message_id_ne_cree_pas_de_doublon(): void
     {
-        $messageId = '<20261012.alpa-test-idempotence-12345@domain.local>';
+        $messageId = '<20261012.alpha-test-idempotence-12345@domain.local>';
 
         $payload = [
             'email_message_id' => $messageId,
             'nom' => 'Andria',
             'prenom' => 'Haja',
-            'email' => 'andria.haja@alpaciment.local',
+            'email' => 'andria.haja@alphaciment.local',
             'telephone' => '+261340000099',
             'ville' => 'Antananarivo',
             'source' => 'email / n8n',
@@ -373,17 +373,17 @@ class ImportCandidatureN8nTest extends TestCase
     {
         $payload = [
             'nom_complet' => 'Andria Manana',
-            'email' => 'andria.manana@alpaciment.local',
+            'email' => 'andria.manana@alphaciment.local',
             'telephone' => '+261320000099',
             'ville' => 'Antsirabe',
             'source' => 'email / n8n',
-            'cle_idempotence' => '<msg-test-nom-complet-123@alpaciment.local>',
+            'cle_idempotence' => '<msg-test-nom-complet-123@alphaciment.local>',
             'sujet_email' => 'Candidature Spontanée Ingénieur',
             'corps_email' => 'Veuillez trouver ci-joint ma candidature.',
             'donnees_json' => [
                 'contact' => [
                     'nom_complet' => 'Andria Manana',
-                    'email' => 'andria.manana@alpaciment.local',
+                    'email' => 'andria.manana@alphaciment.local',
                     'telephone' => '+261320000099',
                     'ville' => 'Antsirabe',
                 ],
@@ -405,7 +405,7 @@ class ImportCandidatureN8nTest extends TestCase
         $this->assertNotNull($candidature->candidat);
         $this->assertEquals('Andria', $candidature->candidat->nom);
         $this->assertEquals('Manana', $candidature->candidat->prenom);
-        $this->assertEquals('andria.manana@alpaciment.local', $candidature->candidat->email);
+        $this->assertEquals('andria.manana@alphaciment.local', $candidature->candidat->email);
     }
 }
 

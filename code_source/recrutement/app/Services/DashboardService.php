@@ -30,6 +30,7 @@ class DashboardService
         $directions = $this->dashboardRepository->getDirectionBreakdown();
         $canaux = $this->dashboardRepository->getChannelBreakdown($filters);
         $pending = $this->dashboardRepository->getPendingCandidatures(6);
+        $dernieresCandidatures = $this->dashboardRepository->getLatestUnseenCandidatures($filters, 6);
         $offresRecentes = $this->dashboardRepository->getRecentOffers(5);
 
         // 2. Vitesse et goulots (Médiane P50, P90, Stagnation, Backlog, Délai 1ère réponse)
@@ -61,6 +62,7 @@ class DashboardService
             'repartition_directions' => $directions,
             'repartition_canaux' => $canaux,
             'candidatures_a_traiter' => $pending,
+            'dernieres_candidatures' => $dernieresCandidatures,
             'offres_recentes' => OffreResource::collection($offresRecentes)->resolve($request),
 
             // Nouveaux blocs analytiques

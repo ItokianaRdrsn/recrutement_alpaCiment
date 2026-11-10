@@ -494,7 +494,7 @@ export function ModelesEmailsView() {
                                 </label>
                                 <input
                                     onChange={(e) => setFormData({ ...formData, objet: e.target.value })}
-                                    placeholder="Ex: AlpA Ciment - Convocation : Entretien pour {poste}"
+                                    placeholder="Ex: Alpha Ciment - Convocation : Entretien pour {poste}"
                                     required
                                     style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
                                     type="text"

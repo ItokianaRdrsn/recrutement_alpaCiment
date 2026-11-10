@@ -111,6 +111,100 @@ class DocumentService
     }
 
     /**
+     * Décode et enregistre une photo de profil encodée en Base64.
+     */
+    public function stockerPhotoBase64(
+        int $candidatureId,
+        string $base64,
+        string $clientNom = 'photo.jpg',
+        array &$fichiersCrees = []
+    ): Document {
+        if (str_contains($base64, ';base64,')) {
+            $parts = explode(';base64,', $base64);
+            $base64 = end($parts);
+        }
+
+        $decoded = base64_decode($base64, true);
+        if ($decoded === false || empty($decoded)) {
+            throw new DocumentStorageException("Le contenu Base64 de la photo est invalide.");
+        }
+
+        $taille = strlen($decoded);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->buffer($decoded) ?: 'image/jpeg';
+        $ext = $this->resoudreExtension($mime, $clientNom, true);
+
+        $safeName = Str::uuid() . '.' . $ext;
+        $path = 'documents/photos/' . $safeName;
+
+        if (Storage::disk(self::DISK)->put($path, $decoded) === false) {
+            throw new DocumentStorageException("Échec d'écriture de la photo Base64 sur le disque.");
+        }
+
+        $fichiersCrees[] = $path;
+
+        return $this->candidatureRepository->createDocument([
+            'id_candidature' => $candidatureId,
+            'type_document' => TypeDocumentEnum::Photo->value,
+            'nom_fichier' => basename($clientNom),
+            'chemin_fichier' => $path,
+            'taille_octets' => $taille,
+            'mime_type' => $mime,
+            'description' => 'Photo de profil (Import Base64)',
+        ]);
+    }
+
+    /**
+     * Décode et enregistre une pièce jointe additionnelle encodée en Base64 (Lettre de motivation, diplôme, etc.).
+     */
+    public function stockerPieceJointeBase64(
+        int $candidatureId,
+        string $base64,
+        string $clientNom = 'document.pdf',
+        string $typeDocument = 'Autre',
+        array &$fichiersCrees = []
+    ): Document {
+        if (str_contains($base64, ';base64,')) {
+            $parts = explode(';base64,', $base64);
+            $base64 = end($parts);
+        }
+
+        $decoded = base64_decode($base64, true);
+        if ($decoded === false || empty($decoded)) {
+            throw new DocumentStorageException("Le contenu Base64 de la pièce jointe [{$clientNom}] est invalide.");
+        }
+
+        $taille = strlen($decoded);
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->buffer($decoded) ?: 'application/octet-stream';
+        $ext = $this->resoudreExtension($mime, $clientNom, false);
+
+        $safeName = Str::uuid() . '.' . $ext;
+        $path = 'documents/annexes/' . $safeName;
+
+        if (Storage::disk(self::DISK)->put($path, $decoded) === false) {
+            throw new DocumentStorageException("Échec d'écriture de la pièce jointe [{$clientNom}] sur le disque.");
+        }
+
+        $fichiersCrees[] = $path;
+
+        $typeVal = match (strtolower(trim($typeDocument))) {
+            'photo' => TypeDocumentEnum::Photo->value,
+            default => TypeDocumentEnum::Autre->value,
+        };
+
+        return $this->candidatureRepository->createDocument([
+            'id_candidature' => $candidatureId,
+            'type_document' => $typeVal,
+            'nom_fichier' => basename($clientNom),
+            'chemin_fichier' => $path,
+            'taille_octets' => $taille,
+            'mime_type' => $mime,
+            'description' => $typeDocument ?: 'Pièce jointe additionnelle',
+        ]);
+    }
+
+    /**
      * Supprime physiquement les fichiers orphelins (utilisé lors d'un rollback SQL).
      */
     public function supprimerFichiers(array $paths): void

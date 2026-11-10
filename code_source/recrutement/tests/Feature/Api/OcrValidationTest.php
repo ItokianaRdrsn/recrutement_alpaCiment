@@ -18,7 +18,7 @@ class OcrValidationTest extends TestCase
         $this->rhUser = User::factory()->rh()->make([
             'id' => 1,
             'name' => 'Agent RH Test',
-            'email' => 'rh.test@alpaciment.mg',
+            'email' => 'rh.test@alphaciment.mg',
         ]);
     }
 
@@ -198,7 +198,7 @@ class OcrValidationTest extends TestCase
             'commentaire_rh' => 'Poste rectifié en Lead Architecte',
             'competences' => [],
             'experiences' => [
-                ['poste' => 'Lead Architecte', 'entreprise' => 'Alpa Ciment']
+                ['poste' => 'Lead Architecte', 'entreprise' => 'Alpha Ciment']
             ],
             'formations' => [],
         ]);

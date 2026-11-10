@@ -3,7 +3,7 @@
 email_classifier.py
 ===================
 Module d'analyse et de classification intelligente des emails entrants
-pour le service recrutement d'AlpA Ciment via Ollama (qwen2.5:7b).
+pour le service recrutement d'Alpha Ciment via Ollama (qwen2.5:7b).
 
 Catégories d'intention :
 1. 'demande_offre'       : Candidature ciblée sur une offre d'emploi spécifique.
@@ -31,7 +31,7 @@ from config import (
 from ollama_client import OllamaBusy, chat_json
 from schemas import EmailClassificationResultSchema, EmailTypeEnum
 
-logger = logging.getLogger("AlpaCimentOCR.email_classifier")
+logger = logging.getLogger("AlphaCimentOCR.email_classifier")
 
 # -----------------------------------------------------------------------------
 # CACHE DES OFFRES LARAVEL AVEC TTL ET REPLI PÉRIMÉ
@@ -72,7 +72,7 @@ def fetch_active_offers_from_laravel(force_refresh: bool = False) -> List[Dict[s
                         parsed_offers.append({
                             "id": int(oid),
                             "reference": str(ref).strip() if ref else None,
-                            "title": str(title).strip() if title else "Poste AlpA Ciment",
+                            "title": str(title).strip() if title else "Poste Alpha Ciment",
                         })
 
             with _offers_cache_lock:
@@ -238,7 +238,7 @@ def match_offer_by_reference_in_text(
 # 3. PROMPT SYSTEME CLASSIFICATION LLM
 # -----------------------------------------------------------------------------
 
-CLASSIFIER_SYSTEM_PROMPT = """Tu es un assistant RH expert chargé de classifier les emails reçus par le service recrutement d'AlpA Ciment.
+CLASSIFIER_SYSTEM_PROMPT = """Tu es un assistant RH expert chargé de classifier les emails reçus par le service recrutement d'Alpha Ciment.
 Ta mission est d'analyser le sujet et le corps de l'email pour déterminer avec précision l'intention de l'expéditeur.
 
 Tu dois impérativement classer l'email dans l'un des 4 types suivants :
@@ -317,7 +317,7 @@ def classify_email_intent(
             f"- ID: {o.get('id')} | Réf: {o.get('reference') or 'N/A'} | Titre: {o.get('title')}"
             for o in active_offers
         ]
-        offers_context = "OFFRES ACTUELLEMENT PUBLIÉES CHEZ ALPA CIMENT :\n" + "\n".join(lines) + "\n\n"
+        offers_context = "OFFRES ACTUELLEMENT PUBLIÉES CHEZ ALPHA CIMENT :\n" + "\n".join(lines) + "\n\n"
 
     user_prompt = f"""{offers_context}EMAIL À CLASSIFIER :
 Expéditeur : {sender or "Inconnu"}

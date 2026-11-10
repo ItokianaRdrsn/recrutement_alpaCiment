@@ -1,6 +1,6 @@
 # Register d'Architecture & Justification Technologique (ADR)
 
-Ce document répertorie l'ensemble des choix technologiques, frameworks, bases de données, librairies et algorithmes retenus pour la plateforme de recrutement *recrutement_alpaCiment*. 
+Ce document répertorie l'ensemble des choix technologiques, frameworks, bases de données, librairies et algorithmes retenus pour la plateforme de recrutement *recrutement_alphaCiment*. 
 
 Pour chaque choix, il présente les **motifs de sélection**, les **alternatives comparées avec leurs Pour/Contre**, et les **sources & documentations de référence**.
 
@@ -214,7 +214,7 @@ Pour chaque choix, il présente les **motifs de sélection**, les **alternatives
 - **Supériorité sur le JSON Structuré & Consignes Négatives** : Qwen 2.5 (7B) surpasse largement Llama 3.2 (3B) et Mistral (7B) dans les benchmarks d'extraction d'information structurée (Information Extraction / NER). Il respecte à la perfection les consignes négatives critiques (ex: *"ne jamais placer un projet d'école dans les expériences en entreprise"*).
 - **Compréhension Multilingue & Sémantique** : Excellente compréhension du vocabulaire académique et professionnel francophone (diplômes, contrats, intitulés de postes, technologies).
 - **Format JSON Garanti via Ollama** : L'utilisation conjointe avec l'option `format="json"` d'Ollama garantit une réponse parsable sans balises superflues de texte conversationnel.
-- **Souveraineté & Respect RGPD** : Le modèle s'exécute à 100% en local sur la machine ou le serveur d'AlpA Ciment sans transmettre les données personnelles des candidats à des tiers.
+- **Souveraineté & Respect RGPD** : Le modèle s'exécute à 100% en local sur la machine ou le serveur d'Alpha Ciment sans transmettre les données personnelles des candidats à des tiers.
 
 ### ⚖️ Comparatif & Alternatives Évaluées
 

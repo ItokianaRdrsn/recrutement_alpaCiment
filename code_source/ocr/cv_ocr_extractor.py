@@ -27,7 +27,7 @@ os.environ["FLAGS_use_mkldnn"] = "0"
 os.environ["FLAGS_use_onednn"] = "0"
 os.environ["PADDLE_PDX_ENABLE_MKLDNN_BYDEFAULT"] = "0"
 
-logger = logging.getLogger("AlpaCimentOCR.extractor")
+logger = logging.getLogger("AlphaCimentOCR.extractor")
 
 # Sémaphore de limitation de concurrence OCR
 _ocr_semaphore = threading.Semaphore(max(1, OCR_CONCURRENCY))

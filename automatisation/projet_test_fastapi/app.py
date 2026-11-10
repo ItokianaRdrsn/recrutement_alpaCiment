@@ -1,6 +1,6 @@
 """
 API FastAPI Locale pour le Test & Apprentissage de n8n
-Projet : Plateforme de Recrutement AlpA Ciment
+Projet : Plateforme de Recrutement Alpha Ciment
 Fonctionne 100% Hors Connexion (Localhost)
 """
 
@@ -14,10 +14,10 @@ import uvicorn
 
 # Configuration des logs
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-logger = logging.getLogger("AlpaCimentAPI")
+logger = logging.getLogger("AlphaCimentAPI")
 
 app = FastAPI(
-    title="AlpA Ciment - API Mock RH pour n8n",
+    title="Alpha Ciment - API Mock RH pour n8n",
     description="API locale hors-connexion pour apprendre à orchestrer des flux RH avec n8n.",
     version="1.0.0"
 )
@@ -136,7 +136,7 @@ BOITE_NOTIFICATIONS_SIMULEES: List[dict] = []
 def racine():
     """Point d'entrée pour vérifier que l'API est active."""
     return {
-        "service": "AlpA Ciment - API Mock RH",
+        "service": "Alpha Ciment - API Mock RH",
         "statut": "actif",
         "mode": "100% Hors-Connexion",
         "endpoints_disponibles": [
@@ -397,10 +397,10 @@ def extraire_cv_ocr(payload: dict):
         ],
         "projets": [
             {
-                "titre_projet": "Plateforme Logistique AlpA Tracking",
+                "titre_projet": "Plateforme Logistique Alpha Tracking",
                 "role": "Concepteur & Lead Développeur",
                 "technologies": "React, Node.js, PostgreSQL",
-                "url_projet": "https://github.com/example/alpa-tracking",
+                "url_projet": "https://github.com/example/alpha-tracking",
                 "date_debut": "2022-03-01",
                 "date_fin": "2022-09-30",
                 "description": "Projet académique de fin d'études : système IoT de traçabilité des camions de livraison de ciment."
@@ -424,7 +424,7 @@ def extraire_cv_ocr(payload: dict):
                 "niveau": "Bac+5"
             }
         ],
-        "texte_brut_ocr": texte or f"Curriculum Vitae de Jean Rakoto. Ingénieur Logiciel. Projets : AlpA Tracking. Expérience : Tech Solutions."
+        "texte_brut_ocr": texte or f"Curriculum Vitae de Jean Rakoto. Ingénieur Logiciel. Projets : Alpha Tracking. Expérience : Tech Solutions."
     }
 
 

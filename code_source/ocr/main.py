@@ -2,7 +2,7 @@
 """
 main.py
 =======
-Microservice FastAPI pour AlpA Ciment :
+Microservice FastAPI pour Alpha Ciment :
 - Orchestration du pipeline OCR (PaddleOCR, PyPDF, python-docx)
 - Structuration sémantique NER (LLM local qwen2.5:7b via Ollama)
 - Classification intelligente et filtrage déterministe d'emails (n8n)
@@ -36,6 +36,7 @@ from cv_ocr_extractor import (
     extract_raw_text_from_bytes,
     extract_text,
 )
+from document_classifier import classify_document, select_best_cv
 from email_classifier import classify_email_intent
 from ollama_client import (
     InvalidModelOutput,
@@ -51,7 +52,7 @@ from ollama_client import (
 # CONFIGURATION DES LOGS & TRACABILITÉ
 # -----------------------------------------------------------------------------
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-logger = logging.getLogger("AlpaCimentOCR")
+logger = logging.getLogger("AlphaCimentOCR")
 
 
 # -----------------------------------------------------------------------------
@@ -60,7 +61,7 @@ logger = logging.getLogger("AlpaCimentOCR")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialisation au démarrage et nettoyage à l'arrêt."""
-    logger.info(f"Démarrage du microservice AlpA Ciment OCR & NER (Modèle: {OLLAMA_MODEL}, Env: {ENV}).")
+    logger.info(f"Démarrage du microservice Alpha Ciment OCR & NER (Modèle: {OLLAMA_MODEL}, Env: {ENV}).")
     # Lancement du préchargement en arrière-plan sans bloquer le démarrage de l'app
     warmup()
     yield
@@ -71,7 +72,7 @@ async def lifespan(app: FastAPI):
 # APPLICATION FASTAPI & SÉCURISATION OPENAPI
 # -----------------------------------------------------------------------------
 app = FastAPI(
-    title="AlpA Ciment - Microservice OCR & NER (PaddleOCR + Qwen 2.5 7B)",
+    title="Alpha Ciment - Microservice OCR & NER (PaddleOCR + Qwen 2.5 7B)",
     description="Microservice d'extraction optique (OCR) et de structuration intelligente (NER Qwen 2.5) de CVs.",
     version="2.1.0",
     lifespan=lifespan,
@@ -178,7 +179,7 @@ def health_check_details():
     return {
         "status": "ok",
         "ready": ollama_ok,
-        "service": "AlpA Ciment - Microservice OCR & NER",
+        "service": "Alpha Ciment - Microservice OCR & NER",
         "paddle_ocr_installed": PADDLE_AVAILABLE,
         "pypdf_installed": PYPDF_AVAILABLE,
         "ollama_connected": ollama_ok,
@@ -270,6 +271,76 @@ def extract_ocr_only(
         "texte_brut_ocr": raw_text,
         "duree_secondes": {"ocr": t_ocr}
     }
+
+
+# =============================================================================
+# 1B. IDENTIFICATEUR ET SÉLECTEUR DE CV MULTI-PIÈCES JOINTES
+# =============================================================================
+class DocumentPayload(BaseModel):
+    key: Optional[str] = None
+    filename: str
+    base64: Optional[str] = None
+    text: Optional[str] = None
+    size: Optional[int] = 0
+
+class IdentifyCvRequest(BaseModel):
+    documents: List[DocumentPayload]
+
+@secured_router.post("/identify-cv")
+def identify_cv_endpoint(req: IdentifyCvRequest):
+    """
+    Analyse une liste de pièces jointes (en base64 ou texte extrait) et identifie
+    avec certitude laquelle correspond au véritable CV en comparant scores lexicaux,
+    densité de rubriques de CV, format et exclusions (LM, diplômes).
+    """
+    classified_list = []
+    for doc in req.documents:
+        text = doc.text or ""
+        file_size = doc.size or 0
+        if not text and doc.base64:
+            try:
+                b64 = doc.base64
+                if ";base64," in b64:
+                    b64 = b64.split(";base64,")[-1]
+                file_bytes = base64.b64decode(b64)
+                file_size = len(file_bytes)
+                ocr_res = extract_text(file_bytes, doc.filename)
+                text = ocr_res.get("text", "")
+            except Exception as e:
+                logger.warning(f"[Identify-CV] Échec extraction pour {doc.filename}: {e}")
+                text = ""
+
+        classification = classify_document(text=text, filename=doc.filename, file_size=file_size)
+        classification["key"] = doc.key
+        classification["extracted_text"] = text[:300] if text else ""
+        classified_list.append(classification)
+
+    result = select_best_cv(classified_list)
+    return {
+        "success": True,
+        **result
+    }
+
+
+@secured_router.post("/identify-cv-upload")
+async def identify_cv_upload(files: List[UploadFile] = File(...)):
+    """
+    Reçoit plusieurs fichiers en multipart/form-data et identifie lequel est le CV.
+    """
+    classified_list = []
+    for file in files:
+        file_bytes = await file.read()
+        ocr_res = extract_text(file_bytes, file.filename or "document")
+        text = ocr_res.get("text", "")
+        classification = classify_document(text=text, filename=file.filename or "", file_size=len(file_bytes))
+        classified_list.append(classification)
+
+    result = select_best_cv(classified_list)
+    return {
+        "success": True,
+        **result
+    }
+
 
 
 # =============================================================================

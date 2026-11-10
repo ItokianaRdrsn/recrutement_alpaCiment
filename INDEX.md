@@ -7,11 +7,11 @@ Avec un index à la fin du livre : Tu vas à la lettre N, tu trouves "Napoléon 
 
 En base de données, un index est une structure de données auxiliaire que PostgreSQL maintient en mémoire pour retrouver des lignes sans parcourir toute la table.
 
-2. Les 3 Familles d'Index utilisées dans notre projet AlpA Ciment
+2. Les 3 Familles d'Index utilisées dans notre projet Alpha Ciment
 
 Dans sql/gestion_recrutement.sql, nous avons combiné trois stratégies d'indexation complémentaires :
 
-                               LES INDEX DU PROJET ALPA CIMENT
+                               LES INDEX DU PROJET ALPHA CIMENT
                                               │
               ┌───────────────────────────────┼───────────────────────────────┐
               ▼                               ▼                               ▼

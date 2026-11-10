@@ -8,9 +8,9 @@ Création d'un microservice autonome Python FastAPI dans le dossier `code_source
 ## 🛠️ Structure & Fichiers Créés
 
 ### 1. Microservice Python FastAPI (`code_source/ocr/`)
-- **[main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/main.py)** : Serveur d'extraction FastAPI avec endpoints `GET /health` et `POST /extract-cv`.
-- **[requirements.txt](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/requirements.txt)** : Dépendances Python (`fastapi`, `uvicorn`, `paddleocr`, `pypdf`, `python-multipart`).
-- **[README.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/ocr/README.md)** : Instructions de déploiement et de lancement uvicorn.
+- **[main.py](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/main.py)** : Serveur d'extraction FastAPI avec endpoints `GET /health` et `POST /extract-cv`.
+- **[requirements.txt](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/requirements.txt)** : Dépendances Python (`fastapi`, `uvicorn`, `paddleocr`, `pypdf`, `python-multipart`).
+- **[README.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/code_source/ocr/README.md)** : Instructions de déploiement et de lancement uvicorn.
 
 ### 2. Connecteur Backend Laravel
 - **[VivierController.php](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement/app/Http/Controllers/Api/VivierController.php#L274-L340)** : Méthode `extractOcr($idCandidature)` transmettant le fichier CV du candidat par HTTP POST au microservice FastAPI (`http://127.0.0.1:8001/extract-cv`) avec système de fallback sécurisé.

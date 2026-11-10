@@ -1,6 +1,6 @@
 # Registre Central des Règles de Gestion Métier (Business Rules)
 
-Ce document répertorie l'ensemble des règles de gestion métier appliquées sur la plateforme de recrutement *recrutement_alpaCiment*.
+Ce document répertorie l'ensemble des règles de gestion métier appliquées sur la plateforme de recrutement *recrutement_alphaCiment*.
 
 ---
 

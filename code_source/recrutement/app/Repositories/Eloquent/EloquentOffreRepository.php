@@ -40,6 +40,9 @@ class EloquentOffreRepository implements OffreRepositoryInterface
             ->withCount('candidatures')
             ->when($filters['direction'] ?? null, fn ($query, int $direction) => $query->where('id_direction', $direction))
             ->when($filters['statut'] ?? null, fn ($query, int $statut) => $query->where('id_statut_offre', $statut))
+            // Archive = offres clôturées. 'only' : uniquement l'archive ; 'exclude' : tout sauf l'archive.
+            ->when(($filters['archivees'] ?? null) === 'only', fn ($query) => $query->where('id_statut_offre', $clotureeId))
+            ->when(($filters['archivees'] ?? null) === 'exclude', fn ($query) => $query->where('id_statut_offre', '!=', $clotureeId))
             ->when($filters['type_contrat'] ?? null, fn ($query, int $typeContrat) => $query->where('id_type_contrat', $typeContrat))
             ->when($filters['q'] ?? null, function ($query, string $search) use ($likeOp, $isPgsql): void {
                 $escSearch = addcslashes(trim($search), '%_\\');

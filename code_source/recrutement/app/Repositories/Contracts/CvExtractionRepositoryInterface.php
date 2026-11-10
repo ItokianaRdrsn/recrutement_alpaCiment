@@ -11,4 +11,5 @@ interface CvExtractionRepositoryInterface
     public function addExperience(int $candidatureId, array $attributes): void;
     public function addFormation(int $candidatureId, array $attributes): void;
     public function addProjet(int $candidatureId, array $attributes): void;
+    public function addAutre(int $candidatureId, array $attributes): void;
 }

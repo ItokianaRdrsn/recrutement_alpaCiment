@@ -1,6 +1,6 @@
 const backendUrl = (import.meta.env.VITE_BACKEND_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '');
 
-const AUTH_TOKEN_KEY = 'alpa_ciment_auth_token';
+const AUTH_TOKEN_KEY = 'alpha_ciment_auth_token';
 
 let redirectingToLogin = false;
 
@@ -112,6 +112,9 @@ export async function getCachedJson(url, ttlMs = 300000) {
 }
 
 export async function getJson(url) {
+    if (redirectingToLogin) {
+        return null;
+    }
     const fullUrl = url.startsWith('http') ? url : backendPath(url);
 
     // Déduplication des requêtes GET simultanées en vol (résout le double appel de React StrictMode)

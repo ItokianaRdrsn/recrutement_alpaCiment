@@ -1,4 +1,4 @@
-# Guide de Déploiement n8n sur Serveur Linux Ubuntu via SSH (AlpA Ciment)
+# Guide de Déploiement n8n sur Serveur Linux Ubuntu via SSH (Alpha Ciment)
 
 Ce guide répond aux questions opérationnelles essentielles pour faire tourner **n8n** sur un serveur distant **Ubuntu (22.04 LTS ou 24.04 LTS)** connecté en **SSH**, avec gestion complète de **l'envoi d'e-mails (SMTP)** et comparaison des modes d'hébergement web (serveur web intégré vs Nginx).
 
@@ -9,8 +9,8 @@ Ce guide répond aux questions opérationnelles essentielles pour faire tourner 
 > **RÉPONSE DIRECTE : NON, Nginx n'est absolument pas obligatoire !**  
 > n8n possède son propre **serveur web HTTP natif (Node.js/Express)**. Il est 100% autonome.
 
-### Pourquoi le serveur web intégré de n8n suffit largement pour AlpA Ciment :
-Dans le pipeline AlpA Ciment, n8n relève les candidatures via le nœud Gmail / IMAP en **mode scrutation (Polling / Pull)** : c'est n8n qui se connecte périodiquement aux serveurs de messagerie pour récupérer les e-mails. **Aucun service externe n'a besoin d'envoyer de webhook entrant en HTTPS vers n8n.**
+### Pourquoi le serveur web intégré de n8n suffit largement pour Alpha Ciment :
+Dans le pipeline Alpha Ciment, n8n relève les candidatures via le nœud Gmail / IMAP en **mode scrutation (Polling / Pull)** : c'est n8n qui se connecte périodiquement aux serveurs de messagerie pour récupérer les e-mails. **Aucun service externe n'a besoin d'envoyer de webhook entrant en HTTPS vers n8n.**
 
 Vous avez donc 2 méthodes très simples basées **exclusivement sur le serveur web intégré** :
 
@@ -18,7 +18,7 @@ Vous avez donc 2 méthodes très simples basées **exclusivement sur le serveur 
 | :--- | :---: | :---: | :--- | :--- |
 | **Méthode 1 : Direct IP (Recommandée début)** | ❌ Non | ❌ Non | `http://IP_DU_SERVEUR:5678` | Protégé par l'authentification login/mot de passe n8n |
 | **Méthode 2 : Tunnel SSH (Ultra-sécurisé)** | ❌ Non | ❌ Non | `http://localhost:5678` sur votre PC | **Chiffrement SSH total**, le port n'est même pas ouvert sur Internet |
-| **Méthode 3 : Nginx + SSL Certbot** | ✅ Oui | ✅ Oui | `https://n8n.alpaciment.mg` | Public avec certificat HTTPS (utile uniquement si webhook public externe requis) |
+| **Méthode 3 : Nginx + SSL Certbot** | ✅ Oui | ✅ Oui | `https://n8n.alphaciment.mg` | Public avec certificat HTTPS (utile uniquement si webhook public externe requis) |
 
 ---
 
@@ -31,7 +31,7 @@ Vous avez donc 2 méthodes très simples basées **exclusivement sur le serveur 
 * **Accès** : Utilisateur `sudo` et accès SSH
 
 ### B. Prérequis Indispensables pour l'Envoi d'E-mails (SMTP)
-Dans le workflow AlpA Ciment, 4 nœuds envoient des e-mails automatiques :
+Dans le workflow Alpha Ciment, 4 nœuds envoient des e-mails automatiques :
 - `5b. Reponse Info1` (Accusé de demande d'information)
 - `5d. Email CV Manquant1` (Alerte pièce jointe manquante au candidat)
 - `8b. Email CV Illisible1` (Alerte administrateur CV illisible)
@@ -46,10 +46,10 @@ Utilisez toujours l'un des deux ports sécurisés suivants :
 * **Port 465 avec SSL/TLS direct**
 
 #### 2. Configuration SMTP Gmail pour n8n
-Si vous envoyez les e-mails depuis une adresse Gmail (`recrutement@alpacement.mg` ou compte Gmail) :
+Si vous envoyez les e-mails depuis une adresse Gmail (`recrutement@alphaciment.mg` ou compte Gmail) :
 1. Activez l'**Authentification à deux facteurs (2FA)** sur le compte Google.
 2. Allez dans *Sécurité du compte Google* > *Mots de passe des applications*.
-3. Générez un mot de passe d'application nommé `n8n-alpaciment` (16 caractères, ex: `abcd efgh ijkl mnop`).
+3. Générez un mot de passe d'application nommé `n8n-alphaciment` (16 caractères, ex: `abcd efgh ijkl mnop`).
 4. Dans le nœud n8n `emailSend` (credential SMTP) :
    * **Host** : `smtp.gmail.com`
    * **Port** : `587`
@@ -88,8 +88,8 @@ sudo apt-get update && sudo apt-get install -y docker-ce docker-ce-cli container
 
 ### Étape 3 : Création du Dossier n8n
 ```bash
-sudo mkdir -p /opt/alpaciment/n8n && cd /opt/alpaciment/n8n
-sudo chown -R $USER:$USER /opt/alpaciment/n8n
+sudo mkdir -p /opt/alphaciment/n8n && cd /opt/alphaciment/n8n
+sudo chown -R $USER:$USER /opt/alphaciment/n8n
 ```
 
 ### Étape 4 : Fichier `docker-compose.yml` (Serveur Web Natif n8n)
@@ -98,7 +98,7 @@ Créez le fichier `docker-compose.yml` :
 services:
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
-    container_name: n8n_alpaciment
+    container_name: n8n_alphaciment
     restart: always
     ports:
       # Expose directement le serveur web intégré de n8n sur le port 5678
@@ -117,7 +117,7 @@ services:
 
 volumes:
   n8n_data:
-    name: alpaciment_n8n_data
+    name: alphaciment_n8n_data
 ```
 
 ### Étape 5 : Configuration du Pare-feu (UFW)

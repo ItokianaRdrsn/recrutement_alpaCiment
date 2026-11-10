@@ -1458,24 +1458,23 @@ class EloquentDashboardRepository implements DashboardRepositoryInterface
                     }
                 }
 
+                // Deux canaux affichés : les candidatures importées par le circuit n8n (« via site web »)
+                // et celles déposées directement par le candidat ou saisies par un RH (« via candidat »).
+                $viaSiteWeb = $emailN8n;
+                $viaCandidat = $siteWeb + $rhManuel;
+
                 $breakdown = [
                     [
-                        'canal' => 'Site Web (Candidats direct)',
+                        'canal' => 'Via site web',
                         'code' => 'site_web',
-                        'count' => $siteWeb,
-                        'pourcentage' => $total > 0 ? round(($siteWeb / $total) * 100, 1) : 0,
+                        'count' => $viaSiteWeb,
+                        'pourcentage' => $total > 0 ? round(($viaSiteWeb / $total) * 100, 1) : 0,
                     ],
                     [
-                        'canal' => 'E-mail Ingestion (n8n & IA)',
-                        'code' => 'email',
-                        'count' => $emailN8n,
-                        'pourcentage' => $total > 0 ? round(($emailN8n / $total) * 100, 1) : 0,
-                    ],
-                    [
-                        'canal' => 'Saisie Manuelle RH',
-                        'code' => 'rh_manuel',
-                        'count' => $rhManuel,
-                        'pourcentage' => $total > 0 ? round(($rhManuel / $total) * 100, 1) : 0,
+                        'canal' => 'Via candidat',
+                        'code' => 'candidat',
+                        'count' => $viaCandidat,
+                        'pourcentage' => $total > 0 ? round(($viaCandidat / $total) * 100, 1) : 0,
                     ],
                 ];
             }
@@ -1499,6 +1498,50 @@ class EloquentDashboardRepository implements DashboardRepositoryInterface
                     ->get();
 
                 foreach ($pending as $c) {
+                    $nom = $c->candidat ? trim("{$c->candidat->nom} {$c->candidat->prenom}") : 'Candidat inconnu';
+                    $intitule = $c->offre?->titre_poste ?: ($c->poste_souhaite ?: ($c->domaine?->nom_domaine ?: 'Candidature spontanée'));
+                    $joursAttente = $c->created_at ? Carbon::parse($c->created_at)->diffInDays(Carbon::now()) : 0;
+
+                    $list[] = [
+                        'id_candidature' => $c->id_candidature,
+                        'nom_complet' => $nom,
+                        'email' => $c->candidat?->email ?? '-',
+                        'intitule' => $intitule,
+                        'direction' => $c->offre?->direction?->nom_direction ?? 'Générale',
+                        'dans_vivier' => (bool) $c->dans_vivier,
+                        'jours_attente' => (int) $joursAttente,
+                        'date_depot' => $c->created_at ? Carbon::parse($c->created_at)->toIso8601String() : null,
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        return $list;
+    }
+
+    /**
+     * Dernières candidatures reçues qui n'ont pas encore été ouvertes par un recruteur
+     * (vue = false), de la plus récente à la plus ancienne.
+     */
+    public function getLatestUnseenCandidatures(array $filters = [], int $limit = 6): array
+    {
+        $list = [];
+        try {
+            if (Schema::hasTable('candidature')) {
+                $query = Candidature::query()
+                    ->where(function ($q) {
+                        $q->where('vue', false)->orWhereNull('vue');
+                    });
+
+                $this->applyCandidatureFilters($query, $filters);
+
+                $latest = $query
+                    ->with(['candidat', 'offre.direction', 'domaine'])
+                    ->orderByDesc('created_at')
+                    ->limit($limit)
+                    ->get();
+
+                foreach ($latest as $c) {
                     $nom = $c->candidat ? trim("{$c->candidat->nom} {$c->candidat->prenom}") : 'Candidat inconnu';
                     $intitule = $c->offre?->titre_poste ?: ($c->poste_souhaite ?: ($c->domaine?->nom_domaine ?: 'Candidature spontanée'));
                     $joursAttente = $c->created_at ? Carbon::parse($c->created_at)->diffInDays(Carbon::now()) : 0;

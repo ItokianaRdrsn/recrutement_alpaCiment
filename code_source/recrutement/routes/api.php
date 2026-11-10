@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes - Plateforme Recrutement AlpA Ciment
+| API Routes - Plateforme Recrutement Alpha Ciment
 |--------------------------------------------------------------------------
 | Convention RESTful :
 |  - Pluriel (/offres, /candidatures, /directions) pour les collections/listes.
@@ -37,6 +37,7 @@ Route::post('/logout', [SessionController::class, 'destroy'])
 Route::get('/public/offres', [OffreController::class, 'publicIndex'])->name('api.public.offres.index');
 Route::get('/public/offre/{offre}', [OffreController::class, 'publicShow'])->name('api.public.offre.show');
 Route::get('/public/offres/{offre}', [OffreController::class, 'publicShow']); // Alias
+Route::post('/public/competences/rapprocher', [CompetenceController::class, 'rapprocher'])->name('api.public.competences.rapprocher');
 
 Route::post('/public/offre/{id}/postuler', [CandidatureController::class, 'postulerOffre'])->name('api.public.offre.postuler');
 Route::post('/public/offres/{id}/postuler', [CandidatureController::class, 'postulerOffre']); // Alias
@@ -158,6 +159,10 @@ Route::middleware(['auth:sanctum', 'role:'.implode(',', UserRole::backOfficeValu
     Route::get('/candidature/{id}', [CandidatureController::class, 'show'])->name('api.candidature.show');
     Route::get('/candidatures/{id}', [CandidatureController::class, 'show']); // Alias
 
+    // Ajout d'un document à une candidature existante (CV à jour, lettre, diplôme, autre pièce)
+    Route::post('/candidature/{id}/documents', [\App\Http\Controllers\Api\DocumentController::class, 'store'])->name('api.candidature.documents.store');
+    Route::post('/candidatures/{id}/documents', [\App\Http\Controllers\Api\DocumentController::class, 'store']); // Alias
+
     Route::patch('/candidature/{id}/marquer-vue', [CandidatureController::class, 'marquerVue'])->name('api.candidature.marquer-vue');
     Route::patch('/candidatures/{id}/marquer-vue', [CandidatureController::class, 'marquerVue']); // Alias
 
@@ -166,6 +171,21 @@ Route::middleware(['auth:sanctum', 'role:'.implode(',', UserRole::backOfficeValu
 
     Route::patch('/candidature/{id}/vivier', [CandidatureController::class, 'updateVivierStatus'])->name('api.candidature.update-vivier');
     Route::patch('/candidatures/{id}/vivier', [CandidatureController::class, 'updateVivierStatus']); // Alias
+
+    // Rattachement d'une candidature à une offre d'emploi active
+    Route::post('/candidature/{id}/relier-offre', [CandidatureController::class, 'relierOffre'])->name('api.candidature.relier-offre');
+    Route::post('/candidatures/{id}/relier-offre', [CandidatureController::class, 'relierOffre']); // Alias
+
+    // --- CANDIDATS (Annuaire profils uniques) ---
+    Route::get('/candidats', [\App\Http\Controllers\Api\CandidatController::class, 'index'])->name('api.candidats.index');
+    // Doublons « doux » : déclarés AVANT /candidats/{id} pour ne pas être capturés par le paramètre
+    Route::get('/candidats/doublons', [\App\Http\Controllers\Api\CandidatController::class, 'doublons'])->name('api.candidats.doublons');
+    Route::get('/candidat/{id}/doublons', [\App\Http\Controllers\Api\CandidatController::class, 'doublonsDuCandidat'])->name('api.candidat.doublons');
+    Route::post('/candidat/{id}/fusionner', [\App\Http\Controllers\Api\CandidatController::class, 'fusionner'])->name('api.candidat.fusionner');
+    // RGPD : droit à l'effacement
+    Route::delete('/candidat/{id}/donnees', [\App\Http\Controllers\Api\CandidatController::class, 'effacer'])->name('api.candidat.effacer');
+    Route::get('/candidat/{id}', [\App\Http\Controllers\Api\CandidatController::class, 'show'])->name('api.candidat.show');
+    Route::get('/candidats/{id}', [\App\Http\Controllers\Api\CandidatController::class, 'show']); // Alias
 
     // OCR & Profile routes for candidature
     Route::post('/candidature/{id}/ocr/extract', [VivierController::class, 'extractOcr'])->name('api.candidature.ocr.extract');
@@ -188,6 +208,14 @@ Route::middleware(['auth:sanctum', 'role:'.implode(',', UserRole::backOfficeValu
 
     Route::post('/candidature/{idCandidature}/projets', [VivierController::class, 'addProjet'])->name('api.candidature.add-projet');
     Route::post('/candidatures/{idCandidature}/projets', [VivierController::class, 'addProjet']); // Alias
+
+    Route::post('/candidature/{idCandidature}/autres', [VivierController::class, 'addAutre'])->name('api.candidature.add-autre');
+    Route::post('/candidatures/{idCandidature}/autres', [VivierController::class, 'addAutre']); // Alias
+
+    // --- MATCHING CANDIDAT / OFFRE (Sprint 7) ---
+    Route::get('/candidature/{id}/matching', [\App\Http\Controllers\Api\MatchingController::class, 'candidature'])->name('api.candidature.matching');
+    Route::get('/offre/{id}/matching', [\App\Http\Controllers\Api\MatchingController::class, 'offre'])->name('api.offre.matching');
+    Route::post('/offre/{id}/matching/recalculer', [\App\Http\Controllers\Api\MatchingController::class, 'recalculer'])->name('api.offre.matching.recalculer');
 
     // --- VIVIER RH ---
     Route::get('/vivier', [VivierController::class, 'index'])->name('api.vivier.index');

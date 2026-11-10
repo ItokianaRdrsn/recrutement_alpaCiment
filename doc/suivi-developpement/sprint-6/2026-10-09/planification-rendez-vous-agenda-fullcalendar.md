@@ -10,7 +10,7 @@ Implémentation complète de la gestion des rendez-vous RH (tests techniques et 
 
 ## Pourquoi faire cela
 
-Dans le cadre du processus de recrutement AlpA Ciment, les recruteurs et managers doivent convoquer les candidats pré-sélectionnés à des tests d'évaluation et des entretiens d'embauche. Il est essentiel de :
+Dans le cadre du processus de recrutement Alpha Ciment, les recruteurs et managers doivent convoquer les candidats pré-sélectionnés à des tests d'évaluation et des entretiens d'embauche. Il est essentiel de :
 1. Offrir un agenda visuel et interactif (vues Mois, Semaine, Jour) permettant de visualiser immédiatement les disponibilités des recruteurs et les créneaux d'évaluation.
 2. Permettre la reprogrammation rapide par glisser-déposer (`eventDrop`) et ajustement de durée (`eventResize`).
 3. Intégrer la planification directement au sein de la fiche détaillée d'un candidat pour faciliter la transition du workflow (ex. passage au statut *Test technique* ou *Entretien*).

@@ -1,5 +1,5 @@
 # Guide d'Apprentissage & Mémo Technique pour la Soutenance
-## Plateforme de Recrutement AlpA Ciment : Architecture, Sécurité & Base de Données
+## Plateforme de Recrutement Alpha Ciment : Architecture, Sécurité & Base de Données
 
 Ce document constitue un **guide de référence technique et conceptuel** pour la rédaction de votre mémoire et la préparation aux questions du jury de soutenance. Il aborde en profondeur les choix d'architecture, la sécurité de l'API REST et les stratégies avancées de bases de données (PostgreSQL).
 
@@ -17,7 +17,7 @@ Ce document constitue un **guide de référence technique et conceptuel** pour l
 2. [Structure de Données : JSON vs JSONB dans PostgreSQL](#2-structure-de-données--json-vs-jsonb-dans-postgresql)
    - [Le point commun : L'évolution du schéma sans ALTER TABLE](#a-le-point-commun--lévolution-du-schéma-sans-alter-table)
    - [Les 3 différences fondamentales qui font la supériorité de JSONB](#b-les-3-différences-fondamentales-qui-font-la-supériorité-de-jsonb)
-   - [Application réelle dans AlpA Ciment : Audit Log et Extraction OCR](#c-application-réelle-dans-alpa-ciment--audit-log-et-extraction-ocr)
+   - [Application réelle dans Alpha Ciment : Audit Log et Extraction OCR](#c-application-réelle-dans-alpha-ciment--audit-log-et-extraction-ocr)
 3. [Stratégies d'Indexation en Base de Données](#3-stratégies-dindexation-en-base-de-données)
    - [Qu'est-ce qu'un index ? (L'analogie du livre)](#a-quest-ce-quun-index--lanalogie-du-livre)
    - [Les Index B-Tree : Clés étrangères et tris](#b-les-index-b-tree--clés-étrangères-et-tris)
@@ -131,7 +131,7 @@ Sur le plan de la **flexibilité du schéma**, `json` et `jsonb` permettent tous
 
 ### B. Les 3 différences fondamentales qui font la supériorité de JSONB
 
-| Fonctionnalité | `JSON` standard | `JSONB` (Binary JSON) — Choix AlpA Ciment |
+| Fonctionnalité | `JSON` standard | `JSONB` (Binary JSON) — Choix Alpha Ciment |
 | :--- | :--- | :--- |
 | **Format en base** | Texte brut (comme un simple `VARCHAR`) | Binaire hiérarchique pré-analysé et compressé |
 | **Parsing à la lecture** | Doit réanalyser toute la chaîne caractère par caractère à chaque `SELECT` | **Zéro parsing** : accès direct à l'offset mémoire de chaque clé |
@@ -139,7 +139,7 @@ Sur le plan de la **flexibilité du schéma**, `json` et `jsonb` permettent tous
 | **Opérateurs d'inclusion** | Non supportés | Supporte `@>` (*contient*), `?` (*existe*), `?|` (*ou*) |
 | **Vitesse de recherche** | $\mathcal{O}(N)$ sur la taille du texte | $\mathcal{O}(1)$ ou $\mathcal{O}(\log K)$ sur les clés indexées |
 
-### C. Application réelle dans AlpA Ciment : Audit Log et Extraction OCR
+### C. Application réelle dans Alpha Ciment : Audit Log et Extraction OCR
 
 1. **Table `audit_log`** :
    Colonnes `anciennes_valeurs` et `nouvelles_valeurs` typées en `JSONB`.
@@ -275,7 +275,7 @@ Permet à un recruteur de chercher `"electromecanicien"` et de trouver instantan
 
 ### A. Cycle de vie d'un appel réseau et centralisation (`client.js`)
 
-Plutôt que d'éparpiller des appels `fetch()` natifs non protégés à travers des dizaines de composants React, l'architecture d'AlpA Ciment repose sur une couche d'abstraction unifiée : `client.js`.
+Plutôt que d'éparpiller des appels `fetch()` natifs non protégés à travers des dizaines de composants React, l'architecture d'Alpha Ciment repose sur une couche d'abstraction unifiée : `client.js`.
 
 Cette couche résout automatiquement trois défis majeurs du découplage SPA (Single Page Application) :
 1. **L'injection automatique des en-têtes d'authentification** :
@@ -515,7 +515,7 @@ Le CV physique stocké passe ensuite dans le moteur d'extraction OCR et NER :
 
 ### E. Traçabilité & Conformité RH : Machine à états et Audit Log
 
-Dans une entreprise industrielle comme AlpA Ciment, chaque décision RH doit être auditable et irréfutable :
+Dans une entreprise industrielle comme Alpha Ciment, chaque décision RH doit être auditable et irréfutable :
 
 1. **Workflow de Statuts Horodaté (`historique_statut_candidature`)** :
    Chaque passage d'étape ($\text{Reçue} \rightarrow \text{Présélectionnée} \rightarrow \text{Entretien} \rightarrow \text{Retenue}$) enregistre l'identifiant du recruteur, la date exacte et un commentaire justificatif.

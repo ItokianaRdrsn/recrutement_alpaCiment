@@ -131,7 +131,7 @@ export function AuditLogsView() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
                 <div>
                     <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Activity size={22} className="text-primary" /> Journal d’Audit & Traçabilité RH
+                        <Activity size={22} className="text-primary" /> Journal d’Action & Traçabilité RH
                     </h2>
                     <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>
                         Historique immuable de toutes les actions sensibles effectuées par les recruteurs et administrateurs.

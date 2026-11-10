@@ -6,7 +6,6 @@ use App\Models\CandidatExperience;
 use App\Models\CandidatFormation;
 use App\Models\Candidature;
 use App\Models\CvExtractionOcr;
-use App\Models\VivierCandidat;
 use App\Repositories\Contracts\VivierRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -17,145 +16,7 @@ class EloquentVivierRepository implements VivierRepositoryInterface
 {
     public function getVivierEntries(array $filters): Collection
     {
-        $withRelations = ['candidat.candidatures.documents', 'direction', 'domaine'];
-        if (Schema::hasTable('cv_extraction_ocr')) {
-            $withRelations[] = 'candidat.candidatures.cvExtractionOcr';
-        }
-        $query = VivierCandidat::with($withRelations);
-
-        $search = !empty($filters['cv_keyword']) ? trim($filters['cv_keyword']) : (!empty($filters['q']) ? trim($filters['q']) : null);
-        $isPgsql = DB::getDriverName() === 'pgsql';
-        $likeOp = $isPgsql ? 'ILIKE' : 'like';
-        $hasTsvector = $isPgsql && Schema::hasColumn('document', 'recherche_texte');
-        $hasOcrTable = Schema::hasTable('cv_extraction_ocr');
-
-        if (!empty($search)) {
-            $escSearch = addcslashes($search, '%_\\');
-            $query->whereHas('candidat', function ($sub) use ($search, $escSearch, $likeOp, $hasTsvector, $hasOcrTable, $isPgsql) {
-                $sub->where(function ($w) use ($search, $escSearch, $likeOp, $hasTsvector, $hasOcrTable, $isPgsql) {
-                    if ($isPgsql) {
-                        $w->whereRaw('unaccent(nom) ILIKE unaccent(?)', ["%{$escSearch}%"])
-                            ->orWhereRaw('unaccent(prenom) ILIKE unaccent(?)', ["%{$escSearch}%"])
-                            ->orWhere('email', 'ILIKE', "%{$escSearch}%");
-                    } else {
-                        $w->where('nom', $likeOp, "%{$escSearch}%")
-                            ->orWhere('prenom', $likeOp, "%{$escSearch}%")
-                            ->orWhere('email', $likeOp, "%{$escSearch}%");
-                    }
-
-                    $w->orWhereHas('candidatures', function ($candQ) use ($search, $escSearch, $hasTsvector, $hasOcrTable, $likeOp, $isPgsql) {
-                        $candQ->where(function ($cq) use ($search, $escSearch, $hasTsvector, $hasOcrTable, $likeOp, $isPgsql) {
-                            if ($isPgsql) {
-                                $cq->whereRaw('unaccent(poste_souhaite) ILIKE unaccent(?)', ["%{$escSearch}%"]);
-                            } else {
-                                $cq->where('poste_souhaite', $likeOp, "%{$escSearch}%");
-                            }
-
-                            $cq->orWhereHas('documents', function ($docQ) use ($search, $escSearch, $hasTsvector, $likeOp, $isPgsql) {
-                                if ($hasTsvector) {
-                                    $docQ->whereRaw("recherche_texte @@ websearch_to_tsquery('french_unaccent', ?)", [$search]);
-                                } else {
-                                    if ($isPgsql) {
-                                        $docQ->whereRaw('unaccent(contenu_texte_extrait) ILIKE unaccent(?)', ["%{$escSearch}%"]);
-                                    } else {
-                                        $docQ->where('contenu_texte_extrait', $likeOp, "%{$escSearch}%");
-                                    }
-                                }
-                            });
-
-                            if ($hasOcrTable) {
-                                $cq->orWhereHas('cvExtractionOcr', function ($ocrQ) use ($escSearch, $likeOp, $isPgsql) {
-                                    if ($isPgsql) {
-                                        $ocrQ->whereRaw('unaccent(texte_brut_ocr) ILIKE unaccent(?)', ["%{$escSearch}%"]);
-                                    } else {
-                                        $ocrQ->where('texte_brut_ocr', $likeOp, "%{$escSearch}%");
-                                    }
-                                });
-                            }
-                        });
-                    });
-                });
-            });
-        }
-
-        if (!empty($filters['domaine_direction_only']) && !empty($filters['direction'])) {
-            $dirId = (int) $filters['direction'];
-            $query->where(function ($qDir) use ($dirId) {
-                $qDir->whereHas('domaine', function ($s) use ($dirId) {
-                    $s->where('id_direction', $dirId);
-                })->orWhere(function ($sub) use ($dirId) {
-                    $sub->whereNull('id_domaine')
-                        ->where('id_direction', $dirId);
-                });
-            });
-        } elseif (!empty($filters['direction'])) {
-            $dirId = (int) $filters['direction'];
-            $query->where(function ($qDir) use ($dirId) {
-                $qDir->where('id_direction', $dirId)
-                    ->orWhereHas('domaine', function ($s) use ($dirId) {
-                        $s->where('id_direction', $dirId);
-                    });
-            });
-        }
-
-        if (!empty($filters['domaine'])) {
-            $query->where('id_domaine', $filters['domaine']);
-        }
-
-        if (!empty($filters['statut'])) {
-            $query->where('statut', $filters['statut']);
-        }
-
-        $results = $query->orderByDesc('created_at')->get();
-
-        if (!empty($search)) {
-            $results->transform(function ($viv) use ($search) {
-                $snippet = null;
-                if ($viv->candidat && $viv->candidat->relationLoaded('candidatures')) {
-                    foreach ($viv->candidat->candidatures as $cand) {
-                        if ($cand->relationLoaded('documents')) {
-                            foreach ($cand->documents as $doc) {
-                                if (!empty($doc->contenu_texte_extrait)) {
-                                    $snippet = $this->generateSnippet($doc->contenu_texte_extrait, $search);
-                                    if ($snippet) {
-                                        break 2;
-                                    }
-                                }
-                            }
-                        }
-                        if (!$snippet && $cand->relationLoaded('cvExtractionOcr') && $cand->cvExtractionOcr) {
-                            $rawOcr = $cand->cvExtractionOcr->texte_brut_ocr;
-                            if (empty($rawOcr) && is_array($cand->cvExtractionOcr->donnees_json)) {
-                                $rawOcr = $cand->cvExtractionOcr->donnees_json['texte_brut'] ?? json_encode($cand->cvExtractionOcr->donnees_json);
-                            }
-                            if (!empty($rawOcr)) {
-                                $snippet = $this->generateSnippet($rawOcr, $search);
-                                if ($snippet) {
-                                    break;
-                                }
-                            }
-                        }
-                        if (!$snippet && !empty($cand->poste_souhaite)) {
-                            $snippet = $this->generateSnippet($cand->poste_souhaite, $search, 60);
-                            if ($snippet) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (!$snippet && $viv->candidat) {
-                    $fullCandName = trim(($viv->candidat->prenom ?? '') . ' ' . ($viv->candidat->nom ?? ''));
-                    if ($this->generateSnippet($fullCandName, $search, 40)) {
-                        $snippet = 'Candidat : ' . $fullCandName;
-                    }
-                }
-                $viv->cv_snippet = $snippet;
-                $viv->setAttribute('cv_snippet', $snippet);
-                return $viv;
-            });
-        }
-
-        return $results;
+        return new Collection();
     }
 
     public function getCandidaturesEnVivier(array $filters): Collection
@@ -282,19 +143,19 @@ class EloquentVivierRepository implements VivierRepositoryInterface
         return $results;
     }
 
-    public function findById(int $id): VivierCandidat
+    public function findById(int $id): ?Candidature
     {
-        return VivierCandidat::findOrFail($id);
+        return Candidature::find($id);
     }
 
-    public function updateOrCreate(array $matchAttributes, array $values): VivierCandidat
+    public function updateOrCreate(array $matchAttributes, array $values): ?Candidature
     {
-        return VivierCandidat::updateOrCreate($matchAttributes, $values);
+        return null;
     }
 
-    public function delete(VivierCandidat $vivier): bool
+    public function delete($vivier): bool
     {
-        return $vivier->delete();
+        return true;
     }
 
     public function getExperiencesByCandidature(int $idCandidature): Collection
@@ -309,6 +170,14 @@ class EloquentVivierRepository implements VivierRepositoryInterface
     {
         if (Schema::hasColumn('candidat_formation', 'id_candidature')) {
             return CandidatFormation::with('niveauRel')->where('id_candidature', $idCandidature)->orderByDesc('id_formation')->get();
+        }
+        return new Collection();
+    }
+
+    public function getAutresByCandidature(int $idCandidature): Collection
+    {
+        if (Schema::hasTable('candidat_autre')) {
+            return \App\Models\CandidatAutre::where('id_candidature', $idCandidature)->orderByDesc('id_autre')->get();
         }
         return new Collection();
     }
@@ -364,6 +233,11 @@ class EloquentVivierRepository implements VivierRepositoryInterface
     public function createProjet(array $attributes): \App\Models\CandidatProjet
     {
         return \App\Models\CandidatProjet::create($attributes);
+    }
+
+    public function createAutre(array $attributes): \App\Models\CandidatAutre
+    {
+        return \App\Models\CandidatAutre::create($attributes);
     }
 
     public function getExtractionOcrByCandidature(int $idCandidature): ?CvExtractionOcr

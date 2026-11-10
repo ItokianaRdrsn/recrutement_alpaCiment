@@ -22,7 +22,7 @@ from config import (
     OLLAMA_URL,
 )
 
-logger = logging.getLogger("AlpaCimentOCR.ollama")
+logger = logging.getLogger("AlphaCimentOCR.ollama")
 
 # Sémaphore limitant la concurrence d'appels LLM (Qwen 7B est lourd en mémoire VRAM/RAM)
 _ollama_semaphore = threading.Semaphore(max(1, OLLAMA_CONCURRENCY))

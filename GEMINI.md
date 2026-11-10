@@ -1,4 +1,4 @@
-# Directives d'Espace de Travail & Méthodologie Obligatoire (AlpA Ciment)
+# Directives d'Espace de Travail & Méthodologie Obligatoire (Alpha Ciment)
 
 > **RÈGLE PERMANENTE & PRIORITAIRE** : Ces instructions sont automatiquement chargées par Antigravity à chaque prompt et session. Elles doivent être appliquées strictement sans omission.
 
@@ -6,7 +6,7 @@
 
 ## 1. Référence Méthodologique Fondamentale
 Avant toute intervention, l'assistant doit impérativement respecter les règles définies dans :
-👉 [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/methodologie.md)
+👉 [`doc/suivi-developpement/methodologie.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/methodologie.md)
 
 ---
 
@@ -46,6 +46,6 @@ Avant toute intervention, l'assistant doit impérativement respecter les règles
    - Concurrence maîtrisée (sémaphores), gestion des timeouts et détection de troncature de tokens.
    - Validation stricte des formats et typage Pydantic (`schemas.py`).
 4. **Intégrité de la Base de Données & Documentation** :
-   - Toute modification de schéma SQL doit être répercutée immédiatement dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
-   - Tenue à jour cumulative du document de suivi [`doc/suivi-developpement/doc-suivi-etape.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/doc-suivi-etape.md).
-   - Mise à jour du catalogue des services [`doc/suivi-developpement/catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/catalogue-services.md).
+   - Toute modification de schéma SQL doit être répercutée immédiatement dans [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql).
+   - Tenue à jour cumulative du document de suivi [`doc/suivi-developpement/doc-suivi-etape.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/doc-suivi-etape.md).
+   - Mise à jour du catalogue des services [`doc/suivi-developpement/catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/catalogue-services.md).

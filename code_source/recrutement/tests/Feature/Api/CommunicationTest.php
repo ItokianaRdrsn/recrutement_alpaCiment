@@ -121,7 +121,7 @@ class CommunicationTest extends TestCase
 
         $this->rhUser = User::create([
             'nom' => 'RH Test Communication',
-            'email' => 'rh.test.comm@alpaciment.mg',
+            'email' => 'rh.test.comm@alphaciment.mg',
             'role' => 'rh',
         ]);
     }

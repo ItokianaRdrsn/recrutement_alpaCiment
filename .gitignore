@@ -28,3 +28,5 @@ credentials.json
 # Test Datasets & CV de test (Données personnelles anonymisées)
 cv_tests/
 */cv_tests/
+
+code_source/recrutement/resultat-tests.txt

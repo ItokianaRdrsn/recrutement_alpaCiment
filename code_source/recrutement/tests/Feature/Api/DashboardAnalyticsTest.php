@@ -207,7 +207,7 @@ class DashboardAnalyticsTest extends TestCase
         // Utilisateur RH
         $this->rhUser = User::create([
             'nom' => 'rh_test',
-            'email' => 'rh@alpaciment.local',
+            'email' => 'rh@alphaciment.local',
             'role' => 'rh',
             'mot_de_passe' => bcrypt('password'),
         ]);
@@ -237,6 +237,7 @@ class DashboardAnalyticsTest extends TestCase
                     'repartition_directions',
                     'repartition_canaux',
                     'candidatures_a_traiter',
+                    'dernieres_candidatures',
                     'offres_recentes',
                 ],
             ]);
@@ -263,6 +264,9 @@ class DashboardAnalyticsTest extends TestCase
         // Vérification candidatures à traiter
         $this->assertNotEmpty($data['candidatures_a_traiter']);
         $this->assertEquals('Andria Haja', $data['candidatures_a_traiter'][0]['nom_complet']);
+
+        // Dernières candidatures non vues : la plus récente d'abord
+        $this->assertIsArray($data['dernieres_candidatures']);
     }
 
     public function test_dashboard_filters_by_direction(): void
@@ -285,8 +289,13 @@ class DashboardAnalyticsTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json('data');
 
-        // Les 3 candidatures ont été créées dans le mois en cours
-        $this->assertEquals(3, $data['kpis']['total_candidatures']);
+        // Les candidatures du jeu de test datent de now() moins 2, 5 et 10 jours : selon le jour du mois,
+        // certaines tombent dans le mois précédent (ex. le 9, « moins 10 jours » = fin du mois dernier).
+        $attendu = collect([2, 5, 10])
+            ->filter(fn (int $jours) => now()->subDays($jours)->gte(now()->startOfMonth()))
+            ->count();
+
+        $this->assertEquals($attendu, $data['kpis']['total_candidatures']);
     }
 
     public function test_dashboard_filters_by_direct_dates_and_adapts_trend_curve_to_period(): void

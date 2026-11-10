@@ -1,247 +1,297 @@
 # Chapitre 2 : Réalisation de l’Application
 
-Ce chapitre constitue le cœur technique du mémoire. Il détaille la démarche d'ingénierie logicielle suivie pour concrétiser la plateforme AlpA Ciment : modélisation rigoureuse des données, développement modulaire selon la Clean Architecture, métriques du code, mise en place des algorithmes d'IA et de recherche plein texte, et retour d'expérience approfondi sur les défis techniques résolus.
+Ce chapitre constitue le cœur technique du mémoire. Il détaille la démarche d'ingénierie logicielle suivie pour concevoir et implémenter la plateforme de recrutement d'Alpha Ciment : modélisation rigoureuse des données, développement modulaire selon la Clean Architecture, métriques logicielles du code source, mise en œuvre des algorithmes de vision et de recherche plein texte, et retour d'expérience approfondi sur les défis techniques résolus.
 
 ---
 
 ## 2.1 Analyse et Conception
 
-### 2.1.1 Analyse de l'Existant et Besoins Métiers
-Avant le développement de la plateforme, le processus de recrutement d'AlpA Ciment souffrait de la dispersion de ses données sur des fichiers tableurs (Excel) et des boîtes e-mails individuelles. Les fiches de poste étaient hétérogènes, et la qualification d'un candidat dépendait de notes volantes.
+La réalisation de notre application s'est articulée autour de trois grandes phases méthodologiques :
+1. **L'analyse de l'existant** pour diagnostiquer les goulets d'étranglement organisationnels et formaliser les besoins métiers des recruteurs d'Alpha Ciment ;
+2. **La conception architecturale et fonctionnelle** afin de modéliser la structure ergonomique (wireframes), le modèle de données relationnel et les patrons de conception logiciels ;
+3. **Le développement par composants** en appliquant une stricte séparation des responsabilités.
 
-L'analyse du cahier des charges a conduit à définir **trois impératifs fonctionnels** :
-1. **Unification des flux de candidature** : Distinguer formellement les candidatures répondant à une offre publiée (direction $\rightarrow$ offre $\rightarrow$ profil) et les candidatures spontanées (direction $\rightarrow$ domaine d'activité), tout en conservant une fiche candidat unique et pérenne.
-2. **Pérennisation du vivier de talents** : Permettre à tout moment de marquer une candidature comme appartenant au vivier (`dans_vivier = true`), quel que soit son statut dans le pipeline, afin qu'elle puisse être recontactée lors d'un besoin futur.
-3. **Zéro trigger en base de données (Choix d'Architecture Assumé)** :
-   Contrairement aux systèmes utilisant des déclencheurs SQL (triggers) opaques et difficiles à déboguer, il a été délibérément acté que **100% des règles de gestion, vérifications de cohérence et calculs dérivés soient pris en charge par le code applicatif** (couche *Service* de Laravel). Ce choix garantit :
-   * Une prévisibilité absolue du comportement système.
-   * La traçabilité intégrale dans le code source versionné sous Git.
-   * La possibilité de tester unitairement et d'automatiser les tests de non-régression sans dépendre d'effets de bord cachés en base.
+### 2.1.1 Analyse de l'Existant
+
+Avant l'engagement de ce projet, les opérations de recrutement au sein d'Alpha Ciment étaient réparties de façon hétérogène entre plusieurs outils non interconnectés :
+* **Réception dispersée des dossiers** : Les candidatures arrivaient soit sous forme de dossiers papier remis en mains propres aux postes de garde des usines d'Ibity et Tamatave, soit par e-mails envoyés directement aux adresses individuelles des responsables RH au siège de Tsaralalàna.
+* **Suivi manuel sur fichiers tableurs (Excel)** : Les chargés de recrutement tenaient des listes séparées sur tableurs pour noter les coordonnées des candidats. Cette dispersion entraînait de fréquentes redondances de saisie, des risques d'écrasement de données et une absence totale de centralisation.
+* **Perte irrémédiable des profils qualifiés** : Dès lors qu'un recrutement était clôturé, l'ensemble des candidats présélectionnés mais non retenus pour le poste final était classé dans des archives inaccessibles. Lorsqu'un besoin analogue se présentait quelques mois plus tard, le service RH ne disposait d'aucun moyen de retrouver ces compétences, imposant la publication d'une nouvelle offre coûteuse.
+* **Absence d'historique et de traçabilité** : Aucune trace immuable ne permettait de vérifier quel recruteur avait convoqué un candidat, à quelle date un entretien s'était tenu, ou quel motif précis avait justifié le refus d'une candidature.
+
+Face à ce constat, la conception d'une plateforme web centralisée, capable de fédérer les dépôts en ligne et les dépôts papier, d'automatiser l'extraction documentaire et de bâtir un Vivier de Talents permanent, est devenue une nécessité opérationnelle absolue.
 
 ---
 
-### 2.1.2 Modélisation Conceptuelle des Données (MCD & MLD)
+### 2.1.2 Conception de l'Application
 
-La base de données repose sur un schéma relationnel de **22 tables interconnectées** garantissant l'intégrité référentielle et la traçabilité complète des opérations.
+La conception constitue une étape fondamentale préalable à tout codage. Elle garantit que l'architecture logicielle réponde avec précision aux exigences de l'entreprise tout en évitant les refontes structurelles coûteuses.
+
+#### 2.1.2.1 Conception Affichage et Wireframing
+
+La conception de l'affichage permet de définir l'ergonomie, la hiérarchie visuelle et la navigation des utilisateurs avant le développement React. Elle a été réalisée à l'aide de l'outil de maquettage open-source **Pencil**.
+
+L'application web est structurée autour de **14 interfaces principales** :
+1. Page de connexion administrateur et recruteur RH.
+2. Portail public de consultation des offres d'emploi disponibles.
+3. Formulaire public de candidature sur offre.
+4. Formulaire public de candidature spontanée catégorisée.
+5. Tableau de bord décisionnel RH (KPIs et statistiques graphiques).
+6. Module de gestion des référentiels (Directions, Domaines, Compétences).
+7. Formulaire de création et paramétrage d'une offre d'emploi.
+8. Liste de pilotage des offres publiées et clôturées.
+9. Guichet de saisie manuelle RH pour les dossiers papier de l'usine.
+10. Pipeline global de sélection RH (tableau de bord des statuts).
+11. Fiche Candidat 360° avec visualiseur direct de CV PDF.
+12. Interface de validation humaine de l'OCR (*Human-in-the-Loop*).
+13. Moteur de recherche multicritère du Vivier de Talents.
+14. Agenda interactif de planification des entretiens (FullCalendar).
+
+```
+ ┌────────────────────────────────────────────────────────────────────────┐
+ │                          MAQUETTE PENCIL (Extrait)                     │
+ │ ┌───────────────────────────────────┬────────────────────────────────┐ │
+ │ │ [Alpha Ciment] - Vivier de Talents│ Connecté : Recruteur RH (Site) │ │
+ │ ├───────────────────────────────────┴────────────────────────────────┤ │
+ │ │ Filtres : [Direction: Usine ▼] [Domaine: Maintenance ▼] [FTS: ....]│ │
+ │ ├────────────────────────────────────────────────────────────────────┤ │
+ │ │ Candidat        │ Compétences clés           │ Statut   │ Action   │ │
+ │ │ Jean R.         │ Électromécanique, Haute T. │ Vivier   │ [Voir]   │ │
+ │ │ Sarah M.        │ Chimie industrielle, ISO   │ Entretien│ [Voir]   │ │
+ │ └────────────────────────────────────────────────────────────────────┘ │
+ └────────────────────────────────────────────────────────────────────────┘
+```
+*Figure 4 : Extrait de la conception de l'interface utilisateur avec Pencil*
+
+---
+
+#### 2.1.2.2 Conception Base de Données (MCD, MLD et Schéma Conceptuel des Vues)
+
+La base de données relationnelle a été modélisée pour garantir une intégrité référentielle stricte (3FN) tout en supportant les volumes massifs de texte générés par la reconnaissance optique. Elle est structurée autour de **22 tables interconnectées** et enrichie de vues analytiques optimisées.
 
 ```
                     MODÈLE CONCEPTUEL DES DONNÉES (MCD SIMPLIFIÉ)
- 
-  ┌──────────────┐          1,n ┌──────────────┐ 0,n          0,n ┌──────────────┐
-  │  DIRECTION   │◄─────────────┤    OFFRE     ├─────────────────►│  COMPETENCE  │
-  └──────┬───────┘              └──────┬───────┘                  └──────┬───────┘
-         │ 1,n                         │ 0,n                             │ 0,n
-         ▼                             ▼                                 ▼
-  ┌──────────────┐ 0,n          1,1 ┌──────────────┐              ┌──────────────┐
-  │   DOMAINE    │◄─────────────┤ CANDIDATURE  │              │   CANDIDAT   │
-  └──────────────┘              └──────┬───────┘              │  COMPETENCE  │
-                                       │ 1,1                  └──────▲───────┘
-                                       ▼                             │ 0,n
-                                ┌──────────────┐ 1,1          1,n ┌──┴───────────┐
-                                │   CANDIDAT   │◄─────────────────┤   CANDIDAT   │
-                                └──────────────┘                  └──────────────┘
-                                       │ 1,n
-                     ┌─────────────────┼─────────────────┐
-                     ▼                 ▼                 ▼
-              ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-              │  DOCUMENTS   │  │ RENDEZ-VOUS  │  │COMMUNICATION │
-              │  (CV / OCR)  │  │(Entretiens)  │  │  (Historique)│
-              └──────────────┘  └──────────────┘  └──────────────┘
+  
+   ┌──────────────┐          1,n ┌──────────────┐ 0,n          0,n ┌──────────────┐
+   │  DIRECTION   │◄─────────────┤    OFFRE     ├─────────────────►│  COMPETENCE  │
+   └──────┬───────┘              └──────┬───────┘                  └──────┬───────┘
+          │ 1,n                         │ 0,n                             │ 0,n
+          ▼                             ▼                                 ▼
+   ┌──────────────┐ 0,n          1,1 ┌──────────────┐              ┌──────────────┐
+   │   DOMAINE    │◄─────────────┤ CANDIDATURE  │              │   CANDIDAT   │
+   └──────────────┘              └──────┬───────┘              │  COMPETENCE  │
+                                        │ 1,1                  └──────▲───────┘
+                                        ▼                             │ 0,n
+                                 ┌──────────────┐ 1,1          1,n ┌──┴───────────┐
+                                 │   CANDIDAT   │◄─────────────────┤   CANDIDAT   │
+                                 └──────────────┘                  └──────────────┘
+                                        │ 1,n
+                      ┌─────────────────┼─────────────────┐
+                      ▼                 ▼                 ▼
+               ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+               │  DOCUMENTS   │  │ RENDEZ-VOUS  │  │COMMUNICATION │
+               │  (CV / OCR)  │  │(Entretiens)  │  │  (Historique)│
+               └──────────────┘  └──────────────┘  └──────────────┘
 ```
+*Figure 5 : Modèle Conceptuel des Données (MCD)*
 
-#### Modèle Logique de Données (MLD — Extrait des relations maîtresses) :
-* **`direction`** (`id_direction` PK, `nom_direction`)
-* **`domaine`** (`id_domaine` PK, `#id_direction` FK, `nom_domaine`, `valide`, `valide_par`, `date_validation`)
-* **`candidat`** (`id_candidat` PK, `nom`, `prenom`, `email` UNIQUE, `telephone`, `ville`, `created_at`)
-* **`offre`** (`id_offre` PK, `#id_direction` FK, `titre_poste`, `description`, `lieu`, `date_publication`, `date_cloture`, `#id_statut_offre` FK)
-* **`candidature`** (`id_candidature` PK, `#id_candidat` FK, `#id_offre` FK (nullable), `#id_domaine` FK (nullable), `poste_souhaite`, `#id_statut_candidature` FK, `dans_vivier`, `canal_depot`, `created_at`)
-* **`document`** (`id_document` PK, `#id_candidature` FK, `nom_fichier`, `chemin_fichier`, `type_document`, `contenu_texte_extrait`, `recherche_texte` tsvector)
-* **`cv_extraction_ocr`** (`id_extraction` PK, `#id_document` FK, `donnees_json` JSONB, `statut_validation`, `valide_par`)
-* **`rendez_vous`** (`id_rendez_vous` PK, `#id_candidature` FK, `#id_utilisateur` FK, `date_heure`, `#id_type_rdv` FK, `#id_statut_rdv` FK, `lieu_ou_lien`)
-* **`communication`** (`id_communication` PK, `#id_candidature` FK, `#id_utilisateur` FK, `sujet`, `contenu_corps_copie`, `date_envoi`)
-* **`audit_log`** (`id_log` PK, `#id_utilisateur` FK, `action`, `entite_type`, `entite_id`, `details_json` JSONB, `created_at`)
+#### Les 22 Tables de la Base de Données (MPD) :
+1. `utilisateurs` : Comptes des recruteurs et administrateurs RH.
+2. `roles` : Rôles du système (Administrateur RH, Recruteur, Observateur).
+3. `utilisateur_role` : Association utilisateur-rôle.
+4. `directions` : Directions de l'entreprise (Usine Ibity, Usine Tamatave, Siège Tsaralalàna, Direction Financière, etc.).
+5. `domaines` : Domaines d'activité rattachés à chaque direction.
+6. `statuts_offre` : Statuts d'une offre (Brouillon, Publiée, Clôturée).
+7. `offres` : Fiches de poste publiées avec missions et prérequis.
+8. `competences` : Référentiel des compétences techniques et comportementales.
+9. `offre_competence` : Compétences requises pour chaque offre.
+10. `candidats` : Dossier individuel identifié de façon unique par son e-mail.
+11. `statuts_candidature` : Les 6 statuts normalisés du pipeline RH.
+12. `candidatures` : Postulations rattachées soit à une offre, soit spontanées.
+13. `candidat_competence` : Compétences validées attribuées au candidat.
+14. `documents` : Fichiers téléversés (CV, lettre, scans) avec vecteur `recherche_texte`.
+15. `cv_extractions_ocr` : Données brutes JSONB extraites par FastAPI.
+16. `historique_statuts_candidature` : Piste d'audit des changements d'états.
+17. `types_rendez_vous` : Catégories de rendez-vous (Entretien RH, Test Technique, Visio).
+18. `statuts_rendez_vous` : États des convocations (Planifié, Confirmé, Effectué, Annulé).
+19. `rendez_vous` : Événements d'agenda liant candidat, recruteur, date et lieu.
+20. `modeles_emails` : Modèles d'emails personnalisables avec balises dynamiques.
+21. `communications` : Copie immuable de chaque courriel expédié au candidat.
+22. `audit_logs` : Journal d'audit horodaté des actions sensibles du système.
+
+*Figure 6 : Modèle Physique des Données (MPD - 22 tables)*
+
+#### Schéma Conceptuel des Vues SQL :
+Pour alléger les requêtes du tableau de bord et du moteur de recherche du Vivier, des vues SQL spécialisées ont été mises en œuvre :
+* `v_candidatures_synthese` : Consolide les informations du candidat, de son offre, de sa direction et de son dernier statut à jour.
+* `v_vivier_talents` : Filtre l'ensemble des candidats dont l'indicateur `dans_vivier = true`, regroupant leurs compétences sous forme de tableau agrégé (`array_agg`) et leur dernier document textuel indexé.
+* `v_stats_mensuelles_recrutement` : Calcule les agrégats mensuels de candidatures reçues, de taux de conversion et de délais moyens d'évaluation.
+
+*Figure 7 : Schéma conceptuel des Vues SQL analytiques*
 
 ---
 
-### 2.1.3 Métriques de Conception et Structure Logicielle
+#### 2.1.2.3 Conception Métiers et Métriques Logicielles
 
-L'application respecte les standards de la Clean Architecture. Le code est rigoureusement ventilé selon les métriques suivantes :
+Conformément aux principes de la Clean Architecture, 100% de la logique métier réside dans la couche applicative de Laravel, sans recourir à des triggers masqués en base de données.
 
-| Composant Architectural | Nombre | Rôle et Responsabilité |
+### Tableau 9 : Métriques logicielles et volumétrie du code du projet
+
+| Composant Architectural | Nombre Réalisé | Responsabilité et Description |
 | :--- | :---: | :--- |
-| **Tables de Base de Données (PostgreSQL)** | **22** | Modèle relationnel 3FN avec colonnes JSONB et tsvector |
-| **Modèles Eloquent (ORM Laravel)** | **20** | Représentation objet des entités et déclaration des relations |
-| **Contrôleurs d'API (Thin Controllers)** | **14** | Aiguillage HTTP REST, délégation stricte aux services |
-| **FormRequests (Validation HTTP)** | **18** | Validation stricte des types de données et règles d'entrée |
-| **Services Métiers (Couche Application)** | **12** | Centralisation 100% de la logique métier et transactions |
-| **Repositories (Abstraction Données)** | **10** | Requêtage optimisé PostgreSQL, isolation de la persistance |
-| **API Resources (DTOs JSON)** | **16** | Normalisation des réponses JSON pour le client React |
-| **Vues & Pages React (SPA)** | **14** | Interfaces écrans modulaires (Tableaux, Fiches, Calendrier) |
-| **Composants Réutilisables React** | **35+** | Modales, badges de statut, formulaires, visualiseur de CV |
-| **Tests Automatisés (PHPUnit / Pest)** | **37** | Couverture de 194 assertions sur les cas nominaux et limites |
+| **Tables de Base de Données (PostgreSQL)** | **22** | Modèle 3FN avec types JSONB et vecteurs tsvector |
+| **Modèles Eloquent (ORM Laravel)** | **20** | Entités de données et relations objet |
+| **Contrôleurs REST (Thin Controllers)** | **14** | Aiguillage HTTP REST sans logique métier |
+| **FormRequests (Validation HTTP)** | **18** | Validation stricte des données entrantes |
+| **Services Métiers (Couche Application)** | **12** | Logique applicative, workflows et transactions `DB::transaction` |
+| **Repositories (Abstraction SGBD)** | **10** | Requêtes SQL optimisées et isolation de la persistance |
+| **API Resources (DTOs JSON)** | **16** | Sérialisation normalisée des réponses pour React |
+| **Pages & Vues Principales (React SPA)** | **14** | Écrans riches et responsives |
+| **Composants Réutilisables React** | **35+** | Modales, badges, cartes, visualiseur de CV |
+| **Tests Automatisés (PHPUnit)** | **37** | Couverture intégrale de 194 assertions réussies |
 
 ---
 
-## 2.2 Développement par Module Fonctionnel
+## 2.2 Développement par Fonctionnalité ou Module
 
-### 2.2.1 Module 1 : Authentification, Sécurité et Journalisation
+### 2.2.1 Gestion des Référentiels et Paramètres
 
-#### A. Description
-Ce module assure la protection des données sensibles (dossiers des candidats, salaires souhaités, évaluations d'entretiens) et gère le contrôle d'accès basé sur les rôles (RBAC).
+Cette fonctionnalité assure la gestion administrative des structures d'Alpha Ciment : création des Directions (Usine, Siège, Supply Chain), des Domaines d'activité rattachés, et du catalogue des Compétences.
 
-#### B. Fonctionnalités Clés
-* Authentification sécurisée par jetons d'API (Laravel Sanctum).
-* Gestion des rôles utilisateurs : Administrateur RH, Chargé de recrutement, Manager opérationnel.
-* Déconnexion sécurisée et révocation dynamique des tokens.
-* **Journal d'Audit immuable (`audit_logs`)** : Chaque opération sensible (changement de statut d'un candidat, convocation à un entretien, suppression d'un document) est tracée avec l'identifiant de l'auteur, l'adresse IP, l'horodatage et un instantané JSON des valeurs avant/après modification.
+Le responsable RH renseigne un code et un libellé. Dès la saisie validée, un popup modal de confirmation s'affiche demandant la validation de l'opération afin d'éviter toute insertion accidentelle dans le référentiel d'entreprise.
 
-#### C. Choix d'Implémentation Technique
-* **Hachage des mots de passe par BCrypt** avec facteur de coût adaptatif.
+*Figure 8 : Formulaire d'insertion d'une direction et d'un domaine d'activité*  
+*Figure 9 : Popup de validation et confirmation d'enregistrement*
+
+---
+
+### 2.2.2 Gestion des Offres de Recrutement
+
+Ce module permet de rédiger et publier les avis de recrutement pour l'usine ou les bureaux. Le recruteur renseigne l'intitulé du poste, la direction de rattachement, le lieu de travail (Ibity, Tamatave ou Tsaralalàna), la description des missions, le niveau d'études minimal et les compétences techniques attendues.
+
+L'offre transite selon une machine à états stricte :
+$$\text{Brouillon} \longrightarrow \text{Publiée} \longrightarrow \text{Clôturée}$$
+
+*Figure 10 : Formulaire de création et paramétrage d'une offre d'emploi*  
+*Figure 11 : Liste des offres avec statuts de publication*
+
+---
+
+### 2.2.3 Portail Candidat et Dépôt Multi-Canal
+
+Le portail d'acquisition permet de capter les candidatures à travers trois canaux distincts :
+1. **Postulation en ligne sur une offre publiée** : Formulaire interactif permettant au candidat de renseigner ses coordonnées et de téléverser son CV (PDF ou image).
+2. **Candidature spontanée** : Le candidat choisit sa direction et son domaine de prédilection.
+3. **Guichet de saisie manuelle RH (Site Usine)** : Interface réservée aux recruteurs pour numériser et saisir les dossiers déposés physiquement aux portes des usines, en attribuant la mention `canal_depot = 'rh_manuel'`.
+
+**Algorithme de dédoublonnage automatique** : Dès la soumission, le système vérifie si l'adresse e-mail existe déjà dans la table `candidats`. Si le candidat est connu, la nouvelle candidature est automatiquement rattachée à son profil existant, évitant ainsi la prolifération de dossiers multiples.
+
+*Figure 12 : Portail public de dépôt de candidature en ligne*  
+*Figure 13 : Formulaire de saisie manuelle RH (Guichet Usine)*
+
+---
+
+### 2.2.4 Pipeline RH et Fiche Candidat 360°
+
+Le pipeline RH permet aux équipes de recrutement de suivre visuellement la progression de chaque dossier à travers six étapes normalisées :
+$$\text{Reçue} \longrightarrow \text{Présélectionnée} \longrightarrow \text{Test Technique} \longrightarrow \text{Entretien} \longrightarrow \begin{cases} \text{Retenue (Embauche)} \\ \text{Non retenue} \end{cases}$$
+
+Chaque changement de statut exige un commentaire obligatoire et horodate l'identité du recruteur dans `historique_statuts_candidature`.
+
+La **Fiche Candidat 360°** centralise l'intégralité des données en un seul écran :
+* État civil, téléphone et adresse vérifiés ;
+* **Visualiseur direct de CV** permettant de lire le document PDF dans l'interface sans téléchargement ;
+* Chronologie des étapes passées et motifs des décisions ;
+* Historique des rendez-vous et des courriels adressés ;
+* Bouton d'action directe pour basculer le profil dans le Vivier de Talents (`dans_vivier = true`).
+
+*Figure 14 : Pipeline de sélection RH et tableau de suivi des statuts*  
+*Figure 15 : Fiche Candidat 360° avec aperçu direct du CV*
+
+---
+
+### 2.2.5 Microservice OCR, Extraction IA et Validation RH (*Human-in-the-Loop*)
+
+Ce module automatise l'analyse des pièces jointes pour alimenter la base de données sans obliger le recruteur à tout ressaisir manuellement :
+1. Le fichier téléversé est transmis via une requête HTTP asynchrone au microservice **FastAPI** (port 8001).
+2. Le moteur de vision **PaddleOCR (PP-OCRv4)** détecte l'orientation de la page et extrait les blocs textuels.
+3. Le module NLP (**spaCy** et **RapidFuzz**) identifie les sections clés (Formations, Expériences) et confronte les mots extraits au référentiel officiel des compétences de l'entreprise via une distance de Levenshtein optimisée.
+4. Les données structurées sont renvoyées sous forme d'un objet JSON stocké dans la table `cv_extractions_ocr`.
+5. **Principe Human-in-the-Loop** : L'écran RH affiche les données pré-remplies en vis-à-vis du document original. Le recruteur valide ou corrige chaque champ avant d'enregistrer définitivement les informations en base.
+
+*Figure 16 : Écran d'extraction OCR et interface de validation humaine*
+
+---
+
+### 2.2.6 Vivier de Talents et Moteur de Recherche Plein Texte
+
+Le Vivier de Talents est la base documentaire de tous les profils qualifiés conservés pour les futurs recrutements d'Alpha Ciment.
+
+Il dispose d'un moteur de recherche à deux niveaux :
+* **Filtrage multicritère relationnel** : Recherche combinée par Direction, Domaine, Niveau d'études et Compétences requises (avec opérateur booléen ET ou OU).
+* **Recherche Plein Texte (FTS) instantanée dans le texte des CVs** : Exploitation de la colonne `recherche_texte tsvector` sous PostgreSQL indexée par un index inversé généralisé `GIN`. L'extension `french_unaccent` garantit qu'une recherche sur `"mecanicien"` renvoie immédiatement les CVs contenant `"mécanicien"`, `"Mécanicien"` ou `"MÉCANICIEN"`.
+* **Affichage de l'Extrait Contextuel (`cv_snippet`)** : L'interface affiche en temps réel la phrase exacte du CV où le mot-clé a été trouvé, entouré de ses mots voisins en surbrillance.
+
+*Figure 17 : Moteur de recherche multicritère du Vivier de Talents*  
+*Figure 18 : Affichage d'un résultat avec extrait contextuel surligné (cv_snippet)*
+
+---
+
+### 2.2.7 Planification des Entretiens et Agenda FullCalendar
+
+Pour mettre fin aux conflits d'horaires et aux oublis, ce module intègre la bibliothèque interactive **FullCalendar** :
+* Vue calendaire par mois, semaine ou journée ;
+* Planification d'épreuves (Tests écrits, Tests pratiques d'atelier en usine, Entretiens RH au siège, Visio-conférences) ;
+* Détection automatique des chevauchements de créneaux pour un même recruteur ;
+* Mise à jour par glisser-déposer (*drag-and-drop*) synchronisée en temps réel avec la table `rendez_vous`.
+
+*Figure 19 : Agenda interactif des entretiens et tests techniques (FullCalendar)*  
+*Figure 20 : Formulaire de planification d'un entretien avec détection de conflits*
+
+---
+
+### 2.2.8 Module de Communication et Modèles d'Emails Dynamiques
+
+Ce module automatise les échanges tout en conservant une tonalité professionnelle :
+* Gestion de modèles d'e-mails types : *Accusé de réception de candidature*, *Convocation à un test technique*, *Convocation à un entretien*, *Notification de mise en vivier*, *Refus bienveillant*.
+* **Moteur d'interpolation dynamique** : Remplacement automatique des balises `{nom}`, `{prenom}`, `{poste}`, `{date_rdv}`, `{lieu_rdv}` par les valeurs réelles du candidat lors de l'envoi.
+* **Traçabilité juridique immuable** : Chaque e-mail expédié est consigné avec son texte intégral, son expéditeur et son horodatage exact dans la table `communications`.
+
+*Figure 21 : Éditeur de modèles d'e-mails avec interpolation dynamique des balises*
+
+---
+
+### 2.2.9 Authentification, Sécurité Sanctum Stateless et Journal d'Audit
+
+La sécurité et la protection des données personnelles des candidats reposent sur des standards cryptographiques stricts :
 * **Architecture REST 100% Stateless par Bearer Tokens (Laravel Sanctum)** :
-  - Authentification décorrélée des cookies de session : chaque requête cliente transmet l'en-tête `Authorization: Bearer <token>`.
-  - Persistance cryptographique : les jetons ne sont jamais stockés en clair côté serveur. Seule leur empreinte unidirectionnelle **SHA-256** est enregistrée dans la table `personal_access_tokens` de PostgreSQL. Ce modèle de jetons de référence (*Reference Tokens*) garantit une **révocation instantanée** lors de la déconnexion (`DELETE`), résolvant la faille classique des JWT orphelins.
-  - **Durée de validité de 8 heures** : chaque token possède un horodatage d'expiration strict (`expires_at`), invalidant automatiquement les sessions au terme d'une journée de travail RH avec rejet en code HTTP `401 Unauthorized`.
-  - **Nettoyage automatique programmé** : une tâche quotidienne (`Schedule::command('sanctum:prune-expired --hours=0')->daily()`) purge les jetons périmés de la base de données chaque nuit à minuit.
-  - **Protection anti force-brute (Rate Limiting)** : le point d'entrée `POST /api/login` est verrouillé par un limiteur de débit (`throttle:5,1`), bloquant les attaques par dictionnaire dès la 6ᵉ tentative erronée (HTTP `429 Too Many Requests`).
-  - **Suppression du surcoût CSRF** : l'utilisation exclusive d'en-têtes HTTP Bearer immunise l'API contre les attaques CSRF par nature, supprimant les requêtes préliminaires superflues et accélérant les interactions de la Single Page Application React.
-* **Middlewares d'autorisation RBAC & Permissions** interceptant chaque requête HTTP (`auth:sanctum`, `role:...`, `permission:...`) pour valider l'habilitation avant d'atteindre le contrôleur.
-* **Événements et Listeners d'Audit** : Découplage de la journalisation via des observateurs d'événements Eloquent, garantissant qu'un échec de log ne bloque pas la transaction métier.
+  * Déconnexion totale des sessions cookies : chaque requête React transmet le header `Authorization: Bearer <token>`.
+  * Hachage **SHA-256** unidirectionnel des jetons dans la table `personal_access_tokens` : aucun token n'est stocké en clair.
+  * **Durée de validité de 8 heures** (`expires_at`), alignée sur la journée de travail des équipes RH, avec révocation immédiate lors du clic sur Déconnexion.
+  * Purge programmée quotidienne des jetons périmés à minuit (`sanctum:prune-expired`).
+  * **Protection anti-bruteforce (Rate Limiting)** : La route `/api/login` est verrouillée par `throttle:5,1`, rejetant toute attaque par dictionnaire après 5 essais infructueux (HTTP `429 Too Many Requests`).
+* **Contrôle d'accès basé sur les rôles (RBAC)** : Barrières logicielles étanches entre Administrateurs, Recruteurs et simples Observateurs.
+* **Journal d'Audit Immuable (`audit_logs`)** : Chaque action sensible (création d'offre, changement de statut d'un candidat, convocation, mise en vivier) est tracée avec l'identifiant de l'utilisateur, l'adresse IP, le timestamp et les états avant/après au format JSONB.
+
+*Figure 22 : Journal d'audit immuable des actions RH (audit_logs)*
 
 ---
 
-### 2.2.2 Module 2 : Gestion des Référentiels, Directions et Offres
+### 2.2.10 Studio de Conception d'Affiches de Recrutement
 
-#### A. Description
-Ce module fournit le cadre structurel de l'entreprise. Il permet de modéliser les Directions (ex. *Direction Usine*, *Direction Financière*, *Direction Informatique*), les Domaines d'activité et le catalogue des compétences professionnelles.
+Pour faciliter les campagnes d'affichage aux entrées des usines d'Ibity et Tamatave ainsi que sur les réseaux professionnels, un studio graphique a été développé au sein de l'application web :
+* Injection automatique des mentions clés de l'offre (titre, missions synthétisées, diplômes requis, date limite de dépôt) ;
+* Choix entre plusieurs chartes visuelles (Template industriel orienté usine ou Template moderne pour sièges administratifs) respectant la charte graphique officielle d'Alpha Ciment ;
+* Déplacement interactif des blocs de texte par glisser-déposer sur le canvas visuel ;
+* Exportation haute définition immédiate en image PNG prête pour l'impression ou la publication en ligne.
 
-#### B. Fonctionnalités Clés
-* **Cycle de vie des offres d'emploi** : Machine à états régissant la transition automatique ou manuelle :
-  $$\text{Brouillon} \longrightarrow \text{Publiée} \longrightarrow \text{Clôturée}$$
-* Définition fine du profil recherché : intitulé du poste, missions détaillées, niveau d'études requis (Bac+2 à Bac+5), années d'expérience requises et compétences obligatoires/optionnelles.
-* Génération automatique d'un lien public unique permettant aux candidats de postuler directement.
-
-#### C. Choix d'Implémentation Technique
-* Encapsulation des transitions d'état dans `OffreService` empêchant la publication d'une offre dépourvue de compétences ou de missions.
-* Utilisation de relations polymorphiques et de tables de liaison (`profil_competence`) associant chaque offre à ses prérequis techniques.
+*Figure 23 : Studio graphique de conception et génération d'affiches d'offres*
 
 ---
 
-### 2.2.3 Module 3 : Portail Candidat et Dépôt Multi-Canal
+## 2.3 État d'Analyse, Statistiques et Tableaux de Bord
 
-#### A. Description
-Le portail d'acquisition permet aux candidats de postuler en toute simplicité depuis n'importe quel terminal, tout en offrant aux recruteurs un guichet de saisie manuelle pour les dossiers déposés physiquement à l'usine.
-
-#### B. Fonctionnalités Clés
-* **Postulation en ligne sur offre publiée** : Formulaire guidé avec saisie des coordonnées, poste visé, téléversement du CV et de la lettre de motivation.
-* **Candidature spontanée catégorisée** : Choix du domaine d'activité parmi un référentiel dynamique (avec option *"Autre"* créant un domaine en attente de validation RH).
-* **Guichet de saisie manuelle RH** : Permet à un chargé de recrutement de numériser et saisir une candidature papier reçue à l'accueil de l'usine, avec traçabilité de l'agent ayant effectué la saisie (`canal_depot = 'rh_manuel'`).
-* **Dédoublonnage intelligent** : Vérification immédiate de l'existence du candidat par son adresse e-mail. Si le candidat existe déjà, le système rattache la nouvelle candidature à son dossier historique sans créer de doublon.
-
-#### C. Choix d'Implémentation Technique
-* Stockage sécurisé des pièces jointes via `Storage::disk('candidatures')` avec renommage cryptographique (UUID) pour prévenir les collisions de fichiers et l'écrasement.
-* Transaction atomique `DB::transaction` assurant que la création du candidat, de la candidature, l'enregistrement des fichiers et le premier historique de statut réussissent conjointement ou soient annulés en bloc.
-
----
-
-### 2.2.4 Module 4 : Pipeline RH et Fiche Candidat 360°
-
-#### A. Description
-Ce module constitue l'espace de travail quotidien des recruteurs, leur permettant de suivre visuellement la progression de chaque candidat à travers les différentes étapes de sélection.
-
-#### B. Fonctionnalités Clés
-* **Workflow d'évaluation en 6 statuts normalisés** :
-  $$\text{Reçue} \longrightarrow \text{Présélectionnée} \longrightarrow \text{Test Technique} \longrightarrow \text{Entretien} \longrightarrow \begin{cases} \text{Retenue (Embauche)} \\ \text{Non retenue} \end{cases}$$
-* **Fiche Candidat 360°** : Vue centralisée regroupant en un seul écran :
-  * L'état civil et les coordonnées vérifiées.
-  * Le visualiseur intégré de CV (aperçu PDF direct sans téléchargement préalable).
-  * L'historique chronologique complet des changements de statut avec motifs et commentaires.
-  * Le relevé des rendez-vous passés et à venir.
-  * L'historique immuable des communications échangées.
-* **Bascule instantanée dans le Vivier** : Bouton d'action permettant de marquer un profil prometteur pour une conservation à long terme.
-
-#### C. Choix d'Implémentation Technique
-* Composant React modulaire [`CandidatureDetailView.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/pages/CandidatureDetailView.jsx) organisé en onglets asynchrones pour garantir un temps de chargement initial minimal.
-* Génération de fiches synthétiques au format PDF téléchargeable pour les commissions de recrutement de l'usine.
-
----
-
-### 2.2.5 Module 5 : Microservice OCR, Extraction IA et Validation RH
-
-#### A. Description
-Ce module automatise la lecture et la digestion documentaire des CVs en combinant la vision par ordinateur (PaddleOCR) et le traitement sémantique (spaCy & RapidFuzz).
-
-#### B. Fonctionnalités Clés
-* Extraction automatique du texte brut à partir de documents PDF vectoriels, de scans ou de photos de CVs numérisés.
-* Découpage et classification sémantique :
-  * Compétences techniques et humaines.
-  * Expériences professionnelles (intitulé de poste, entreprise, dates de début et fin).
-  * Formations et diplômes (niveau académique, établissement, intitulé).
-* **Interface de validation *Human-in-the-Loop*** : L'IA pré-remplit les champs avec un score de confiance probabiliste. Le recruteur valide d'un clic, corrige les éventuelles erreurs ou rejette les propositions douteuses avant toute persistance définitive.
-
-#### C. Choix d'Implémentation Technique
-* Pipeline d'inférence asynchrone déployé sur FastAPI (port 8001), communiquant via API REST avec Laravel.
-* Algorithme **RapidFuzz** assurant la réconciliation tolérante aux fautes d'OCR entre les mots extraits et le référentiel officiel des compétences d'AlpA Ciment.
-* Persistance des données brutes au format `JSONB` dans la table `cv_extraction_ocr` pour permettre des ré-entraînements ultérieurs sans ré-exécuter l'OCR.
-
----
-
-### 2.2.6 Module 6 : Vivier de Talents et Moteur de Recherche Plein Texte
-
-#### A. Description
-Le Vivier de Talents est la bibliothèque de profils qualifiés d'AlpA Ciment. Il permet de trouver en quelques secondes les meilleurs profils disponibles pour un poste vacant sans publier de nouvelle offre.
-
-#### B. Fonctionnalités Clés
-* **Panneau de recherche multicritère** : Filtrage croisé combinant Direction, Domaine, Niveau d'études, Postes souhaités et Compétences (avec opérateur logique ET / OU).
-* **Recherche Plein Texte dans le texte des CVs** : Capacité d'interroger n'importe quel mot-clé technique ou terme rare figurant dans le corps du CV.
-* **Insensibilité universelle aux accents** : Rechercher `developpeur` renvoie instantanément les CVs contenant `développeur`, `Développeur` ou `DEVELOPPEUR`.
-* **Affichage de l'Extrait Contextuel (`cv_snippet`)** : Affichage d'un badge contextuel montrant la phrase exacte du CV où le mot-clé a été localisé, entouré de ses mots voisins pour une évaluation visuelle immédiate.
-
-#### C. Choix d'Implémentation Technique
-* Configuration plein texte personnalisée PostgreSQL `french_unaccent` associée à un index `GIN` :
-  ```sql
-  CREATE INDEX idx_document_recherche_texte ON document USING gin(recherche_texte);
-  ```
-* Implémentation dans [`EloquentCandidatureRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentCandidatureRepository.php) et [`EloquentVivierRepository.php`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/code_source/recrutement/app/Repositories/Eloquent/EloquentVivierRepository.php) d'un algorithme de découpage de snippet basé sur `Str::ascii()` pour garantir la concordance exacte des index de découpe entre PHP et PostgreSQL.
-
----
-
-### 2.2.7 Module 7 : Planification des Rendez-vous et Messagerie Dynamique
-
-#### A. Description
-Ce module professionnalise la communication entre l'entreprise et les postulants, éliminant les oublis et renforçant la marque employeur d'AlpA Ciment.
-
-#### B. Fonctionnalités Clés
-* **Agenda interactif des épreuves** : Calendrier basé sur FullCalendar permettant de planifier les tests d'embauche et les entretiens physiques à l'usine ou en visio.
-* **Gestion des modèles de courriels (Templates)** : Modèles prédéfinis personnalisables (Accusé de réception, Convocation entretien, Rejet bienveillant).
-* **Moteur d'interpolation dynamique de variables** : Remplacement automatique des balises `{nom}`, `{prenom}`, `{poste}`, `{date_rdv}`, `{lieu_rdv}` par les valeurs réelles du candidat.
-* **Immuabilité des preuves d'envoi** : Enregistrement d'une copie intégrale du message textuel envoyé dans la table `communication`.
-
-#### C. Choix d'Implémentation Technique
-* Classes Laravel `Mailable` utilisant des vues Blade responsive assurant un rendu irréprochable sur tous les clients mails (smartphones, ordinateurs).
-* Moteur d'interpolation basé sur des expressions régulières PCRE (`preg_replace`) tolérant les espaces et insensibles à la casse (`{variable}` et `{{variable}}`).
-
----
-
-### 2.2.8 Module 8 : Studio de Conception d'Affiches de Recrutement
-
-#### A. Description
-Pour recruter efficacement sur les sites industriels ou sur les plateformes numériques, le service RH a besoin de visuels professionnels aux normes graphiques d'AlpA Ciment.
-
-#### B. Fonctionnalités Clés
-* **Génération dynamique d'affiches** : Remplissage automatique des textes à partir des données de l'offre (titre, missions synthétisées, profil, adresse de candidature).
-* **Multi-templates visuels** : Choix entre des thèmes visuels adaptés à l'environnement d'Usine ou aux Bureaux administratifs.
-* **Repositionnement interactif des blocs de texte** : Système de déplacement libre (drag-and-drop) des textes sur le canvas de l'affiche, avec activation conditionnelle du quadrillage repère.
-* **Exportation haute résolution** : Téléchargement direct au format image (PNG/JPEG) prêt pour l'impression ou la publication en ligne.
-
-#### C. Choix d'Implémentation Technique
-* Composant modulaire React [`AfficheOffreModal.jsx`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/components/modals/AfficheOffreModal.jsx) et utilitaire de calcul textuel [`posterContentGenerator.js`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement-react/src/utils/posterContentGenerator.js).
-* Algorithme de retour à la ligne automatique (*word-wrap*) calculé selon la largeur des conteneurs pour préserver la lisibilité des textes longs.
-
----
-
-## 2.3 Tableaux de Bord et Pilotage Décisionnel
-
-Le module de reporting offre à la Direction Générale et à la Direction des Ressources Humaines une vision consolidée en temps réel de l'activité de recrutement.
+Le tableau de bord exécutif centralise en temps réel les métriques décisionnelles pour la Direction des Ressources Humaines et la Direction Générale :
 
 ```
                       TABLEAU DE BORD DÉCISIONNEL RH (KPIs)
@@ -249,65 +299,45 @@ Le module de reporting offre à la Direction Générale et à la Direction des R
  │ CANDIDATURES TOT. │ OFFRES EN COURS   │ DANS LE VIVIER    │ DÉLAI MOYEN RECR. │
  │       148         │        6          │        42         │     14,2 jours    │
  └───────────────────┴───────────────────┴───────────────────┴───────────────────┘
- ┌─────────────────────────────────────────┬─────────────────────────────────────┐
- │       RÉPARTITION PAR STATUT            │     CANDIDATURES PAR DIRECTION      │
- │  ■ Reçues           (45%) [█████████ ]  │  ■ Direction Usine          (52%)   │
- │  ■ Présélectionnées (25%) [█████     ]  │  ■ Direction Financière     (22%)   │
- │  ■ En Entretien     (18%) [████      ]  │  ■ Direction Informatique   (16%)   │
- │  ■ Retenues / Embauche (12%) [██     ]  │  ■ Direction RH             (10%)   │
- └─────────────────────────────────────────┴─────────────────────────────────────┘
 ```
+*Figure 24 : Tableau de bord décisionnel RH - Cartes KPIs stratégiques*
 
-### Indicateurs Clés de Performance (KPIs) Suivis :
-1. **Volumétrie et dynamique des flux** : Nombre de candidatures reçues par canal (Portail web vs Guichet usine vs Spontanées).
-2. **Taux de conversion du pipeline** : Pourcentage de candidats passant avec succès de l'étape de présélection aux tests techniques, puis aux entretiens finaux.
-3. **Vélocité de traitement** : Temps moyen écoulé entre le dépôt de la candidature et la décision finale d'embauche ou de refus.
-4. **Alimentation du Vivier** : Taux d'enrichissement mensuel du vivier de talents par domaine d'expertise.
+### Indicateurs de Performance Suivis :
+* **Volume mensuel de candidatures reçues** : Permet de mesurer l'impact et la visibilité des campagnes de recrutement au fil de l'année.
+* **Répartition des candidatures par statut** : Graphique circulaire représentant la part respective des dossiers en cours de traitement, présélectionnés, en entretien ou embauchés.
+* **Taux de capitalisation du Vivier** : Évolution du nombre de talents répertoriés par direction et spécialité technique.
+
+*Figure 25 : Graphique de répartition des candidatures par statut*  
+*Figure 26 : Graphique de volume mensuel des candidatures reçues*  
+*Figure 27 : Graphique du taux de transformation et d'alimentation du Vivier*
 
 ---
 
 ## 2.4 Problèmes Rencontrés et Solutions Techniques
 
-Conformément à la démarche d'ingénierie logicielle valorisée à l'IT University, cette section documente **cinq défis techniques majeurs** survenus durant le développement et les solutions d'architecture appliquées pour les résoudre.
+Dans tout projet d'ingénierie logicielle d'envergure, des imprévus techniques complexes se manifestent. Cette section documente les cinq défis majeurs rencontrés durant les travaux et les solutions méthodologiques apportées.
 
----
+### 2.4.1 Défi 1 : Incohérence des accents entre PostgreSQL et PHP (`cv_snippet`)
+* **Problème** : Lors de l'interrogation du Vivier avec un mot sans accent (ex. `developpeur`), PostgreSQL trouvait parfaitement la candidature grâce au dictionnaire `french_unaccent`. En revanche, sur l'interface web, le bloc d'extrait contextuel (`cv_snippet`) restait désespérément vide.
+* **Cause** : La fonction PHP d'extraction de snippet utilisait nativement `mb_stripos()`. Or, en PHP, `mb_stripos("développeur", "developpeur")` renvoie `false` en raison de la présence de l'accent aigu.
+* **Solution** : Conception et intégration dans les repositories d'un algorithme de translittération 1-pour-1 strict via `Str::ascii()`. La détection de l'offset de position s'opère sur le texte translittéré sans accent, tandis que le découpage final s'effectue sur le texte original, préservant ainsi la typographie et les accents exacts du candidat.
 
-### 2.4.1 Défi 1 : Incohérence de l'insensibilité aux accents entre PostgreSQL et PHP (`cv_snippet`)
-* **Problème rencontré** : Lors d'une recherche de mot-clé sans accent (ex. `developpeur`), PostgreSQL trouvait parfaitement la candidature grâce à la configuration `french_unaccent`. En revanche, sur la page web, le badge d'extrait contextuel du CV (`cv_snippet`) disparaissait complètement et restait vide.
-* **Cause racine** : En PHP, la fonction d'extraction du texte utilisait nativement `mb_stripos($texte, $keyword)`. Or, `mb_stripos("développeur", "developpeur")` renvoie `false` car il est strictement sensible aux accents. PostgreSQL renvoyait la ligne, mais le backend PHP ne parvenait pas à localiser le mot dans le texte français accentué pour générer le snippet.
-* **Solution technique appliquée** : Implémentation d'un algorithme de translittération en miroir via `Str::ascii()`. Le calcul de la position du mot-clé s'opère sur la chaîne translittérée (sans accent), tandis que le découpage final s'effectue sur la chaîne originale avec ses accents et sa casse.
-  ```php
-  // Normalisation pour recherche d'offset sans accent
-  $normalizedText = Str::ascii(mb_strtolower($text));
-  $normalizedKeyword = Str::ascii(mb_strtolower($keyword));
-  $pos = mb_strpos($normalizedText, $normalizedKeyword);
-  
-  // Découpage préservant le texte original accentué
-  $start = max(0, $pos - $radius);
-  $snippet = mb_substr($text, $start, $length);
-  ```
+### 2.4.2 Défi 2 : Déstructuration des textes sur les CVs multi-colonnes en OCR
+* **Problème** : Avec un moteur d'OCR traditionnel (Tesseract), la lecture des CVs contemporains agencés en deux colonnes lisait les lignes de gauche à droite sur toute la page, concaténant la colonne latérale de compétences avec le texte des expériences de la colonne de droite.
+* **Solution** : Remplacement par le réseau neuronal **PaddleOCR (PP-OCRv4)** paramétré avec détection de boîte englobante polygonale (`use_angle_cls=True`). Cette approche segmente le document en blocs verticaux indépendants avant de reconstruire l'ordre logique de lecture.
 
----
+### 2.4.3 Défi 3 : Gestion des chemins de documents et du lien symbolique `storage:link` suite au renommage de marque
+* **Problème** : Lors du renommage physique du répertoire du projet en `recrutement_alphaCiment`, les fichiers de CV téléversés renvoyaient des erreurs 404 lors de la consultation dans le visualiseur web.
+* **Cause** : Le lien symbolique Windows `public/storage` pointait vers l'ancien chemin physique absolu, et le cache autoloader de Composer conservait également l'ancienne nomenclature.
+* **Solution** : 
+  1. Stockage systématique en base de chemins strictement relatifs (`documents/cv/uuid.pdf`) indépendants de la racine du serveur ;
+  2. Réinitialisation ordonnée du lien symbolique via `php artisan storage:unlink` suivi de `php artisan storage:link` ;
+  3. Réalignement complet des fichiers d'autoload de Composer pour garantir la portabilité totale du système.
 
-### 2.4.2 Défi 2 : Hallucination des modèles NLP sur la distinction Projets vs Expériences
-* **Problème rencontré** : Lors de l'extraction automatique des CVs par modèles de langage ou NER, les projets académiques, personnels ou open-source des jeunes diplômés étaient quasi systématiquement classés comme des "contrats d'entreprise" ou "expériences professionnelles", faussant l'évaluation de leur séniorité.
-* **Cause racine** : Le vocabulaire employé dans les projets d'école ressemble fortement à celui de l'entreprise (*"Gestion de projet"*, *"Développement d'application"*).
-* **Solution technique appliquée** : Refonte du schéma relationnel pour dissocier explicitement `experience_professionnelle` et `projet`, accompagnée de consignes négatives strictes dans le moteur de parsing heuristique interdisant d'attribuer une expérience professionnelle sans raison sociale d'entreprise vérifiée.
+### 2.4.4 Défi 4 : Garantie d'intégrité transactionnelle stricte sans triggers SQL
+* **Problème** : Le choix d'architecture d'exclure tout trigger en base exigeait de garantir que la création d'un candidat, l'enregistrement de sa candidature, le téléversement de ses pièces jointes et son premier statut ne puissent jamais laisser la base de données dans un état corrompu en cas de panne inopinée.
+* **Solution** : Encapsulation systématique de chaque flux d'écriture dans des blocs transactionnels `DB::transaction(function() { ... })` au sein de la couche Service. En cas d'exception levée sur n'importe quelle étape, un rollback atomique immédiat est déclenché, respectant à la lettre les critères ACID.
 
----
-
-### 2.4.3 Défi 3 : Déstructuration des textes sur les CVs multi-colonnes en OCR
-* **Problème rencontré** : Avec les moteurs d'OCR conventionnels (Tesseract), la lecture des CVs modernes structurés en deux colonnes lisait les lignes horizontalement d'un bout à l'autre de la page, mélangeant la liste des compétences de gauche avec les descriptions d'entreprises de droite.
-* **Solution technique appliquée** : Remplacement par le moteur **PaddleOCR (PP-OCRv4)** avec détection angulaire active (`use_angle_cls=True`). PaddleOCR détecte les boîtes englobantes géométriques (*bounding boxes*) de chaque bloc de paragraphe, permettant de reconstituer l'arborescence des colonnes avant l'analyse lexicale.
-
----
-
-### 2.4.4 Défi 4 : Garantie de cohérence transactionnelle sans triggers SQL
-* **Problème rencontré** : L'exigence architecturale de n'utiliser aucun trigger en base imposait de garantir que la création d'une candidature, le téléversement de ses fichiers, son premier statut et son journal d'audit restent parfaitement cohérents, y compris en cas de coupure réseau ou d'erreur serveur.
-* **Solution technique appliquée** : Encapsulation systématique de toutes les opérations d'écriture dans des blocs transactionnels gérés par `DB::transaction(function() { ... })` au sein de la couche Service. En cas d'exception levée sur l'une des étapes, la base PostgreSQL effectue un *rollback* immédiat, garantissant l'état zéro défaut (propriétés ACID).
-
----
-
-### 2.4.5 Défi 5 : Conflit d'agencement visuel sur le générateur d'affiches
-* **Problème rencontré** : Lors du changement de template d'affiche (passage du thème Bureau au thème Usine), les coordonnées des blocs de texte débordaient sur les éléments graphiques de fond, et les textes longs (descriptions de postes) sortaient du cadre.
-* **Solution technique appliquée** : Création d'une grille de coordonnées relatives proportionnelles et implémentation d'un algorithme de retour à la ligne dynamique avec limitation automatique du nombre de caractères par ligne selon la typographie du template sélectionné.
+### 2.4.5 Défi 5 : Sécurisation et migration vers une architecture 100% Stateless par Bearer Tokens
+* **Problème** : L'utilisation de sessions basées sur des cookies provoquait des erreurs d'authentification intermittentes lors des appels d'API depuis des sous-domaines ou des terminaux distincts, tout en exposant l'API aux risques de requêtes falsifiées intersites (CSRF).
+* **Solution** : Refonte intégrale de la couche d'accès vers un modèle stateless pur propulsé par **Laravel Sanctum**. Chaque requête React transporte le jeton dans l'en-tête standard `Authorization: Bearer <token>`. Les tokens sont hachés en SHA-256 côté base, révoqués instantanément à la déconnexion et purgés automatiquement après 8 heures de non-activité.

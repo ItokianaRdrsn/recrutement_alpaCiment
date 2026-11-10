@@ -1,6 +1,6 @@
 # Guide Méthodologique de Traitement des Demandes (Prompts)
 
-Ce document définit la méthode de travail standardisée que l'assistant AI doit obligatoirement respecter à chaque intervention pour le projet *recrutement_alpaCiment*.
+Ce document définit la méthode de travail standardisée que l'assistant AI doit obligatoirement respecter à chaque intervention pour le projet *recrutement_alphaCiment*.
 
 ---
 
@@ -23,7 +23,7 @@ Lorsqu'une demande concerne le développement d'une nouvelle tâche ou fonctionn
    - Conserver impérativement tout l'historique antérieur (approche **cumulative**, aucune suppression).
    - Ajouter la nouvelle entrée avec le prompt exact de l'utilisateur et sa résolution.
 4. **Mise à jour du fichier des règles de gestion (`regles-de-gestion.md`)** :
-   - Si la tâche introduit ou modifie une règle métier, l'ajouter immédiatement dans [regles-de-gestion.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/regles-de-gestion.md).
+   - Si la tâche introduit ou modifie une règle métier, l'ajouter immédiatement dans [regles-de-gestion.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/regles-de-gestion.md).
 5. **Mise à jour des tâches du sprint (`taches.md`)** :
    - Si la tâche est terminée, passer son statut à **[FAIT]** - **100%** dans le fichier `taches.md` du sprint concerné, et recalculer le pourcentage d'avancement global du sprint.
 6. **Justification des Technologies & Librairies Sélectionnées (`justification-technologique.md`)** :
@@ -49,13 +49,13 @@ Lorsqu'une demande concerne un ajustement mineur, un correctif de bug ou un alig
 
 Pour **TOUTE** modification, refactorisation ou ajout de méthode backend dans les Services :
 1. **Consultation préalable obligatoire** :
-   - Consulter systématiquement [`doc/suivi-developpement/catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/catalogue-services.md).
+   - Consulter systématiquement [`doc/suivi-developpement/catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/catalogue-services.md).
    - Vérifier si la méthode n'existe pas déjà sous un autre nom ou dans un autre service pour éliminer la duplication de code.
 2. **Respect de la responsabilité unique (SRP)** :
    - Ne jamais polluer un service avec des responsabilités étrangères.
    - Par exemple : le stockage physique des fichiers et le MIME sniffing appartiennent à `DocumentService`, le parsing OCR appartient à `CvExtractionService`, les métriques à `PipelineMetricService`, et `CandidatureService` ne s'occupe que de l'entité Candidature.
 3. **Mise à jour du catalogue** :
-   - Dès qu'une fonction est créée, renommée, déplacée ou supprimée, mettre à jour immédiatement le tableau et la fiche correspondante dans [`doc/suivi-developpement/catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/catalogue-services.md).
+   - Dès qu'une fonction est créée, renommée, déplacée ou supprimée, mettre à jour immédiatement le tableau et la fiche correspondante dans [`doc/suivi-developpement/catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/catalogue-services.md).
 
 ---
 
@@ -66,7 +66,7 @@ Pour **TOUTE** décision technique ou sélection de librairie / framework / outi
 1. **Explicitation du Choix** : Expliquer clairement pourquoi la solution a été choisie.
 2. **Comparatif avec les Alternatives** : Présenter au moins 1 à 2 alternatives viables et expliquer pourquoi elles n'ont pas été retenues (Pour / Contre).
 3. **Ressources & Sources de Recherche** : Fournir les liens vers la documentation officielle, articles d'analyse ou benchmarks exploités.
-4. **Mise à jour du document central** : Documenter la décision dans [justification-technologique.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/justification-technologique.md).
+4. **Mise à jour du document central** : Documenter la décision dans [justification-technologique.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/justification-technologique.md).
 
 ---
 
@@ -75,9 +75,9 @@ Pour **TOUTE** décision technique ou sélection de librairie / framework / outi
 Dès qu'une modification de structure de base de données est réalisée (nouvelle table, ajout ou renommage de colonne, index, contrainte `CHECK` ou clé étrangère) via une migration Laravel ou directement :
 
 1. **Mise à jour obligatoire du script maître** :
-   - Reporter **systématiquement et immédiatement** le script SQL correspondant dans le fichier maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql).
+   - Reporter **systématiquement et immédiatement** le script SQL correspondant dans le fichier maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql).
 2. **Garantie d'intégrité** :
-   - Le fichier [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql) doit impérativement rester le reflet exact à 100% de la structure de base de données du projet, directement ré-exécutable de bout en bout pour reconstruire la base PostgreSQL complète.
+   - Le fichier [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql) doit impérativement rester le reflet exact à 100% de la structure de base de données du projet, directement ré-exécutable de bout en bout pour reconstruire la base PostgreSQL complète.
 
 ---
 
@@ -124,8 +124,8 @@ Dès qu'une modification de structure de base de données est réalisée (nouvel
 - [ ] Code backend & frontend modifié et vérifié.
 - [ ] Compilation frontend effectuée (`npm run build`).
 - [ ] Suite de tests backend / microservices validée (`php artisan test`, `pytest`).
-- [ ] **Mise à jour du fichier maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/sql/gestion_recrutement.sql)** si une modification ou un ajout touche la base de données.
-- [ ] **Catalogue des Services vérifié et synchronisé** ([`catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/catalogue-services.md)).
+- [ ] **Mise à jour du fichier maître [`sql/gestion_recrutement.sql`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/sql/gestion_recrutement.sql)** si une modification ou un ajout touche la base de données.
+- [ ] **Catalogue des Services vérifié et synchronisé** ([`catalogue-services.md`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/catalogue-services.md)).
 - [ ] Fichiers de documentation générés ou mis à jour selon la méthodologie (Sprint vs Rectification).
 - [ ] Registre de justification technologique (`justification-technologique.md`) renseigné si une technologie/librairie est concernée.
 - [ ] **Restitution finale conforme aux 5 blocs du Format Standardisé des Outputs**.

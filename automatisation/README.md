@@ -1,4 +1,4 @@
-# Automatisation avec n8n (Recrutement AlpaCiment)
+# Automatisation avec n8n (Recrutement AlphaCiment)
 
 Ce répertoire contient l'infrastructure Docker pour exécuter l'instance **n8n** dédiée à l'automatisation des processus de recrutement.
 
@@ -66,6 +66,6 @@ Vos données restent intactes même après un redémarrage ou un arrêt (`docker
 ## 🎓 Projet de Test & Guide d'apprentissage (100% Hors Connexion)
 
 Un projet complet d'apprentissage avec API locale **FastAPI** et un workflow n8n prêt à l'emploi est disponible dans le dossier :
-👉 [`projet_test_fastapi/`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/projet_test_fastapi)
+👉 [`projet_test_fastapi/`](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/projet_test_fastapi)
 
-Consultez le guide détaillé : [DOCUMENTATION_N8N_COMPLETE.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/projet_test_fastapi/DOCUMENTATION_N8N_COMPLETE.md)
+Consultez le guide détaillé : [DOCUMENTATION_N8N_COMPLETE.md](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/projet_test_fastapi/DOCUMENTATION_N8N_COMPLETE.md)

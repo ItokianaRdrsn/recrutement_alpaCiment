@@ -51,6 +51,7 @@ class CandidatureResource extends JsonResource
             'formations' => $this->whenLoaded('formations'),
             'experiences' => $this->whenLoaded('experiences'),
             'projets' => $this->whenLoaded('projets'),
+            'autres' => $this->whenLoaded('autres'),
         ];
     }
 }

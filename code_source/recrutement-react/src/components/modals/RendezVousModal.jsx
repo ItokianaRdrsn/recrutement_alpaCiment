@@ -309,7 +309,7 @@ export function RendezVousModal({
                                 {isEditing ? 'Modifier le Rendez-vous' : 'Planifier un Test ou Entretien'}
                             </h3>
                             <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                                Agenda RH AlpA Ciment
+                                Agenda RH Alpha Ciment
                             </span>
                         </div>
                     </div>
@@ -545,7 +545,7 @@ export function RendezVousModal({
                                         ? 'https://meet.google.com/xyz-abc'
                                         : idModeRealisation === '3'
                                         ? '+261 34 00 000 00'
-                                        : 'Salle de réunion RH - Usine AlpA Ciment'
+                                        : 'Salle de réunion RH - Usine Alpha Ciment'
                                 }
                                 value={detailsLieu}
                                 onChange={(e) => setDetailsLieu(e.target.value)}

@@ -13,6 +13,7 @@ interface DashboardRepositoryInterface
     public function getDirectionBreakdown(): array;
     public function getChannelBreakdown(array $filters = []): array;
     public function getPendingCandidatures(int $limit = 5): array;
+    public function getLatestUnseenCandidatures(array $filters = [], int $limit = 6): array;
 
     // Métriques avancées du tableau de bord
     public function getWorkflowDurations(array $filters = []): array;

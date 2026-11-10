@@ -62,8 +62,8 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                         return (
                             <React.Fragment key={offre.id}>
                                 <tr
-                                    onClick={compact && onSelectOffer ? () => onSelectOffer(offre) : undefined}
-                                    style={compact && onSelectOffer ? { cursor: 'pointer' } : {}}
+                                    onClick={onSelectOffer ? () => onSelectOffer(offre) : undefined}
+                                    style={onSelectOffer ? { cursor: 'pointer' } : {}}
                                 >
                                     {!compact ? (
                                         <td>
@@ -131,9 +131,14 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                     {!compact ? <td>{formatDate(offre.date_limite)}</td> : null}
                                     <td>
                                         <span className="status-pill">{offre.statut?.libelle ?? '-'}</span>
+                                        {offre.est_archivee && offre.suppression_prevue_le ? (
+                                            <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '4px' }}>
+                                                Suppression le {formatDate(offre.suppression_prevue_le)}
+                                            </div>
+                                        ) : null}
                                     </td>
                                     {renderActions || compact || onNavigate ? (
-                                        <td style={{ padding: '8px 12px', whiteSpace: 'nowrap', width: '1%' }}>
+                                        <td onClick={(e) => e.stopPropagation()} style={{ padding: '8px 12px', whiteSpace: 'nowrap', width: '1%', cursor: 'default' }}>
                                             <div style={{ display: 'inline-flex', gap: '4px', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
                                                 {compact && onSelectOffer ? (
                                                     <button

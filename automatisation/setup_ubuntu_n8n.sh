@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Script d'installation automatisée de n8n sur Ubuntu Linux (AlpA Ciment)
+# Script d'installation automatisée de n8n sur Ubuntu Linux (Alpha Ciment)
 # Compatible : Ubuntu 22.04 LTS / 24.04 LTS
 # ==============================================================================
 
 set -euo pipefail
 
-echo ">>> [3/5] Création de l'arborescence n8n (/opt/alpaciment/n8n)..."
-sudo mkdir -p /opt/alpaciment/n8n
-sudo chown -R "$USER:$USER" /opt/alpaciment/n8n
+echo ">>> [3/5] Création de l'arborescence n8n (/opt/alphaciment/n8n)..."
+sudo mkdir -p /opt/alphaciment/n8n
+sudo chown -R "$USER:$USER" /opt/alphaciment/n8n
 
-cat << 'EOF' > /opt/alpaciment/n8n/docker-compose.yml
+cat << 'EOF' > /opt/alphaciment/n8n/docker-compose.yml
 services:
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
-    container_name: n8n_alpaciment
+    container_name: n8n_alphaciment
     restart: always
     ports:
       - "5678:5678"
@@ -32,7 +32,7 @@ services:
 
 volumes:
   n8n_data:
-    name: alpaciment_n8n_data
+    name: alphaciment_n8n_data
 EOF
 
 echo ">>> [4/5] Configuration du pare-feu (UFW)..."
@@ -41,7 +41,7 @@ sudo ufw allow 5678/tcp comment 'n8n Web UI'
 sudo ufw --force enable
 
 echo ">>> [5/5] Démarrage du conteneur n8n via Docker Compose..."
-cd /opt/alpaciment/n8n
+cd /opt/alphaciment/n8n
 sudo docker compose up -d
 
 echo ">>> [Test Connectivité SMTP Sortante]..."

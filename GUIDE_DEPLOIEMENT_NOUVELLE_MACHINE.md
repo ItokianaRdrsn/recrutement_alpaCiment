@@ -1,5 +1,5 @@
 # 🚀 Guide Complet de Déploiement & Migration sur une Nouvelle Machine
-## Projet : Plateforme de Recrutement AlpA Ciment
+## Projet : Plateforme de Recrutement Alpha Ciment
 
 Ce guide permet d'installer et d'exécuter l'intégralité du projet sur **n'importe quel autre ordinateur** (Windows, Linux, macOS) et dans **n'importe quel répertoire/chemin d'accès**.
 
@@ -111,7 +111,7 @@ cp .env.example .env
 
 Ouvrez `.env` et ajustez les paramètres de base de données selon votre configuration locale :
 ```ini
-APP_NAME="Recrutement AlpA Ciment"
+APP_NAME="Recrutement Alpha Ciment"
 APP_ENV=local
 APP_KEY=
 APP_DEBUG=true

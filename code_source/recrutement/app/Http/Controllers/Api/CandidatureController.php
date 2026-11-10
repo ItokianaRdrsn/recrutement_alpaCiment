@@ -180,4 +180,32 @@ class CandidatureController extends Controller
             'data' => new CandidatureResource($candidature),
         ]);
     }
+
+    /**
+     * Rattacher une candidature (spontanée ou en vivier) à une offre d'emploi active
+     */
+    public function relierOffre(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'id_offre' => 'required|integer|exists:offre,id_offre',
+            'commentaire' => 'nullable|string|max:500',
+        ], [
+            'id_offre.required' => 'Veuillez sélectionner une offre d\'emploi.',
+            'id_offre.integer' => 'L\'identifiant de l\'offre est invalide.',
+            'id_offre.exists' => 'L\'offre d\'emploi sélectionnée n\'existe pas ou a été supprimée.',
+            'commentaire.max' => 'Le commentaire ne peut pas dépasser 500 caractères.',
+        ]);
+
+        $candidature = $this->candidatureService->relierOffre(
+            $id,
+            (int) $validated['id_offre'],
+            $validated['commentaire'] ?? null,
+            auth()->id()
+        );
+
+        return response()->json([
+            'message' => 'La candidature a été reliée avec succès à l\'offre.',
+            'data' => new CandidatureResource($candidature),
+        ]);
+    }
 }

@@ -192,10 +192,40 @@ class RechercheAvanceeCandidaturesTest extends TestCase
             $table->timestamps();
         });
 
+        // Tables chargées en eager loading par la liste des candidatures (projets, autres informations)
+        Schema::create('candidat_projet', function (Blueprint $table) {
+            $table->id('id_projet');
+            $table->unsignedBigInteger('id_candidature');
+            $table->string('titre_projet', 200);
+            $table->string('role', 150)->nullable();
+            $table->string('technologies', 255)->nullable();
+            $table->string('url_projet', 255)->nullable();
+            $table->date('date_debut')->nullable();
+            $table->date('date_fin')->nullable();
+            $table->text('description')->nullable();
+            $table->string('source', 20)->default('manuel');
+            $table->float('score_confiance')->nullable();
+            $table->unsignedBigInteger('id_document')->nullable();
+            $table->boolean('valide')->default(false);
+            $table->timestamp('date_validation')->nullable();
+            $table->unsignedBigInteger('valide_par')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('candidat_autre', function (Blueprint $table) {
+            $table->id('id_autre');
+            $table->unsignedBigInteger('id_candidature');
+            $table->string('titre', 255);
+            $table->text('description')->nullable();
+            $table->string('source', 20)->default('ocr');
+            $table->boolean('valide')->default(true);
+            $table->timestamps();
+        });
+
         // 2. Utilisateur RH authentifié
         $this->rhUser = User::create([
-            'nom' => 'Responsable RH AlpA',
-            'email' => 'rh.recherche@alpaciment.mg',
+            'nom' => 'Responsable RH Alpha',
+            'email' => 'rh.recherche@alphaciment.mg',
             'role' => 'rh',
             'mot_de_passe' => bcrypt('secret123'),
         ]);
@@ -267,7 +297,7 @@ class RechercheAvanceeCandidaturesTest extends TestCase
         $compSql = Competence::create(['id_competence' => 3, 'nom_competence' => 'PostgreSQL', 'id_type_competence' => 1]);
 
         // Candidat 1 : Python + React
-        $cand1 = Candidat::create(['nom' => 'Dev', 'prenom' => 'Fullstack', 'email' => 'fullstack@alpa.mg']);
+        $cand1 = Candidat::create(['nom' => 'Dev', 'prenom' => 'Fullstack', 'email' => 'fullstack@alphaciment.mg']);
         $candidature1 = Candidature::create(['id_candidat' => $cand1->id_candidat]);
         DB::table('candidat_competence')->insert([
             ['id_candidature' => $candidature1->id_candidature, 'id_competence' => 1, 'niveau' => 'Avancé', 'source' => 'manuel', 'valide' => true],
@@ -275,7 +305,7 @@ class RechercheAvanceeCandidaturesTest extends TestCase
         ]);
 
         // Candidat 2 : Python seulement
-        $cand2 = Candidat::create(['nom' => 'Dev', 'prenom' => 'Data', 'email' => 'data@alpa.mg']);
+        $cand2 = Candidat::create(['nom' => 'Dev', 'prenom' => 'Data', 'email' => 'data@alphaciment.mg']);
         $candidature2 = Candidature::create(['id_candidat' => $cand2->id_candidat]);
         DB::table('candidat_competence')->insert([
             ['id_candidature' => $candidature2->id_candidature, 'id_competence' => 1, 'niveau' => 'Intermédiaire', 'source' => 'manuel', 'valide' => true],
@@ -295,7 +325,7 @@ class RechercheAvanceeCandidaturesTest extends TestCase
 
     public function test_filtrage_par_niveau_etude_et_diplome(): void
     {
-        $cand1 = Candidat::create(['nom' => 'Ingenieur', 'prenom' => 'Paul', 'email' => 'paul@alpa.mg']);
+        $cand1 = Candidat::create(['nom' => 'Ingenieur', 'prenom' => 'Paul', 'email' => 'paul@alphaciment.mg']);
         $candidature1 = Candidature::create(['id_candidat' => $cand1->id_candidat]);
         CandidatFormation::create([
             'id_candidature' => $candidature1->id_candidature,
@@ -305,7 +335,7 @@ class RechercheAvanceeCandidaturesTest extends TestCase
             'domaine_etude' => 'Génie Civil',
         ]);
 
-        $cand2 = Candidat::create(['nom' => 'Technicien', 'prenom' => 'Luc', 'email' => 'luc@alpa.mg']);
+        $cand2 = Candidat::create(['nom' => 'Technicien', 'prenom' => 'Luc', 'email' => 'luc@alphaciment.mg']);
         $candidature2 = Candidature::create(['id_candidat' => $cand2->id_candidat]);
         CandidatFormation::create([
             'id_candidature' => $candidature2->id_candidature,
@@ -331,7 +361,7 @@ class RechercheAvanceeCandidaturesTest extends TestCase
     public function test_filtrage_par_annees_experience_minimum(): void
     {
         // Candidat 1 : 5 ans d'expérience (2018-01-01 -> 2023-01-01 = ~1826 jours)
-        $cand1 = Candidat::create(['nom' => 'Senior', 'prenom' => 'Alain', 'email' => 'alain.senior@alpa.mg']);
+        $cand1 = Candidat::create(['nom' => 'Senior', 'prenom' => 'Alain', 'email' => 'alain.senior@alphaciment.mg']);
         $candidature1 = Candidature::create(['id_candidat' => $cand1->id_candidat]);
         CandidatExperience::create([
             'id_candidature' => $candidature1->id_candidature,
@@ -343,12 +373,12 @@ class RechercheAvanceeCandidaturesTest extends TestCase
         ]);
 
         // Candidat 2 : 1 an d'expérience (2023-01-01 -> 2024-01-01 = 365 jours)
-        $cand2 = Candidat::create(['nom' => 'Junior', 'prenom' => 'Miora', 'email' => 'miora.junior@alpa.mg']);
+        $cand2 = Candidat::create(['nom' => 'Junior', 'prenom' => 'Miora', 'email' => 'miora.junior@alphaciment.mg']);
         $candidature2 = Candidature::create(['id_candidat' => $cand2->id_candidat]);
         CandidatExperience::create([
             'id_candidature' => $candidature2->id_candidature,
             'poste' => 'Opératrice de production',
-            'entreprise' => 'AlpA Ciment',
+            'entreprise' => 'Alpha Ciment',
             'date_debut' => '2023-01-01',
             'date_fin' => '2024-01-01',
             'poste_actuel' => false,
@@ -372,7 +402,7 @@ class RechercheAvanceeCandidaturesTest extends TestCase
         $compSap = Competence::create(['nom_competence' => 'SAP', 'id_type_competence' => 1]);
 
         // Candidat Parfait : CV contient "logistique", compétence SAP, Bac+5, 4 ans exp
-        $candTarget = Candidat::create(['nom' => 'Ideal', 'prenom' => 'Candidat', 'email' => 'ideal@alpa.mg']);
+        $candTarget = Candidat::create(['nom' => 'Ideal', 'prenom' => 'Candidat', 'email' => 'ideal@alphaciment.mg']);
         $candTargetCandidature = Candidature::create(['id_candidat' => $candTarget->id_candidat]);
 
         Document::create([
@@ -420,7 +450,7 @@ class RechercheAvanceeCandidaturesTest extends TestCase
 
     public function test_recherche_cv_snippet_insensible_aux_accents_et_vivier(): void
     {
-        $cand = Candidat::create(['nom' => 'Rakoto', 'prenom' => 'Jean', 'email' => 'jean.rakoto@alpa.mg']);
+        $cand = Candidat::create(['nom' => 'Rakoto', 'prenom' => 'Jean', 'email' => 'jean.rakoto@alphaciment.mg']);
         $candidature = Candidature::create([
             'id_candidat' => $cand->id_candidat,
             'dans_vivier' => true,

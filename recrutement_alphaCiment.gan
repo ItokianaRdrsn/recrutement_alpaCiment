@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><project name="Plateforme de Recrutement AlpA Ciment" company="Alpha Ciment" webLink="" view-date="2026-07-24" view-index="0" gantt-divider-location="713" resource-divider-location="300" version="3.3.3316" locale="fr_FR">
-    <description><![CDATA[Planning Gantt détaillé (7j/7 avec week-ends) - Plateforme de Recrutement AlpA Ciment]]></description>
-    <view zooming-state="default:2" id="gantt-chart">
-        <field id="tpd3" name="Nom" width="414" order="0"/>
-        <field id="tpd4" name="Date de début" width="141" order="1"/>
-        <field id="tpd5" name="Date de fin" width="142" order="2"/>
+<?xml version="1.0" encoding="UTF-8"?><project name="Plateforme de Recrutement Alpha Ciment" company="Alpha Ciment" webLink="" view-date="2026-07-27" view-index="0" gantt-divider-location="608" resource-divider-location="300" version="3.3.3316" locale="fr_FR">
+    <description><![CDATA[Planning Gantt détaillé (7j/7 avec week-ends) - Plateforme de Recrutement Alpha Ciment]]></description>
+    <view zooming-state="default:7" id="gantt-chart">
+        <field id="tpd3" name="Nom" width="352" order="0"/>
+        <field id="tpd4" name="Date de début" width="119" order="1"/>
+        <field id="tpd5" name="Date de fin" width="121" order="2"/>
         <option id="filter.completedTasks" value="false"/>
         <option id="filter.dueTodayTasks" value="false"/>
         <option id="filter.overdueTasks" value="false"/>

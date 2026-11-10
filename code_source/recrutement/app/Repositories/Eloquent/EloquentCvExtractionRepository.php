@@ -16,10 +16,7 @@ class EloquentCvExtractionRepository implements CvExtractionRepositoryInterface
 
     public function attachCompetence(int $candidatureId, string $nomCompetence, ?string $niveau = null, string $source = 'ocr'): void
     {
-        $comp = Competence::firstOrCreate(
-            ['nom_competence' => trim($nomCompetence)],
-            ['id_type_competence' => 1]
-        );
+        $comp = Competence::trouverOuCreer(trim($nomCompetence), ['id_type_competence' => 1]);
 
         DB::table('candidat_competence')->updateOrInsert(
             [
@@ -59,5 +56,14 @@ class EloquentCvExtractionRepository implements CvExtractionRepositoryInterface
         $attributes['updated_at'] = now();
 
         DB::table('candidat_projet')->insert($attributes);
+    }
+
+    public function addAutre(int $candidatureId, array $attributes): void
+    {
+        $attributes['id_candidature'] = $candidatureId;
+        $attributes['created_at'] = now();
+        $attributes['updated_at'] = now();
+
+        DB::table('candidat_autre')->insert($attributes);
     }
 }

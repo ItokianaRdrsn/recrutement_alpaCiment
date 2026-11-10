@@ -24,6 +24,7 @@ export function CandidaturePrintDossier({ details, profileData, rendezVousList =
     const experiences = profileData?.experiences ?? [];
     const formations = profileData?.formations ?? [];
     const projets = profileData?.projets ?? [];
+    const autres = profileData?.autres ?? [];
     const historiques = details.historique ?? [];
 
     const dateEdition = new Intl.DateTimeFormat('fr-FR', {
@@ -41,11 +42,11 @@ export function CandidaturePrintDossier({ details, profileData, rendezVousList =
                 <div className="print-doc-header-left">
                     <img
                         src="/themes/custom/apiqa/images/logo-cut.png"
-                        alt="AlpA Ciment"
+                        alt="Alpha Ciment"
                         className="print-doc-logo"
                     />
                     <div className="print-doc-header-text">
-                        <span className="print-doc-company">ALPA CIMENT MADAGASCAR</span>
+                        <span className="print-doc-company">ALPHA CIMENT MADAGASCAR</span>
                         <span className="print-doc-direction">Direction des Ressources Humaines • Gestion des Talents</span>
                     </div>
                 </div>
@@ -258,6 +259,29 @@ export function CandidaturePrintDossier({ details, profileData, rendezVousList =
                 </section>
             )}
 
+            {/* INFORMATIONS COMPLÉMENTAIRES & AUTRES (SI EXISTANTES) */}
+            {autres.length > 0 && (
+                <section className="print-doc-section">
+                    <h3 className="print-doc-section-title">Informations Complémentaires &amp; Divers ({autres.length})</h3>
+                    <table className="print-doc-table">
+                        <thead>
+                            <tr>
+                                <th style={{ width: '35%' }}>Catégorie / Mention</th>
+                                <th style={{ width: '65%' }}>Détails</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {autres.map((a, i) => (
+                                <tr key={a.id_autre ?? i}>
+                                    <td><strong>{a.titre}</strong></td>
+                                    <td style={{ whiteSpace: 'pre-line' }}>{a.description || '—'}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </section>
+            )}
+
             {/* 8. SESSIONS D'ÉVALUATION & ENTRETIENS RH */}
             <section className="print-doc-section">
                 <h3 className="print-doc-section-title">
@@ -351,10 +375,10 @@ export function CandidaturePrintDossier({ details, profileData, rendezVousList =
             {/* 11. PIED DE PAGE OFFICIEL */}
             <footer className="print-doc-footer">
                 <div className="print-doc-footer-legal">
-                    AlpA Ciment Madagascar — Société Anonyme • Direction des Ressources Humaines
+                    Alpha Ciment Madagascar — Société Anonyme • Direction des Ressources Humaines
                 </div>
                 <div className="print-doc-footer-confidentiality">
-                    Document strictement confidentiel • Réservé aux membres autorisés de la commission de recrutement AlpA Ciment.
+                    Document strictement confidentiel • Réservé aux membres autorisés de la commission de recrutement Alpha Ciment.
                 </div>
             </footer>
         </aside>

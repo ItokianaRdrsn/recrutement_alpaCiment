@@ -1,6 +1,6 @@
-# Planning global des sprints (Scope Général - 71,0 j)
+# Planning global des sprints (Scope Général - 73,0 j)
 
-Ce document contient la découpe officielle et exacte du projet *recrutement_alpaCiment* sur **71,0 jours** avec la planification calendaire théorique (jours ouvrés hors week-ends à partir du **Mercredi 12 Août 2026**) et le suivi des dates réelles constatées dans l'historique du projet.
+Ce document contient la découpe officielle et exacte du projet *recrutement_alphaCiment* sur **73,0 jours** avec la planification calendaire théorique (jours ouvrés hors week-ends à partir du **Mercredi 12 Août 2026**) et le suivi des dates réelles constatées dans l'historique du projet.
 
 ## 📅 Règles de Calcul du Planning
 - **Date de début du projet** : Mercredi 12 Août 2026 (Réception du Cahier des Charges).
@@ -17,11 +17,11 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 | **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | 25/08/2026 | 01/09/2026 | 25/08/2026 | 26/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | 02/09/2026 | 10/09/2026 | 26/08/2026 | 27/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 3** | Dépôt et réception des candidatures (Web, Saisie RH & Import) | 7,5 j | 11/09/2026 | 21/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 4** | Gestion RH des candidatures et fiche candidat | 7,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 11,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | 08/10/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 4** | Gestion RH des candidatures et fiche candidat | 8,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 12,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | 08/10/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 6** | Rendez-vous, communications, automatisation et modèles | 12,0 j | 16/10/2026 | 31/10/2026 | 07/10/2026 | 13/10/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 7** | Dashboard, recherche avancée, matching, audit logs et finalisation | 11,0 j | 03/11/2026 | 17/11/2026 | 13/10/2026 | *En cours* | **54.5%** (6,0/11,0j) | **[EN COURS]** |
-| **Total** | **Total Scope Général** | **71,0 j** | **12/08/2026** | **17/11/2026** | **12/08/2026** | *En cours* | **93.0%** (66,0/71,0j) | |
+| **Total** | **Total Scope Général** | **73,0 j** | **12/08/2026** | **17/11/2026** | **12/08/2026** | *En cours* | **93.2%** (68,0/73,0j) | |
 
 ---
 
@@ -91,7 +91,7 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 
 ---
 
-### Sprint 4 : Gestion RH des candidatures et fiche candidat (7,0 j - 100.0% FAIT)
+### Sprint 4 : Gestion RH des candidatures et fiche candidat (8,0 j - 100.0% FAIT)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **22/09/2026** au **30/09/2026** (7,0 j)
 - ⏱️ **Dates Réelles** : Du **28/08/2026** au **28/08/2026**
 - **BACK-OFFICE** :
@@ -102,12 +102,13 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
   - Fiche candidat : informations, documents, historique statuts et communications (2,0 j) - **[FAIT]**
   - Changement de statut avec commentaire et historique (1,5 j) - **[FAIT]**
   - Export PDF de la fiche candidat (0,5 j) - **[FAIT]**
+  - Liste globale des candidats (Annuaire des profils uniques) (1,0 j) - **[FAIT]**
   - Tests et debug (1,0 j) - **[FAIT]**
-- **Sous-total : 7,0 j (100.0% FAIT)**
+- **Sous-total : 8,0 j (100.0% FAIT)**
 
 ---
 
-### Sprint 5 : Vivier, compétences et validation CV (11,5 j - 100.0% FAIT)
+### Sprint 5 : Vivier, compétences et validation CV (12,5 j - 100.0% FAIT)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **01/10/2026** au **15/10/2026** (11,5 j)
 - ⏱️ **Dates Réelles** : Du **28/08/2026** au **08/10/2026**
 - **BACK-OFFICE** :
@@ -119,8 +120,9 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
   - Intégration FastAPI et microservice OCR dans `code_source/ocr` (2,0 j) - **[FAIT]**
   - Extraction des compétences, expériences et formations depuis le CV (2,0 j) - **[FAIT]**
   - Validation, correction et rejet des données extraites (2,0 j) - **[FAIT]**
+  - Rattachement / Relier une candidature spontanée ou en vivier à une offre (1,0 j) - **[FAIT]**
   - Tests et debug (1,0 j) - **[FAIT]**
-- **Sous-total : 11,5 j (100.0% FAIT)**
+- **Sous-total : 12,5 j (100.0% FAIT)**
 
 ---
 
@@ -160,5 +162,5 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 
 ---
 
-## 📈 **Total Scope Général : 71,0 j (Avancement global : 93.0% - 66,0 j / 71,0 j)**
+## 📈 **Total Scope Général : 73,0 j (Avancement global : 93.2% - 68,0 j / 73,0 j)**
 

@@ -23,6 +23,10 @@ class CvExtractionService
             $donnees = json_decode($donnees, true) ?: [];
         }
 
+        if (empty($donnees['autres']) && !empty($data['autres']) && is_array($data['autres'])) {
+            $donnees['autres'] = $data['autres'];
+        }
+
         $ocr = $this->cvExtractionRepository->createExtraction([
             'id_candidature' => $candidatureId,
             'texte_brut_ocr' => $data['texte_brut_ocr'] ?? null,
@@ -42,7 +46,7 @@ class CvExtractionService
                     $this->cvExtractionRepository->attachCompetence(
                         candidatureId: $candidatureId,
                         nomCompetence: trim($nom),
-                        niveau: is_array($c) ? ($c['niveau'] ?? null) : null,
+                        niveau: is_array($c) ? ($c['niveau'] ?? 'Intermédiaire') : 'Intermédiaire',
                         source: SourceDonnee::Ocr->value
                     );
                 }
@@ -94,6 +98,29 @@ class CvExtractionService
                         'technologies' => $p['technologies'] ?? null,
                         'url_projet' => $p['url_projet'] ?? null,
                         'description' => $p['description'] ?? null,
+                        'source' => SourceDonnee::Ocr->value,
+                        'valide' => true,
+                    ]);
+                }
+            }
+        }
+
+        // 5. Autres (loisirs, permis, références, engagement associatif...)
+        if (!empty($donnees['autres']) && is_array($donnees['autres'])) {
+            foreach ($donnees['autres'] as $a) {
+                if (is_string($a)) {
+                    $titre = 'Information complémentaire';
+                    $description = $a;
+                } elseif (is_array($a)) {
+                    $titre = $a['titre'] ?? $a['categorie'] ?? $a['nom'] ?? 'Information complémentaire';
+                    $description = $a['description'] ?? $a['valeur'] ?? $a['contenu'] ?? $a['details'] ?? null;
+                } else {
+                    continue;
+                }
+                if (!empty($titre) || !empty($description)) {
+                    $this->cvExtractionRepository->addAutre($candidatureId, [
+                        'titre' => mb_substr((string) ($titre ?: 'Information complémentaire'), 0, 255),
+                        'description' => $description ? (string) $description : null,
                         'source' => SourceDonnee::Ocr->value,
                         'valide' => true,
                     ]);

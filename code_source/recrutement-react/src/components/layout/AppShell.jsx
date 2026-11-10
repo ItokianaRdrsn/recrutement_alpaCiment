@@ -15,6 +15,7 @@ import {
     ShieldAlert,
     Sparkles,
     UserCheck,
+    Users,
 } from 'lucide-react';
 import { submitLogout } from '../../api/client';
 
@@ -48,6 +49,8 @@ export function AppShell({ children, user }) {
 
     const activeView = activePath.startsWith('/offres')
         ? 'offres'
+        : activePath.startsWith('/candidats')
+        ? 'candidats'
         : activePath.startsWith('/candidatures')
         ? 'candidatures'
         : activePath.startsWith('/vivier')
@@ -85,11 +88,11 @@ export function AppShell({ children, user }) {
                 <div className="brand-block">
                     <img
                         src="/themes/custom/apiqa/images/logo-cut.png"
-                        alt="AlpA Ciment Logo"
+                        alt="Alpha Ciment Logo"
                         className="sidebar-logo-img"
                     />
                     <div>
-                        <strong>AlpA Ciment</strong>
+                        <strong>Alpha Ciment</strong>
                         <span>Portail Recrutement RH</span>
                     </div>
                 </div>
@@ -151,6 +154,20 @@ export function AppShell({ children, user }) {
                         <span>Candidatures spontanées</span>
                     </a>
 
+                    {/* CANDIDATS (ANNUAIRE) */}
+                    <a
+                        aria-current={activePath.startsWith('/candidats') ? 'page' : undefined}
+                        className={activePath.startsWith('/candidats') ? 'nav-link active' : 'nav-link'}
+                        href="/candidats"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/candidats');
+                        }}
+                    >
+                        <Users aria-hidden="true" size={18} />
+                        <span>Répertoire Candidats</span>
+                    </a>
+
                     {/* VIVIER & OCR */}
                     <a
                         aria-current={activePath === '/vivier' ? 'page' : undefined}
@@ -204,10 +221,11 @@ export function AppShell({ children, user }) {
                         }}
                     >
                         <Activity aria-hidden="true" size={18} />
-                        <span>Journal d'audit</span>
+                        <span>Journal d'action</span>
                     </a>
 
-                    {/* MONITORING PIPELINE IA & N8N */}
+                    {/* MONITORING PIPELINE IA & N8N (TEMPORAIREMENT COMMENTÉ SELON DEMANDE UTILISATEUR) */}
+                    {/*
                     <a
                         aria-current={activePath === '/monitoring-pipeline' ? 'page' : undefined}
                         className={activePath === '/monitoring-pipeline' ? 'nav-link active' : 'nav-link'}
@@ -220,6 +238,7 @@ export function AppShell({ children, user }) {
                         <Cpu aria-hidden="true" size={18} />
                         <span>Monitoring Pipeline</span>
                     </a>
+                    */}
 
                     {/* RÉFÉRENTIELS (CLIC SUR LE HEADER AFFICHE / MASQUE UNIQUEMENT LE MENU DÉROULANT SANS REDIRECTION AUTOMATIQUE) */}
                     <div
@@ -275,7 +294,7 @@ export function AppShell({ children, user }) {
                                 : activeView === 'agenda'
                                 ? 'Agenda des Entretiens & Tests'
                                 : activeView === 'audit-logs'
-                                ? "Journal d'audit & Traçabilité"
+                                ? "Journal d'action & Traçabilité"
                                 : activeView === 'monitoring-pipeline'
                                 ? 'Monitoring Pipeline IA & n8n'
                                 : activeView === 'referentiels'

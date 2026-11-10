@@ -11,7 +11,7 @@ export function EnvoyerMessageModal({ isOpen, onClose, onSuccess, candidature, r
     // Champs spécifiques pour le rendez-vous / convocation
     const [dateRdv, setDateRdv] = useState('');
     const [heureRdv, setHeureRdv] = useState('09:00 à 10:00');
-    const [lieuRdv, setLieuRdv] = useState('Siège AlpA Ciment - Salle de réunion RH');
+    const [lieuRdv, setLieuRdv] = useState('Siège Alpha Ciment - Salle de réunion RH');
     const [modeRdv, setModeRdv] = useState('Présentiel');
     const [responsable, setResponsable] = useState('');
 
@@ -43,9 +43,9 @@ export function EnvoyerMessageModal({ isOpen, onClose, onSuccess, candidature, r
 
     // Suggestions de lieux
     const suggestionsLieux = [
-        'Siège AlpA Ciment - Salle de réunion RH',
-        'Siège AlpA Ciment - Direction Générale',
-        'Usine AlpA Ciment - Bureau Technique',
+        'Siège Alpha Ciment - Salle de réunion RH',
+        'Siège Alpha Ciment - Direction Générale',
+        'Usine Alpha Ciment - Bureau Technique',
         'Visioconférence (Lien Google Meet / Teams)',
         'Entretien téléphonique',
     ];
@@ -114,7 +114,7 @@ export function EnvoyerMessageModal({ isOpen, onClose, onSuccess, candidature, r
             setDateRdv(`${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`);
             setHeureRdv('09:00 à 10:00');
             setModeRdv('Présentiel');
-            setLieuRdv('Siège AlpA Ciment - Salle de réunion RH');
+            setLieuRdv('Siège Alpha Ciment - Salle de réunion RH');
         }
 
         // Chargement des modèles d'emails
@@ -167,7 +167,7 @@ export function EnvoyerMessageModal({ isOpen, onClose, onSuccess, candidature, r
             nom_complet: `${candidature?.candidat?.prenom || ''} ${candidature?.candidat?.nom || ''}`.trim(),
             email: candidature?.candidat?.email || '',
             telephone: candidature?.candidat?.telephone || '',
-            poste: candidature?.offre?.titre_poste || candidature?.poste_souhaite || 'Poste chez AlpA Ciment',
+            poste: candidature?.offre?.titre_poste || candidature?.poste_souhaite || 'Poste chez Alpha Ciment',
             direction: candidature?.offre?.direction?.nom_direction || 'Ressources Humaines',
             date_rdv: formatFrenchDate(customVars.dateRdv ?? dateRdv),
             heure_rdv: customVars.heureRdv ?? heureRdv,
@@ -524,7 +524,7 @@ export function EnvoyerMessageModal({ isOpen, onClose, onSuccess, candidature, r
                                     list="suggestions-lieux-message"
                                     value={lieuRdv}
                                     disabled={sending}
-                                    placeholder="Ex: Siège AlpA Ciment - Salle RH"
+                                    placeholder="Ex: Siège Alpha Ciment - Salle RH"
                                     onChange={(e) => {
                                         const newLieu = e.target.value;
                                         setLieuRdv(newLieu);

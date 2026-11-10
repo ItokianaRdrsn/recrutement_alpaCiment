@@ -2,7 +2,7 @@
 """
 config.py
 =========
-Configuration centralisée du microservice FastAPI OCR & NER d'AlpA Ciment.
+Configuration centralisée du microservice FastAPI OCR & NER d'Alpha Ciment.
 Toutes les variables sont surchargeables par variables d'environnement.
 """
 
@@ -51,6 +51,8 @@ OLLAMA_TAGS_URL = os.getenv("OLLAMA_TAGS_URL", "http://127.0.0.1:11434/api/tags"
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 OLLAMA_CONCURRENCY = int(os.getenv("OLLAMA_CONCURRENCY", "1"))
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "8192"))
+# Nombre de nouvelles tentatives si le LLM renvoie un JSON invalide ou dépasse le délai
+LLM_MAX_RETRIES = int(os.getenv("LLM_MAX_RETRIES", "1"))
 
 # -----------------------------------------------------------------------------
 # LIMITES D'INGESTION & OCR
@@ -67,3 +69,5 @@ MAX_EMAIL_BODY_CHARS = int(os.getenv("MAX_EMAIL_BODY_CHARS", "2000"))
 LARAVEL_BASE_URL = os.getenv("LARAVEL_BASE_URL", "http://127.0.0.1:8000")
 LARAVEL_PUBLIC_OFFERS_URL = f"{LARAVEL_BASE_URL.rstrip('/')}/api/offres/publiques"
 OFFERS_CACHE_TTL_S = int(os.getenv("OFFERS_CACHE_TTL_S", "300"))
+# Recherche des compétences extraites dans le référentiel Laravel (un seul appel par CV)
+LARAVEL_COMPETENCES_RAPPROCHER_URL = f"{LARAVEL_BASE_URL.rstrip('/')}/api/public/competences/rapprocher"

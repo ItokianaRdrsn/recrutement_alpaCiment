@@ -10,6 +10,7 @@ import {
     Filter,
     GraduationCap,
     Layers,
+    Link2,
     Plus,
     RefreshCw,
     RotateCcw,
@@ -24,6 +25,7 @@ import { ErrorState, LoadingState, TableSkeleton, VivierSkeleton } from '../comp
 import { Pagination } from '../components/common/Pagination';
 import { formatDate } from '../utils/formatters';
 import { CandidatureDetailView } from './CandidatureDetailView';
+import { RelierOffreModal } from '../components/modals/RelierOffreModal';
 
 export function VivierView({ referentiels }) {
     const [vivierList, setVivierList] = useState([]);
@@ -49,6 +51,7 @@ export function VivierView({ referentiels }) {
     const [candSearchResults, setCandSearchResults] = useState([]);
     const [searchingCands, setSearchingCands] = useState(false);
     const [addingCandId, setAddingCandId] = useState(null);
+    const [relierModalItem, setRelierModalItem] = useState(null);
 
     const [filters, setFilters] = useState({ q: '', direction: '', domaine: '', statut: '' });
     const [appliedFilters, setAppliedFilters] = useState({ q: '', direction: '', domaine: '', statut: '' });
@@ -311,15 +314,27 @@ export function VivierView({ referentiels }) {
                                         <td>
                                             <div style={{ display: 'flex', gap: '6px' }}>
                                                 {item.id_candidature ? (
-                                                    <button
-                                                        className="filter-button"
-                                                        onClick={() => setSelectedCandidatureId(item.id_candidature)}
-                                                        style={{ padding: '6px 12px', fontSize: '13px', gap: '6px' }}
-                                                        type="button"
-                                                    >
-                                                        <Eye size={15} />
-                                                        <span>Consulter dossier</span>
-                                                    </button>
+                                                    <>
+                                                        <button
+                                                            className="filter-button"
+                                                            onClick={() => setSelectedCandidatureId(item.id_candidature)}
+                                                            style={{ padding: '6px 12px', fontSize: '13px', gap: '6px' }}
+                                                            type="button"
+                                                        >
+                                                            <Eye size={15} />
+                                                            <span>Consulter dossier</span>
+                                                        </button>
+                                                        <button
+                                                            className="filter-button"
+                                                            onClick={() => setRelierModalItem(item)}
+                                                            style={{ padding: '6px 12px', fontSize: '13px', gap: '6px', color: '#059669', borderColor: '#a7f3d0', background: '#ecfdf5' }}
+                                                            title="Relier cette candidature à une offre d'emploi active"
+                                                            type="button"
+                                                        >
+                                                            <Link2 size={15} />
+                                                            <span>Relier à une offre</span>
+                                                        </button>
+                                                    </>
                                                 ) : null}
                                                 <button
                                                     className="row-button danger"
@@ -565,6 +580,19 @@ export function VivierView({ referentiels }) {
                     </div>
                 </div>,
                 document.body
+            )}
+            {relierModalItem && (
+                <RelierOffreModal
+                    candidature={{
+                        id_candidature: relierModalItem.id_candidature,
+                        candidat: relierModalItem.candidat,
+                        dans_vivier: true,
+                    }}
+                    onClose={() => setRelierModalItem(null)}
+                    onSuccess={async () => {
+                        await loadVivier();
+                    }}
+                />
             )}
         </div>
     );
