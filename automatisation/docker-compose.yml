@@ -1,7 +1,7 @@
 services:
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
-    container_name: n8n_alpaciment
+    container_name: n8n_alphaciment
     restart: unless-stopped
     ports:
       - "${N8N_PORT:-5678}:5678"
@@ -12,8 +12,13 @@ services:
       - N8N_HOST=${N8N_HOST:-localhost}
       - N8N_WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678/}
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=${N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS:-true}
+      # Les workflows lisent ces URLs via {{ $env.OCR_BASE_URL }} / {{ $env.LARAVEL_BASE_URL }}
+      - N8N_BLOCK_ENV_ACCESS_IN_NODE=false
+      - OCR_BASE_URL=${OCR_BASE_URL:-http://host.docker.internal:8001}
+      - LARAVEL_BASE_URL=${LARAVEL_BASE_URL:-http://host.docker.internal:8000}
     volumes:
       - n8n_data:/home/node/.n8n
+    # Nécessaire sous Linux (inutile mais inoffensif sous Docker Desktop Windows/Mac)
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

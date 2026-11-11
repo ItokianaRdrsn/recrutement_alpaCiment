@@ -1,6 +1,6 @@
 # 📘 Documentation Complète & Projet Pratique n8n (100% Hors Connexion)
 
-> **Projet : Plateforme de Recrutement AlpA Ciment**  
+> **Projet : Plateforme de Recrutement Alpha Ciment**  
 > **Technologies :** n8n (Docker), FastAPI (Python local), 100% Localhost sans connexion Internet.
 
 ---
@@ -95,7 +95,7 @@ Pour appeler depuis n8n une API tournant sur votre machine locale (FastAPI sur l
 - ❌ **Ne pas utiliser :** `http://localhost:8000/api/...`
 - ✅ **Toujours utiliser :** `http://host.docker.internal:8000/api/...`
 
-L'alias spécial `host.docker.internal` est déjà configuré dans notre [docker-compose.yml](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/docker-compose.yml).
+L'alias spécial `host.docker.internal` est déjà configuré dans notre [docker-compose.yml](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/docker-compose.yml).
 
 ---
 
@@ -131,7 +131,7 @@ L'API démarre sur `http://localhost:8000`.
 
 ### B. Méthode 1 : Importer le Workflow en 1 clic
 
-Un fichier de workflow prêt à l'emploi a été généré : [workflow_triage_candidats_n8n.json](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/automatisation/projet_test_fastapi/workflow_triage_candidats_n8n.json).
+Un fichier de workflow prêt à l'emploi a été généré : [workflow_triage_candidats_n8n.json](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/automatisation/projet_test_fastapi/workflow_triage_candidats_n8n.json).
 
 1. Ouvrez n8n dans votre navigateur : **[http://localhost:5678](http://localhost:5678)**
 2. Créez un nouveau workflow (cliquez sur **Add workflow**).

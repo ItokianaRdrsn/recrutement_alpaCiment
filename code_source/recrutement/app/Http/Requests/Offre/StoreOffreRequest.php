@@ -34,14 +34,31 @@ class StoreOffreRequest extends FormRequest
             'id_lieu' => ['nullable', 'integer', 'exists:lieu,id_lieu'],
             'lieu' => ['nullable', 'string', 'max:150'],
             'id_type_contrat' => ['nullable', 'integer', 'exists:type_contrat,id_type_contrat'],
+            'duree_contrat' => ['nullable', 'string', 'max:100'],
             'date_publication' => ['nullable', 'date'],
-            'date_limite' => ['nullable', 'date', 'after_or_equal:date_publication'],
+            'date_limite' => [
+                'nullable',
+                'date',
+                !empty($this->date_publication) ? 'after_or_equal:date_publication' : 'nullable',
+            ],
             'id_statut_offre' => ['nullable', 'integer', 'exists:statut_offre,id_statut_offre'],
             'profil' => ['nullable', 'array'],
             'profils' => ['nullable', 'array'],
             'missions' => ['nullable', 'array'],
             'formations' => ['nullable', 'array'],
             'competences' => ['nullable', 'array'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'titre_poste.required' => "L'intitulé du poste est obligatoire.",
+            'id_direction.required' => "La direction de rattachement est obligatoire.",
+            'id_direction.exists' => "La direction sélectionnée est invalide.",
+            'date_limite.after_or_equal' => "La date limite de candidature doit être postérieure ou égale à la date de publication.",
+            'date_publication.date' => "La date de publication doit être une date valide.",
+            'date_limite.date' => "La date limite de candidature doit être une date valide.",
         ];
     }
 }

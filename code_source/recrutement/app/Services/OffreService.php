@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\StatutOffreEnum;
 use App\Models\Offre;
-use App\Models\StatutOffre;
 use App\Repositories\Contracts\OffreRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +12,8 @@ use Illuminate\Validation\ValidationException;
 class OffreService
 {
     public function __construct(
-        protected OffreRepositoryInterface $offreRepository
+        protected OffreRepositoryInterface $offreRepository,
+        protected AuditLogService $auditLogService
     ) {}
 
     public function paginate(array $filters, int $perPage = 15): LengthAwarePaginator
@@ -41,7 +42,7 @@ class OffreService
 
     public function create(array $data, array $relationsData): Offre
     {
-        $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->offreRepository->getStatusId('Brouillon');
+        $data['id_statut_offre'] = $data['id_statut_offre'] ?? $this->offreRepository->getStatusId(StatutOffreEnum::Brouillon);
         $data['id_lieu'] = !empty($data['id_lieu']) ? (int) $data['id_lieu'] : 1;
 
         unset($data['profil'], $data['profils'], $data['missions'], $data['formations'], $data['competences']);
@@ -49,12 +50,50 @@ class OffreService
         return DB::transaction(function () use ($data, $relationsData) {
             $offre = $this->offreRepository->create($data);
             $this->offreRepository->syncNestedRelations($offre, $relationsData);
-            return $this->offreRepository->findById($offre->id_offre);
+            $createdOffre = $this->offreRepository->findById($offre->id_offre);
+
+            $this->auditLogService->log(
+                action: 'CREATION_OFFRE',
+                entite: 'Offre',
+                idEntite: $createdOffre->id_offre,
+                description: "Création de l'offre d'emploi : {$createdOffre->titre_poste} ({$createdOffre->reference_offre})",
+                anciennesValeurs: null,
+                nouvellesValeurs: [
+                    'titre_poste' => $createdOffre->titre_poste,
+                    'reference_offre' => $createdOffre->reference_offre,
+                    'id_direction' => $createdOffre->id_direction,
+                    'id_domaine' => $createdOffre->id_domaine,
+                    'id_statut_offre' => $createdOffre->id_statut_offre,
+                ]
+            );
+
+            return $createdOffre;
         });
+    }
+
+    /**
+     * Une offre clôturée (= archivée) est figée : plus aucune modification ni changement de statut.
+     */
+    public function estCloturee(Offre $offre): bool
+    {
+        $clotureeId = $this->offreRepository->getStatusId(StatutOffreEnum::Cloturee);
+
+        return $clotureeId !== null && (int) $offre->id_statut_offre === (int) $clotureeId;
+    }
+
+    protected function refuserSiCloturee(Offre $offre): void
+    {
+        if ($this->estCloturee($offre)) {
+            throw ValidationException::withMessages([
+                'offre' => ["Cette offre est clôturée (archivée) : elle n'est plus modifiable."],
+            ]);
+        }
     }
 
     public function update(Offre $offre, array $data, array $relationsData): Offre
     {
+        $this->refuserSiCloturee($offre);
+
         if (isset($data['id_statut_offre']) && (int) $data['id_statut_offre'] !== (int) $offre->id_statut_offre) {
             $this->validateWorkflowProgression($offre, (int) $data['id_statut_offre']);
         }
@@ -63,18 +102,43 @@ class OffreService
             $data['id_lieu'] = 1;
         }
 
+        $anciennesValeurs = [
+            'titre_poste' => $offre->titre_poste,
+            'reference_offre' => $offre->reference_offre,
+            'id_statut_offre' => $offre->id_statut_offre,
+            'id_direction' => $offre->id_direction,
+        ];
+
         unset($data['profil'], $data['profils'], $data['missions'], $data['formations'], $data['competences']);
 
-        return DB::transaction(function () use ($offre, $data, $relationsData) {
+        return DB::transaction(function () use ($offre, $data, $relationsData, $anciennesValeurs) {
             $this->offreRepository->update($offre, $data);
             $this->offreRepository->syncNestedRelations($offre, $relationsData);
-            return $this->offreRepository->findById($offre->id_offre);
+            $updatedOffre = $this->offreRepository->findById($offre->id_offre);
+
+            $this->auditLogService->log(
+                action: 'MODIFICATION_OFFRE',
+                entite: 'Offre',
+                idEntite: $updatedOffre->id_offre,
+                description: "Modification de l'offre d'emploi : {$updatedOffre->titre_poste} ({$updatedOffre->reference_offre})",
+                anciennesValeurs: $anciennesValeurs,
+                nouvellesValeurs: [
+                    'titre_poste' => $updatedOffre->titre_poste,
+                    'reference_offre' => $updatedOffre->reference_offre,
+                    'id_statut_offre' => $updatedOffre->id_statut_offre,
+                    'id_direction' => $updatedOffre->id_direction,
+                ]
+            );
+
+            return $updatedOffre;
         });
     }
 
     public function publish(Offre $offre): Offre
     {
-        $targetId = $this->offreRepository->getStatusId('Publiee');
+        $this->refuserSiCloturee($offre);
+
+        $targetId = $this->offreRepository->getStatusId(StatutOffreEnum::Publiee);
         if (!$targetId) {
             abort(500, 'Statut Publiee introuvable.');
         }
@@ -86,12 +150,25 @@ class OffreService
             'date_publication' => $offre->date_publication ?? today(),
         ]);
 
-        return $this->offreRepository->findById($offre->id_offre);
+        $published = $this->offreRepository->findById($offre->id_offre);
+
+        $this->auditLogService->log(
+            action: 'PUBLICATION_OFFRE',
+            entite: 'Offre',
+            idEntite: $published->id_offre,
+            description: "Publication de l'offre : {$published->titre_poste} ({$published->reference_offre})",
+            anciennesValeurs: ['id_statut_offre' => $offre->id_statut_offre],
+            nouvellesValeurs: ['id_statut_offre' => $targetId, 'date_publication' => $published->date_publication]
+        );
+
+        return $published;
     }
 
     public function close(Offre $offre): Offre
     {
-        $targetId = $this->offreRepository->getStatusId('Cloturee');
+        $this->refuserSiCloturee($offre);
+
+        $targetId = $this->offreRepository->getStatusId(StatutOffreEnum::Cloturee);
         if (!$targetId) {
             abort(500, 'Statut Cloturee introuvable.');
         }
@@ -101,14 +178,26 @@ class OffreService
         $this->offreRepository->update($offre, [
             'id_statut_offre' => $targetId,
             'date_limite' => $offre->date_limite ?? today(),
+            'date_cloture' => now(),
         ]);
 
-        return $this->offreRepository->findById($offre->id_offre);
+        $closed = $this->offreRepository->findById($offre->id_offre);
+
+        $this->auditLogService->log(
+            action: 'CLOTURE_OFFRE',
+            entite: 'Offre',
+            idEntite: $closed->id_offre,
+            description: "Clôture de l'offre : {$closed->titre_poste} ({$closed->reference_offre})",
+            anciennesValeurs: ['id_statut_offre' => $offre->id_statut_offre],
+            nouvellesValeurs: ['id_statut_offre' => $targetId, 'date_limite' => $closed->date_limite]
+        );
+
+        return $closed;
     }
 
     public function delete(Offre $offre): void
     {
-        $brouillonId = $this->offreRepository->getStatusId('Brouillon');
+        $brouillonId = $this->offreRepository->getStatusId(StatutOffreEnum::Brouillon);
 
         if ($brouillonId && (int) $offre->id_statut_offre !== $brouillonId) {
             throw ValidationException::withMessages([
@@ -116,13 +205,28 @@ class OffreService
             ]);
         }
 
+        $deletedDetails = [
+            'id_offre' => $offre->id_offre,
+            'titre_poste' => $offre->titre_poste,
+            'reference_offre' => $offre->reference_offre,
+        ];
+
         $this->offreRepository->delete($offre);
+
+        $this->auditLogService->log(
+            action: 'SUPPRESSION_OFFRE',
+            entite: 'Offre',
+            idEntite: $deletedDetails['id_offre'],
+            description: "Suppression définitive du brouillon de l'offre : {$deletedDetails['titre_poste']}",
+            anciennesValeurs: $deletedDetails,
+            nouvellesValeurs: null
+        );
     }
 
     public function validateWorkflowProgression(Offre $offre, int $targetStatusId): void
     {
-        $current = StatutOffre::find($offre->id_statut_offre);
-        $target = StatutOffre::find($targetStatusId);
+        $current = $this->offreRepository->findStatutById((int) $offre->id_statut_offre);
+        $target = $this->offreRepository->findStatutById($targetStatusId);
 
         if (!$current || !$target) {
             return;

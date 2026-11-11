@@ -1,6 +1,6 @@
 @echo off
 echo =======================================================
-echo Demarrage de l'API FastAPI RH AlpA Ciment (Hors Connexion)
+echo Demarrage de l'API FastAPI RH Alpha Ciment (Hors Connexion)
 echo Accessible sur : http://localhost:8000
 echo Documentation Swagger : http://localhost:8000/docs
 echo =======================================================

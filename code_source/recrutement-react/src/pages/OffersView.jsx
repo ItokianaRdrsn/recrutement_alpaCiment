@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
+    Archive,
     ArrowLeft,
     Award,
     BriefcaseBusiness,
     CheckCircle2,
     Edit3,
+    FileText,
     Filter,
     GraduationCap,
     ListChecks,
@@ -18,9 +20,10 @@ import {
     X,
 } from 'lucide-react';
 import { getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { ErrorState, LoadingState, OffersSkeleton, TableSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { RowActions } from '../components/common/RowActions';
+import { AfficheOffreModal } from '../components/modals/AfficheOffreModal';
 import { CompetenceModal } from '../components/modals/CompetenceModal';
 import { SaisirRhCandidatureModal } from '../components/modals/SaisirRhCandidatureModal';
 import { emptyOfferForm, offerPayload } from '../utils/formatters';
@@ -34,6 +37,15 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         statut: '',
         type_contrat: '',
         page: 1,
+        per_page: 10,
+    });
+    const [appliedFilters, setAppliedFilters] = useState({
+        q: '',
+        direction: '',
+        statut: '',
+        type_contrat: '',
+        page: 1,
+        per_page: 10,
     });
     const [saisirRhOffreId, setSaisirRhOffreId] = useState(null);
     const [offersResponse, setOffersResponse] = useState({ data: [], meta: null });
@@ -47,6 +59,8 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
     const [selectedAddCompNiveau, setSelectedAddCompNiveau] = useState('Intermediaire');
     const [showCompetenceCreateModal, setShowCompetenceCreateModal] = useState(false);
     const [extraCompetences, setExtraCompetences] = useState([]);
+    const [selectedAfficheOffer, setSelectedAfficheOffer] = useState(null);
+    const [listTab, setListTab] = useState('actives'); // 'actives' | 'archive'
 
     const getCompId = useCallback((c) => Number(c?.id_competence ?? c?.id ?? 0), []);
     const getCompName = useCallback((c) => c?.nom_competence ?? c?.nom ?? `Compétence #${getCompId(c)}`, [getCompId]);
@@ -85,16 +99,19 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
     const queryString = useMemo(() => {
         const params = new URLSearchParams();
 
-        Object.entries(filters).forEach(([key, value]) => {
+        Object.entries(appliedFilters).forEach(([key, value]) => {
             if (value) {
                 params.set(key, value);
             }
         });
 
-        params.set('per_page', '10');
+        params.set('per_page', String(appliedFilters.per_page || 10));
+        // L'archive = offres clôturées ; l'onglet principal les masque.
+        params.set('archivees', listTab === 'archive' ? 'only' : 'exclude');
+        if (listTab === 'archive') params.delete('statut');
 
         return params.toString();
-    }, [filters]);
+    }, [appliedFilters, listTab]);
 
     const loadOffers = useCallback(async () => {
         setLoading(true);
@@ -140,10 +157,37 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         }));
     }
 
+    function handleApplyFilters() {
+        setAppliedFilters({ ...filters, page: 1 });
+    }
+
+    function handleResetFilters() {
+        const reset = { q: '', direction: '', statut: '', type_contrat: '', page: 1, per_page: 10 };
+        setFilters(reset);
+        setAppliedFilters(reset);
+    }
+
     function changePage(page) {
         setFilters((current) => ({
             ...current,
             page,
+        }));
+        setAppliedFilters((current) => ({
+            ...current,
+            page,
+        }));
+    }
+
+    function changePerPage(perPage) {
+        setFilters((current) => ({
+            ...current,
+            per_page: perPage,
+            page: 1,
+        }));
+        setAppliedFilters((current) => ({
+            ...current,
+            per_page: perPage,
+            page: 1,
         }));
     }
 
@@ -309,8 +353,10 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
             titre_poste: offre.titre_poste ?? '',
             id_direction: offre.direction?.id ? String(offre.direction.id) : '',
             description: offre.description ?? '',
+            id_lieu: offre.id_lieu ? String(offre.id_lieu) : '',
             lieu: offre.lieu ?? '',
             id_type_contrat: offre.type_contrat?.id ? String(offre.type_contrat.id) : '',
+            duree_contrat: offre.duree_contrat ?? '',
             date_publication: offre.date_publication ?? '',
             date_limite: offre.date_limite ?? '',
             id_statut_offre: offre.statut?.id ? String(offre.statut.id) : defaultStatusId ? String(defaultStatusId) : '',
@@ -334,10 +380,29 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    const clotureeStatusId = referentiels.statuts_offre?.find((s) => s.libelle === 'Cloturee' || s.libelle === 'Clôturée')?.id_statut_offre;
+    const isClosedForm = Boolean(offerForm.id) && Boolean(clotureeStatusId) && String(offerForm.id_statut_offre) === String(clotureeStatusId);
+
+    function switchListTab(tab) {
+        if (tab === listTab) return;
+        setListTab(tab);
+        setFilters((current) => ({ ...current, page: 1 }));
+        setAppliedFilters((current) => ({ ...current, page: 1 }));
+    }
+
     async function saveOffer(event) {
         event.preventDefault();
+        if (isClosedForm) return; // offre clôturée (archivée) : consultation seule
         setSaving(true);
         setFormError('');
+
+        if (offerForm.date_publication && offerForm.date_limite) {
+            if (offerForm.date_limite < offerForm.date_publication) {
+                setFormError('La date limite de candidature doit être postérieure ou égale à la date de publication.');
+                setSaving(false);
+                return;
+            }
+        }
 
         try {
             await sendJson(offerForm.id ? `/api/offre/${offerForm.id}` : '/api/offres', {
@@ -369,6 +434,38 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
         }
     }
 
+    async function handleSaveAfficheToOffer(posterData) {
+        const cleanJobTitle = (posterData.prefix && !posterData.jobTitle.toLowerCase().startsWith(posterData.prefix.toLowerCase())
+            ? `${posterData.prefix} ${posterData.jobTitle.replace(/\n+/g, ' ')}`
+            : posterData.jobTitle.replace(/\n+/g, ' ')).trim();
+
+        const updated = {
+            ...offerForm,
+            titre_poste: cleanJobTitle || offerForm.titre_poste,
+            description: posterData.accroche || offerForm.description,
+            missions: posterData.missions?.map((m, idx) => ({
+                id: offerForm.missions?.[idx]?.id,
+                description: m,
+                ordre: idx + 1,
+            })) || offerForm.missions,
+        };
+        setOfferForm(updated);
+
+        const offerId = selectedAfficheOffer?.id ?? selectedAfficheOffer?.id_offre ?? offerForm.id;
+        if (offerId) {
+            try {
+                await sendJson(`/api/offre/${offerId}`, {
+                    body: offerPayload(updated),
+                    method: 'PUT',
+                });
+                await loadOffers();
+            } catch (err) {
+                console.warn('Erreur synchronisation API:', err);
+            }
+        }
+        alert("L'affiche et les données de l'offre ont été synchronisées avec succès !");
+    }
+
     async function changeOfferStatus(offre, action) {
         setFormError('');
 
@@ -388,7 +485,8 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
 
         const canPublish = canManage && currentOrder < publieeOrder;
         const canClose = canManage && currentOrder < clotureeOrder;
-        const canEdit = canManage;
+        const isArchived = offre.est_archivee || currentOrder >= clotureeOrder;
+        const canEdit = canManage && !isArchived;
         const canDelete = canManage;
 
         return (
@@ -411,14 +509,23 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                     title={canClose ? "Clôturer l'offre" : "Clôture impossible (Offre déjà clôturée)"}
                     type="button"
                 >
-                    <X aria-hidden="true" size={15} />
+                    <Archive aria-hidden="true" size={15} />
+                </button>
+                <button
+                    className="row-button"
+                    onClick={() => setSelectedAfficheOffer(offre)}
+                    style={{ color: '#e61e24' }}
+                    title="Générer l'affiche officielle de recrutement (PDF)"
+                    type="button"
+                >
+                    <FileText aria-hidden="true" size={15} />
                 </button>
                 <button
                     className="row-button"
                     disabled={!canEdit}
                     onClick={() => { if (canEdit) editOffer(offre); }}
                     style={!canEdit ? { opacity: 0.35, cursor: 'not-allowed' } : {}}
-                    title={canEdit ? "Modifier l'offre" : "Modification non autorisée"}
+                    title={canEdit ? "Modifier l'offre" : isArchived ? "Offre clôturée (archivée) : consultation seule" : "Modification non autorisée"}
                     type="button"
                 >
                     <Edit3 aria-hidden="true" size={15} />
@@ -459,12 +566,33 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                 <section className="data-section">
                     <div className="section-heading">
                         <div>
-                            <h2>{offerForm.id ? 'Modifier une offre' : 'Nouvelle offre'}</h2>
-                            <p>Formulaire de saisie complete de l'offre, des profils, missions, formations et competences.</p>
+                            <h2>{isClosedForm ? 'Offre archivée (consultation)' : offerForm.id ? 'Modifier une offre' : 'Nouvelle offre'}</h2>
+                            <p>{isClosedForm ? 'Cette offre est clôturée : elle est conservée en archive et n\'est plus modifiable.' : "Formulaire de saisie complete de l'offre, des profils, missions, formations et competences."}</p>
+                        </div>
+                        <div className="section-heading-actions">
+                            <button
+                                className="filter-button"
+                                onClick={() => setSelectedAfficheOffer(offerForm)}
+                                style={{
+                                    background: '#fef2f2',
+                                    color: '#e61e24',
+                                    borderColor: '#fca5a5',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    fontWeight: '700',
+                                }}
+                                title="Prévisualiser l'affiche officielle de recrutement au format PDF"
+                                type="button"
+                            >
+                                <FileText size={17} />
+                                <span>Affiche Recrutement (PDF)</span>
+                            </button>
                         </div>
                     </div>
 
                     <form className="compact-form offer-form" onSubmit={saveOffer}>
+                      <fieldset disabled={isClosedForm} style={{ display: 'contents', border: 0, padding: 0, margin: 0 }}>
                         <div className="form-sub-header">
                             <BriefcaseBusiness size={18} />
                             <span>Informations Principales</span>
@@ -513,6 +641,27 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                                 ))}
                             </select>
                         </label>
+
+                        {/* Durée du contrat (si CDD) */}
+                        {(() => {
+                            const selectedContrat = referentiels.types_contrat?.find(
+                                (c) => String(c.id_type_contrat) === String(offerForm.id_type_contrat)
+                            );
+                            const isCdd = selectedContrat?.libelle?.toUpperCase()?.includes('CDD');
+                            if (!isCdd) return null;
+                            return (
+                                <label>
+                                    <span>Durée du contrat (CDD) <span style={{ color: '#ef4444' }}>*</span></span>
+                                    <input
+                                        name="duree_contrat"
+                                        onChange={(event) => updateOfferForm('duree_contrat', event.target.value)}
+                                        placeholder="Ex: 6 mois, 1 an, 12 mois..."
+                                        type="text"
+                                        value={offerForm.duree_contrat || ''}
+                                    />
+                                </label>
+                            );
+                        })()}
 
                         <label>
                             <span>Statut <span style={{ color: '#ef4444' }}>*</span></span>
@@ -892,9 +1041,28 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         </div>
 
                         <div className="form-actions full-span" style={{ marginTop: '16px' }}>
-                            <button className="filter-button" disabled={saving} type="submit">
-                                <Save aria-hidden="true" size={17} />
-                                <span>{saving ? 'Enregistrement...' : "Enregistrer l'offre"}</span>
+                            {!isClosedForm ? (
+                                <button className="filter-button" disabled={saving} type="submit">
+                                    <Save aria-hidden="true" size={17} />
+                                    <span>{saving ? 'Enregistrement...' : "Enregistrer l'offre"}</span>
+                                </button>
+                            ) : null}
+                            <button
+                                className="ghost-button"
+                                onClick={() => setSelectedAfficheOffer(offerForm)}
+                                style={{
+                                    color: '#e61e24',
+                                    borderColor: '#fca5a5',
+                                    fontWeight: '600',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                }}
+                                title="Prévisualiser l'affiche officielle au format PDF"
+                                type="button"
+                            >
+                                <FileText size={17} />
+                                <span>Aperçu Affiche (PDF)</span>
                             </button>
                             <button
                                 className="ghost-button"
@@ -910,6 +1078,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         </div>
 
                         {formError ? <p className="form-error full-span">{formError}</p> : null}
+                      </fieldset>
                     </form>
                 </section>
 
@@ -938,18 +1107,53 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         typesList={competencesData?.types ?? []}
                     />
                 ) : null}
+
+                {selectedAfficheOffer ? (
+                    <AfficheOffreModal
+                        allCompetences={allCompetences}
+                        offer={selectedAfficheOffer}
+                        onClose={() => setSelectedAfficheOffer(null)}
+                        onSaveToOffer={handleSaveAfficheToOffer}
+                        referentiels={referentiels}
+                    />
+                ) : null}
             </div>
         );
     }
 
+    if (loading && offersResponse.data.length === 0) {
+        return <OffersSkeleton />;
+    }
+
     return (
         <div className="view-stack">
+            <div role="tablist" aria-label="Offres" style={{ display: 'flex', gap: '8px', marginBottom: '4px' }}>
+                {[
+                    ['actives', 'Offres'],
+                    ['archive', 'Archive (offres clôturées)'],
+                ].map(([key, label]) => (
+                    <button
+                        aria-selected={listTab === key}
+                        className={listTab === key ? 'filter-button' : 'ghost-button'}
+                        key={key}
+                        onClick={() => switchListTab(key)}
+                        role="tab"
+                        type="button"
+                    >
+                        <span>{label}</span>
+                    </button>
+                ))}
+            </div>
+
             <section className="filter-bar" aria-label="Filtres des offres">
                 <label className="search-field">
                     <Search aria-hidden="true" size={18} />
                     <input
                         name="q"
                         onChange={(event) => updateFilter('q', event.target.value)}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter') handleApplyFilters();
+                        }}
                         placeholder="Rechercher un poste, un lieu..."
                         type="search"
                         value={filters.q}
@@ -968,6 +1172,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                     </select>
                 </label>
 
+                {listTab === 'actives' ? (
                 <label>
                     <span>Statut</span>
                     <select onChange={(event) => updateFilter('statut', event.target.value)} value={filters.statut}>
@@ -979,6 +1184,7 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         ))}
                     </select>
                 </label>
+                ) : null}
 
                 <label>
                     <span>Contrat</span>
@@ -993,13 +1199,13 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                 </label>
 
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <button className="filter-button" onClick={loadOffers} type="button">
+                    <button className="filter-button" onClick={handleApplyFilters} type="button">
                         <Filter aria-hidden="true" size={17} />
                         <span>Filtrer</span>
                     </button>
                     <button
                         className="ghost-button"
-                        onClick={() => setFilters({ q: '', direction: '', statut: '', type_contrat: '', page: 1 })}
+                        onClick={handleResetFilters}
                         title="Réinitialiser les filtres"
                         type="button"
                     >
@@ -1012,11 +1218,11 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
             <section className="data-section">
                 <div className="section-heading">
                     <div>
-                        <h2>Liste des offres</h2>
-                        <p>{meta?.total ?? 0} offre(s) trouvee(s)</p>
+                        <h2>{listTab === 'archive' ? 'Archive des offres' : 'Liste des offres'}</h2>
+                        <p>{meta?.total ?? 0} offre(s) trouvee(s){listTab === 'archive' ? ' — supprimées automatiquement après la durée de conservation' : ''}</p>
                     </div>
                     <div className="section-heading-actions">
-                        {canManage ? (
+                        {canManage && listTab === 'actives' ? (
                             <button className="filter-button" onClick={openNewOfferForm} type="button">
                                 <Plus aria-hidden="true" size={17} />
                                 <span>Nouvelle offre</span>
@@ -1032,21 +1238,26 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                 {error ? (
                     <ErrorState message={error} onRetry={loadOffers} />
                 ) : loading ? (
-                    <LoadingState
-                        message="Chargement des offres d'emploi..."
-                        subtitle="Récupération du catalogue et des critères de recrutement"
-                    />
+                    <TableSkeleton rows={6} cols={6} />
                 ) : (
                     <OffersTable
                         offers={offersResponse.data}
                         onNavigate={onNavigate}
                         onSaisirRh={(id) => setSaisirRhOffreId(id)}
                         onSelectOffer={editOffer}
+                        onShowAffiche={(offre) => setSelectedAfficheOffer(offre)}
                         renderActions={renderOfferActions}
                     />
                 )}
 
-                {meta ? <Pagination meta={meta} onChangePage={changePage} /> : null}
+                {meta ? (
+                    <Pagination
+                        meta={meta}
+                        onChangePage={changePage}
+                        onChangePerPage={changePerPage}
+                        perPage={appliedFilters.per_page || 10}
+                    />
+                ) : null}
             </section>
 
             {saisirRhOffreId ? (
@@ -1078,6 +1289,16 @@ export function OffersView({ canManage, competencesData, initialEditingOffer = n
                         }
                     }}
                     typesList={competencesData.types ?? []}
+                />
+            ) : null}
+
+            {selectedAfficheOffer ? (
+                <AfficheOffreModal
+                    allCompetences={allCompetences}
+                    offer={selectedAfficheOffer}
+                    onClose={() => setSelectedAfficheOffer(null)}
+                    onSaveToOffer={handleSaveAfficheToOffer}
+                    referentiels={referentiels}
                 />
             ) : null}
         </div>

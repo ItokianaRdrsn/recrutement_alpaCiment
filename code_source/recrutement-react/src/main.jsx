@@ -1,9 +1,9 @@
 import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import './styles.css';
-import { backendPath, getJson, getPublicJson, sendPublicFormData } from './api/client';
-import { ErrorState, LoadingState, PagePreloader } from './components/common/FeedbackStates';
+import { backendPath, getAuthToken, getJson, getPublicJson, redirectToLogin, sendPublicFormData } from './api/client';
+import { ErrorState, PagePreloader } from './components/common/FeedbackStates';
 import { AppShell } from './components/layout/AppShell';
 import { PublicLayout } from './components/layout/PublicLayout';
 
@@ -12,9 +12,19 @@ const DashboardView = lazy(() => import('./pages/DashboardView').then((m) => ({ 
 const OffersView = lazy(() => import('./pages/OffersView').then((m) => ({ default: m.OffersView })));
 const CandidaturesOffresView = lazy(() => import('./pages/CandidaturesOffresView').then((m) => ({ default: m.CandidaturesOffresView })));
 const CandidaturesSpontaneesView = lazy(() => import('./pages/CandidaturesSpontaneesView').then((m) => ({ default: m.CandidaturesSpontaneesView })));
+const CandidatsListView = lazy(() => import('./pages/CandidatsListView').then((m) => ({ default: m.CandidatsListView })));
 const ReferentialsView = lazy(() => import('./pages/ReferentialsView').then((m) => ({ default: m.ReferentialsView })));
 const VivierView = lazy(() => import('./pages/VivierView').then((m) => ({ default: m.VivierView })));
+const AgendaView = lazy(() => import('./pages/AgendaView').then((m) => ({ default: m.AgendaView })));
+const ModelesEmailsView = lazy(() => import('./pages/ModelesEmailsView').then((m) => ({ default: m.ModelesEmailsView })));
+const AuditLogsView = lazy(() => import('./pages/AuditLogsView').then((m) => ({ default: m.AuditLogsView })));
+const PipelineMonitoringView = lazy(() => import('./pages/PipelineMonitoringView').then((m) => ({ default: m.PipelineMonitoringView })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })));
+
+function CandidatureRedirect() {
+    const { id } = useParams();
+    return <Navigate replace to={`/candidatures/offres?candidature=${id}`} />;
+}
 
 const CandidatureSpontaneePage = lazy(() => import('./frontOffice/CandidatureSpontaneePage'));
 const PostulerOffrePage = lazy(() => import('./frontOffice/PostulerOffrePage'));
@@ -63,19 +73,32 @@ function MainApp() {
             setBootstrapLoading(false);
             return;
         }
-        try {
-            const [meResponse, referentielResponse, competencesResponse] = await Promise.all([
-                getJson('/api/me'),
-                getJson('/api/referentiels/recrutement'),
-                getJson('/api/competences'),
-            ]);
 
-            if (!meResponse || !referentielResponse) {
+        if (!getAuthToken()) {
+            setBootstrapLoading(false);
+            redirectToLogin();
+            return;
+        }
+        try {
+            // 1. Auth Guard : Vérification préalable de l'authentification avec /api/me
+            const meResponse = await getJson('/api/me');
+            if (!meResponse?.data) {
+                // Token expiré ou invalide : getJson déclenche déjà la redirection vers /login
+                setBootstrapLoading(false);
                 return;
             }
 
             setUser(meResponse.data);
-            setReferentiels(referentielResponse.data);
+
+            // 2. Utilisateur validé : chargement sécurisé des référentiels et compétences
+            const [referentielResponse, competencesResponse] = await Promise.all([
+                getJson('/api/referentiels/recrutement'),
+                getJson('/api/competences'),
+            ]);
+
+            if (referentielResponse?.data) {
+                setReferentiels(referentielResponse.data);
+            }
             if (competencesResponse?.data) {
                 setCompetencesData(competencesResponse.data);
             }
@@ -214,9 +237,13 @@ function MainApp() {
                     path="/candidatures"
                 />
                 <Route
+                    element={<CandidatureRedirect />}
+                    path="/candidatures/:id"
+                />
+                <Route
                     element={
                         <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
-                            <CandidaturesOffresView referentiels={referentiels} />
+                            <CandidaturesOffresView competencesData={competencesData} referentiels={referentiels} />
                         </BackOfficeLayout>
                     }
                     path="/candidatures/offres"
@@ -224,10 +251,18 @@ function MainApp() {
                 <Route
                     element={
                         <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
-                            <CandidaturesSpontaneesView referentiels={referentiels} />
+                            <CandidaturesSpontaneesView competencesData={competencesData} referentiels={referentiels} />
                         </BackOfficeLayout>
                     }
                     path="/candidatures/spontanees"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <CandidatsListView />
+                        </BackOfficeLayout>
+                    }
+                    path="/candidats"
                 />
                 <Route
                     element={
@@ -236,6 +271,38 @@ function MainApp() {
                         </BackOfficeLayout>
                     }
                     path="/vivier"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <AgendaView />
+                        </BackOfficeLayout>
+                    }
+                    path="/agenda"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <ModelesEmailsView />
+                        </BackOfficeLayout>
+                    }
+                    path="/modeles-emails"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <AuditLogsView />
+                        </BackOfficeLayout>
+                    }
+                    path="/audit-logs"
+                />
+                <Route
+                    element={
+                        <BackOfficeLayout bootstrapError={bootstrapError} bootstrapLoading={bootstrapLoading} user={user}>
+                            <PipelineMonitoringView />
+                        </BackOfficeLayout>
+                    }
+                    path="/monitoring-pipeline"
                 />
                 <Route
                     element={

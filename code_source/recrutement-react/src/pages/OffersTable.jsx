@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpRight, ChevronDown, ChevronUp, Edit3, Share2, UserPlus, Users } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, ChevronUp, Edit3, FileText, Share2, UserPlus, Users } from 'lucide-react';
 import { formatDate } from '../utils/formatters';
 
-export function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = null, onSelectOffer = null, renderActions = null }) {
+export function OffersTable({ compact = false, offers, onNavigate = null, onSaisirRh = null, onSelectOffer = null, onShowAffiche = null, renderActions = null }) {
     const navigate = useNavigate();
     const [expandedRow, setExpandedRow] = useState(null);
 
@@ -62,8 +62,8 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                         return (
                             <React.Fragment key={offre.id}>
                                 <tr
-                                    onClick={compact && onSelectOffer ? () => onSelectOffer(offre) : undefined}
-                                    style={compact && onSelectOffer ? { cursor: 'pointer' } : {}}
+                                    onClick={onSelectOffer ? () => onSelectOffer(offre) : undefined}
+                                    style={onSelectOffer ? { cursor: 'pointer' } : {}}
                                 >
                                     {!compact ? (
                                         <td>
@@ -131,9 +131,14 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                     {!compact ? <td>{formatDate(offre.date_limite)}</td> : null}
                                     <td>
                                         <span className="status-pill">{offre.statut?.libelle ?? '-'}</span>
+                                        {offre.est_archivee && offre.suppression_prevue_le ? (
+                                            <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '4px' }}>
+                                                Suppression le {formatDate(offre.suppression_prevue_le)}
+                                            </div>
+                                        ) : null}
                                     </td>
                                     {renderActions || compact || onNavigate ? (
-                                        <td style={{ padding: '8px 12px', whiteSpace: 'nowrap', width: '1%' }}>
+                                        <td onClick={(e) => e.stopPropagation()} style={{ padding: '8px 12px', whiteSpace: 'nowrap', width: '1%', cursor: 'default' }}>
                                             <div style={{ display: 'inline-flex', gap: '4px', alignItems: 'center', flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
                                                 {compact && onSelectOffer ? (
                                                     <button
@@ -162,6 +167,7 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                         <Share2 size={15} />
                                                     </button>
                                                 ) : null}
+                                             
                                                 {!compact ? (
                                                     <button
                                                         disabled={!isPublished}
@@ -254,7 +260,32 @@ export function OffersTable({ compact = false, offers, onNavigate = null, onSais
                                                     </div>
                                                 ) : null}
 
-                                                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                                                <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                                                    {onShowAffiche ? (
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onShowAffiche(offre);
+                                                            }}
+                                                            style={{
+                                                                background: '#fef2f2',
+                                                                color: '#e61e24',
+                                                                border: '1px solid #fca5a5',
+                                                                borderRadius: '6px',
+                                                                padding: '7px 14px',
+                                                                fontSize: '12px',
+                                                                fontWeight: '600',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '6px',
+                                                                cursor: 'pointer'
+                                                            }}
+                                                        >
+                                                            <FileText size={14} />
+                                                            <span>Affiche Recrutement (PDF)</span>
+                                                        </button>
+                                                    ) : null}
                                                     <button
                                                         type="button"
                                                         onClick={(e) => goToCandidatures(e, offre)}

@@ -87,7 +87,7 @@ Quand un CV est analysé, le recruteur voit sur la même page le document origin
 ## Sources
 
 - `[S1]` Documentation Laravel Form Request Validation : https://laravel.com/docs/11.x/validation#form-request-validation
-- `[S2]` Cahier des charges AlpA Ciment - Module Vivier, Profil Candidat et Validation CV.
+- `[S2]` Cahier des charges Alpha Ciment - Module Vivier, Profil Candidat et Validation CV.
 
 ## Vérifications
 

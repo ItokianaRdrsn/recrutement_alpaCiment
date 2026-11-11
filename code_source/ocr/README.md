@@ -1,6 +1,6 @@
 # Microservice FastAPI OCR & Parsing CV (PaddleOCR)
 
-Ce microservice Python autonome est dédié à l'extraction OCR de texte brut et au parsing structuré de CVs pour le système de recrutement AlpA Ciment.
+Ce microservice Python autonome est dédié à l'extraction OCR de texte brut et au parsing structuré de CVs pour le système de recrutement Alpha Ciment.
 
 ---
 

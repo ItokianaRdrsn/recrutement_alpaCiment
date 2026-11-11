@@ -24,30 +24,38 @@ class DomaineService
 
     public function create(array $data, bool $validated = false, ?int $userId = null): Domaine
     {
-        $domaine = new Domaine($data);
-        $this->applyValidationState($domaine, $validated, $userId);
-        $domaine->save();
+        $attributes = $data;
+        $attributes['valide'] = $validated;
+        $attributes['date_validation'] = $validated ? now() : null;
+        $attributes['valide_par'] = $validated ? $userId : null;
+
+        $domaine = $this->domaineRepository->create($attributes);
 
         return $this->domaineRepository->findById($domaine->id_domaine);
     }
 
     public function update(Domaine $domaine, array $data, ?bool $validated = null, ?int $userId = null): Domaine
     {
-        $domaine->fill($data);
+        $attributes = $data;
 
         if ($validated !== null) {
-            $this->applyValidationState($domaine, $validated, $userId);
+            $attributes['valide'] = $validated;
+            $attributes['date_validation'] = $validated ? now() : null;
+            $attributes['valide_par'] = $validated ? $userId : null;
         }
 
-        $domaine->save();
+        $this->domaineRepository->update($domaine, $attributes);
 
         return $this->domaineRepository->findById($domaine->id_domaine);
     }
 
     public function validateDomain(Domaine $domaine, ?int $userId): Domaine
     {
-        $this->applyValidationState($domaine, true, $userId);
-        $domaine->save();
+        $this->domaineRepository->update($domaine, [
+            'valide' => true,
+            'date_validation' => now(),
+            'valide_par' => $userId,
+        ]);
 
         return $this->domaineRepository->findById($domaine->id_domaine);
     }
@@ -55,12 +63,5 @@ class DomaineService
     public function delete(Domaine $domaine): void
     {
         $this->domaineRepository->delete($domaine);
-    }
-
-    protected function applyValidationState(Domaine $domaine, bool $validated, ?int $userId): void
-    {
-        $domaine->valide = $validated;
-        $domaine->date_validation = $validated ? now() : null;
-        $domaine->valide_par = $validated ? $userId : null;
     }
 }

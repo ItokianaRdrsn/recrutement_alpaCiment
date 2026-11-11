@@ -8,11 +8,12 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'utilisateur';
     protected $primaryKey = 'id_utilisateur';
@@ -38,6 +39,21 @@ class User extends Authenticatable
     public function getAuthPasswordName(): string
     {
         return 'mot_de_passe';
+    }
+
+    public function setPasswordAttribute($value): void
+    {
+        $this->attributes['mot_de_passe'] = $value;
+    }
+
+    public function setNameAttribute($value): void
+    {
+        $this->attributes['nom'] = $value;
+    }
+
+    public function getNameAttribute(): ?string
+    {
+        return $this->attributes['nom'] ?? $this->attributes['name'] ?? null;
     }
 
     public function roleEnum(): ?UserRole

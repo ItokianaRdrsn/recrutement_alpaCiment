@@ -59,7 +59,7 @@ export default function CandidatureSpontaneePage({ onNavigate, sendFormData }) {
 
             <div className="data-section" style={{ background: '#ffffff', padding: '28px', borderRadius: '12px', boxShadow: '0 4px 16px rgba(0,0,0,0.08)', border: '1px solid var(--border)' }}>
                 <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: '16px', marginBottom: '20px' }}>
-                    <p className="eyebrow" style={{ color: 'var(--primary)', fontWeight: 600 }}>AlpA Ciment Recrutement</p>
+                    <p className="eyebrow" style={{ color: 'var(--primary)', fontWeight: 600 }}>Alpha Ciment Recrutement</p>
                     <h1 style={{ fontSize: '24px', margin: '4px 0', color: 'var(--text)' }}>Candidature Spontanée</h1>
                     <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
                         Aucune offre ne correspond exactement à votre profil ? Saisissez votre poste souhaité et transmettez votre CV.

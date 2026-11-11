@@ -6,6 +6,30 @@ export function formatDate(value) {
     return new Intl.DateTimeFormat('fr-FR').format(new Date(value));
 }
 
+export function formatTime(value) {
+    if (!value) {
+        return '-';
+    }
+
+    const match = String(value).match(/(\d{2}):(\d{2})/);
+    if (match) {
+        return `${match[1]}:${match[2]}`;
+    }
+
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return '-';
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+export function formatDateTime(value) {
+    if (!value) {
+        return '-';
+    }
+
+    return `${formatDate(value)} à ${formatTime(value)}`;
+}
+
 export const emptyOfferForm = {
     id: null,
     titre_poste: '',
@@ -14,6 +38,7 @@ export const emptyOfferForm = {
     id_lieu: '',
     lieu: '',
     id_type_contrat: '',
+    duree_contrat: '',
     date_publication: '',
     date_limite: '',
     id_statut_offre: '',
@@ -31,6 +56,7 @@ export function offerPayload(form) {
         id_lieu: form.id_lieu ? Number(form.id_lieu) : 1,
         lieu: form.lieu ? form.lieu.trim() : null,
         id_type_contrat: form.id_type_contrat ? Number(form.id_type_contrat) : null,
+        duree_contrat: form.duree_contrat ? form.duree_contrat.trim() : null,
         date_publication: form.date_publication || null,
         date_limite: form.date_limite || null,
         id_statut_offre: form.id_statut_offre ? Number(form.id_statut_offre) : null,

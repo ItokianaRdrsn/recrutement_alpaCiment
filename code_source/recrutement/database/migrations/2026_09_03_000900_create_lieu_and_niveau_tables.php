@@ -23,7 +23,7 @@ return new class extends Migration
                 'Fianarantsoa',
                 'Toliara',
                 'Antsiranana',
-                'Usine AlpA Ciment',
+                'Usine Alpha Ciment',
             ] as $lieu) {
                 DB::table('lieu')->insertOrIgnore(['libelle' => $lieu]);
             }

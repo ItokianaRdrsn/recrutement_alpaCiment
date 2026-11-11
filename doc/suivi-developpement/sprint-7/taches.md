@@ -2,8 +2,10 @@
 
 ## Avancement du Sprint
 
-- **[À FAIRE]** 8 tâches
-- **Sous-total : 11,0 j**
+- **[FAIT]** 5 tâches (6,0 j)
+- **[EN COURS]** 0 tâche (0,0 j)
+- **[À FAIRE]** 3 tâches (5,0 j)
+- **Sous-total : 11,0 j (Avancement : 54.5% - 6,0 j / 11,0 j)**
 
 ---
 
@@ -11,25 +13,25 @@
 
 ### BACK-OFFICE
 
-#### **[À FAIRE]** Tableau de bord et indicateurs principaux
+#### **[FAIT]** Tableau de bord et indicateurs principaux
 - **Estimation :** 1,0 j
-- **Notes :** KPI principaux et santé du recrutement.
+- **Notes :** Cartes KPIs de performance (Total candidatures, Sur offre vs Spontanées, Vivier, Offres ouvertes, Entretiens prévus, Taux de succès).
 
-#### **[À FAIRE]** Statistiques mensuelles, répartition par statut et taux de transformation
+#### **[FAIT]** Statistiques mensuelles, répartition par statut et taux de transformation
 - **Estimation :** 1,5 j
-- **Notes :** Reporting analytique RH.
+- **Notes :** Entonnoir de recrutement RH (Conversion Funnel de Reçue à Retenue) et graphique d'évolution mensuelle des candidatures sur 6 mois.
 
-#### **[À FAIRE]** Délai moyen de traitement et filtres du dashboard
+#### **[FAIT]** Délai moyen de traitement et filtres du dashboard
 - **Estimation :** 1,0 j
-- **Notes :** Calcul des délais de recrutement.
+- **Notes :** Calcul automatique du délai moyen d'embauche (Time-to-Hire), répartition par Direction et canaux, alertes dossiers en attente et filtres dynamiques (période, dates, direction).
 
-#### **[À FAIRE]** Consultation et filtrage du Journal d'Audit des actions RH
+#### **[FAIT]** Consultation et filtrage du Journal d'Audit des actions RH
 - **Estimation :** 1,0 j
-- **Notes :** Écran dédié et/ou composant de traçabilité des modifications (qui a modifié/créé quoi et quand : offres, candidatures, vivier).
+- **Notes :** Écran dédié et traçabilité immuable des modifications RH (/audit-logs) avec filtres par action, entité, dates et modale de diff JSON.
 
-#### **[À FAIRE]** Recherche avancée par mots-clés CV et compétences
+#### **[FAIT]** Recherche avancée par mots-clés CV et compétences
 - **Estimation :** 1,5 j
-- **Notes :** Recherche globale full-text dans la base de candidatures.
+- **Notes :** Recherche globale full-text dans la base de candidatures (OCR CV avec tsvector/LIKE et extrait contextuel `cv_snippet`), filtrage multi-compétences (modes ANY/ALL), niveau d'études/diplôme, expérience minimale cumulée, et composant UI React `AdvancedSearchPanel`.
 
 #### **[À FAIRE]** Matching candidat -> offre avec score simple
 - **Estimation :** 2,0 j

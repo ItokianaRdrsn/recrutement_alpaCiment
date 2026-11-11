@@ -8,6 +8,7 @@ venv/
 env/
 __pycache__/
 *.py[cod]
+.pytest_cache/
 
 # IDE & OS
 .vscode/
@@ -15,8 +16,17 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Secrets & Credentials
+# Secrets & Credentials & Environment
+.env
+.env.*
+*.env
 automatisation/client_secret*.json
 client_secret*.json
 *.secret.json
 credentials.json
+
+# Test Datasets & CV de test (Données personnelles anonymisées)
+cv_tests/
+*/cv_tests/
+
+code_source/recrutement/resultat-tests.txt

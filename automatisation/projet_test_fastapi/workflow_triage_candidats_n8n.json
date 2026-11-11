@@ -1,5 +1,5 @@
 {
-  "name": "Projet Test - Triage Candidats AlpA Ciment (FastAPI)",
+  "name": "Projet Test - Triage Candidats Alpha Ciment (FastAPI)",
   "nodes": [
     {
       "parameters": {},
@@ -101,7 +101,7 @@
         "url": "http://host.docker.internal:8000/api/notifications/envoyer",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"destinataire_email\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.email }}\",\n  \"destinataire_nom\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}\",\n  \"objet\": \"Convocation entretien - AlpA Ciment\",\n  \"contenu\": \"Bonjour {{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}, votre candidature pour {{ $('2. Évaluer Candidat (FastAPI)').item.json.poste }} a été retenue.\",\n  \"type_notification\": \"CONVOCATION_ENTRETIEN\"\n}",
+        "jsonBody": "={\n  \"destinataire_email\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.email }}\",\n  \"destinataire_nom\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}\",\n  \"objet\": \"Convocation entretien - Alpha Ciment\",\n  \"contenu\": \"Bonjour {{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}, votre candidature pour {{ $('2. Évaluer Candidat (FastAPI)').item.json.poste }} a été retenue.\",\n  \"type_notification\": \"CONVOCATION_ENTRETIEN\"\n}",
         "options": {}
       },
       "id": "node-email-convoc",
@@ -137,7 +137,7 @@
         "url": "http://host.docker.internal:8000/api/notifications/envoyer",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"destinataire_email\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.email }}\",\n  \"destinataire_nom\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}\",\n  \"objet\": \"Information candidature - AlpA Ciment\",\n  \"contenu\": \"Bonjour {{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}, nous vous remercions pour votre intérêt. Votre profil n'a pas été retenu pour le poste de {{ $('2. Évaluer Candidat (FastAPI)').item.json.poste }}.\",\n  \"type_notification\": \"REJET\"\n}",
+        "jsonBody": "={\n  \"destinataire_email\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.email }}\",\n  \"destinataire_nom\": \"{{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}\",\n  \"objet\": \"Information candidature - Alpha Ciment\",\n  \"contenu\": \"Bonjour {{ $('2. Évaluer Candidat (FastAPI)').item.json.nom }}, nous vous remercions pour votre intérêt. Votre profil n'a pas été retenu pour le poste de {{ $('2. Évaluer Candidat (FastAPI)').item.json.poste }}.\",\n  \"type_notification\": \"REJET\"\n}",
         "options": {}
       },
       "id": "node-email-rejet",

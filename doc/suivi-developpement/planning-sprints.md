@@ -1,6 +1,6 @@
-# Planning global des sprints (Scope Général - 71,0 j)
+# Planning global des sprints (Scope Général - 73,0 j)
 
-Ce document contient la découpe officielle et exacte du projet *recrutement_alpaCiment* sur **71,0 jours** avec la planification calendaire théorique (jours ouvrés hors week-ends à partir du **Mercredi 12 Août 2026**) et le suivi des dates réelles constatées dans l'historique du projet.
+Ce document contient la découpe officielle et exacte du projet *recrutement_alphaCiment* sur **73,0 jours** avec la planification calendaire théorique (jours ouvrés hors week-ends à partir du **Mercredi 12 Août 2026**) et le suivi des dates réelles constatées dans l'historique du projet.
 
 ## 📅 Règles de Calcul du Planning
 - **Date de début du projet** : Mercredi 12 Août 2026 (Réception du Cahier des Charges).
@@ -17,11 +17,11 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 | **Sprint 1** | Socle technique, sécurité et référentiels de base | 6,0 j | 25/08/2026 | 01/09/2026 | 25/08/2026 | 26/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 2** | Gestion des offres, directions et domaines | 7,0 j | 02/09/2026 | 10/09/2026 | 26/08/2026 | 27/08/2026 | **100.0%** | **[FAIT]** |
 | **Sprint 3** | Dépôt et réception des candidatures (Web, Saisie RH & Import) | 7,5 j | 11/09/2026 | 21/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 4** | Gestion RH des candidatures et fiche candidat | 7,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 11,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | 08/10/2026 | **100.0%** | **[FAIT]** |
-| **Sprint 6** | Rendez-vous, communications, automatisation et modèles | 12,0 j | 16/10/2026 | 31/10/2026 | 07/10/2026 | *En cours* | **20.8%** (2,5/12,0j) | **[EN COURS]** |
-| **Sprint 7** | Dashboard, recherche avancée, matching, audit logs et finalisation | 11,0 j | 03/11/2026 | 17/11/2026 | *A venir* | *A venir* | **0.0%** | **[A FAIRE]** |
-| **Total** | **Total Scope Général** | **71,0 j** | **12/08/2026** | **17/11/2026** | **12/08/2026** | *En cours* | **74.6%** (53,0/71,0j) | |
+| **Sprint 4** | Gestion RH des candidatures et fiche candidat | 8,0 j | 22/09/2026 | 30/09/2026 | 28/08/2026 | 28/08/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 5** | Vivier, compétences et validation CV (OCR / IA) | 12,5 j | 01/10/2026 | 15/10/2026 | 28/08/2026 | 08/10/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 6** | Rendez-vous, communications, automatisation et modèles | 12,0 j | 16/10/2026 | 31/10/2026 | 07/10/2026 | 13/10/2026 | **100.0%** | **[FAIT]** |
+| **Sprint 7** | Dashboard, recherche avancée, matching, audit logs et finalisation | 11,0 j | 03/11/2026 | 17/11/2026 | 13/10/2026 | *En cours* | **54.5%** (6,0/11,0j) | **[EN COURS]** |
+| **Total** | **Total Scope Général** | **73,0 j** | **12/08/2026** | **17/11/2026** | **12/08/2026** | *En cours* | **93.2%** (68,0/73,0j) | |
 
 ---
 
@@ -91,7 +91,7 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
 
 ---
 
-### Sprint 4 : Gestion RH des candidatures et fiche candidat (7,0 j - 100.0% FAIT)
+### Sprint 4 : Gestion RH des candidatures et fiche candidat (8,0 j - 100.0% FAIT)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **22/09/2026** au **30/09/2026** (7,0 j)
 - ⏱️ **Dates Réelles** : Du **28/08/2026** au **28/08/2026**
 - **BACK-OFFICE** :
@@ -102,12 +102,13 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
   - Fiche candidat : informations, documents, historique statuts et communications (2,0 j) - **[FAIT]**
   - Changement de statut avec commentaire et historique (1,5 j) - **[FAIT]**
   - Export PDF de la fiche candidat (0,5 j) - **[FAIT]**
+  - Liste globale des candidats (Annuaire des profils uniques) (1,0 j) - **[FAIT]**
   - Tests et debug (1,0 j) - **[FAIT]**
-- **Sous-total : 7,0 j (100.0% FAIT)**
+- **Sous-total : 8,0 j (100.0% FAIT)**
 
 ---
 
-### Sprint 5 : Vivier, compétences et validation CV (11,5 j - 100.0% FAIT)
+### Sprint 5 : Vivier, compétences et validation CV (12,5 j - 100.0% FAIT)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **01/10/2026** au **15/10/2026** (11,5 j)
 - ⏱️ **Dates Réelles** : Du **28/08/2026** au **08/10/2026**
 - **BACK-OFFICE** :
@@ -119,45 +120,47 @@ Ce document contient la découpe officielle et exacte du projet *recrutement_alp
   - Intégration FastAPI et microservice OCR dans `code_source/ocr` (2,0 j) - **[FAIT]**
   - Extraction des compétences, expériences et formations depuis le CV (2,0 j) - **[FAIT]**
   - Validation, correction et rejet des données extraites (2,0 j) - **[FAIT]**
+  - Rattachement / Relier une candidature spontanée ou en vivier à une offre (1,0 j) - **[FAIT]**
   - Tests et debug (1,0 j) - **[FAIT]**
-- **Sous-total : 11,5 j (100.0% FAIT)**
+- **Sous-total : 12,5 j (100.0% FAIT)**
 
 ---
 
-### Sprint 6 : Rendez-vous, communications, automatisation et modèles (12,0 j - 20.8% EN COURS)
+### Sprint 6 : Rendez-vous, communications, automatisation et modèles (12,0 j - 100.0% FAIT)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **16/10/2026** au **31/10/2026** (12,0 j)
-- ⏱️ **Dates Réelles** : Du **07/10/2026** au *En cours*
+- ⏱️ **Dates Réelles** : Du **07/10/2026** au **13/10/2026**
 - **BACK-OFFICE** :
-  - CRUD des rendez-vous : test, entretien, statut, mode, responsable (2,0 j) - **[À FAIRE]**
-  - Vue agenda par utilisateur, candidature et période (1,0 j) - **[À FAIRE]**
-  - Communication liée aux rendez-vous (1,0 j) - **[À FAIRE]**
-  - CRUD des modèles de communication (1,0 j) - **[À FAIRE]**
-  - Accusé de réception et première communication automatique (0,5 j) - **[À FAIRE]**
-  - Activation, désactivation et configuration de l'envoi automatique (1,0 j) - **[À FAIRE]**
+  - CRUD des rendez-vous : test, entretien, statut, mode, responsable (2,0 j) - **[FAIT]**
+  - Vue agenda par utilisateur, candidature et période (1,0 j) - **[FAIT]**
+  - Communication liée aux rendez-vous (1,0 j) - **[FAIT]**
+  - CRUD des modèles de communication (1,0 j) - **[FAIT]**
+  - Accusé de réception et première communication automatique (0,5 j) - **[FAIT]**
+  - Activation, désactivation et configuration de l'envoi automatique (1,0 j) - **[FAIT]**
 - **API / SERVICES & AUTOMATISATION** :
   - Récupération et ingestion des candidatures par E-mail via n8n & FastAPI OCR/LLM (1,5 j) - **[FAIT]**
-  - Automatisation n8n : classification, routage, switch offre/spontanée et synchronisation (1,0 j) - **[EN COURS]**
-  - Envoi manuel, historique des communications et préparation des rappels (1,5 j) - **[À FAIRE]**
-  - Log et Journalisation des actions RH (Audit Log) (1,5 j) - **[À FAIRE]**
-  - Tests et debug (0,5 j) - **[À FAIRE]**
-- **Sous-total : 2,5 j / 12,0 j (20.8% EN COURS)**
+  - Automatisation n8n : classification, routage, switch offre/spontanée et synchronisation (1,0 j) - **[FAIT]**
+  - Envoi manuel, historique des communications et préparation des rappels (1,5 j) - **[FAIT]**
+  - Log et Journalisation des actions RH (Audit Log) (1,5 j) - **[FAIT]**
+  - Tests et debug (0,5 j) - **[FAIT]**
+- **Sous-total : 12,0 j / 12,0 j (100.0% FAIT)**
 
 ---
 
-### Sprint 7 : Dashboard, recherche avancée, matching, audit logs et finalisation (11,0 j - 0.0% A FAIRE)
+### Sprint 7 : Dashboard, recherche avancée, matching, audit logs et finalisation (11,0 j - 54.5% EN COURS)
 - 📅 **Dates Prévisionnelles (Jours ouvrés)** : Du **03/11/2026** au **17/11/2026** (11,0 j)
-- ⏱️ **Dates Réelles** : *À venir*
+- ⏱️ **Dates Réelles** : Du **13/10/2026** au *En cours*
 - **BACK-OFFICE** :
-  - Tableau de bord et indicateurs principaux (1,0 j) - **[À FAIRE]**
-  - Statistiques mensuelles, répartition par statut et taux de transformation (1,5 j) - **[À FAIRE]**
-  - Délai moyen de traitement et filtres du dashboard (1,0 j) - **[À FAIRE]**
-  - Consultation et filtrage du Journal d'Audit des actions RH (1,0 j) - **[À FAIRE]**
-  - Recherche avancée par mots-clés CV et compétences (1,5 j) - **[À FAIRE]**
+  - Tableau de bord et indicateurs principaux (1,0 j) - **[FAIT]**
+  - Statistiques mensuelles, répartition par statut et taux de transformation (1,5 j) - **[FAIT]**
+  - Délai moyen de traitement et filtres du dashboard (1,0 j) - **[FAIT]**
+  - Consultation et filtrage du Journal d'Audit des actions RH (1,0 j) - **[FAIT]**
+  - Recherche avancée par mots-clés CV et compétences (1,5 j) - **[FAIT]** (Panneau de recherche multi-critères, PostgreSQL tsvector fulltext, OCR JSON, compétences mode any/all)
   - Matching candidat -> offre avec score simple (2,0 j) - **[À FAIRE]**
-  - Tests fonctionnels globaux, corrections et optimisation (1,5 j) - **[À FAIRE]**
-  - Documentation et préparation du déploiement (1,5 j) - **[À FAIRE]**
-- **Sous-total : 11,0 j (0.0% A FAIRE)**
+  - Tests fonctionnels globaux, corrections et optimisation (1,5 j) - **[EN COURS]** (Optimisation Lighthouse LCP, déduplication réseau, audit de sécurité)
+  - Documentation et préparation du déploiement (1,5 j) - **[EN COURS]** (Fichier prérequis, Docker, guide d'installation Ollama/PaddleOCR)
+- **Sous-total : 6,0 j / 11,0 j (54.5% EN COURS)**
 
 ---
 
-## 📈 **Total Scope Général : 71,0 j (Avancement global : 70.4% - 50,0 j / 71,0 j)**
+## 📈 **Total Scope Général : 73,0 j (Avancement global : 93.2% - 68,0 j / 73,0 j)**
+

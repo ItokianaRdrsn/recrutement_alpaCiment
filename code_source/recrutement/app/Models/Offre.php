@@ -25,8 +25,10 @@ class Offre extends Model
         'id_lieu',
         'lieu',
         'id_type_contrat',
+        'duree_contrat',
         'date_publication',
         'date_limite',
+        'date_cloture',
         'id_statut_offre',
     ];
 
@@ -46,7 +48,13 @@ class Offre extends Model
         return [
             'date_publication' => 'date',
             'date_limite' => 'date',
+            'date_cloture' => 'datetime',
         ];
+    }
+
+    public function getTitreAttribute(): ?string
+    {
+        return $this->titre_poste;
     }
 
     public function direction(): BelongsTo

@@ -1,15 +1,15 @@
-# Sprint 4 - Tâches & Suivi (Gestion RH des candidatures et fiche candidat - 7,0 j)
+# Sprint 4 - Tâches & Suivi (Gestion RH des candidatures et fiche candidat - 8,0 j)
 
 ## 📊 Progression du Sprint
 - **Statut :** **[FAIT]**
-- **Progression :** **100.0% terminé** (7.0 / 7.0 j)
+- **Progression :** **100.0% terminé** (8.0 / 8.0 j)
 - **Barre de progression :** `[████████████████████] 100%`
 
 ---
 
 ## 📑 Documentation Technique Détaillée du Sprint 4
-- [Gestion des candidatures, arborescences et filtrage avancé (2026-08-28)](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-4/2026-08-28/gestion-candidatures-filtres.md)
-- [Fiche candidat détaillée, historique des statuts et export PDF (2026-08-28)](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alpaCiment/doc/suivi-developpement/sprint-4/2026-08-28/fiche-candidat-historique.md)
+- [Gestion des candidatures, arborescences et filtrage avancé (2026-08-28)](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/sprint-4/2026-08-28/gestion-candidatures-filtres.md)
+- [Fiche candidat détaillée, historique des statuts et export PDF (2026-08-28)](file:///c:/Users/Strix/OneDrive/Documents/itu/itu_s6/Projet_Soutenance/recrutement_alphaCiment/doc/suivi-developpement/sprint-4/2026-08-28/fiche-candidat-historique.md)
 
 ---
 
@@ -66,6 +66,13 @@
 
 ---
 
+#### **[FAIT]** Liste globale des candidats (Annuaire des profils uniques) (1,0 j)
+- **Estimation :** 1,0 j
+- **Progression :** **100%**
+- **Notes :** Répertoire global et dédoublonné des profils candidats `/candidats` (API `/api/candidats` et `/api/candidat/{id}`), moteur de recherche instantané multi-champs, compteurs de candidatures associées et tiroir de détails profil.
+
+---
+
 #### **[FAIT]** Tests et debug
 - **Estimation :** 1,0 j
 - **Progression :** **100%**
@@ -73,4 +80,4 @@
 
 ---
 
-## Total Sprint 4 : 7,0 j (100.0% Terminé)
+## Total Sprint 4 : 8,0 j (100.0% Terminé)

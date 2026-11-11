@@ -6,6 +6,7 @@ use App\Models\Offre;
 use App\Models\StatutOffre;
 use App\Repositories\Contracts\OffreRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class EloquentOffreRepository implements OffreRepositoryInterface
@@ -31,18 +32,36 @@ class EloquentOffreRepository implements OffreRepositoryInterface
         $publieeId = $this->getStatusId('Publiee') ?? 0;
         $brouillonId = $this->getStatusId('Brouillon') ?? 0;
         $clotureeId = $this->getStatusId('Cloturee') ?? 0;
+        $isPgsql = DB::getDriverName() === 'pgsql';
+        $likeOp = $isPgsql ? 'ILIKE' : 'like';
 
         return Offre::query()
             ->with($this->resourceRelations())
             ->withCount('candidatures')
             ->when($filters['direction'] ?? null, fn ($query, int $direction) => $query->where('id_direction', $direction))
             ->when($filters['statut'] ?? null, fn ($query, int $statut) => $query->where('id_statut_offre', $statut))
+            // Archive = offres clôturées. 'only' : uniquement l'archive ; 'exclude' : tout sauf l'archive.
+            ->when(($filters['archivees'] ?? null) === 'only', fn ($query) => $query->where('id_statut_offre', $clotureeId))
+            ->when(($filters['archivees'] ?? null) === 'exclude', fn ($query) => $query->where('id_statut_offre', '!=', $clotureeId))
             ->when($filters['type_contrat'] ?? null, fn ($query, int $typeContrat) => $query->where('id_type_contrat', $typeContrat))
-            ->when($filters['q'] ?? null, function ($query, string $search): void {
-                $query->where(function ($query) use ($search): void {
-                    $query->where('titre_poste', 'like', "%{$search}%")
-                        ->orWhere('description', 'like', "%{$search}%")
-                        ->orWhere('lieu', 'like', "%{$search}%");
+            ->when($filters['q'] ?? null, function ($query, string $search) use ($likeOp, $isPgsql): void {
+                $escSearch = addcslashes(trim($search), '%_\\');
+                $query->where(function ($query) use ($escSearch, $likeOp, $isPgsql): void {
+                    if ($isPgsql) {
+                        $query->whereRaw('unaccent(titre_poste) ILIKE unaccent(?)', ["%{$escSearch}%"])
+                            ->orWhereRaw('unaccent(description) ILIKE unaccent(?)', ["%{$escSearch}%"])
+                            ->orWhereRaw('unaccent(lieu) ILIKE unaccent(?)', ["%{$escSearch}%"])
+                            ->orWhereHas('direction', function ($dirQ) use ($escSearch) {
+                                $dirQ->whereRaw('unaccent(nom_direction) ILIKE unaccent(?)', ["%{$escSearch}%"]);
+                            });
+                    } else {
+                        $query->where('titre_poste', $likeOp, "%{$escSearch}%")
+                            ->orWhere('description', $likeOp, "%{$escSearch}%")
+                            ->orWhere('lieu', $likeOp, "%{$escSearch}%")
+                            ->orWhereHas('direction', function ($dirQ) use ($escSearch, $likeOp) {
+                                $dirQ->where('nom_direction', $likeOp, "%{$escSearch}%");
+                            });
+                    }
                 });
             })
             ->orderByRaw("
@@ -112,8 +131,13 @@ class EloquentOffreRepository implements OffreRepositoryInterface
         return $offre->delete();
     }
 
-    public function getStatusId(string $libelle): ?int
+    public function getStatusId(string|\App\Enums\StatutOffreEnum $libelle): ?int
     {
+        if ($libelle instanceof \App\Enums\StatutOffreEnum) {
+            $status = StatutOffre::whereIn('libelle', $libelle->variations())->first();
+            return $status ? (int) $status->id_statut_offre : null;
+        }
+
         $status = StatutOffre::where('libelle', $libelle)->first();
         return $status ? (int) $status->id_statut_offre : null;
     }
@@ -191,5 +215,25 @@ class EloquentOffreRepository implements OffreRepositoryInterface
             }
             $offre->competences()->sync($syncData);
         }
+    }
+
+    public function findStatutById(int $id): ?StatutOffre
+    {
+        return StatutOffre::find($id);
+    }
+
+    public function getActiveOffersSummary(): array
+    {
+        return Offre::query()
+            ->whereHas('statut', function ($query) {
+                $query->whereIn('libelle', \App\Enums\StatutOffreEnum::Publiee->variations());
+            })
+            ->select('id_offre', 'titre_poste')
+            ->get()
+            ->map(fn($o) => [
+                'id' => $o->id_offre,
+                'title' => $o->titre_poste,
+            ])
+            ->toArray();
     }
 }

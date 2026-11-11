@@ -18,7 +18,7 @@ class OcrValidationTest extends TestCase
         $this->rhUser = User::factory()->rh()->make([
             'id' => 1,
             'name' => 'Agent RH Test',
-            'email' => 'rh.test@alpaciment.mg',
+            'email' => 'rh.test@alphaciment.mg',
         ]);
     }
 
@@ -70,7 +70,13 @@ class OcrValidationTest extends TestCase
                 'source' => 'cv_ocr',
             ]);
 
-        $service = new VivierService($vivierRepo, $competenceRepo);
+        $auditMock = $this->createMock(\App\Services\AuditLogService::class);
+        $auditMock->expects($this->once())->method('log');
+
+        $candMock = $this->createMock(\App\Repositories\Contracts\CandidatureRepositoryInterface::class);
+        $candidatMock = $this->createMock(\App\Repositories\Contracts\CandidatRepositoryInterface::class);
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $candMock, $candidatMock, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'valide',
@@ -122,7 +128,13 @@ class OcrValidationTest extends TestCase
         $vivierRepo->expects($this->never())->method('createExperience');
         $vivierRepo->expects($this->never())->method('createFormation');
 
-        $service = new VivierService($vivierRepo, $competenceRepo);
+        $auditMock = $this->createMock(\App\Services\AuditLogService::class);
+        $auditMock->expects($this->once())->method('log');
+
+        $candMock = $this->createMock(\App\Repositories\Contracts\CandidatureRepositoryInterface::class);
+        $candidatMock = $this->createMock(\App\Repositories\Contracts\CandidatRepositoryInterface::class);
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $candMock, $candidatMock, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'rejete',
@@ -173,14 +185,20 @@ class OcrValidationTest extends TestCase
                 return $exp['poste'] === 'Lead Architecte' && $exp['source'] === 'cv_ocr';
             }));
 
-        $service = new VivierService($vivierRepo, $competenceRepo);
+        $auditMock = $this->createMock(\App\Services\AuditLogService::class);
+        $auditMock->expects($this->once())->method('log');
+
+        $candMock = $this->createMock(\App\Repositories\Contracts\CandidatureRepositoryInterface::class);
+        $candidatMock = $this->createMock(\App\Repositories\Contracts\CandidatRepositoryInterface::class);
+
+        $service = new VivierService($vivierRepo, $competenceRepo, $candMock, $candidatMock, $auditMock);
 
         $result = $service->validateOcrData(999, [
             'statut_validation' => 'corrige',
             'commentaire_rh' => 'Poste rectifié en Lead Architecte',
             'competences' => [],
             'experiences' => [
-                ['poste' => 'Lead Architecte', 'entreprise' => 'Alpa Ciment']
+                ['poste' => 'Lead Architecte', 'entreprise' => 'Alpha Ciment']
             ],
             'formations' => [],
         ]);

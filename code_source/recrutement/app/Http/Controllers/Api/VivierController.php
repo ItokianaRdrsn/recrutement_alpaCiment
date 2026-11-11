@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Vivier\AddCompetenceRequest;
 use App\Http\Requests\Vivier\AddExperienceRequest;
 use App\Http\Requests\Vivier\AddFormationRequest;
+use App\Http\Requests\Vivier\AddProjetRequest;
 use App\Http\Requests\Vivier\StoreVivierRequest;
 use App\Http\Requests\Vivier\ValidateOcrRequest;
 use App\Http\Resources\CvExtractionOcrResource;
@@ -33,27 +34,27 @@ class VivierController extends Controller
     }
 
     /**
-     * Add candidate to Vivier
+     * Add candidate / candidature to Vivier
      */
-    public function store(StoreVivierRequest $request): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        $vivier = $this->vivierService->addToVivier($request->validated());
+        $cand = $this->vivierService->addToVivier($request->all());
 
         return response()->json([
-            'message' => 'Candidat ajouté au vivier avec succès.',
-            'data' => new VivierResource($vivier->load(['candidat', 'direction', 'domaine'])),
+            'message' => 'Candidature ajoutée au vivier avec succès.',
+            'data' => $cand ? new VivierResource($cand) : null,
         ], 201);
     }
 
     /**
-     * Remove candidate from Vivier
+     * Remove candidate / candidature from Vivier
      */
     public function destroy(int $id): JsonResponse
     {
         $this->vivierService->removeFromVivier($id);
 
         return response()->json([
-            'message' => 'Candidat retiré du vivier avec succès.',
+            'message' => 'Candidature retirée du vivier avec succès.',
         ]);
     }
 
@@ -101,6 +102,30 @@ class VivierController extends Controller
         $form = $this->vivierService->addFormation($idCandidature, $request->validated());
 
         return response()->json(['message' => 'Formation ajoutée.', 'data' => $form], 201);
+    }
+
+    /**
+     * Add candidate project on Candidature
+     */
+    public function addProjet(AddProjetRequest $request, int $idCandidature): JsonResponse
+    {
+        $projet = $this->vivierService->addProjet($idCandidature, $request->validated());
+
+        return response()->json(['message' => 'Projet ajouté avec succès.', 'data' => $projet], 201);
+    }
+
+    /**
+     * Add candidate extra info on Candidature
+     */
+    public function addAutre(\Illuminate\Http\Request $request, int $idCandidature): JsonResponse
+    {
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+        $autre = $this->vivierService->addAutre($idCandidature, $validated);
+
+        return response()->json(['message' => 'Information complémentaire ajoutée avec succès.', 'data' => $autre], 201);
     }
 
     /**

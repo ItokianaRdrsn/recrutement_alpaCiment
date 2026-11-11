@@ -24,20 +24,23 @@ class VivierResource extends JsonResource
                 'motif_ajout' => $this->resource['motif_ajout'] ?? null,
                 'statut' => $this->resource['statut'] ?? null,
                 'created_at' => $this->resource['created_at'] ?? null,
+                'cv_snippet' => $this->resource['cv_snippet'] ?? null,
             ];
         }
 
         return [
-            'id_vivier_candidat' => $this->id_vivier_candidat,
-            'id_candidature' => $this->id_candidature ?? null,
+            'id_vivier_candidat' => $this->id_candidature,
+            'id_candidature' => $this->id_candidature,
             'id_candidat' => $this->id_candidat,
             'candidat' => $this->whenLoaded('candidat'),
-            'direction' => $this->whenLoaded('direction'),
+            'direction' => $this->whenLoaded('direction') ?? $this->offre?->direction ?? $this->domaine?->direction,
             'domaine' => $this->whenLoaded('domaine'),
-            'poste_souhaite' => $this->poste_souhaite ?? null,
-            'motif_ajout' => $this->motif_ajout,
-            'statut' => $this->statut,
+            'offre' => $this->whenLoaded('offre'),
+            'poste_souhaite' => $this->poste_souhaite ?? ($this->offre?->titre_poste ?? null),
+            'motif_ajout' => $this->offre ? "Candidature sur l'offre : " . ($this->offre->titre_poste ?? 'Poste') : 'Candidature spontanée en vivier',
+            'statut' => $this->statut?->libelle ?? 'Actif',
             'created_at' => $this->created_at,
+            'cv_snippet' => $this->cv_snippet ?? null,
         ];
     }
 }

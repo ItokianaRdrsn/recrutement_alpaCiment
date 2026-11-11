@@ -26,7 +26,12 @@ class CandidatureController extends Controller
      */
     public function postulerOffre(PostulerOffreRequest $request, string $idOffre): JsonResponse
     {
-        $candidature = $this->candidatureService->postulerOffre($idOffre, $request->validated(), $request);
+        $candidature = $this->candidatureService->postulerOffre(
+            $idOffre,
+            $request->validated(),
+            $request->file('cv') ?? $request->file('cv_file'),
+            $request->file('photo')
+        );
 
         return response()->json([
             'message' => 'Votre candidature a bien été enregistrée. Merci !',
@@ -42,7 +47,11 @@ class CandidatureController extends Controller
      */
     public function candidatureSpontanee(CandidatureSpontaneeRequest $request): JsonResponse
     {
-        $candidature = $this->candidatureService->candidatureSpontanee($request->validated(), $request);
+        $candidature = $this->candidatureService->candidatureSpontanee(
+            $request->validated(),
+            $request->file('cv') ?? $request->file('cv_file'),
+            $request->file('photo')
+        );
 
         return response()->json([
             'message' => 'Votre candidature spontanée a bien été enregistrée. Merci !',
@@ -58,8 +67,10 @@ class CandidatureController extends Controller
      */
     public function importExternalCandidature(ImportExternalCandidatureRequest $request): JsonResponse
     {
-        \Illuminate\Support\Facades\Log::info("ImportExternalCandidature request keys: " . json_encode(array_keys($request->all())) . " | has cv_base64: " . ($request->has('cv_base64') ? 'YES, len=' . strlen($request->input('cv_base64')) : 'NO') . " | has cv file: " . ($request->hasFile('cv') ? 'YES' : 'NO'));
-        $candidature = $this->candidatureService->importExternalCandidature($request->validated(), $request);
+        $candidature = $this->candidatureService->importExternalCandidature(
+            $request->validated(),
+            $request->file('cv') ?? $request->file('cv_file')
+        );
 
         return response()->json([
             'status' => 'success',
@@ -67,7 +78,7 @@ class CandidatureController extends Controller
             'data' => [
                 'id_candidature' => $candidature->id_candidature,
                 'candidat' => $candidature->candidat?->only(['nom', 'prenom', 'email']),
-                'source' => $candidature->postule_depuis,
+                'source' => $candidature->canal_depot,
             ],
         ], 201);
     }
@@ -77,7 +88,12 @@ class CandidatureController extends Controller
      */
     public function saisirRh(SaisirRhCandidatureRequest $request): JsonResponse
     {
-        $candidature = $this->candidatureService->saisirRh($request->validated(), $request, auth()->id());
+        $candidature = $this->candidatureService->saisirRh(
+            $request->validated(),
+            $request->file('cv') ?? $request->file('cv_file'),
+            $request->file('photo'),
+            auth()->id()
+        );
 
         return response()->json([
             'message' => 'Candidature saisie manuellement avec succès par le service RH.',
@@ -107,6 +123,7 @@ class CandidatureController extends Controller
     public function show(int $id): JsonResponse
     {
         $candidature = $this->candidatureService->find($id);
+        $this->candidatureService->markAsViewed($id);
 
         return response()->json(['data' => new CandidatureResource($candidature)]);
     }
@@ -160,6 +177,34 @@ class CandidatureController extends Controller
 
         return response()->json([
             'message' => $candidature->dans_vivier ? 'Candidature marquée comme étant dans le vivier.' : 'Candidature retirée du vivier.',
+            'data' => new CandidatureResource($candidature),
+        ]);
+    }
+
+    /**
+     * Rattacher une candidature (spontanée ou en vivier) à une offre d'emploi active
+     */
+    public function relierOffre(Request $request, int $id): JsonResponse
+    {
+        $validated = $request->validate([
+            'id_offre' => 'required|integer|exists:offre,id_offre',
+            'commentaire' => 'nullable|string|max:500',
+        ], [
+            'id_offre.required' => 'Veuillez sélectionner une offre d\'emploi.',
+            'id_offre.integer' => 'L\'identifiant de l\'offre est invalide.',
+            'id_offre.exists' => 'L\'offre d\'emploi sélectionnée n\'existe pas ou a été supprimée.',
+            'commentaire.max' => 'Le commentaire ne peut pas dépasser 500 caractères.',
+        ]);
+
+        $candidature = $this->candidatureService->relierOffre(
+            $id,
+            (int) $validated['id_offre'],
+            $validated['commentaire'] ?? null,
+            auth()->id()
+        );
+
+        return response()->json([
+            'message' => 'La candidature a été reliée avec succès à l\'offre.',
             'data' => new CandidatureResource($candidature),
         ]);
     }

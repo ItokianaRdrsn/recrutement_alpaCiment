@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import {
     BookmarkCheck,
@@ -9,6 +10,7 @@ import {
     Filter,
     GraduationCap,
     Layers,
+    Link2,
     Plus,
     RefreshCw,
     RotateCcw,
@@ -18,11 +20,12 @@ import {
     User,
     X,
 } from 'lucide-react';
-import { getJson, sendJson } from '../api/client';
-import { ErrorState, LoadingState } from '../components/common/FeedbackStates';
+import { getCachedJson, getJson, sendJson } from '../api/client';
+import { ErrorState, LoadingState, TableSkeleton, VivierSkeleton } from '../components/common/FeedbackStates';
 import { Pagination } from '../components/common/Pagination';
 import { formatDate } from '../utils/formatters';
 import { CandidatureDetailView } from './CandidatureDetailView';
+import { RelierOffreModal } from '../components/modals/RelierOffreModal';
 
 export function VivierView({ referentiels }) {
     const [vivierList, setVivierList] = useState([]);
@@ -31,7 +34,16 @@ export function VivierView({ referentiels }) {
     const [error, setError] = useState('');
     const [selectedCandidatureId, setSelectedCandidatureId] = useState(null);
     const [page, setPage] = useState(1);
-    const perPage = 10;
+    const [perPage, setPerPage] = useState(10);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const urlCandidatureId = searchParams.get('candidature') || searchParams.get('id');
+
+    useEffect(() => {
+        if (urlCandidatureId) {
+            setSelectedCandidatureId(Number(urlCandidatureId));
+        }
+    }, [urlCandidatureId]);
 
     // Modal state for searching & adding candidature to Vivier
     const [showAddModal, setShowAddModal] = useState(false);
@@ -39,31 +51,48 @@ export function VivierView({ referentiels }) {
     const [candSearchResults, setCandSearchResults] = useState([]);
     const [searchingCands, setSearchingCands] = useState(false);
     const [addingCandId, setAddingCandId] = useState(null);
+    const [relierModalItem, setRelierModalItem] = useState(null);
 
     const [filters, setFilters] = useState({ q: '', direction: '', domaine: '', statut: '' });
+    const [appliedFilters, setAppliedFilters] = useState({ q: '', direction: '', domaine: '', statut: '' });
+
+    // Charger les statuts une seule fois au montage
+    useEffect(() => {
+        let isMounted = true;
+        async function loadStatuts() {
+            try {
+                const statutsResponse = await getCachedJson('/api/referentiels/statuts-candidature');
+                if (isMounted) {
+                    setStatutsList(statutsResponse?.data ?? []);
+                }
+            } catch (err) {
+                console.error('Erreur chargement statuts:', err);
+            }
+        }
+        loadStatuts();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const loadVivier = useCallback(async () => {
         setLoading(true);
         setError('');
         try {
             const params = new URLSearchParams();
-            if (filters.q) params.set('q', filters.q);
-            if (filters.direction) params.set('direction', filters.direction);
-            if (filters.domaine) params.set('domaine', filters.domaine);
-            if (filters.statut) params.set('statut', filters.statut);
+            if (appliedFilters.q) params.set('q', appliedFilters.q);
+            if (appliedFilters.direction) params.set('direction', appliedFilters.direction);
+            if (appliedFilters.domaine) params.set('domaine', appliedFilters.domaine);
+            if (appliedFilters.statut) params.set('statut', appliedFilters.statut);
 
-            const [vivRes, statutsResponse] = await Promise.all([
-                getJson(`/api/vivier?${params.toString()}`),
-                getJson('/api/referentiels/statuts-candidature'),
-            ]);
+            const vivRes = await getJson(`/api/vivier?${params.toString()}`);
             setVivierList(vivRes?.data ?? []);
-            setStatutsList(statutsResponse?.data ?? []);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }, [filters]);
+    }, [appliedFilters]);
 
     useEffect(() => {
         loadVivier();
@@ -123,15 +152,31 @@ export function VivierView({ referentiels }) {
         }
     }
 
+    const handleApplyVivierFilters = () => {
+        setAppliedFilters({ ...filters });
+        setPage(1);
+    };
+
     const resetVivierFilters = () => {
-        setFilters({ q: '', direction: '', domaine: '', statut: '' });
+        const reset = { q: '', direction: '', domaine: '', statut: '' };
+        setFilters(reset);
+        setAppliedFilters(reset);
+        setPage(1);
     };
 
     if (selectedCandidatureId) {
         return (
             <CandidatureDetailView
                 idCandidature={selectedCandidatureId}
-                onBack={() => setSelectedCandidatureId(null)}
+                onBack={() => {
+                    setSelectedCandidatureId(null);
+                    setSearchParams((prev) => {
+                        const next = new URLSearchParams(prev);
+                        next.delete('candidature');
+                        next.delete('id');
+                        return next;
+                    });
+                }}
                 onRefreshList={loadVivier}
                 referentiels={referentiels}
                 statutsList={statutsList}
@@ -139,16 +184,23 @@ export function VivierView({ referentiels }) {
         );
     }
 
+    if (loading && vivierList.length === 0) {
+        return <VivierSkeleton />;
+    }
+
     return (
         <div className="view-stack">
-            {/* BARRE DE FILTRES ET BOUTON AJOUTER AU VIVIER STYLISÉ */}
+            {/* BARRE DE FILTRES ET BOUTON AJOUTER AU VIVIER HARMONISÉ */}
             <section className="filter-bar" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end', flex: 1 }}>
                     <label className="search-field" style={{ flex: '1 1 240px', minWidth: '200px' }}>
                         <Search size={18} />
                         <input
                             onChange={(e) => setFilters((curr) => ({ ...curr, q: e.target.value }))}
-                            placeholder="Rechercher dans le vivier (nom, email)..."
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleApplyVivierFilters();
+                            }}
+                            placeholder="Rechercher dans le vivier (nom, email, mot-clé CV)..."
                             type="search"
                             value={filters.q}
                         />
@@ -185,7 +237,7 @@ export function VivierView({ referentiels }) {
                     </label>
 
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <button className="filter-button" onClick={loadVivier} type="button">
+                        <button className="filter-button" onClick={handleApplyVivierFilters} type="button">
                             <Filter size={17} />
                             <span>Filtrer</span>
                         </button>
@@ -196,28 +248,13 @@ export function VivierView({ referentiels }) {
                     </div>
                 </div>
 
-                {/* BOUTON AJOUTER AU VIVIER STYLISÉ */}
+                {/* BOUTON AJOUTER AU VIVIER HARMONISÉ */}
                 <button
-                    className="primary-button"
+                    className="filter-button"
                     onClick={() => setShowAddModal(true)}
-                    style={{
-                        padding: '12px 20px',
-                        borderRadius: '10px',
-                        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                        color: '#ffffff',
-                        fontWeight: '600',
-                        fontSize: '14px',
-                        boxShadow: '0 6px 18px rgba(99, 102, 241, 0.35)',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        transition: 'transform 0.15s ease, boxShadow 0.15s ease',
-                    }}
                     type="button"
                 >
-                    <Plus size={18} />
+                    <Plus size={17} />
                     <span>Ajouter au vivier RH</span>
                 </button>
             </section>
@@ -235,10 +272,7 @@ export function VivierView({ referentiels }) {
                 </div>
 
                 {loading ? (
-                    <LoadingState
-                        message="Chargement du vivier de talents..."
-                        subtitle="Agrégation des candidatures et profils RH qualifiés"
-                    />
+                    <TableSkeleton rows={6} cols={6} />
                 ) : error ? (
                     <ErrorState message={error} onRetry={loadVivier} />
                 ) : !vivierList.length ? (
@@ -263,6 +297,11 @@ export function VivierView({ referentiels }) {
                                             <strong>{item.candidat?.prenom} {item.candidat?.nom}</strong>
                                             <br />
                                             <small>{item.candidat?.email}</small>
+                                            {item.cv_snippet && (
+                                                <div style={{ marginTop: '5px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fff1f0', border: '1px solid #fecaca', padding: '3px 8px', borderRadius: '5px', display: 'inline-block' }}>
+                                                    📄 <strong>Extrait CV :</strong> <em>{item.cv_snippet}</em>
+                                                </div>
+                                            )}
                                         </td>
                                         <td>
                                             <strong>{item.direction?.nom_direction ?? 'Toutes directions'}</strong>
@@ -275,15 +314,27 @@ export function VivierView({ referentiels }) {
                                         <td>
                                             <div style={{ display: 'flex', gap: '6px' }}>
                                                 {item.id_candidature ? (
-                                                    <button
-                                                        className="filter-button"
-                                                        onClick={() => setSelectedCandidatureId(item.id_candidature)}
-                                                        style={{ padding: '6px 12px', fontSize: '13px', gap: '6px' }}
-                                                        type="button"
-                                                    >
-                                                        <Eye size={15} />
-                                                        <span>Consulter dossier</span>
-                                                    </button>
+                                                    <>
+                                                        <button
+                                                            className="filter-button"
+                                                            onClick={() => setSelectedCandidatureId(item.id_candidature)}
+                                                            style={{ padding: '6px 12px', fontSize: '13px', gap: '6px' }}
+                                                            type="button"
+                                                        >
+                                                            <Eye size={15} />
+                                                            <span>Consulter dossier</span>
+                                                        </button>
+                                                        <button
+                                                            className="filter-button"
+                                                            onClick={() => setRelierModalItem(item)}
+                                                            style={{ padding: '6px 12px', fontSize: '13px', gap: '6px', color: '#059669', borderColor: '#a7f3d0', background: '#ecfdf5' }}
+                                                            title="Relier cette candidature à une offre d'emploi active"
+                                                            type="button"
+                                                        >
+                                                            <Link2 size={15} />
+                                                            <span>Relier à une offre</span>
+                                                        </button>
+                                                    </>
                                                 ) : null}
                                                 <button
                                                     className="row-button danger"
@@ -307,8 +358,14 @@ export function VivierView({ referentiels }) {
                         current_page: page,
                         last_page: Math.ceil(vivierList.length / perPage) || 1,
                         total: vivierList.length,
+                        from: vivierList.length > 0 ? (page - 1) * perPage + 1 : 0,
+                        to: Math.min(page * perPage, vivierList.length),
                     }}
                     onChangePage={(p) => setPage(p)}
+                    onChangePerPage={(n) => {
+                        setPerPage(n);
+                        setPage(1);
+                    }}
                     perPage={perPage}
                 />
             </section>
@@ -383,7 +440,11 @@ export function VivierView({ referentiels }) {
                         {/* LISTE DES CANDIDATURES TROUVÉES */}
                         <div style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
                             {searchingCands ? (
-                                <LoadingState />
+                                <div style={{ display: 'grid', gap: '8px', padding: '8px 0' }}>
+                                    {[1, 2, 3].map((i) => (
+                                        <div key={i} className="skeleton-box" style={{ height: '56px', borderRadius: '8px' }} />
+                                    ))}
+                                </div>
                             ) : !candSearchResults.length ? (
                                 <div className="empty-state" style={{ padding: '30px 20px' }}>
                                     Aucune candidature trouvée avec ce critère de recherche.
@@ -425,6 +486,11 @@ export function VivierView({ referentiels }) {
                                                     <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
                                                         {cand.candidat?.email} • Déposée le {formatDate(cand.created_at)}
                                                     </p>
+                                                    {cand.cv_snippet && (
+                                                        <div style={{ marginTop: '5px', fontSize: '11px', color: '#b91c1c', backgroundColor: '#fff1f0', border: '1px solid #fecaca', padding: '3px 8px', borderRadius: '5px', display: 'inline-block' }}>
+                                                            📄 <strong>Extrait CV :</strong> <em>{cand.cv_snippet}</em>
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 <div>
@@ -514,6 +580,19 @@ export function VivierView({ referentiels }) {
                     </div>
                 </div>,
                 document.body
+            )}
+            {relierModalItem && (
+                <RelierOffreModal
+                    candidature={{
+                        id_candidature: relierModalItem.id_candidature,
+                        candidat: relierModalItem.candidat,
+                        dans_vivier: true,
+                    }}
+                    onClose={() => setRelierModalItem(null)}
+                    onSuccess={async () => {
+                        await loadVivier();
+                    }}
+                />
             )}
         </div>
     );

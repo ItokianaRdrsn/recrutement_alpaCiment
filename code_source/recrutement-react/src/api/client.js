@@ -1,12 +1,40 @@
 const backendUrl = (import.meta.env.VITE_BACKEND_URL ?? 'http://127.0.0.1:8000').replace(/\/$/, '');
 
+const AUTH_TOKEN_KEY = 'alpha_ciment_auth_token';
+
 let redirectingToLogin = false;
+
+export function getAuthToken() {
+    return localStorage.getItem(AUTH_TOKEN_KEY);
+}
+
+export function setAuthToken(token) {
+    if (token) {
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+    } else {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+    }
+}
+
+export function clearAuthToken() {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+}
+
+function authHeaders(extraHeaders = {}) {
+    const token = getAuthToken();
+    return {
+        Accept: 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...extraHeaders,
+    };
+}
 
 export function backendPath(path) {
     return backendUrl ? `${backendUrl}${path}` : path;
 }
 
 export function redirectToLogin() {
+    clearAuthToken();
     if (redirectingToLogin || window.location.pathname === '/login') {
         return;
     }
@@ -54,63 +82,78 @@ export async function sendPublicFormData(url, formData, method = 'POST') {
     return payload;
 }
 
-export async function getJson(url) {
-    const fullUrl = url.startsWith('http') ? url : backendPath(url);
-    const response = await fetch(fullUrl, {
-        credentials: 'include',
-        headers: {
-            Accept: 'application/json',
-        },
-    });
+const inFlightRequests = new Map();
+const staticDataCache = new Map();
 
-    if (response.status === 401) {
-        redirectToLogin();
-        return null;
+export function invalidateCache(prefix = null) {
+    if (!prefix) {
+        staticDataCache.clear();
+        return;
     }
-
-    if (!response.ok) {
-        throw new Error(`Erreur HTTP ${response.status}`);
+    for (const key of staticDataCache.keys()) {
+        if (key.includes(prefix)) {
+            staticDataCache.delete(key);
+        }
     }
-
-    return response.json();
 }
 
-let csrfToken = null;
+export async function getCachedJson(url, ttlMs = 300000) {
+    const fullUrl = url.startsWith('http') ? url : backendPath(url);
+    const now = Date.now();
+    const entry = staticDataCache.get(fullUrl);
+    if (entry && now - entry.timestamp < ttlMs) {
+        return entry.data;
+    }
+    const data = await getJson(url);
+    if (data) {
+        staticDataCache.set(fullUrl, { timestamp: now, data });
+    }
+    return data;
+}
 
-export async function getCsrfToken() {
-    if (csrfToken) {
-        return csrfToken;
+export async function getJson(url) {
+    if (redirectingToLogin) {
+        return null;
+    }
+    const fullUrl = url.startsWith('http') ? url : backendPath(url);
+
+    // Déduplication des requêtes GET simultanées en vol (résout le double appel de React StrictMode)
+    if (inFlightRequests.has(fullUrl)) {
+        return inFlightRequests.get(fullUrl);
     }
 
-    try {
-        const fullUrl = backendPath('/api/csrf-token');
-        const response = await fetch(fullUrl, {
-            credentials: 'include',
-            headers: {
-                Accept: 'application/json',
-            },
-        });
-        if (response.ok) {
-            const data = await response.json();
-            csrfToken = data?.data?.token ?? '';
+    const requestPromise = (async () => {
+        try {
+            const response = await fetch(fullUrl, {
+                headers: authHeaders(),
+            });
+
+            if (response.status === 401) {
+                redirectToLogin();
+                return null;
+            }
+
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP ${response.status}`);
+            }
+
+            return await response.json();
+        } finally {
+            inFlightRequests.delete(fullUrl);
         }
-    } catch {
-        csrfToken = '';
-    }
+    })();
 
-    return csrfToken;
+    inFlightRequests.set(fullUrl, requestPromise);
+    return requestPromise;
 }
 
 export async function submitLogin({ email, password, remember = false }) {
     const fullUrl = backendPath('/api/login');
-    const token = await getCsrfToken();
     const response = await fetch(fullUrl, {
         method: 'POST',
-        credentials: 'include',
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token,
         },
         body: JSON.stringify({ email, password, remember }),
     });
@@ -127,21 +170,23 @@ export async function submitLogin({ email, password, remember = false }) {
         throw new Error(msg);
     }
 
+    if (payload?.data?.token) {
+        setAuthToken(payload.data.token);
+    }
+
     redirectingToLogin = false;
     return payload.data;
 }
 
 export async function sendJson(url, { body, method = 'POST' } = {}) {
     const fullUrl = url.startsWith('http') ? url : backendPath(url);
-    const token = await getCsrfToken();
+    const headers = authHeaders({
+        'Content-Type': 'application/json',
+    });
+
     const response = await fetch(fullUrl, {
         method,
-        credentials: 'include',
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token,
-        },
+        headers,
         body: body ? JSON.stringify(body) : undefined,
     });
 
@@ -170,14 +215,11 @@ export async function sendJson(url, { body, method = 'POST' } = {}) {
 
 export async function sendFormData(url, formData, method = 'POST') {
     const fullUrl = url.startsWith('http') ? url : backendPath(url);
-    const token = await getCsrfToken();
+    const headers = authHeaders();
+
     const response = await fetch(fullUrl, {
         method,
-        credentials: 'include',
-        headers: {
-            Accept: 'application/json',
-            'X-CSRF-TOKEN': token,
-        },
+        headers,
         body: formData,
     });
 
@@ -206,7 +248,7 @@ export async function submitLogout() {
     } catch {
         // Ignore logout errors
     } finally {
-        csrfToken = null;
+        clearAuthToken();
         redirectingToLogin = false;
         window.location.href = '/login';
     }

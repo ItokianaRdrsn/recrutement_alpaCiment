@@ -1,17 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
+    Activity,
     BriefcaseBusiness,
     Building2,
+    CalendarDays,
     ChevronDown,
     ChevronUp,
+    Cpu,
     Layers,
     LayoutDashboard,
     LogOut,
+    Mail,
+    ShieldAlert,
     Sparkles,
     UserCheck,
+    Users,
 } from 'lucide-react';
 import { submitLogout } from '../../api/client';
+
+function getInitials(name) {
+    if (!name) return 'RH';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
 export function AppShell({ children, user }) {
     const navigate = useNavigate();
@@ -36,10 +49,20 @@ export function AppShell({ children, user }) {
 
     const activeView = activePath.startsWith('/offres')
         ? 'offres'
+        : activePath.startsWith('/candidats')
+        ? 'candidats'
         : activePath.startsWith('/candidatures')
         ? 'candidatures'
         : activePath.startsWith('/vivier')
         ? 'vivier'
+        : activePath.startsWith('/agenda')
+        ? 'agenda'
+        : activePath.startsWith('/modeles-emails')
+        ? 'modeles-emails'
+        : activePath.startsWith('/audit-logs')
+        ? 'audit-logs'
+        : activePath.startsWith('/monitoring-pipeline')
+        ? 'monitoring-pipeline'
         : activePath.startsWith('/referentiels')
         ? 'referentiels'
         : 'dashboard';
@@ -65,11 +88,11 @@ export function AppShell({ children, user }) {
                 <div className="brand-block">
                     <img
                         src="/themes/custom/apiqa/images/logo-cut.png"
-                        alt="AlpA Ciment Logo"
+                        alt="Alpha Ciment Logo"
                         className="sidebar-logo-img"
                     />
                     <div>
-                        <strong>AlpA Ciment</strong>
+                        <strong>Alpha Ciment</strong>
                         <span>Portail Recrutement RH</span>
                     </div>
                 </div>
@@ -131,6 +154,20 @@ export function AppShell({ children, user }) {
                         <span>Candidatures spontanées</span>
                     </a>
 
+                    {/* CANDIDATS (ANNUAIRE) */}
+                    <a
+                        aria-current={activePath.startsWith('/candidats') ? 'page' : undefined}
+                        className={activePath.startsWith('/candidats') ? 'nav-link active' : 'nav-link'}
+                        href="/candidats"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/candidats');
+                        }}
+                    >
+                        <Users aria-hidden="true" size={18} />
+                        <span>Répertoire Candidats</span>
+                    </a>
+
                     {/* VIVIER & OCR */}
                     <a
                         aria-current={activePath === '/vivier' ? 'page' : undefined}
@@ -144,6 +181,64 @@ export function AppShell({ children, user }) {
                         <Layers aria-hidden="true" size={18} />
                         <span>Vivier</span>
                     </a>
+
+                    {/* AGENDA & RENDEZ-VOUS */}
+                    <a
+                        aria-current={activePath === '/agenda' ? 'page' : undefined}
+                        className={activePath === '/agenda' ? 'nav-link active' : 'nav-link'}
+                        href="/agenda"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/agenda');
+                        }}
+                    >
+                        <CalendarDays aria-hidden="true" size={18} />
+                        <span>Agenda & Tests</span>
+                    </a>
+
+                    {/* MODÈLES D'EMAILS */}
+                    <a
+                        aria-current={activePath === '/modeles-emails' ? 'page' : undefined}
+                        className={activePath === '/modeles-emails' ? 'nav-link active' : 'nav-link'}
+                        href="/modeles-emails"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/modeles-emails');
+                        }}
+                    >
+                        <Mail aria-hidden="true" size={18} />
+                        <span>Modèles d'e-mails</span>
+                    </a>
+
+                    {/* JOURNAL D'AUDIT */}
+                    <a
+                        aria-current={activePath === '/audit-logs' ? 'page' : undefined}
+                        className={activePath === '/audit-logs' ? 'nav-link active' : 'nav-link'}
+                        href="/audit-logs"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/audit-logs');
+                        }}
+                    >
+                        <Activity aria-hidden="true" size={18} />
+                        <span>Journal d'action</span>
+                    </a>
+
+                    {/* MONITORING PIPELINE IA & N8N (TEMPORAIREMENT COMMENTÉ SELON DEMANDE UTILISATEUR) */}
+                    {/*
+                    <a
+                        aria-current={activePath === '/monitoring-pipeline' ? 'page' : undefined}
+                        className={activePath === '/monitoring-pipeline' ? 'nav-link active' : 'nav-link'}
+                        href="/monitoring-pipeline"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            navigate('/monitoring-pipeline');
+                        }}
+                    >
+                        <Cpu aria-hidden="true" size={18} />
+                        <span>Monitoring Pipeline</span>
+                    </a>
+                    */}
 
                     {/* RÉFÉRENTIELS (CLIC SUR LE HEADER AFFICHE / MASQUE UNIQUEMENT LE MENU DÉROULANT SANS REDIRECTION AUTOMATIQUE) */}
                     <div
@@ -196,6 +291,12 @@ export function AppShell({ children, user }) {
                                 ? "Offres d'emploi"
                                 : activeView === 'vivier'
                                 ? 'Vivier'
+                                : activeView === 'agenda'
+                                ? 'Agenda des Entretiens & Tests'
+                                : activeView === 'audit-logs'
+                                ? "Journal d'action & Traçabilité"
+                                : activeView === 'monitoring-pipeline'
+                                ? 'Monitoring Pipeline IA & n8n'
                                 : activeView === 'referentiels'
                                 ? 'Référentiels'
                                 : 'Tableau de bord'}
@@ -203,12 +304,30 @@ export function AppShell({ children, user }) {
                     </div>
 
                     <div className="topbar-actions">
-                        <div className="user-chip">
-                            <span>{user?.name ?? 'Utilisateur'}</span>
-                            <small>{user?.role ?? '-'}</small>
+                        <div className="topbar-user-profile" title={user?.email ? `Connecté en tant que ${user.email}` : undefined}>
+                            <div className="topbar-user-avatar">
+                                <span className="topbar-avatar-initials">
+                                    {getInitials(user?.name)}
+                                </span>
+                                <span className="topbar-status-dot" title="Session active"></span>
+                            </div>
+                            <div className="topbar-user-meta">
+                                <span className="topbar-user-name">{user?.name ?? 'Utilisateur'}</span>
+                                <div className="topbar-user-role-wrap">
+                                    <span className={`topbar-role-pill ${user?.role === 'admin' ? 'is-admin' : ''}`}>
+                                        {user?.role ?? 'RH'}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                        <button className="icon-button danger" onClick={submitLogout} title="Se déconnecter" type="button">
-                            <LogOut aria-hidden="true" size={18} />
+
+                        <button 
+                            className="topbar-logout-btn" 
+                            onClick={submitLogout} 
+                            title="Se déconnecter" 
+                            type="button"
+                        >
+                            <LogOut aria-hidden="true" size={15} />
                             <span>Sortir</span>
                         </button>
                     </div>

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| API Routes - Plateforme Recrutement AlpA Ciment
+| API Routes - Plateforme Recrutement Alpha Ciment
 |--------------------------------------------------------------------------
 | Convention RESTful :
 |  - Pluriel (/offres, /candidatures, /directions) pour les collections/listes.
@@ -24,21 +24,20 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public Authentication & Session endpoints for React SPA
-Route::middleware(['web'])->group(function (): void {
-    Route::get('/csrf-token', fn () => response()->json([
-        'data' => [
-            'token' => csrf_token(),
-        ],
-    ]))->name('api.csrf-token');
+//RATE LIMITING 5 requete par minute throttle
+Route::post('/login', [SessionController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('api.login');
 
-    Route::post('/login', [SessionController::class, 'store'])->name('api.login');
-    Route::post('/logout', [SessionController::class, 'destroy'])->name('api.logout');
-});
+Route::post('/logout', [SessionController::class, 'destroy'])
+    ->middleware('auth:sanctum')
+    ->name('api.logout');
 
 // Public routes for candidates
 Route::get('/public/offres', [OffreController::class, 'publicIndex'])->name('api.public.offres.index');
 Route::get('/public/offre/{offre}', [OffreController::class, 'publicShow'])->name('api.public.offre.show');
 Route::get('/public/offres/{offre}', [OffreController::class, 'publicShow']); // Alias
+Route::post('/public/competences/rapprocher', [CompetenceController::class, 'rapprocher'])->name('api.public.competences.rapprocher');
 
 Route::post('/public/offre/{id}/postuler', [CandidatureController::class, 'postulerOffre'])->name('api.public.offre.postuler');
 Route::post('/public/offres/{id}/postuler', [CandidatureController::class, 'postulerOffre']); // Alias
@@ -46,15 +45,53 @@ Route::post('/public/offres/{id}/postuler', [CandidatureController::class, 'post
 Route::post('/public/candidature/spontanee', [CandidatureController::class, 'candidatureSpontanee'])->name('api.public.candidature.spontanee');
 Route::post('/public/candidature-spontanee', [CandidatureController::class, 'candidatureSpontanee']); // Alias
 Route::post('/public/import-candidature', [CandidatureController::class, 'importExternalCandidature'])->name('api.public.import-candidature');
+Route::post('/public/pipeline-metrics', [\App\Http\Controllers\Api\PipelineMetricController::class, 'storePublic'])->name('api.public.pipeline-metrics');
+Route::post('/public/pipeline-log-error', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Log::error('🚨 [PIPELINE N8N ERROR] ' . json_encode($request->all(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+    try {
+        \App\Models\AuditLog::create([
+            'id_utilisateur' => null,
+            'action' => 'erreur_pipeline',
+            'entite' => 'n8n_pipeline',
+            'id_entite' => null,
+            'description' => substr($request->input('alerte') ?: ($request->input('message_erreur') ?: 'Erreur pipeline n8n'), 0, 255),
+            'nouvelles_valeurs' => $request->all(),
+            'ip_adresse' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+    } catch (\Throwable $e) {
+        // En cas d'erreur audit_log, le log applicatif a déjà capturé l'incident
+    }
 
-// Protected Back-Office routes
-Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('pipeline_metrics')) {
+            \App\Models\PipelineMetric::create([
+                'id_candidature' => null,
+                'id_offre' => null,
+                'cle_idempotence' => $request->input('execution_id'),
+                'email_expediteur' => $request->input('sender_email'),
+                'sujet_email' => mb_substr((string) ($request->input('workflow_name') ?: 'Workflow n8n'), 0, 250),
+                'intention' => $request->input('intention', 'demande_emploi'),
+                'statut' => 'erreur',
+                'noeud_erreur' => mb_substr((string) ($request->input('noeud_fautif') ?: $request->input('failed_node') ?: 'Inconnu'), 0, 150),
+                'message_erreur' => $request->input('message_erreur') ?: $request->input('error_message') ?: json_encode($request->all(), JSON_UNESCAPED_UNICODE),
+            ]);
+        }
+    } catch (\Throwable $e) {
+        // Ignorer si table non migrée
+    }
+
+    return response()->json(['status' => 'logged', 'timestamp' => now()->toIso8601String()]);
+})->name('api.public.pipeline-log-error');
+
+// Protected Back-Office routes (Stateless Sanctum Bearer Token)
+Route::middleware(['auth:sanctum', 'role:'.implode(',', UserRole::backOfficeValues())])->group(function (): void {
     Route::get('/me', MeController::class)->name('api.me');
 
     Route::get('/dashboard', DashboardController::class)->name('api.dashboard');
     Route::get('/referentiels/recrutement', ReferentielController::class)->name('api.referentiels.recrutement');
     Route::get('/referentiels/statuts-candidature', [CandidatureController::class, 'statuts'])->name('api.referentiels.statuts-candidature');
-    
+
     Route::get('/lieux', [\App\Http\Controllers\Api\LieuController::class, 'index'])->name('api.lieux.index');
     Route::get('/niveaux', [\App\Http\Controllers\Api\NiveauController::class, 'index'])->name('api.niveaux.index');
 
@@ -75,18 +112,24 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     // --- ADMINISTRATION REFERENTIELS ---
     Route::middleware('permission:manage_referentiels')->group(function (): void {
         Route::post('/directions', [DirectionController::class, 'store'])->name('api.directions.store');
+        Route::post('/referentiels/directions', [DirectionController::class, 'store']); // Alias
         Route::put('/direction/{direction}', [DirectionController::class, 'update'])->name('api.direction.update');
         Route::put('/directions/{direction}', [DirectionController::class, 'update']); // Alias
+        Route::put('/referentiels/directions/{direction}', [DirectionController::class, 'update']); // Alias
         Route::delete('/direction/{direction}', [DirectionController::class, 'destroy'])->name('api.direction.destroy');
         Route::delete('/directions/{direction}', [DirectionController::class, 'destroy']); // Alias
+        Route::delete('/referentiels/directions/{direction}', [DirectionController::class, 'destroy']); // Alias
 
         Route::post('/domaines', [DomaineController::class, 'store'])->name('api.domaines.store');
+        Route::post('/referentiels/domaines', [DomaineController::class, 'store']); // Alias
         Route::put('/domaine/{domaine}', [DomaineController::class, 'update'])->name('api.domaine.update');
         Route::put('/domaines/{domaine}', [DomaineController::class, 'update']); // Alias
+        Route::put('/referentiels/domaines/{domaine}', [DomaineController::class, 'update']); // Alias
         Route::patch('/domaine/{domaine}/valider', [DomaineController::class, 'validateDomain'])->name('api.domaine.validate');
         Route::patch('/domaines/{domaine}/valider', [DomaineController::class, 'validateDomain']); // Alias
         Route::delete('/domaine/{domaine}', [DomaineController::class, 'destroy'])->name('api.domaine.destroy');
         Route::delete('/domaines/{domaine}', [DomaineController::class, 'destroy']); // Alias
+        Route::delete('/referentiels/domaines/{domaine}', [DomaineController::class, 'destroy']); // Alias
 
         Route::post('/competences', [CompetenceController::class, 'store'])->name('api.competences.store');
     });
@@ -111,10 +154,14 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     // --- CANDIDATURES ---
     Route::get('/candidatures', [CandidatureController::class, 'index'])->name('api.candidatures.index');
     Route::post('/candidatures/saisir-rh', [CandidatureController::class, 'saisirRh'])->name('api.candidatures.saisir-rh');
-    
+
     // Singular Candidature routes
     Route::get('/candidature/{id}', [CandidatureController::class, 'show'])->name('api.candidature.show');
     Route::get('/candidatures/{id}', [CandidatureController::class, 'show']); // Alias
+
+    // Ajout d'un document à une candidature existante (CV à jour, lettre, diplôme, autre pièce)
+    Route::post('/candidature/{id}/documents', [\App\Http\Controllers\Api\DocumentController::class, 'store'])->name('api.candidature.documents.store');
+    Route::post('/candidatures/{id}/documents', [\App\Http\Controllers\Api\DocumentController::class, 'store']); // Alias
 
     Route::patch('/candidature/{id}/marquer-vue', [CandidatureController::class, 'marquerVue'])->name('api.candidature.marquer-vue');
     Route::patch('/candidatures/{id}/marquer-vue', [CandidatureController::class, 'marquerVue']); // Alias
@@ -124,6 +171,21 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
 
     Route::patch('/candidature/{id}/vivier', [CandidatureController::class, 'updateVivierStatus'])->name('api.candidature.update-vivier');
     Route::patch('/candidatures/{id}/vivier', [CandidatureController::class, 'updateVivierStatus']); // Alias
+
+    // Rattachement d'une candidature à une offre d'emploi active
+    Route::post('/candidature/{id}/relier-offre', [CandidatureController::class, 'relierOffre'])->name('api.candidature.relier-offre');
+    Route::post('/candidatures/{id}/relier-offre', [CandidatureController::class, 'relierOffre']); // Alias
+
+    // --- CANDIDATS (Annuaire profils uniques) ---
+    Route::get('/candidats', [\App\Http\Controllers\Api\CandidatController::class, 'index'])->name('api.candidats.index');
+    // Doublons « doux » : déclarés AVANT /candidats/{id} pour ne pas être capturés par le paramètre
+    Route::get('/candidats/doublons', [\App\Http\Controllers\Api\CandidatController::class, 'doublons'])->name('api.candidats.doublons');
+    Route::get('/candidat/{id}/doublons', [\App\Http\Controllers\Api\CandidatController::class, 'doublonsDuCandidat'])->name('api.candidat.doublons');
+    Route::post('/candidat/{id}/fusionner', [\App\Http\Controllers\Api\CandidatController::class, 'fusionner'])->name('api.candidat.fusionner');
+    // RGPD : droit à l'effacement
+    Route::delete('/candidat/{id}/donnees', [\App\Http\Controllers\Api\CandidatController::class, 'effacer'])->name('api.candidat.effacer');
+    Route::get('/candidat/{id}', [\App\Http\Controllers\Api\CandidatController::class, 'show'])->name('api.candidat.show');
+    Route::get('/candidats/{id}', [\App\Http\Controllers\Api\CandidatController::class, 'show']); // Alias
 
     // OCR & Profile routes for candidature
     Route::post('/candidature/{id}/ocr/extract', [VivierController::class, 'extractOcr'])->name('api.candidature.ocr.extract');
@@ -144,8 +206,47 @@ Route::middleware(['web', 'auth', 'role:'.implode(',', UserRole::backOfficeValue
     Route::post('/candidature/{idCandidature}/formations', [VivierController::class, 'addFormation'])->name('api.candidature.add-formation');
     Route::post('/candidatures/{idCandidature}/formations', [VivierController::class, 'addFormation']); // Alias
 
+    Route::post('/candidature/{idCandidature}/projets', [VivierController::class, 'addProjet'])->name('api.candidature.add-projet');
+    Route::post('/candidatures/{idCandidature}/projets', [VivierController::class, 'addProjet']); // Alias
+
+    Route::post('/candidature/{idCandidature}/autres', [VivierController::class, 'addAutre'])->name('api.candidature.add-autre');
+    Route::post('/candidatures/{idCandidature}/autres', [VivierController::class, 'addAutre']); // Alias
+
+    // --- MATCHING CANDIDAT / OFFRE (Sprint 7) ---
+    Route::get('/candidature/{id}/matching', [\App\Http\Controllers\Api\MatchingController::class, 'candidature'])->name('api.candidature.matching');
+    Route::get('/offre/{id}/matching', [\App\Http\Controllers\Api\MatchingController::class, 'offre'])->name('api.offre.matching');
+    Route::post('/offre/{id}/matching/recalculer', [\App\Http\Controllers\Api\MatchingController::class, 'recalculer'])->name('api.offre.matching.recalculer');
+
     // --- VIVIER RH ---
     Route::get('/vivier', [VivierController::class, 'index'])->name('api.vivier.index');
     Route::post('/vivier', [VivierController::class, 'store'])->name('api.vivier.store');
     Route::delete('/vivier/{id}', [VivierController::class, 'destroy'])->name('api.vivier.destroy');
+
+    // --- MONITORING PIPELINE N8N / OCR / NER (P2 & P3) ---
+    Route::get('/pipeline-metrics', [\App\Http\Controllers\Api\PipelineMetricController::class, 'index'])->name('api.pipeline-metrics.index');
+
+    // --- JOURNAL D'AUDIT DES ACTIONS RH (Sprint 6) ---
+    Route::get('/audit-logs', [App\Http\Controllers\Api\AuditLogController::class, 'index'])->name('api.audit-logs.index');
+    Route::get('/audit/logs', [App\Http\Controllers\Api\AuditLogController::class, 'index']); // Alias
+
+    // --- GESTION DES RENDEZ-VOUS & AGENDA RH (Sprint 6) ---
+    Route::get('/rendez-vous/referentiels', [\App\Http\Controllers\Api\RendezVousController::class, 'referentiels'])->name('api.rendez-vous.referentiels');
+    Route::post('/rendez-vous/{rendezVous}/annuler', [\App\Http\Controllers\Api\RendezVousController::class, 'cancel'])->name('api.rendez-vous.cancel');
+    Route::apiResource('rendez-vous', \App\Http\Controllers\Api\RendezVousController::class)->parameters(['rendez-vous' => 'rendezVous']);
+
+    // --- MODULE DE COMMUNICATION & MODÈLES D'EMAILS (Sprint 6) ---
+    Route::get('/modeles-messages/referentiels', [\App\Http\Controllers\Api\ModeleMessageController::class, 'referentiels'])->name('api.modeles-messages.referentiels');
+    Route::post('/modeles-messages/apercu', [\App\Http\Controllers\Api\ModeleMessageController::class, 'apercu'])->name('api.modeles-messages.apercu');
+    Route::apiResource('modeles-messages', \App\Http\Controllers\Api\ModeleMessageController::class);
+
+    // Aliases pour modeles-emails
+    Route::get('/modeles-emails/referentiels', [\App\Http\Controllers\Api\ModeleMessageController::class, 'referentiels']);
+    Route::post('/modeles-emails/apercu', [\App\Http\Controllers\Api\ModeleMessageController::class, 'apercu']);
+    Route::apiResource('modeles-emails', \App\Http\Controllers\Api\ModeleMessageController::class);
+
+    Route::get('/candidature/{id}/communications', [\App\Http\Controllers\Api\CommunicationController::class, 'indexCandidature'])->name('api.candidature.communications.index');
+    Route::get('/candidatures/{id}/communications', [\App\Http\Controllers\Api\CommunicationController::class, 'indexCandidature']); // Alias
+    Route::post('/candidature/{id}/communications', [\App\Http\Controllers\Api\CommunicationController::class, 'envoyer'])->name('api.candidature.communications.envoyer');
+    Route::post('/candidatures/{id}/communications', [\App\Http\Controllers\Api\CommunicationController::class, 'envoyer']); // Alias
 });
+

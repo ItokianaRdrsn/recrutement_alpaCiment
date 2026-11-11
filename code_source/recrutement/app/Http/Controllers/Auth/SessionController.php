@@ -50,11 +50,16 @@ class SessionController extends Controller
                 ->onlyInput('email');
         }
 
-        $request->session()->regenerate();
-        $request->session()->forget('url.intended');
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+            $request->session()->forget('url.intended');
+        }
 
         if ($request->wantsJson() || $request->is('api/*')) {
             $user = Auth::user();
+            $expiresAt = now()->addHours(8);
+            $token = $user->createToken('auth-token', ['*'], $expiresAt)->plainTextToken;
+
             return response()->json([
                 'message' => 'Connexion réussie',
                 'data' => [
@@ -64,6 +69,8 @@ class SessionController extends Controller
                     'role' => $user->role,
                     'role_label' => $user->roleEnum()?->label(),
                     'permissions' => $user->permissions(),
+                    'token' => $token,
+                    'expires_at' => $expiresAt->toIso8601String(),
                 ],
             ]);
         }
@@ -74,16 +81,33 @@ class SessionController extends Controller
 
     public function destroy(Request $request): JsonResponse|RedirectResponse
     {
-        Auth::logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
         if ($request->wantsJson() || $request->is('api/*')) {
+            $user = $request->user();
+            if ($user && method_exists($user, 'currentAccessToken')) {
+                $token = $user->currentAccessToken();
+                if ($token instanceof \Laravel\Sanctum\PersonalAccessToken) {
+                    $token->delete();
+                }
+            }
+
+            if (Auth::guard('web')->check()) {
+                Auth::guard('web')->logout();
+            }
+
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+
             return response()->json([
                 'message' => 'Déconnexion réussie',
             ]);
         }
+
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         $frontendUrl = rtrim((string) config('app.frontend_url'), '/');
         return redirect()->to($frontendUrl ? $frontendUrl.'/login' : route('login'));

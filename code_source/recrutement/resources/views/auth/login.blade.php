@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Connexion - Recrutement AlpA Ciment</title>
+        <title>Connexion - Recrutement Alpha Ciment</title>
         <style>
             :root {
                 color-scheme: light;
@@ -117,7 +117,7 @@
     <body>
         <main>
             <h1>Back-office recrutement</h1>
-            <p>Connexion a l'espace RH AlpA Ciment.</p>
+            <p>Connexion a l'espace RH Alpha Ciment.</p>
 
             <form method="POST" action="{{ route('login.store') }}">
                 @csrf

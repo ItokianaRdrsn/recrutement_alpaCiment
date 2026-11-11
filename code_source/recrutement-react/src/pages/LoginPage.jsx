@@ -1,13 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Eye, EyeOff, Lock, LogIn, Mail, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
+import { 
+    AlertCircle, 
+    ArrowRight, 
+    Eye, 
+    EyeOff, 
+    Lock, 
+    LogIn, 
+    Mail, 
+    ShieldCheck, 
+    Sparkles, 
+    Users 
+} from 'lucide-react';
 import { submitLogin } from '../api/client';
+import './LoginPage.css';
 
 export function LoginPage({ onLoginSuccess }) {
     const navigate = useNavigate();
     const [email, setEmail] = useState('admin@alphaciment.local');
     const [password, setPassword] = useState('password');
-    const [remember, setRemember] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -21,7 +32,6 @@ export function LoginPage({ onLoginSuccess }) {
             const userData = await submitLogin({
                 email: email.trim(),
                 password,
-                remember,
             });
 
             if (onLoginSuccess) {
@@ -43,249 +53,134 @@ export function LoginPage({ onLoginSuccess }) {
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
-            padding: '24px',
-            fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-        }}>
-            <div style={{
-                maxWidth: '440px',
-                width: '100%',
-                background: '#ffffff',
-                borderRadius: '16px',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-                overflow: 'hidden',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-            }}>
-                {/* Header branding */}
-                <div style={{
-                    background: 'linear-gradient(135deg, #D40B00 0%, #FF0D00 100%)',
-                    padding: '30px 28px 22px',
-                    color: '#ffffff',
-                    textAlign: 'center',
-                }}>
-                    <div style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '6px 14px',
-                        borderRadius: '12px',
-                        background: '#ffffff',
-                        marginBottom: '14px',
-                        boxShadow: '0 8px 20px rgba(0, 0, 0, 0.25)',
-                    }}>
-                        <img
-                            src="/logo/logo-cut.png"
-                            alt="AlpA Ciment Logo"
-                            style={{ height: '42px', width: 'auto', display: 'block' }}
-                        />
+        <div className="login-page-wrapper">
+            <div className="login-tablet-card">
+                {/* Colonne gauche : Présentation & Marque */}
+                <div className="login-brand-panel">
+                    <div className="login-brand-header">
+                        <div className="login-logo-container">
+                            <img
+                                src="/logo/logo-cut.png"
+                                alt="Alpha Ciment Logo"
+                                className="login-logo-img"
+                            />
+                        </div>
+                        <div>
+                            <h1 className="login-brand-title">Alpha Ciment</h1>
+                            <p className="login-brand-tagline">
+                                Plateforme Recrutement & Gestion des Talents
+                            </p>
+                        </div>
                     </div>
-                    <h1 style={{
-                        fontSize: '22px',
-                        fontWeight: '700',
-                        margin: '0 0 6px',
-                        letterSpacing: '-0.3px',
-                    }}>
-                        AlpA Ciment
-                    </h1>
-                    <p style={{
-                        fontSize: '13.5px',
-                        color: 'rgba(255, 255, 255, 0.85)',
-                        margin: 0,
-                    }}>
-                        Plateforme Recrutement & Gestion des Talents
-                    </p>
+
+                    <div className="login-features-list">
+                        <div className="login-feature-item">
+                            <div className="login-feature-icon">
+                                <Users size={17} />
+                            </div>
+                            <div className="login-feature-content">
+                                <strong>Gestion Centralisée RH</strong>
+                                <span>Suivi complet des offres, candidatures et vivier de profils.</span>
+                            </div>
+                        </div>
+
+                        <div className="login-feature-item">
+                            <div className="login-feature-icon">
+                                <Sparkles size={17} />
+                            </div>
+                            <div className="login-feature-content">
+                                <strong>Intelligence CV & OCR</strong>
+                                <span>Extraction automatique des compétences et classement assisté.</span>
+                            </div>
+                        </div>
+
+                        <div className="login-feature-item">
+                            <div className="login-feature-icon">
+                                <ShieldCheck size={17} />
+                            </div>
+                            <div className="login-feature-content">
+                                <strong>Sécurité & Traçabilité</strong>
+                                <span>Authentification Sanctum et journal d'audit des actions RH.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="login-brand-footer">
+                        <span>Alpha Ciment Madagascar</span>
+                        <div className="login-badge-pill">
+                            <span className="login-badge-dot"></span>
+                            <span>Espace Sécurisé</span>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Form area */}
-                <div style={{ padding: '28px' }}>
-                    <div style={{ marginBottom: '20px' }}>
-                        <h2 style={{
-                            fontSize: '17px',
-                            fontWeight: '600',
-                            color: '#0f172a',
-                            margin: '0 0 4px',
-                        }}>
-                            Connexion au Back-Office
-                        </h2>
-                        <p style={{
-                            fontSize: '13px',
-                            color: '#64748b',
-                            margin: 0,
-                        }}>
-                            Entrez vos identifiants pour accéder à l'espace RH
+                {/* Colonne droite : Formulaire de Connexion */}
+                <div className="login-form-panel">
+                    <div className="login-form-header">
+                        <h2 className="login-form-title">Connexion</h2>
+                        <p className="login-form-subtitle">
+                            Entrez vos identifiants pour accéder à votre espace RH
                         </p>
                     </div>
 
                     {errorMessage && (
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'flex-start',
-                            gap: '10px',
-                            padding: '12px 14px',
-                            background: '#fef2f2',
-                            border: '1px solid #fecaca',
-                            borderRadius: '8px',
-                            color: '#991b1b',
-                            fontSize: '13px',
-                            marginBottom: '18px',
-                            lineHeight: '1.4',
-                        }}>
-                            <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '1px' }} />
+                        <div className="login-error-alert" role="alert">
+                            <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
                             <span>{errorMessage}</span>
                         </div>
                     )}
 
                     <form onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: '16px' }}>
-                            <label style={{
-                                display: 'block',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                color: '#334155',
-                                marginBottom: '6px',
-                            }}>
+                        <div className="login-field-group">
+                            <label className="login-label" htmlFor="login-email">
                                 Adresse E-mail
                             </label>
-                            <div style={{ position: 'relative' }}>
-                                <Mail size={16} style={{
-                                    position: 'absolute',
-                                    left: '12px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    color: '#94a3b8',
-                                }} />
+                            <div className="login-input-wrapper">
+                                <Mail size={16} className="login-input-icon" />
                                 <input
+                                    id="login-email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="nom@alphaciment.local"
                                     required
                                     autoFocus
-                                    style={{
-                                        width: '100%',
-                                        height: '42px',
-                                        padding: '0 12px 0 38px',
-                                        borderRadius: '8px',
-                                        border: '1px solid #cbd5e1',
-                                        fontSize: '13.5px',
-                                        color: '#0f172a',
-                                        boxSizing: 'border-box',
-                                        outline: 'none',
-                                        transition: 'border-color 0.2s',
-                                    }}
+                                    className="login-input"
                                 />
                             </div>
                         </div>
 
-                        <div style={{ marginBottom: '18px' }}>
-                            <label style={{
-                                display: 'block',
-                                fontSize: '13px',
-                                fontWeight: '600',
-                                color: '#334155',
-                                marginBottom: '6px',
-                            }}>
+                        <div className="login-field-group">
+                            <label className="login-label" htmlFor="login-password">
                                 Mot de passe
                             </label>
-                            <div style={{ position: 'relative' }}>
-                                <Lock size={16} style={{
-                                    position: 'absolute',
-                                    left: '12px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    color: '#94a3b8',
-                                }} />
+                            <div className="login-input-wrapper">
+                                <Lock size={16} className="login-input-icon" />
                                 <input
+                                    id="login-password"
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="••••••••"
                                     required
-                                    style={{
-                                        width: '100%',
-                                        height: '42px',
-                                        padding: '0 40px 0 38px',
-                                        borderRadius: '8px',
-                                        border: '1px solid #cbd5e1',
-                                        fontSize: '13.5px',
-                                        color: '#0f172a',
-                                        boxSizing: 'border-box',
-                                        outline: 'none',
-                                    }}
+                                    className="login-input login-input-password"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
                                     tabIndex={-1}
-                                    style={{
-                                        position: 'absolute',
-                                        right: '12px',
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        background: 'transparent',
-                                        border: 'none',
-                                        padding: 0,
-                                        cursor: 'pointer',
-                                        color: '#64748b',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                    }}
+                                    className="login-toggle-password"
+                                    aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                                 >
                                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
                             </div>
                         </div>
 
-                        {/* <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginBottom: '22px',
-                        }}>
-                            <label style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                fontSize: '13px',
-                                color: '#475569',
-                                cursor: 'pointer',
-                                userSelect: 'none',
-                            }}>
-                                <input
-                                    type="checkbox"
-                                    checked={remember}
-                                    onChange={(e) => setRemember(e.target.checked)}
-                                    style={{ width: '15px', height: '15px', accentColor: '#FF0D00' }}
-                                />
-                                Se souvenir de moi
-                            </label>
-                        </div> */}
-
                         <button
                             type="submit"
                             disabled={loading}
-                            style={{
-                                width: '100%',
-                                height: '44px',
-                                background: loading ? '#fca5a5' : 'linear-gradient(135deg, #D40B00 0%, #FF0D00 100%)',
-                                color: '#ffffff',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                fontWeight: '600',
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '8px',
-                                boxShadow: '0 4px 14px rgba(255, 13, 0, 0.3)',
-                                transition: 'all 0.2s',
-                            }}
+                            className="login-submit-button"
                         >
                             {loading ? (
                                 <span>Connexion en cours...</span>
@@ -298,80 +193,36 @@ export function LoginPage({ onLoginSuccess }) {
                         </button>
                     </form>
 
-                    {/* Quick Login Helpers for dev / demo */}
-                    <div style={{
-                        marginTop: '24px',
-                        paddingTop: '18px',
-                        borderTop: '1px solid #f1f5f9',
-                    }}>
-                        <div style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            color: '#64748b',
-                            marginBottom: '10px',
-                        }}>
+                    {/* Comptes de démonstration */}
+                    <div className="login-demo-container">
+                        <div className="login-demo-title">
                             <Sparkles size={14} color="#f59e0b" />
-                            <span>Comptes de démonstration (clic rapide) :</span>
+                            <span>Comptes de démonstration :</span>
                         </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        <div className="login-demo-buttons">
                             <button
                                 type="button"
                                 onClick={() => handleQuickLogin('admin@alphaciment.local')}
-                                style={{
-                                    fontSize: '12px',
-                                    padding: '5px 10px',
-                                    background: '#f8fafc',
-                                    border: '1px solid #e2e8f0',
-                                    borderRadius: '6px',
-                                    color: '#1e293b',
-                                    cursor: 'pointer',
-                                    fontWeight: '500',
-                                }}
+                                className="login-demo-btn"
                             >
                                 Administrateur
                             </button>
                             <button
                                 type="button"
                                 onClick={() => handleQuickLogin('rh@alphaciment.local')}
-                                style={{
-                                    fontSize: '12px',
-                                    padding: '5px 10px',
-                                    background: '#f8fafc',
-                                    border: '1px solid #e2e8f0',
-                                    borderRadius: '6px',
-                                    color: '#1e293b',
-                                    cursor: 'pointer',
-                                    fontWeight: '500',
-                                }}
+                                className="login-demo-btn"
                             >
                                 Responsable RH
                             </button>
                         </div>
                     </div>
 
-                    {/* Public Portal Link */}
-                    <div style={{
-                        marginTop: '20px',
-                        textAlign: 'center',
-                    }}>
+                    {/* Lien Portail Public */}
+                    <div className="login-public-portal">
                         <button
                             type="button"
                             onClick={() => navigate('/candidat/offres')}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: '#2563eb',
-                                fontSize: '13px',
-                                fontWeight: '500',
-                                cursor: 'pointer',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '6px',
-                                padding: '4px 8px',
-                            }}
+                            className="login-public-link"
                         >
                             <span>Espace Candidat Public</span>
                             <ArrowRight size={14} />

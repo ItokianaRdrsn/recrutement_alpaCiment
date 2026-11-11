@@ -26,8 +26,8 @@ export function DirectionModal({ direction = null, onClose, onSuccess }) {
 
         try {
             const endpoint = direction
-                ? `/api/referentiels/directions/${direction.id}`
-                : '/api/referentiels/directions';
+                ? `/api/directions/${direction.id}`
+                : '/api/directions';
             const method = direction ? 'PUT' : 'POST';
 
             const res = await sendJson(endpoint, {
