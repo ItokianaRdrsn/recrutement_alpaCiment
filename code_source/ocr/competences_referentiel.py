@@ -29,6 +29,18 @@ def normaliser(nom: Optional[str]) -> str:
     return re.sub(r"\s+", " ", texte).strip(" \t.,;:-")
 
 
+_PREFIXE_LANGUE = re.compile(r"^\s*langues?\s*:\s*", re.IGNORECASE)
+
+
+def retirer_prefixe_langue(competences: Any) -> None:
+    """Retire le préfixe « Langue : » des noms de compétences (modification sur place) : « Langue : Français » -> « Français »."""
+    for comp in competences or []:
+        if isinstance(comp, dict) and isinstance(comp.get("nom"), str):
+            nom = _PREFIXE_LANGUE.sub("", comp["nom"]).strip()
+            if nom:
+                comp["nom"] = nom
+
+
 def rapprocher_competences(noms: List[str]) -> Dict[str, Dict[str, Any]]:
     """
     Interroge Laravel. Retourne {nom_recherché_normalisé: {"existe": bool, "competence": str|None, "methode": str}}.

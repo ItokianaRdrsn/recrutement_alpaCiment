@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import requests
 
-from competences_referentiel import appliquer_rapprochement, normaliser, rapprocher_competences
+from competences_referentiel import appliquer_rapprochement, normaliser, rapprocher_competences, retirer_prefixe_langue
 from cv_llm_parser import parse_cv_with_llm
 
 
@@ -84,3 +84,15 @@ def test_parse_cv_continue_si_le_rapprochement_est_indisponible():
     with patch("cv_llm_parser.chat_json", return_value=llm):
         res = parse_cv_with_llm("Marc, python")
     assert res["competences"][0]["nom"] == "python"
+
+
+def test_retirer_prefixe_langue_garde_le_nom_de_la_langue():
+    comps = [
+        {"nom": "Langue : Français", "niveau": "Avancé"},
+        {"nom": "langue:Anglais"},
+        {"nom": "Langues : Malagasy"},
+        {"nom": "Python"},
+        {"nom": "Langue :"},
+    ]
+    retirer_prefixe_langue(comps)
+    assert [c["nom"] for c in comps] == ["Français", "Anglais", "Malagasy", "Python", "Langue :"]

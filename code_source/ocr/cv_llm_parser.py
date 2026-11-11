@@ -30,7 +30,7 @@ from ollama_client import (
     chat_json,
     is_available as is_ollama_available,
 )
-from competences_referentiel import appliquer_rapprochement, rapprocher_competences
+from competences_referentiel import appliquer_rapprochement, rapprocher_competences, retirer_prefixe_langue
 from schemas import CvStructuredSchema
 
 logger = logging.getLogger("AlphaCimentOCR.llm")
@@ -58,7 +58,7 @@ SCHÉMA JSON OBLIGATOIRE À RETOURNER :
   "profil": "Bref résumé ou accroche professionnelle du candidat (ou null)",
   "competences": [
     {
-      "nom": "Nom de la compétence, technologie, outil ou langue (ex: Langue : Français, Python, Gestion d'équipe)",
+      "nom": "Nom de la compétence, technologie, outil ou langue (ex: Français, Python, Gestion d'équipe)",
       "niveau": "Débutant | Intermédiaire | Avancé | Expert (Intermédiaire si le CV ne précise aucun niveau)"
     }
   ],
@@ -104,8 +104,8 @@ CONSIGNES STRICTES D'EXTRACTION :
 ==============================
 1. FORMAT DE SORTIE : Réponds UNIQUEMENT avec le bloc JSON brut. Aucun texte d'introduction, aucun commentaire, aucune balise Markdown.
 2. TÉLÉPHONE : Recopie le numéro EXACTEMENT comme il apparaît dans le texte brut (ex: si le texte indique '032 48 429 39', renvoie '032 48 429 39'. Ne le convertis JAMAIS en '+261').
-3. LANGUES DANS COMPÉTENCES : Toutes les langues mentionnées (ex: Malagasy, Français, Anglais) DOIVENT être incluses dans le tableau "competences" avec le format 'Langue : [Nom]' (ex: 'Langue : Français', niveau: 'Avancé').
-3 bis. COMPÉTENCES ATOMIQUES : Une compétence = une seule capacité, technologie ou outil précis. Un titre de rubrique (ex: "Réseaux & Télécoms", "Datacom & Sécurité", "Compétences techniques", "Informatique") n'est JAMAIS une compétence : ne le recopie pas. Éclate la liste qui le suit en autant de compétences distinctes. Exemple : "Réseaux & Télécoms : Réseaux mobiles, configuration et simulation de systèmes réseau, surveys et documentation de sites télécoms" donne 4 compétences : "Réseaux mobiles", "Configuration et simulation de systèmes réseau", "Surveys de sites télécoms", "Documentation de sites télécoms". Exemple : "Datacom & Sécurité : notions Datacom (Huawei), fondamentaux de cybersécurité réseau" donne "Datacom (Huawei)" et "Cybersécurité réseau". Retire les mots de niveau ("notions de", "fondamentaux de", "maîtrise de") du nom et utilise-les pour renseigner "niveau" (notions / fondamentaux = Débutant). Si le CV ne précise aucun niveau, mets "Intermédiaire". N'attribue "Avancé" ou "Expert" que si le CV l'écrit explicitement (n'invente JAMAIS un niveau supérieur). Cette règle ne concerne pas les langues : elles restent obligatoirement dans "competences" au format 'Langue : [Nom]' (règle 3), jamais dans "autres".
+3. LANGUES DANS COMPÉTENCES : Toutes les langues mentionnées (ex: Malagasy, Français, Anglais) DOIVENT être incluses dans le tableau "competences" en écrivant uniquement le nom de la langue, sans préfixe « Langue : » (ex: 'Français', niveau: 'Avancé').
+3 bis. COMPÉTENCES ATOMIQUES : Une compétence = une seule capacité, technologie ou outil précis. Un titre de rubrique (ex: "Réseaux & Télécoms", "Datacom & Sécurité", "Compétences techniques") n'est JAMAIS une compétence : ne le recopie pas. Éclate la liste qui le suit en autant de compétences distinctes. Exemple : "Réseaux & Télécoms : Réseaux mobiles, configuration et simulation de systèmes réseau, surveys et documentation de sites télécoms" donne 4 compétences : "Réseaux mobiles", "Configuration et simulation de systèmes réseau", "Surveys de sites télécoms", "Documentation de sites télécoms". Exemple : "Datacom & Sécurité : notions Datacom (Huawei), fondamentaux de cybersécurité réseau" donne "Datacom (Huawei)" et "Cybersécurité réseau". Retire les mots de niveau ("notions de", "fondamentaux de", "maîtrise de") du nom et utilise-les pour renseigner "niveau" (notions / fondamentaux = Débutant). Si le CV ne précise aucun niveau, mets "Intermédiaire". N'attribue "Avancé" ou "Expert" que si le CV l'écrit explicitement (n'invente JAMAIS un niveau supérieur). Cette règle ne concerne pas les langues : elles restent obligatoirement dans "competences", sous leur seul nom (règle 3), jamais dans "autres".
 4. DISSOCIATION OBLIGATOIRE :
    - "experiences" : Uniquement les emplois réels en entreprise (CDI, CDD, stages conventionnés).
    - "projets" : Projets académiques, projets d'école, projets personnels, hackathons. Ne place JAMAIS un projet d'école dans les expériences !
@@ -349,6 +349,10 @@ Extrais les informations sous forme de JSON valide conforme au schéma attendu."
             warnings.append(f"Validation partielle du modèle : {str(val_err)}")
         else:
             raise InvalidModelOutput(f"Le format retourné par le LLM est invalide : {str(val_err)}")
+
+    # 3 quinquies. Langues : le nom seul (« Français »), jamais « Langue : Français », même si le modèle met le préfixe
+    if isinstance(result_dict.get("competences"), list):
+        retirer_prefixe_langue(result_dict["competences"])
 
     # 3 quater. Niveau des compétences : valeurs canoniques, « Intermédiaire » quand le CV ne précise rien
     if isinstance(result_dict.get("competences"), list):
